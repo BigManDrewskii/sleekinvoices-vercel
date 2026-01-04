@@ -716,3 +716,8 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] Write vitest tests for invoice operations
 - [x] Run all tests and ensure they pass
 - [x] Create final checkpoint
+
+- [x] Theme Update: Apply new dark blue color scheme
+  - [x] Update CSS variables in index.css
+  - [x] Update dark theme colors
+  - [x] Test all components with new theme
