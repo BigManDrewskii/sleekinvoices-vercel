@@ -53,6 +53,11 @@ export default function Analytics() {
     { timeRange },
     { enabled: isAuthenticated }
   );
+  
+  const { data: expenseStats } = trpc.expenses.stats.useQuery(
+    { months: 6 },
+    { enabled: isAuthenticated }
+  );
 
   if (loading || isLoading) {
     return (
@@ -220,6 +225,64 @@ export default function Analytics() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Profit & Loss */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Profit & Loss Overview</CardTitle>
+              <CardDescription>Revenue vs Expenses (Last 6 months)</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Total Revenue</p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {formatCurrency(parseFloat(analytics?.totalRevenue?.toString() || "0"))}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Total Expenses</p>
+                  <p className="text-3xl font-bold text-red-600">
+                    {formatCurrency(parseFloat(expenseStats?.totalExpenses?.toString() || "0"))}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">Net Profit</p>
+                  <p className={`text-3xl font-bold ${
+                    (parseFloat(analytics?.totalRevenue?.toString() || "0") - parseFloat(expenseStats?.totalExpenses?.toString() || "0")) >= 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}>
+                    {formatCurrency(
+                      parseFloat(analytics?.totalRevenue?.toString() || "0") - parseFloat(expenseStats?.totalExpenses?.toString() || "0")
+                    )}
+                  </p>
+                </div>
+              </div>
+              
+              {expenseStats?.expensesByCategory && expenseStats.expensesByCategory.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-semibold mb-4">Expenses by Category</h4>
+                  <div className="space-y-3">
+                    {expenseStats.expensesByCategory.map((cat: any) => (
+                      <div key={cat.categoryId} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: cat.categoryColor || "#3B82F6" }}
+                          />
+                          <span className="text-sm">{cat.categoryName || "Uncategorized"}</span>
+                        </div>
+                        <span className="text-sm font-semibold">
+                          {formatCurrency(parseFloat(cat.total))}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

@@ -15,6 +15,13 @@
       "when": 1767513883366,
       "tag": "0001_outgoing_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767517859152,
+      "tag": "0002_complete_sentry",
+      "breakpoints": true
     }
   ]
 }

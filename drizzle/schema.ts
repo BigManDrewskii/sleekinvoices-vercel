@@ -132,3 +132,130 @@ export const emailLog = mysqlTable("emailLog", {
 
 export type EmailLog = typeof emailLog.$inferSelect;
 export type InsertEmailLog = typeof emailLog.$inferInsert;
+
+/**
+ * Recurring invoices for automated invoice generation
+ */
+export const recurringInvoices = mysqlTable("recurringInvoices", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  clientId: int("clientId").notNull(),
+  
+  // Recurrence settings
+  frequency: mysqlEnum("frequency", ["weekly", "monthly", "yearly"]).notNull(),
+  startDate: timestamp("startDate").notNull(),
+  endDate: timestamp("endDate"), // nullable - null means no end date
+  nextInvoiceDate: timestamp("nextInvoiceDate").notNull(),
+  
+  // Invoice template data
+  invoiceNumberPrefix: varchar("invoiceNumberPrefix", { length: 50 }).notNull(),
+  taxRate: decimal("taxRate", { precision: 5, scale: 2 }).default("0").notNull(),
+  discountType: mysqlEnum("discountType", ["percentage", "fixed"]).default("percentage"),
+  discountValue: decimal("discountValue", { precision: 10, scale: 2 }).default("0").notNull(),
+  notes: text("notes"),
+  paymentTerms: text("paymentTerms"),
+  
+  // Status
+  isActive: boolean("isActive").default(true).notNull(),
+  lastGeneratedAt: timestamp("lastGeneratedAt"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RecurringInvoice = typeof recurringInvoices.$inferSelect;
+export type InsertRecurringInvoice = typeof recurringInvoices.$inferInsert;
+
+/**
+ * Line items template for recurring invoices
+ */
+export const recurringInvoiceLineItems = mysqlTable("recurringInvoiceLineItems", {
+  id: int("id").autoincrement().primaryKey(),
+  recurringInvoiceId: int("recurringInvoiceId").notNull(),
+  description: text("description").notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull(),
+  rate: decimal("rate", { precision: 10, scale: 2 }).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type RecurringInvoiceLineItem = typeof recurringInvoiceLineItems.$inferSelect;
+export type InsertRecurringInvoiceLineItem = typeof recurringInvoiceLineItems.$inferInsert;
+
+/**
+ * Custom invoice templates for branding
+ */
+export const invoiceTemplates = mysqlTable("invoiceTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  isDefault: boolean("isDefault").default(false).notNull(),
+  
+  // Color scheme
+  primaryColor: varchar("primaryColor", { length: 7 }).default("#3b82f6").notNull(), // hex color
+  secondaryColor: varchar("secondaryColor", { length: 7 }).default("#64748b").notNull(),
+  accentColor: varchar("accentColor", { length: 7 }).default("#10b981").notNull(),
+  
+  // Typography
+  fontFamily: varchar("fontFamily", { length: 50 }).default("Inter").notNull(),
+  fontSize: int("fontSize").default(14).notNull(),
+  
+  // Layout options
+  logoPosition: mysqlEnum("logoPosition", ["left", "center", "right"]).default("left").notNull(),
+  showCompanyAddress: boolean("showCompanyAddress").default(true).notNull(),
+  showPaymentTerms: boolean("showPaymentTerms").default(true).notNull(),
+  footerText: text("footerText"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InvoiceTemplate = typeof invoiceTemplates.$inferSelect;
+export type InsertInvoiceTemplate = typeof invoiceTemplates.$inferInsert;
+
+/**
+ * Expense categories for organization
+ */
+export const expenseCategories = mysqlTable("expenseCategories", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  color: varchar("color", { length: 7 }).default("#64748b").notNull(), // hex color
+  icon: varchar("icon", { length: 50 }).default("receipt").notNull(), // lucide icon name
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ExpenseCategory = typeof expenseCategories.$inferSelect;
+export type InsertExpenseCategory = typeof expenseCategories.$inferInsert;
+
+/**
+ * Expenses for profit/loss tracking
+ */
+export const expenses = mysqlTable("expenses", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  categoryId: int("categoryId").notNull(),
+  
+  // Financial details
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  date: timestamp("date").notNull(),
+  
+  // Expense details
+  vendor: varchar("vendor", { length: 255 }),
+  description: text("description").notNull(),
+  notes: text("notes"),
+  
+  // Receipt and payment
+  receiptUrl: text("receiptUrl"),
+  paymentMethod: varchar("paymentMethod", { length: 50 }), // cash, card, bank transfer, etc.
+  
+  // Recurring flag
+  isRecurring: boolean("isRecurring").default(false).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Expense = typeof expenses.$inferSelect;
+export type InsertExpense = typeof expenses.$inferInsert;

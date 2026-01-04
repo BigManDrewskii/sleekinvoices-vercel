@@ -8,12 +8,15 @@ import {
   Client,
   invoices,
   InsertInvoice,
+  invoiceTemplates,
   Invoice,
   invoiceLineItems,
   InsertInvoiceLineItem,
   InvoiceLineItem,
   emailLog,
-  InsertEmailLog
+  InsertEmailLog,
+  expenseCategories,
+  expenses
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -441,4 +444,379 @@ export async function getEmailLogByInvoiceId(invoiceId: number) {
   return db.select().from(emailLog)
     .where(eq(emailLog.invoiceId, invoiceId))
     .orderBy(desc(emailLog.sentAt));
+}
+
+
+// ============================================================================
+// RECURRING INVOICE OPERATIONS
+// ============================================================================
+
+export async function createRecurringInvoice(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { recurringInvoices, recurringInvoiceLineItems } = await import("../drizzle/schema");
+  
+  const result = await db.insert(recurringInvoices).values(data);
+  const insertedId = Number(result[0].insertId);
+  
+  const created = await db.select().from(recurringInvoices)
+    .where(eq(recurringInvoices.id, insertedId))
+    .limit(1);
+  
+  return created[0]!;
+}
+
+export async function getRecurringInvoicesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { recurringInvoices } = await import("../drizzle/schema");
+  
+  return db.select().from(recurringInvoices)
+    .where(eq(recurringInvoices.userId, userId))
+    .orderBy(desc(recurringInvoices.createdAt));
+}
+
+export async function getRecurringInvoiceById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const { recurringInvoices } = await import("../drizzle/schema");
+  
+  const result = await db.select().from(recurringInvoices)
+    .where(and(eq(recurringInvoices.id, id), eq(recurringInvoices.userId, userId)))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+export async function updateRecurringInvoice(id: number, userId: number, data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { recurringInvoices } = await import("../drizzle/schema");
+  
+  await db.update(recurringInvoices)
+    .set(data)
+    .where(and(eq(recurringInvoices.id, id), eq(recurringInvoices.userId, userId)));
+}
+
+export async function deleteRecurringInvoice(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { recurringInvoices, recurringInvoiceLineItems } = await import("../drizzle/schema");
+  
+  // Delete line items first
+  await db.delete(recurringInvoiceLineItems)
+    .where(eq(recurringInvoiceLineItems.recurringInvoiceId, id));
+  
+  // Delete recurring invoice
+  await db.delete(recurringInvoices)
+    .where(and(eq(recurringInvoices.id, id), eq(recurringInvoices.userId, userId)));
+}
+
+export async function getRecurringInvoicesDueForGeneration() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { recurringInvoices } = await import("../drizzle/schema");
+  
+  const now = new Date();
+  
+  return db.select().from(recurringInvoices)
+    .where(and(
+      eq(recurringInvoices.isActive, true),
+      lte(recurringInvoices.nextInvoiceDate, now)
+    ));
+}
+
+export async function createRecurringInvoiceLineItem(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { recurringInvoiceLineItems } = await import("../drizzle/schema");
+  
+  await db.insert(recurringInvoiceLineItems).values(data);
+}
+
+export async function getRecurringInvoiceLineItems(recurringInvoiceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { recurringInvoiceLineItems } = await import("../drizzle/schema");
+  
+  return db.select().from(recurringInvoiceLineItems)
+    .where(eq(recurringInvoiceLineItems.recurringInvoiceId, recurringInvoiceId))
+    .orderBy(recurringInvoiceLineItems.sortOrder);
+}
+
+export async function deleteRecurringInvoiceLineItems(recurringInvoiceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { recurringInvoiceLineItems } = await import("../drizzle/schema");
+  
+  await db.delete(recurringInvoiceLineItems)
+    .where(eq(recurringInvoiceLineItems.recurringInvoiceId, recurringInvoiceId));
+}
+
+
+// ============================================
+// Invoice Templates
+// ============================================
+
+export async function createInvoiceTemplate(template: {
+  userId: number;
+  name: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  fontFamily?: string;
+  logoUrl?: string;
+  isDefault?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(invoiceTemplates).values(template);
+  return result;
+}
+
+export async function getInvoiceTemplatesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(invoiceTemplates).where(eq(invoiceTemplates.userId, userId));
+}
+
+export async function getInvoiceTemplateById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(invoiceTemplates)
+    .where(and(eq(invoiceTemplates.id, id), eq(invoiceTemplates.userId, userId)))
+    .limit(1);
+
+  return result[0];
+}
+
+export async function updateInvoiceTemplate(
+  id: number,
+  userId: number,
+  updates: Partial<{
+    name: string;
+    primaryColor: string;
+    secondaryColor: string;
+    fontFamily: string;
+    logoUrl: string;
+    isDefault: boolean;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(invoiceTemplates)
+    .set(updates)
+    .where(and(eq(invoiceTemplates.id, id), eq(invoiceTemplates.userId, userId)));
+}
+
+export async function deleteInvoiceTemplate(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(invoiceTemplates)
+    .where(and(eq(invoiceTemplates.id, id), eq(invoiceTemplates.userId, userId)));
+}
+
+export async function setDefaultTemplate(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Unset all other defaults
+  await db
+    .update(invoiceTemplates)
+    .set({ isDefault: false })
+    .where(eq(invoiceTemplates.userId, userId));
+
+  // Set the new default
+  await db
+    .update(invoiceTemplates)
+    .set({ isDefault: true })
+    .where(and(eq(invoiceTemplates.id, id), eq(invoiceTemplates.userId, userId)));
+}
+
+
+// ============================================
+// Expense Categories
+// ============================================
+
+export async function createExpenseCategory(category: {
+  userId: number;
+  name: string;
+  color?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(expenseCategories).values(category);
+  return { success: true };
+}
+
+export async function getExpenseCategoriesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(expenseCategories).where(eq(expenseCategories.userId, userId));
+}
+
+export async function deleteExpenseCategory(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(expenseCategories)
+    .where(and(eq(expenseCategories.id, id), eq(expenseCategories.userId, userId)));
+}
+
+// ============================================
+// Expenses
+// ============================================
+
+export async function createExpense(expense: {
+  userId: number;
+  categoryId: number;
+  amount: string;
+  date: Date;
+  description: string;
+  receiptUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(expenses).values(expense);
+  return { success: true };
+}
+
+export async function getExpensesByUserId(userId: number, filters?: {
+  categoryId?: number;
+  startDate?: Date;
+  endDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select({
+      id: expenses.id,
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
+      categoryColor: expenseCategories.color,
+      amount: expenses.amount,
+      date: expenses.date,
+      description: expenses.description,
+      receiptUrl: expenses.receiptUrl,
+      createdAt: expenses.createdAt,
+    })
+    .from(expenses)
+    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+    .where(eq(expenses.userId, userId))
+    .$dynamic();
+
+  if (filters?.categoryId) {
+    query = query.where(eq(expenses.categoryId, filters.categoryId));
+  }
+  if (filters?.startDate) {
+    query = query.where(gte(expenses.date, filters.startDate));
+  }
+  if (filters?.endDate) {
+    query = query.where(lte(expenses.date, filters.endDate));
+  }
+
+  const results = await query.orderBy(desc(expenses.date));
+  return results;
+}
+
+export async function getExpenseById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select()
+    .from(expenses)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)))
+    .limit(1);
+
+  return result[0];
+}
+
+export async function updateExpense(
+  id: number,
+  userId: number,
+  updates: Partial<{
+    categoryId: number;
+    amount: string;
+    date: Date;
+    description: string;
+    receiptUrl: string;
+  }>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(expenses)
+    .set(updates)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)));
+}
+
+export async function deleteExpense(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(expenses)
+    .where(and(eq(expenses.id, id), eq(expenses.userId, userId)));
+}
+
+export async function getExpenseStats(userId: number, months: number = 6) {
+  const db = await getDb();
+  if (!db) return { totalExpenses: "0", expensesByCategory: [] };
+
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - months);
+
+  // Total expenses
+  const totalResult = await db
+    .select({ total: sql<string>`COALESCE(SUM(${expenses.amount}), 0)` })
+    .from(expenses)
+    .where(and(
+      eq(expenses.userId, userId),
+      gte(expenses.date, startDate)
+    ));
+
+  // Expenses by category
+  const categoryResult = await db
+    .select({
+      categoryId: expenses.categoryId,
+      categoryName: expenseCategories.name,
+      categoryColor: expenseCategories.color,
+      total: sql<string>`SUM(${expenses.amount})`,
+    })
+    .from(expenses)
+    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+    .where(and(
+      eq(expenses.userId, userId),
+      gte(expenses.date, startDate)
+    ))
+    .groupBy(expenses.categoryId, expenseCategories.name, expenseCategories.color);
+
+  return {
+    totalExpenses: totalResult[0]?.total || "0",
+    expensesByCategory: categoryResult,
+  };
 }
