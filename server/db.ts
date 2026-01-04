@@ -16,7 +16,12 @@ import {
   emailLog,
   InsertEmailLog,
   expenseCategories,
-  expenses
+  expenses,
+  payments,
+  InsertPayment,
+  Payment,
+  stripeWebhookEvents,
+  InsertStripeWebhookEvent
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -994,4 +999,252 @@ export async function getClientInvoices(clientId: number) {
     .from(invoices)
     .where(eq(invoices.clientId, clientId))
     .orderBy(desc(invoices.createdAt));
+}
+
+
+// ============================================================================
+// PAYMENT OPERATIONS
+// ============================================================================
+
+/**
+ * Create a new payment record
+ */
+export async function createPayment(payment: InsertPayment): Promise<Payment> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(payments).values(payment);
+  const insertedId = Number(result[0].insertId);
+  
+  const created = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.id, insertedId))
+    .limit(1);
+  
+  return created[0]!;
+}
+
+/**
+ * Get all payments for a specific invoice
+ */
+export async function getPaymentsByInvoice(invoiceId: number): Promise<Payment[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db
+    .select()
+    .from(payments)
+    .where(eq(payments.invoiceId, invoiceId))
+    .orderBy(desc(payments.paymentDate));
+}
+
+/**
+ * Get all payments for a user with optional filters
+ */
+export async function getPaymentsByUser(
+  userId: number,
+  filters?: {
+    status?: string;
+    paymentMethod?: string;
+    startDate?: Date;
+    endDate?: Date;
+  }
+): Promise<Payment[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  let query = db
+    .select()
+    .from(payments)
+    .where(eq(payments.userId, userId));
+  
+  // Apply filters if provided
+  const conditions = [eq(payments.userId, userId)];
+  
+  if (filters?.status) {
+    conditions.push(eq(payments.status, filters.status as any));
+  }
+  
+  if (filters?.paymentMethod) {
+    conditions.push(eq(payments.paymentMethod, filters.paymentMethod as any));
+  }
+  
+  if (filters?.startDate) {
+    conditions.push(gte(payments.paymentDate, filters.startDate));
+  }
+  
+  if (filters?.endDate) {
+    conditions.push(lte(payments.paymentDate, filters.endDate));
+  }
+  
+  return await db
+    .select()
+    .from(payments)
+    .where(and(...conditions))
+    .orderBy(desc(payments.paymentDate));
+}
+
+/**
+ * Get payment by ID
+ */
+export async function getPaymentById(paymentId: number): Promise<Payment | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.id, paymentId))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * Update payment status
+ */
+export async function updatePaymentStatus(
+  paymentId: number,
+  status: "pending" | "completed" | "failed" | "refunded"
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(payments)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(payments.id, paymentId));
+}
+
+/**
+ * Delete a payment record
+ */
+export async function deletePayment(paymentId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(payments).where(eq(payments.id, paymentId));
+}
+
+/**
+ * Get total paid amount for an invoice
+ */
+export async function getTotalPaidForInvoice(invoiceId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db
+    .select({
+      total: sql<string>`SUM(${payments.amount})`,
+    })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.invoiceId, invoiceId),
+        eq(payments.status, "completed")
+      )
+    );
+  
+  return parseFloat(result[0]?.total || "0");
+}
+
+/**
+ * Get payment statistics for a user
+ */
+export async function getPaymentStats(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Total payments received
+  const totalResult = await db
+    .select({
+      total: sql<string>`SUM(${payments.amount})`,
+      count: sql<string>`COUNT(*)`,
+    })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.userId, userId),
+        eq(payments.status, "completed")
+      )
+    );
+  
+  // Payments by method
+  const byMethodResult = await db
+    .select({
+      method: payments.paymentMethod,
+      total: sql<string>`SUM(${payments.amount})`,
+      count: sql<string>`COUNT(*)`,
+    })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.userId, userId),
+        eq(payments.status, "completed")
+      )
+    )
+    .groupBy(payments.paymentMethod);
+  
+  return {
+    totalAmount: parseFloat(totalResult[0]?.total || "0"),
+    totalCount: parseInt(totalResult[0]?.count || "0"),
+    byMethod: byMethodResult.map(r => ({
+      method: r.method,
+      total: parseFloat(r.total || "0"),
+      count: parseInt(r.count || "0"),
+    })),
+  };
+}
+
+// ============================================================================
+// STRIPE WEBHOOK OPERATIONS
+// ============================================================================
+
+/**
+ * Log a Stripe webhook event
+ */
+export async function logStripeWebhookEvent(
+  eventId: string,
+  eventType: string,
+  payload: any
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(stripeWebhookEvents).values({
+    eventId,
+    eventType,
+    payload: JSON.stringify(payload),
+    processed: 0,
+  });
+}
+
+/**
+ * Mark webhook event as processed
+ */
+export async function markWebhookEventProcessed(eventId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(stripeWebhookEvents)
+    .set({ processed: 1, processedAt: new Date() })
+    .where(eq(stripeWebhookEvents.eventId, eventId));
+}
+
+/**
+ * Check if webhook event has been processed
+ */
+export async function isWebhookEventProcessed(eventId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db
+    .select()
+    .from(stripeWebhookEvents)
+    .where(eq(stripeWebhookEvents.eventId, eventId))
+    .limit(1);
+  
+  return result.length > 0 && result[0]!.processed === 1;
 }

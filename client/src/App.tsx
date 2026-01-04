@@ -19,6 +19,7 @@ import RecurringInvoices from "./pages/RecurringInvoices";
 import CreateRecurringInvoice from "./pages/CreateRecurringInvoice";
 import Templates from "./pages/Templates";
 import Expenses from "./pages/Expenses";
+import Payments from "./pages/Payments";
 
 function Router() {
   return (
@@ -38,6 +39,7 @@ function Router() {
       <Route path={"/recurring-invoices/create"} component={CreateRecurringInvoice} />
       <Route path={"/templates"} component={Templates} />
       <Route path={"/expenses"} component={Expenses} />
+      <Route path={"/payments"} component={Payments} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

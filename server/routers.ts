@@ -827,6 +827,56 @@ export const appRouter = router({
       }),
   }),
 
+  payments: router({
+    create: protectedProcedure
+      .input(z.object({
+        invoiceId: z.number(),
+        amount: z.string(),
+        currency: z.string().default("USD"),
+        paymentMethod: z.enum(["stripe", "manual", "bank_transfer", "check", "cash"]),
+        paymentDate: z.date(),
+        receivedDate: z.date().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const payment = await db.createPayment({
+          ...input,
+          userId: ctx.user.id,
+          status: "completed",
+        });
+        return payment;
+      }),
+    
+    list: protectedProcedure
+      .input(z.object({
+        status: z.string().optional(),
+        paymentMethod: z.string().optional(),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.getPaymentsByUser(ctx.user.id, input);
+      }),
+    
+    getByInvoice: protectedProcedure
+      .input(z.object({ invoiceId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getPaymentsByInvoice(input.invoiceId);
+      }),
+    
+    getStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getPaymentStats(ctx.user.id);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ paymentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deletePayment(input.paymentId);
+        return { success: true };
+      }),
+  }),
+  
   subscription: router({
     getStatus: protectedProcedure.query(async ({ ctx }) => {
       return {

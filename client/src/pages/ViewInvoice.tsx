@@ -25,6 +25,24 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Link, useLocation, useParams } from "wouter";
 import { toast } from "sonner";
 
@@ -398,6 +416,9 @@ export default function ViewInvoice() {
               </CardContent>
             </Card>
 
+            {/* Payment History */}
+            <PaymentHistoryCard invoiceId={invoiceId} invoiceTotal={parseFloat(invoice.total)} />
+
             {/* Notes and Payment Terms */}
             {(invoice.notes || invoice.paymentTerms || invoice.stripePaymentLinkUrl) && (
               <Card>
@@ -456,7 +477,185 @@ export default function ViewInvoice() {
         title="Delete Invoice"
         description={`Are you sure you want to delete invoice ${invoice.invoiceNumber}? This action cannot be undone.`}
         isLoading={deleteInvoice.isPending}
-      />
+       />
     </div>
+  );
+}
+
+// Payment History Card Component
+function PaymentHistoryCard({ invoiceId, invoiceTotal }: { invoiceId: number; invoiceTotal: number }) {
+  const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    amount: "",
+    currency: "USD",
+    paymentMethod: "manual" as const,
+    paymentDate: new Date().toISOString().split("T")[0],
+    notes: "",
+  });
+
+  const { data: payments, refetch } = trpc.payments.getByInvoice.useQuery({ invoiceId });
+  const createPaymentMutation = trpc.payments.create.useMutation({
+    onSuccess: () => {
+      toast.success("Payment recorded successfully");
+      setRecordPaymentOpen(false);
+      refetch();
+      setFormData({
+        amount: "",
+        currency: "USD",
+        paymentMethod: "manual",
+        paymentDate: new Date().toISOString().split("T")[0],
+        notes: "",
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to record payment: ${error.message}`);
+    },
+  });
+
+  const handleRecordPayment = () => {
+    if (!formData.amount) {
+      toast.error("Please enter an amount");
+      return;
+    }
+
+    createPaymentMutation.mutate({
+      invoiceId,
+      amount: formData.amount,
+      currency: formData.currency,
+      paymentMethod: formData.paymentMethod,
+      paymentDate: new Date(formData.paymentDate),
+      notes: formData.notes || undefined,
+    });
+  };
+
+  const totalPaid = payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+  const balance = invoiceTotal - totalPaid;
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Payment History</CardTitle>
+              <CardDescription>
+                {payments?.length || 0} payment(s) recorded
+              </CardDescription>
+            </div>
+            <Button size="sm" onClick={() => setRecordPaymentOpen(true)}>
+              Record Payment
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Payment Summary */}
+          <div className="mb-4 p-4 bg-muted rounded-lg space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Invoice Total:</span>
+              <span className="font-semibold">{formatCurrency(invoiceTotal)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Total Paid:</span>
+              <span className="font-semibold text-green-600">{formatCurrency(totalPaid)}</span>
+            </div>
+            <div className="flex justify-between text-sm pt-2 border-t">
+              <span className="font-medium">Balance Due:</span>
+              <span className="font-bold">{formatCurrency(balance)}</span>
+            </div>
+          </div>
+
+          {/* Payment List */}
+          {!payments || payments.length === 0 ? (
+            <p className="text-center text-muted-foreground py-4">No payments recorded yet</p>
+          ) : (
+            <div className="space-y-3">
+              {payments.map((payment) => (
+                <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div>
+                    <p className="font-medium">{formatCurrency(payment.amount)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(payment.paymentDate)} • {payment.paymentMethod.replace("_", " ")}
+                    </p>
+                    {payment.notes && (
+                      <p className="text-xs text-muted-foreground mt-1">{payment.notes}</p>
+                    )}
+                  </div>
+                  <StatusBadge status={payment.status} />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Record Payment Dialog */}
+      <Dialog open={recordPaymentOpen} onOpenChange={setRecordPaymentOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Record Payment</DialogTitle>
+            <DialogDescription>Record a payment for this invoice</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount *</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paymentMethod">Payment Method</Label>
+              <Select
+                value={formData.paymentMethod}
+                onValueChange={(value: any) => setFormData({ ...formData, paymentMethod: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="paymentDate">Payment Date</Label>
+              <Input
+                id="paymentDate"
+                type="date"
+                value={formData.paymentDate}
+                onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes (Optional)</Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any notes..."
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRecordPaymentOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRecordPayment} disabled={createPaymentMutation.isPending}>
+              {createPaymentMutation.isPending ? "Recording..." : "Record Payment"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

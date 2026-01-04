@@ -309,3 +309,52 @@ export const clientPortalAccess = mysqlTable("clientPortalAccess", {
 
 export type ClientPortalAccess = typeof clientPortalAccess.$inferSelect;
 export type InsertClientPortalAccess = typeof clientPortalAccess.$inferInsert;
+
+/**
+ * Payments table for tracking all invoice payments
+ */
+export const payments = mysqlTable("payments", {
+  id: int("id").autoincrement().primaryKey(),
+  invoiceId: int("invoiceId").notNull(),
+  userId: int("userId").notNull(),
+  
+  // Payment details
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  paymentMethod: mysqlEnum("paymentMethod", ["stripe", "manual", "bank_transfer", "check", "cash"]).notNull(),
+  
+  // Stripe integration
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 255 }),
+  
+  // Dates
+  paymentDate: timestamp("paymentDate").notNull(), // When payment was made
+  receivedDate: timestamp("receivedDate"), // When payment was received (for checks, bank transfers)
+  
+  // Status
+  status: mysqlEnum("status", ["pending", "completed", "failed", "refunded"]).default("completed").notNull(),
+  
+  // Additional info
+  notes: text("notes"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
+
+/**
+ * Stripe webhook events log for debugging and audit
+ */
+export const stripeWebhookEvents = mysqlTable("stripeWebhookEvents", {
+  id: int("id").autoincrement().primaryKey(),
+  eventId: varchar("eventId", { length: 255 }).notNull().unique(),
+  eventType: varchar("eventType", { length: 100 }).notNull(),
+  payload: text("payload").notNull(), // JSON string
+  processed: int("processed").default(0).notNull(), // 1 = processed, 0 = pending
+  processedAt: timestamp("processedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
+export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
