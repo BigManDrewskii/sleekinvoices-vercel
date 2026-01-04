@@ -68,44 +68,44 @@ Complete expense tracking frontend with receipt uploads, expandable row details,
 
 ---
 
-## COMPONENT 3: Expandable Row Detail View (60 min)
+## COMPONENT 3: Expandable Row Detail View (60 min) ✅
 
 ### File: `client/src/pages/Expenses.tsx` (Update expense list)
 
-- [ ] Add expandedExpenseId state
+- [x] Add expandedExpenseId state
   - [ ] `const [expandedExpenseId, setExpandedExpenseId] = useState<number | null>(null)`
 
-- [ ] Update expense list table structure
-  - [ ] Keep existing columns: Date, Category, Amount, Description, Actions
-  - [ ] Add expand/collapse icon button in first column
-  - [ ] Use ChevronDown/ChevronUp icon from lucide-react
+- [x] Update expense list table structure
+  - [x] Keep existing columns: Date, Category, Amount, Description, Actions
+  - [x] Add expand/collapse icon button in first column
+  - [x] Use ChevronDown/ChevronUp icon from lucide-react
 
-- [ ] Create ExpenseDetailRow component (inline or separate)
-  - [ ] Render below main row when expanded
-  - [ ] Full-width colspan
-  - [ ] Grid layout for details (2-3 columns)
+- [x] Create ExpenseDetailRow component (inline or separate)
+  - [x] Render below main row when expanded
+  - [x] Full-width colspan
+  - [x] Grid layout for details (2-3 columns)
 
-- [ ] Display additional details in expanded view:
-  - [ ] Vendor (if exists)
-  - [ ] Payment Method (if exists) - with badge styling
-  - [ ] Tax Amount (if > 0)
-  - [ ] Total (amount + tax)
-  - [ ] Receipt thumbnail/link (if exists)
-    - [ ] Image: show thumbnail, click to open full size
-    - [ ] PDF: show PDF icon, click to open
-  - [ ] Billable status (if true) - with badge
-  - [ ] Client name (if billable) - with link to client
-  - [ ] Invoice link (if linked to invoice)
+- [x] Display additional details in expanded view:
+  - [x] Vendor (if exists)
+  - [x] Payment Method (if exists) - with badge styling
+  - [x] Tax Amount (if > 0)
+  - [x] Total (amount + tax)
+  - [x] Receipt thumbnail/link (if exists)
+    - [x] Image: show thumbnail, click to open full size
+    - [x] PDF: show PDF icon, click to open
+  - [x] Billable status (if true) - with badge
+  - [x] Client name (if billable) - with link to client
+  - [x] Invoice link (if linked to invoice)
 
-- [ ] Add expand/collapse functionality
-  - [ ] Click row or icon to toggle
-  - [ ] Update expandedExpenseId state
-  - [ ] Smooth animation (optional, use CSS transition)
+- [x] Add expand/collapse functionality
+  - [x] Click row or icon to toggle
+  - [x] Update expandedExpenseId state
+  - [x] Smooth animation (optional, use CSS transition)
 
-- [ ] Style expanded row
-  - [ ] Light background color to distinguish from main rows
-  - [ ] Padding and spacing for readability
-  - [ ] Responsive grid (stack on mobile)
+- [x] Style expanded row
+  - [x] Light background color to distinguish from main rows
+  - [x] Padding and spacing for readability
+  - [x] Responsive grid (stack on mobile)
 
 ---
 

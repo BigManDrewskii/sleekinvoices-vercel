@@ -11,10 +11,12 @@
   - [x] Add vendor, payment method, tax fields
   - [x] Integrate receipt upload
   - [x] Add billable checkbox + client selector
-- [ ] Component 3: Expandable Row Detail View (60 min)
-  - [ ] Expand/collapse functionality
-  - [ ] Show all expense details in expanded view
-  - [ ] Receipt thumbnail/link display
+- [x] Component 3: Expandable Row Detail View (60 min)
+  - [x] Add expand/collapse state management
+  - [x] Add ChevronDown/ChevronUp icon button
+  - [x] Build expanded detail layout showing vendor, payment, tax, receipt, billable
+  - [x] Add smooth animation for expand/collapse
+  - [x] Test all fields display correctly
 - [ ] Component 4: Billable Expense Workflow (45 min)
   - [ ] Backend: getBillableUnlinked, linkToInvoice
   - [ ] Frontend: Add expenses when creating invoice

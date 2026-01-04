@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, DollarSign, Tag } from "lucide-react";
+import { Plus, Trash2, DollarSign, Tag, ChevronDown, ChevronUp, FileText, Receipt } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ export default function Expenses() {
 
   const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [expandedExpenses, setExpandedExpenses] = useState<Set<number>>(new Set());
   
   const [expenseForm, setExpenseForm] = useState({
     categoryId: 0,
@@ -118,6 +119,18 @@ export default function Expenses() {
     } catch (error) {
       toast.error("Failed to delete expense");
     }
+  };
+
+  const toggleExpenseRow = (id: number) => {
+    setExpandedExpenses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
   };
 
   const handleDeleteCategory = async (id: number) => {
@@ -447,30 +460,97 @@ export default function Expenses() {
       ) : (
         <Card>
           <div className="divide-y">
-            {expenses.map((expense: any) => (
-              <div key={expense.id} className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: expense.categoryColor || "#3B82F6" }}
-                  />
-                  <div className="flex-1">
-                    <p className="font-medium">{expense.description}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {expense.categoryName} • {new Date(expense.date).toLocaleDateString()}
-                    </p>
+            {expenses.map((expense: any) => {
+              const isExpanded = expandedExpenses.has(expense.id);
+              return (
+                <div key={expense.id}>
+                  {/* Main Row */}
+                  <div className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-4 flex-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleExpenseRow(expense.id)}
+                        className="p-1 h-8 w-8"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: expense.categoryColor || "#3B82F6" }}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{expense.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {expense.categoryName} • {new Date(expense.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <p className="text-lg font-semibold">{formatCurrency(parseFloat(expense.amount))}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteExpense(expense.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <p className="text-lg font-semibold">{formatCurrency(parseFloat(expense.amount))}</p>
+
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="px-4 pb-4 pt-2 bg-muted/30 border-t">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {expense.vendor && (
+                          <div>
+                            <p className="text-muted-foreground mb-1">Vendor</p>
+                            <p className="font-medium">{expense.vendor}</p>
+                          </div>
+                        )}
+                        {expense.paymentMethod && (
+                          <div>
+                            <p className="text-muted-foreground mb-1">Payment Method</p>
+                            <p className="font-medium capitalize">{expense.paymentMethod.replace('_', ' ')}</p>
+                          </div>
+                        )}
+                        {expense.taxAmount && parseFloat(expense.taxAmount) > 0 && (
+                          <div>
+                            <p className="text-muted-foreground mb-1">Tax Amount</p>
+                            <p className="font-medium">{formatCurrency(parseFloat(expense.taxAmount))}</p>
+                          </div>
+                        )}
+                        {expense.receiptUrl && (
+                          <div>
+                            <p className="text-muted-foreground mb-1">Receipt</p>
+                            <a
+                              href={expense.receiptUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-primary hover:underline"
+                            >
+                              <Receipt className="w-4 h-4" />
+                              View Receipt
+                            </a>
+                          </div>
+                        )}
+                        {expense.isBillable && (
+                          <div>
+                            <p className="text-muted-foreground mb-1">Billable</p>
+                            <p className="font-medium">
+                              Yes {expense.clientName && `• ${expense.clientName}`}
+                              {expense.invoiceId && ` • Linked to invoice`}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteExpense(expense.id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       )}
