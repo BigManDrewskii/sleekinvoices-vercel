@@ -1159,6 +1159,48 @@ export async function getClientInvoices(clientId: number) {
     .orderBy(desc(invoices.createdAt));
 }
 
+export async function getActiveClientPortalAccess(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { clientPortalAccess } = await import("../drizzle/schema");
+  
+  const result = await db
+    .select()
+    .from(clientPortalAccess)
+    .where(
+      and(
+        eq(clientPortalAccess.clientId, clientId),
+        eq(clientPortalAccess.isActive, 1)
+      )
+    )
+    .orderBy(desc(clientPortalAccess.createdAt))
+    .limit(1);
+  
+  if (result.length === 0) return null;
+  
+  const access = result[0]!;
+  
+  // Check if expired
+  if (new Date() > access.expiresAt) {
+    return null;
+  }
+  
+  return access;
+}
+
+export async function revokeClientPortalAccess(accessToken: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { clientPortalAccess } = await import("../drizzle/schema");
+  
+  await db
+    .update(clientPortalAccess)
+    .set({ isActive: 0 })
+    .where(eq(clientPortalAccess.accessToken, accessToken));
+}
+
 
 // ============================================================================
 // PAYMENT OPERATIONS

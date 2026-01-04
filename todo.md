@@ -154,3 +154,12 @@
 - [x] Fix "Invalid or expired access token" error on /portal/:accessToken page
 - [x] Investigate token validation logic in tRPC procedures
 - [x] Add proper error handling for expired tokens (disabled retry, improved UX)
+
+## Client Portal Access Management
+- [x] Add "Generate Portal Link" button to Clients page
+- [x] Display active portal access tokens with expiration dates
+- [x] Implement copy-to-clipboard functionality for portal links
+- [x] Add revoke access button for active tokens
+- [x] Show portal link status (active/expired/revoked) in client list
+- [x] Add backend procedure to revoke portal access
+- [x] Test link generation and revocation flow

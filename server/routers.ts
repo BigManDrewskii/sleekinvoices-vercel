@@ -948,6 +948,21 @@ export const appRouter = router({
         
         return { invoice, lineItems, client };
       }),
+    
+    // Get active portal access for a client (protected)
+    getActiveAccess: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getActiveClientPortalAccess(input.clientId);
+      }),
+    
+    // Revoke portal access (protected)
+    revokeAccess: protectedProcedure
+      .input(z.object({ accessToken: z.string() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.revokeClientPortalAccess(input.accessToken);
+        return { success: true };
+      }),
   }),
 
   payments: router({

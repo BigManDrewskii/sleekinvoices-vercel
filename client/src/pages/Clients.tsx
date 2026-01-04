@@ -11,10 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ClientDialog } from "@/components/clients/ClientDialog";
+import { PortalAccessDialog } from "@/components/clients/PortalAccessDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users } from "lucide-react";
+import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -36,6 +37,7 @@ export default function Clients() {
   const { user, loading, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
+  const [portalAccessDialogOpen, setPortalAccessDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
@@ -93,6 +95,11 @@ export default function Clients() {
   const handleAddNew = () => {
     setSelectedClient(null);
     setClientDialogOpen(true);
+  };
+  
+  const handlePortalAccess = (client: Client) => {
+    setSelectedClient(client);
+    setPortalAccessDialogOpen(true);
   };
 
   const confirmDelete = () => {
@@ -213,7 +220,16 @@ export default function Clients() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handlePortalAccess(client)}
+                              title="Portal Access"
+                            >
+                              <Key className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleEdit(client)}
+                              title="Edit"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -222,6 +238,7 @@ export default function Clients() {
                               size="sm"
                               onClick={() => handleDelete(client)}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Delete"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -274,6 +291,15 @@ export default function Clients() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => handlePortalAccess(client)}
+                        className="flex-1"
+                      >
+                        <Key className="h-4 w-4 mr-1" />
+                        Portal
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleEdit(client)}
                         className="flex-1"
                       >
@@ -304,6 +330,12 @@ export default function Clients() {
         onOpenChange={setClientDialogOpen}
         client={selectedClient}
         onSuccess={() => setSelectedClient(null)}
+      />
+
+      <PortalAccessDialog
+        open={portalAccessDialogOpen}
+        onOpenChange={setPortalAccessDialogOpen}
+        client={selectedClient || { id: 0, name: "", email: null }}
       />
 
       <DeleteConfirmDialog
