@@ -5,6 +5,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { DollarSign, FileText, TrendingUp, AlertCircle, Plus } from "lucide-react";
 import { Link } from "wouter";
+import { UsageIndicator } from "@/components/UsageIndicator";
 
 export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -76,6 +77,19 @@ export default function Dashboard() {
               New Invoice
             </Link>
           </Button>
+        </div>
+
+        {/* Usage Indicator for Free Tier */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Monthly Usage</CardTitle>
+              <CardDescription>Track your invoice creation limit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <UsageIndicator />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Stats Grid */}

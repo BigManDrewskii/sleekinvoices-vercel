@@ -1132,6 +1132,26 @@ export const appRouter = router({
       };
     }),
     
+    /**
+     * Get current month's usage for invoice limit tracking
+     * Returns invoices created this month and the limit based on subscription
+     */
+    getUsage: protectedProcedure.query(async ({ ctx }) => {
+      const usage = await db.getCurrentMonthUsage(ctx.user.id);
+      const { SUBSCRIPTION_PLANS, isPro, getRemainingInvoices } = await import('../shared/subscription.js');
+      
+      const isProUser = isPro(ctx.user.subscriptionStatus);
+      const limit = isProUser ? null : SUBSCRIPTION_PLANS.FREE.invoiceLimit;
+      const remaining = isProUser ? null : getRemainingInvoices(usage.invoicesCreated);
+      
+      return {
+        invoicesCreated: usage.invoicesCreated,
+        limit,
+        remaining,
+        isPro: isProUser,
+      };
+    }),
+    
     createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
       // Create Stripe customer if not exists
       let customerId = ctx.user.stripeCustomerId;
