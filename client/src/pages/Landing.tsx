@@ -6,14 +6,14 @@ import {
   Zap, CreditCard, Bell, Users, Mail, Sparkles, ArrowRight
 } from "lucide-react";
 import { Link } from "wouter";
-import { Navigation } from "@/components/Navigation";
+import { LandingNavigation } from "@/components/LandingNavigation";
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <LandingNavigation />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 md:py-16 lg:py-24">
@@ -111,7 +111,7 @@ export default function Landing() {
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section id="features" className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Everything You Need to Get Paid
@@ -159,6 +159,16 @@ export default function Landing() {
             iconColor="text-rose-500"
           />
         </div>
+        
+        {/* CTA after features */}
+        <div className="text-center mt-16">
+          <Button size="lg" asChild className="text-lg px-8 py-6">
+            <a href={getLoginUrl()}>
+              Start Creating Invoices Free
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+          </Button>
+        </div>
       </section>
 
       {/* How It Works Section */}
@@ -192,7 +202,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section id="pricing" className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-16 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Simple, Transparent Pricing
@@ -243,9 +253,9 @@ export default function Landing() {
           All plans include bank-level security, automatic backups, and data encryption
         </p>
       </section>
-
+      
       {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24 bg-secondary/20">
+      <section id="faq" className="container mx-auto px-4 py-16 md:py-24 bg-secondary/20">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Frequently Asked Questions
