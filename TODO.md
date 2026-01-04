@@ -953,3 +953,12 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] Check favicon in browser tab
 - [x] Verify no "InvoiceFlow" text remains
 - [ ] Test on mobile viewport
+
+
+---
+
+## 🐛 BUG FIXES: Stripe Price ID & Nested Anchor (Jan 4, 2026)
+- [x] Restart dev server to load live STRIPE_PRO_PRICE_ID from environment
+- [x] Fix nested `<a>` tag React error in Subscription.tsx (removed 6 nested anchors)
+- [x] Verify fixes work correctly (no console errors, page loads clean)
+- [x] Ready for manual Stripe checkout testing on production site
