@@ -223,6 +223,7 @@ export async function getInvoicesByUserId(userId: number) {
   const db = await getDb();
   if (!db) return [];
   
+  // Optimized query: Join with payments and calculate totals in a single query
   const results = await db.select({
     id: invoices.id,
     invoiceNumber: invoices.invoiceNumber,
@@ -236,50 +237,51 @@ export async function getInvoicesByUserId(userId: number) {
     clientId: invoices.clientId,
     clientName: clients.name,
     clientEmail: clients.email,
+    totalPaid: sql<string>`COALESCE(SUM(CASE WHEN ${payments.status} = 'completed' THEN ${payments.amount} ELSE 0 END), 0)`,
   })
   .from(invoices)
   .leftJoin(clients, eq(invoices.clientId, clients.id))
+  .leftJoin(payments, eq(payments.invoiceId, invoices.id))
   .where(eq(invoices.userId, userId))
+  .groupBy(invoices.id, clients.id)
   .orderBy(desc(invoices.createdAt));
   
-  // Calculate payment status for each invoice
-  const invoicesWithPaymentStatus = await Promise.all(
-    results.map(async (r) => {
-      const totalPaid = await getTotalPaidForInvoice(r.id);
-      const invoiceTotal = Number(r.total);
-      const amountDue = Math.max(0, invoiceTotal - totalPaid);
-      
-      let paymentStatus: 'unpaid' | 'partial' | 'paid';
-      if (totalPaid === 0) {
-        paymentStatus = 'unpaid';
-      } else if (totalPaid >= invoiceTotal) {
-        paymentStatus = 'paid';
-      } else {
-        paymentStatus = 'partial';
-      }
-      
-      return {
-        id: r.id,
-        invoiceNumber: r.invoiceNumber,
-        status: r.status,
-        issueDate: r.issueDate,
-        dueDate: r.dueDate,
-        total: r.total,
-        currency: r.currency,
-        paymentLink: r.paymentLink,
-        // Payment information
-        totalPaid: totalPaid.toString(),
-        amountDue: amountDue.toString(),
-        paymentStatus,
-        paymentProgress: invoiceTotal > 0 ? Math.round((totalPaid / invoiceTotal) * 100) : 0,
-        client: {
-          id: r.clientId,
-          name: r.clientName || 'Unknown',
-          email: r.clientEmail,
-        },
-      };
-    })
-  );
+  // Calculate payment status from aggregated data
+  const invoicesWithPaymentStatus = results.map((r) => {
+    const totalPaid = parseFloat(r.totalPaid || '0');
+    const invoiceTotal = Number(r.total);
+    const amountDue = Math.max(0, invoiceTotal - totalPaid);
+    
+    let paymentStatus: 'unpaid' | 'partial' | 'paid';
+    if (totalPaid === 0) {
+      paymentStatus = 'unpaid';
+    } else if (totalPaid >= invoiceTotal) {
+      paymentStatus = 'paid';
+    } else {
+      paymentStatus = 'partial';
+    }
+    
+    return {
+      id: r.id,
+      invoiceNumber: r.invoiceNumber,
+      status: r.status,
+      issueDate: r.issueDate,
+      dueDate: r.dueDate,
+      total: r.total,
+      currency: r.currency,
+      paymentLink: r.paymentLink,
+      // Payment information
+      totalPaid: totalPaid.toString(),
+      amountDue: amountDue.toString(),
+      paymentStatus,
+      paymentProgress: invoiceTotal > 0 ? Math.round((totalPaid / invoiceTotal) * 100) : 0,
+      client: {
+        id: r.clientId,
+        name: r.clientName || 'Unknown',
+        email: r.clientEmail,
+      },
+    };
+  });
   
   return invoicesWithPaymentStatus;
 }

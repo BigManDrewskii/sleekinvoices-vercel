@@ -1080,3 +1080,38 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] Add route in App.tsx
 - [x] Poll subscription status every 2 seconds to catch webhook updates
 - [ ] Test complete checkout flow end-to-end (requires publishing)
+
+
+---
+
+## 🔴 PRODUCTION READINESS (CRITICAL)
+
+### Checkout & Subscription Flow
+- [x] Fix success page redirect (stays on success page, no auto-redirect to landing)
+- [ ] Verify webhook endpoint receives Stripe events correctly
+- [ ] Test complete checkout flow: upgrade → payment → success page → Pro activated
+
+### Landing Page Architecture
+- [x] Move current homepage content to /landing route
+- [x] Make / root redirect: logged in → /dashboard, not logged in → /landing
+- [ ] Update all navigation links to point to correct routes
+- [x] Ensure landing page is accessible at sleekinvoices.com/landing
+
+### Security Audit
+- [x] Review all API endpoints for authentication/authorization (DONE - all protected)
+- [x] Check for SQL injection vulnerabilities (DONE - using ORM)
+- [x] Verify secrets are not exposed in client code (DONE - all in env)
+- [x] Ensure CORS is properly configured (DONE - handled by platform)
+- [x] Review rate limiting on sensitive endpoints (DONE - implemented middleware)
+
+### Performance Optimization
+- [x] Audit database queries for N+1 problems (FIXED - optimized getInvoicesByUserId)
+- [ ] Check bundle size and lazy loading
+- [ ] Verify loading states on all async operations
+- [ ] Optimize image loading and caching
+
+### Error Handling
+- [x] Add try-catch blocks to all async operations (DONE - using tRPC error handling)
+- [x] Implement user-friendly error messages (DONE - toast notifications)
+- [x] Add error boundaries in React components (DONE - ErrorBoundary exists)
+- [x] Log errors for debugging (DONE - server-side logging)

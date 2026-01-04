@@ -3,31 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
-import { Link, useLocation } from "wouter";
-import { useEffect } from "react";
+import { Link } from "wouter";
 
 export default function SubscriptionSuccess() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
 
   const { data: subscriptionStatus, isLoading } = trpc.subscription.getStatus.useQuery(
     undefined,
     { 
       enabled: isAuthenticated,
-      refetchInterval: 2000, // Poll every 2 seconds to catch webhook updates
+      // Poll every 2 seconds, but stop after subscription is active
+      refetchInterval: (query) => {
+        return query.state.data?.status === 'active' ? false : 2000;
+      },
+      refetchIntervalInBackground: false,
     }
   );
-
-  // Redirect to dashboard if already Pro (skip success page on refresh)
-  // But don't redirect immediately - let them see the success message first
-  // Only redirect if not authenticated after auth loads
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      // Give a small delay to avoid jarring redirect during Stripe return
-      const timer = setTimeout(() => setLocation("/"), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [authLoading, isAuthenticated, setLocation]);
 
   // Show loading while auth or subscription data is loading
   if (authLoading || isLoading) {

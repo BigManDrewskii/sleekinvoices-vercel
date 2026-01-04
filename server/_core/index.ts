@@ -9,6 +9,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { initializeScheduler } from "../jobs/scheduler";
 import { initializeDefaultCurrencies } from "../currency";
+import { standardRateLimit, strictRateLimit } from "./rateLimit";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -46,6 +47,11 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Rate limiting for API endpoints
+  app.use("/api/trpc", standardRateLimit);
+  app.use("/api/stripe/webhook", strictRateLimit);
+  app.use("/api/oauth", strictRateLimit);
   
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
