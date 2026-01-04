@@ -1403,3 +1403,11 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] Improve spacing and typography consistency
 - [x] Polish empty states with illustrations
 - [x] Enhance form inputs with better focus states
+
+
+---
+
+## 🎨 VISUAL EDITS - USER REQUESTED
+
+- [x] Simplify UpgradePromoBanner design
+- [x] Improve "Upgrade to Pro - Unlimited Invoices" button styling in UsageIndicator

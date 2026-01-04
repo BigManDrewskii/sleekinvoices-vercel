@@ -89,7 +89,11 @@ export function UsageIndicator() {
       {/* Always show upgrade CTA for free users */}
       {!atLimit && !nearLimit && (
         <Link href="/subscription">
-          <Button variant="outline" size="sm" className="w-full">
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all"
+          >
             <Sparkles className="mr-2 h-4 w-4" />
             Upgrade to Pro - Unlimited Invoices
           </Button>
