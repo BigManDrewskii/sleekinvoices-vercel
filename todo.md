@@ -149,3 +149,8 @@
 - [x] Implement clear value proposition before authentication
 - [x] Add social proof near CTAs (trust indicators, feature benefits)
 - [x] Test authentication flow and conversion path (verified navigation, hero CTA, post-features CTA)
+
+## Bug Fixes
+- [x] Fix "Invalid or expired access token" error on /portal/:accessToken page
+- [x] Investigate token validation logic in tRPC procedures
+- [x] Add proper error handling for expired tokens (disabled retry, improved UX)

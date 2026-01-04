@@ -17,12 +17,20 @@ export default function ClientPortal() {
   
   const { data: client, isLoading: clientLoading, error: clientError } = trpc.clientPortal.getClientInfo.useQuery(
     { accessToken },
-    { enabled: !!accessToken }
+    { 
+      enabled: !!accessToken,
+      retry: false, // Don't retry on invalid token
+      refetchOnWindowFocus: false // Don't refetch on window focus
+    }
   );
   
   const { data: invoices, isLoading: invoicesLoading } = trpc.clientPortal.getInvoices.useQuery(
     { accessToken },
-    { enabled: !!accessToken }
+    { 
+      enabled: !!accessToken && !!client, // Only fetch if client is valid
+      retry: false,
+      refetchOnWindowFocus: false
+    }
   );
   
   if (!accessToken) {
