@@ -22,6 +22,13 @@
       "when": 1767517859152,
       "tag": "0002_complete_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1767526073929,
+      "tag": "0003_flimsy_patriot",
+      "breakpoints": true
     }
   ]
 }

@@ -820,3 +820,178 @@ export async function getExpenseStats(userId: number, months: number = 6) {
     expensesByCategory: categoryResult,
   };
 }
+
+
+// ============================================================================
+// Invoice Generation Logs
+// ============================================================================
+
+export async function getGenerationLogsByRecurringId(recurringInvoiceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { invoiceGenerationLogs } = await import("../drizzle/schema");
+  
+  return await db
+    .select()
+    .from(invoiceGenerationLogs)
+    .where(eq(invoiceGenerationLogs.recurringInvoiceId, recurringInvoiceId))
+    .orderBy(desc(invoiceGenerationLogs.generationDate));
+}
+
+
+// ============================================================================
+// Currencies
+// ============================================================================
+
+export async function getAllCurrencies() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { currencies } = await import("../drizzle/schema");
+  
+  return await db.select().from(currencies).where(eq(currencies.isActive, 1));
+}
+
+export async function getCurrencyByCode(code: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { currencies } = await import("../drizzle/schema");
+  
+  const result = await db.select().from(currencies).where(eq(currencies.code, code)).limit(1);
+  return result[0];
+}
+
+export async function createCurrency(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { currencies } = await import("../drizzle/schema");
+  
+  const result = await db.insert(currencies).values(data);
+  const insertedId = Number(result[0].insertId);
+  
+  const inserted = await db.select().from(currencies).where(eq(currencies.id, insertedId)).limit(1);
+  return inserted[0]!;
+}
+
+export async function updateCurrency(code: string, data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { currencies } = await import("../drizzle/schema");
+  
+  await db.update(currencies).set(data).where(eq(currencies.code, code));
+}
+
+export async function updateExchangeRates(rates: Record<string, number>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { currencies } = await import("../drizzle/schema");
+  
+  // Update exchange rates for all currencies
+  for (const [code, rate] of Object.entries(rates)) {
+    await db.update(currencies)
+      .set({ 
+        exchangeRateToUSD: rate.toString(),
+        lastUpdated: new Date(),
+      })
+      .where(eq(currencies.code, code));
+  }
+}
+
+/**
+ * Convert amount from one currency to another using exchange rates
+ */
+export async function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): Promise<number> {
+  if (fromCurrency === toCurrency) return amount;
+  
+  const from = await getCurrencyByCode(fromCurrency);
+  const to = await getCurrencyByCode(toCurrency);
+  
+  if (!from || !to) {
+    throw new Error(`Currency not found: ${!from ? fromCurrency : toCurrency}`);
+  }
+  
+  // Convert to USD first, then to target currency
+  const amountInUSD = amount / parseFloat(from.exchangeRateToUSD);
+  const convertedAmount = amountInUSD * parseFloat(to.exchangeRateToUSD);
+  
+  return convertedAmount;
+}
+
+
+// ============================================================================
+// Client Portal Access
+// ============================================================================
+
+export async function createClientPortalAccess(clientId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { clientPortalAccess } = await import("../drizzle/schema");
+  const { nanoid } = await import("nanoid");
+  
+  // Generate unique access token
+  const accessToken = nanoid(32);
+  
+  // Token expires in 90 days
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 90);
+  
+  await db.insert(clientPortalAccess).values({
+    clientId,
+    accessToken,
+    expiresAt,
+    isActive: 1,
+  });
+  
+  return accessToken;
+}
+
+export async function getClientByAccessToken(accessToken: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { clientPortalAccess, clients } = await import("../drizzle/schema");
+  
+  const result = await db
+    .select({
+      client: clients,
+      access: clientPortalAccess,
+    })
+    .from(clientPortalAccess)
+    .innerJoin(clients, eq(clients.id, clientPortalAccess.clientId))
+    .where(eq(clientPortalAccess.accessToken, accessToken))
+    .limit(1);
+  
+  if (result.length === 0) return null;
+  
+  const { client, access } = result[0]!;
+  
+  // Check if token is expired or inactive
+  if (!access.isActive || new Date() > access.expiresAt) {
+    return null;
+  }
+  
+  // Update last accessed time
+  await db
+    .update(clientPortalAccess)
+    .set({ lastAccessedAt: new Date() })
+    .where(eq(clientPortalAccess.accessToken, accessToken));
+  
+  return client;
+}
+
+export async function getClientInvoices(clientId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db
+    .select()
+    .from(invoices)
+    .where(eq(invoices.clientId, clientId))
+    .orderBy(desc(invoices.createdAt));
+}

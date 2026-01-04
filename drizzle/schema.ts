@@ -13,6 +13,7 @@ export const users = mysqlTable("users", {
   
   // Company/branding info
   companyName: text("companyName"),
+  baseCurrency: varchar("baseCurrency", { length: 3 }).default("USD").notNull(),
   companyAddress: text("companyAddress"),
   companyPhone: varchar("companyPhone", { length: 50 }),
   logoUrl: text("logoUrl"),
@@ -65,6 +66,7 @@ export const invoices = mysqlTable("invoices", {
   status: mysqlEnum("status", ["draft", "sent", "paid", "overdue", "canceled"]).default("draft").notNull(),
   
   // Financial details
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   taxRate: decimal("taxRate", { precision: 5, scale: 2 }).default("0").notNull(),
   taxAmount: decimal("taxAmount", { precision: 10, scale: 2 }).default("0").notNull(),
@@ -259,3 +261,51 @@ export const expenses = mysqlTable("expenses", {
 
 export type Expense = typeof expenses.$inferSelect;
 export type InsertExpense = typeof expenses.$inferInsert;
+
+/**
+ * Invoice generation logs for tracking automated recurring invoice generation
+ */
+export const invoiceGenerationLogs = mysqlTable("invoiceGenerationLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  recurringInvoiceId: int("recurringInvoiceId").notNull(),
+  generatedInvoiceId: int("generatedInvoiceId"),
+  generationDate: timestamp("generationDate").defaultNow().notNull(),
+  status: mysqlEnum("status", ["success", "failed"]).notNull(),
+  errorMessage: text("errorMessage"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InvoiceGenerationLog = typeof invoiceGenerationLogs.$inferSelect;
+export type InsertInvoiceGenerationLog = typeof invoiceGenerationLogs.$inferInsert;
+
+/**
+ * Currencies table for multi-currency support
+ */
+export const currencies = mysqlTable("currencies", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 3 }).notNull().unique(), // USD, EUR, GBP, etc.
+  name: varchar("name", { length: 100 }).notNull(),
+  symbol: varchar("symbol", { length: 10 }).notNull(),
+  exchangeRateToUSD: varchar("exchangeRateToUSD", { length: 20 }).notNull(), // Store as string for precision
+  lastUpdated: timestamp("lastUpdated").defaultNow().notNull(),
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = inactive
+});
+
+export type Currency = typeof currencies.$inferSelect;
+export type InsertCurrency = typeof currencies.$inferInsert;
+
+/**
+ * Client portal access tokens for secure client invoice viewing
+ */
+export const clientPortalAccess = mysqlTable("clientPortalAccess", {
+  id: int("id").autoincrement().primaryKey(),
+  clientId: int("clientId").notNull(),
+  accessToken: varchar("accessToken", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  lastAccessedAt: timestamp("lastAccessedAt"),
+  isActive: int("isActive").default(1).notNull(), // 1 = active, 0 = revoked
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ClientPortalAccess = typeof clientPortalAccess.$inferSelect;
+export type InsertClientPortalAccess = typeof clientPortalAccess.$inferInsert;

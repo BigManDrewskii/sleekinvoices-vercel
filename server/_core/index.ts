@@ -7,6 +7,8 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { initializeScheduler } from "../jobs/scheduler";
+import { initializeDefaultCurrencies } from "../currency";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -57,8 +59,18 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
-  server.listen(port, () => {
+  server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize default currencies if needed
+    try {
+      await initializeDefaultCurrencies();
+    } catch (error) {
+      console.error("[Server] Failed to initialize currencies:", error);
+    }
+    
+    // Initialize cron jobs for automated tasks
+    initializeScheduler();
   });
 }
 

@@ -583,6 +583,27 @@ export const appRouter = router({
         await db.updateRecurringInvoice(input.id, ctx.user.id, { isActive: input.isActive });
         return { success: true };
       }),
+    
+    // Manual trigger for testing (admin only)
+    triggerGeneration: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        // Only allow admin users to manually trigger
+        if (ctx.user.role !== 'admin') {
+          throw new Error('Only admins can manually trigger invoice generation');
+        }
+        
+        const { generateRecurringInvoices } = await import('./jobs/generateRecurringInvoices');
+        await generateRecurringInvoices();
+        
+        return { success: true, message: 'Invoice generation triggered' };
+      }),
+    
+    // Get generation logs for a recurring invoice
+    getGenerationLogs: protectedProcedure
+      .input(z.object({ recurringInvoiceId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getGenerationLogsByRecurringId(input.recurringInvoiceId);
+      }),
   }),
 
   templates: router({
@@ -733,6 +754,76 @@ export const appRouter = router({
       .input(z.object({ months: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
         return await db.getExpenseStats(ctx.user.id, input?.months);
+      }),
+  }),
+
+  currencies: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllCurrencies();
+    }),
+    
+    updateRates: protectedProcedure.mutation(async ({ ctx }) => {
+      // Only allow admin users to update rates
+      if (ctx.user.role !== 'admin') {
+        throw new Error('Only admins can update exchange rates');
+      }
+      
+      const { updateExchangeRates } = await import('./currency');
+      await updateExchangeRates();
+      
+      return { success: true, message: 'Exchange rates updated' };
+    }),
+  }),
+
+  clientPortal: router({
+    // Generate access token for a client (protected - admin only)
+    generateAccessToken: protectedProcedure
+      .input(z.object({ clientId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const accessToken = await db.createClientPortalAccess(input.clientId);
+        return { accessToken, portalUrl: `/portal/${accessToken}` };
+      }),
+    
+    // Get client info by access token (public)
+    getClientInfo: publicProcedure
+      .input(z.object({ accessToken: z.string() }))
+      .query(async ({ input }) => {
+        const client = await db.getClientByAccessToken(input.accessToken);
+        if (!client) {
+          throw new Error('Invalid or expired access token');
+        }
+        return client;
+      }),
+    
+    // Get invoices for a client (public)
+    getInvoices: publicProcedure
+      .input(z.object({ accessToken: z.string() }))
+      .query(async ({ input }) => {
+        const client = await db.getClientByAccessToken(input.accessToken);
+        if (!client) {
+          throw new Error('Invalid or expired access token');
+        }
+        
+        return await db.getClientInvoices(client.id);
+      }),
+    
+    // Get single invoice details (public)
+    getInvoice: publicProcedure
+      .input(z.object({ accessToken: z.string(), invoiceId: z.number() }))
+      .query(async ({ input }) => {
+        const client = await db.getClientByAccessToken(input.accessToken);
+        if (!client) {
+          throw new Error('Invalid or expired access token');
+        }
+        
+        const invoice = await db.getInvoiceById(input.invoiceId, client.userId);
+        if (!invoice || invoice.clientId !== client.id) {
+          throw new Error('Invoice not found');
+        }
+        
+        const lineItems = await db.getLineItemsByInvoiceId(input.invoiceId);
+        
+        return { invoice, lineItems, client };
       }),
   }),
 
