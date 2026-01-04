@@ -1,4 +1,4 @@
-import { eq, and, desc, sql, gte, lte } from "drizzle-orm";
+import { eq, and, desc, sql, gte, lte, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -1739,4 +1739,65 @@ export async function getRevenueVsExpensesByMonth(userId: number, year: number =
   }
   
   return monthlyData;
+}
+
+// Billable Expense Functions
+export async function getBillableUnlinkedExpenses(userId: number, clientId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const conditions = [
+    eq(expenses.userId, userId),
+    eq(expenses.isBillable, true),
+    isNull(expenses.invoiceId)
+  ];
+  
+  if (clientId) {
+    conditions.push(eq(expenses.clientId, clientId));
+  }
+  
+  const result = await db.select({
+    id: expenses.id,
+    description: expenses.description,
+    amount: expenses.amount,
+    taxAmount: expenses.taxAmount,
+    date: expenses.date,
+    vendor: expenses.vendor,
+    clientId: expenses.clientId,
+    clientName: clients.name,
+  })
+    .from(expenses)
+    .leftJoin(clients, eq(expenses.clientId, clients.id))
+    .where(and(...conditions))
+    .orderBy(desc(expenses.date));
+  
+  return result;
+}
+
+export async function linkExpenseToInvoice(expenseId: number, invoiceId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // Verify expense belongs to user and is billable
+  const expense = await db.select()
+    .from(expenses)
+    .where(
+      and(
+        eq(expenses.id, expenseId),
+        eq(expenses.userId, userId),
+        eq(expenses.isBillable, true)
+      )
+    )
+    .limit(1);
+  
+  if (expense.length === 0) {
+    throw new Error("Expense not found or not billable");
+  }
+  
+  // Update expense with invoiceId
+  await db.update(expenses)
+    .set({ invoiceId })
+    .where(eq(expenses.id, expenseId));
+  
+  return { success: true };
 }

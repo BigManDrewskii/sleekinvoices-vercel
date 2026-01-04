@@ -17,10 +17,13 @@
   - [x] Build expanded detail layout showing vendor, payment, tax, receipt, billable
   - [x] Add smooth animation for expand/collapse
   - [x] Test all fields display correctly
-- [ ] Component 4: Billable Expense Workflow (45 min)
-  - [ ] Backend: getBillableUnlinked, linkToInvoice
-  - [ ] Frontend: Add expenses when creating invoice
-  - [ ] Auto-create line items from expenses
+- [x] Component 4: Billable Expense Workflow (45 min)
+  - [x] Backend: getBillableUnlinked procedure
+  - [x] Backend: linkToInvoice procedure
+  - [x] Backend: getBillableExpenses helper in db.ts
+  - [x] Frontend: Add expenses button on CreateInvoice
+  - [x] Frontend: Expense selection dialog
+  - [x] Frontend: Auto-create line items from expenses
 - [ ] Component 5: Filtering & Stats (30 min)
   - [ ] Filter by payment method, billable status, client
   - [ ] Enhanced stats display

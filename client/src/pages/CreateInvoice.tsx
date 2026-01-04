@@ -1,11 +1,14 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ClientSelector } from "@/components/invoices/ClientSelector";
 import { LineItemRow, LineItem } from "@/components/invoices/LineItemRow";
+import { BillableExpenseDialog } from "@/components/invoices/BillableExpenseDialog";
 import { InvoiceFormCalculations } from "@/components/invoices/InvoiceFormCalculations";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -38,6 +41,10 @@ export default function CreateInvoice() {
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Billable expenses dialog
+  const [showExpenseDialog, setShowExpenseDialog] = useState(false);
+  const [linkedExpenseIds, setLinkedExpenseIds] = useState<number[]>([]);
 
   // Fetch next invoice number
   const { data: nextNumber } = trpc.invoices.getNextNumber.useQuery(undefined, {
@@ -169,6 +176,7 @@ export default function CreateInvoice() {
       discountValue,
       notes,
       paymentTerms,
+      expenseIds: linkedExpenseIds.length > 0 ? linkedExpenseIds : undefined,
     });
   };
 
@@ -194,6 +202,7 @@ export default function CreateInvoice() {
       discountValue,
       notes,
       paymentTerms,
+      expenseIds: linkedExpenseIds.length > 0 ? linkedExpenseIds : undefined,
     });
   };
 
@@ -329,10 +338,22 @@ export default function CreateInvoice() {
                     <CardTitle>Line Items</CardTitle>
                     <CardDescription>Add products or services to the invoice</CardDescription>
                   </div>
-                  <Button type="button" variant="outline" size="sm" onClick={addLineItem}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Item
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowExpenseDialog(true)}
+                      disabled={!clientId}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Add Billable Expenses
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={addLineItem}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Item
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -456,6 +477,25 @@ export default function CreateInvoice() {
           </div>
         </div>
       </div>
+      
+      {/* Billable Expenses Dialog */}
+      <BillableExpenseDialog
+        open={showExpenseDialog}
+        onOpenChange={setShowExpenseDialog}
+        clientId={clientId}
+        onAddExpenses={(expenses) => {
+          const newItems = expenses.map(exp => ({
+            id: nanoid(),
+            description: `${exp.description} (${exp.vendor || 'Expense'})`,
+            quantity: 1,
+            rate: Number(exp.amount) + (Number(exp.taxAmount) || 0),
+          }));
+          setLineItems([...lineItems, ...newItems]);
+          setLinkedExpenseIds([...linkedExpenseIds, ...expenses.map(e => e.id)]);
+          setShowExpenseDialog(false);
+          toast.success(`Added ${expenses.length} expense(s) to invoice`);
+        }}
+      />
     </div>
   );
 }

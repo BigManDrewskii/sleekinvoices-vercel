@@ -145,6 +145,7 @@ export const appRouter = router({
         discountValue: z.number().default(0),
         notes: z.string().optional(),
         paymentTerms: z.string().optional(),
+        expenseIds: z.array(z.number()).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         // Calculate totals
@@ -196,6 +197,13 @@ export const appRouter = router({
             amount: (item.quantity * item.rate).toString(),
             sortOrder: i,
           });
+        }
+        
+        // Link billable expenses to this invoice
+        if (input.expenseIds && input.expenseIds.length > 0) {
+          for (const expenseId of input.expenseIds) {
+            await db.linkExpenseToInvoice(expenseId, invoice.id, ctx.user.id);
+          }
         }
         
         return invoice;
@@ -825,6 +833,21 @@ export const appRouter = router({
       .input(z.object({ months: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
         return await db.getExpenseStats(ctx.user.id, input?.months);
+      }),
+    
+    getBillableUnlinked: protectedProcedure
+      .input(z.object({ clientId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getBillableUnlinkedExpenses(ctx.user.id, input?.clientId);
+      }),
+    
+    linkToInvoice: protectedProcedure
+      .input(z.object({
+        expenseId: z.number(),
+        invoiceId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.linkExpenseToInvoice(input.expenseId, input.invoiceId, ctx.user.id);
       }),
   }),
 
