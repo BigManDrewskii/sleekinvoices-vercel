@@ -1237,3 +1237,112 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [ ] Implement batch PDF export for selected invoices
 - [ ] Add loading spinner during export
 - [ ] Add success toast after export completes
+
+
+---
+
+## 🔴 COMPREHENSIVE UI/UX AUDIT - CRITICAL FIXES
+
+### Navigation & Core
+- [ ] Fix navigation active state bug (green boxes on all items)
+- [ ] Verify line item delete button exists and works
+- [x] Improve client selection flow (enhanced New Client button visibility)
+- [ ] Implement mobile navigation (hamburger menu + drawer)
+
+### Invoice Creation
+- [x] Remove duplicate cancel buttons
+- [ ] Add date picker component (calendar UI)
+- [ ] Add currency symbol to rate input field
+- [ ] Fix "No clients yet" blocking issue
+
+### Settings & Profile
+- [ ] Fix logo upload preview (show uploaded image)
+- [ ] Simplify email template editor (hide HTML or add visual editor)
+- [ ] Add currency selection dropdown
+- [ ] Add tax settings section
+
+### Subscription & Billing
+- [ ] Make "Manage Billing" button more visible for Pro users
+- [ ] Add annual billing option
+- [ ] Improve upgrade CTA placement and visibility
+
+### Dashboard & Analytics
+- [ ] Fix empty state messaging (detect first login)
+- [ ] Add export functionality (PDF for reports, CSV for lists)
+- [ ] Fix red $0.00 display for expenses (use neutral color)
+- [ ] Add custom date range picker
+
+---
+
+## 🟡 ESSENTIAL FEATURES - COMPETITIVE PARITY
+
+### Invoice Management
+- [ ] Recurring invoices (setup recurrence rules)
+- [ ] Duplicate invoice functionality
+- [ ] Invoice templates (multiple designs)
+- [ ] Batch operations (select multiple, bulk actions)
+- [ ] Auto-save drafts
+
+### Client Management
+- [ ] Import clients from CSV
+- [ ] Export clients to CSV
+- [ ] Client notes/tags
+- [ ] Client detail page with invoice history
+
+### Reporting & Export
+- [ ] Export analytics to PDF
+- [ ] Export invoice list to CSV
+- [ ] Export client list to CSV
+- [ ] Custom date range for reports
+
+### Customization
+- [ ] Multiple invoice template designs
+- [ ] Custom fields
+- [ ] Color scheme customization
+- [ ] Custom branding options
+
+---
+
+## 🟢 POLISH & REFINEMENT
+
+### Visual Design
+- [ ] Standardize spacing (8px grid system)
+- [ ] Fix icon size consistency
+- [ ] Improve typography hierarchy
+- [ ] Enhance color contrast (WCAG AA)
+- [ ] Add micro-interactions and animations
+
+### Responsive Design
+- [ ] Test and fix mobile layout (375px, 414px)
+- [ ] Test and fix tablet layout (768px, 1024px)
+- [ ] Make tables horizontally scrollable on mobile
+- [ ] Ensure touch targets are 44x44px minimum
+
+### User Experience
+- [ ] Add breadcrumb navigation
+- [ ] Expand user menu (profile, settings, help)
+- [ ] Add contextual help tooltips
+- [ ] Improve empty states with actionable guidance
+- [ ] Add onboarding checklist for new users
+
+### Performance
+- [ ] Lazy load charts and heavy components
+- [ ] Optimize images
+- [ ] Implement code splitting
+- [ ] Reduce bundle size
+
+---
+
+## 🚀 ADVANCED FEATURES - ROADMAP
+
+- [ ] Estimates/Quotes (convert to invoice)
+- [ ] Time tracking (billable hours)
+- [ ] Expense tracking (mark as billable)
+- [ ] Client portal (view/pay invoices)
+- [ ] Multi-currency support
+- [ ] Payment reminders (automated)
+- [ ] Late fees
+- [ ] Deposit/retainer tracking
+- [ ] Team collaboration (multiple users)
+- [ ] Integrations (QuickBooks, Xero, Zapier)
+

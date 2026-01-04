@@ -64,8 +64,9 @@ export function ClientSelector({ value, onChange, error }: ClientSelectorProps) 
         </Select>
         <Button
           type="button"
-          variant="outline"
+          variant={!clients || clients.length === 0 ? "default" : "outline"}
           onClick={() => setCreateDialogOpen(true)}
+          className={!clients || clients.length === 0 ? "shadow-lg" : ""}
         >
           <Plus className="h-4 w-4 mr-2" />
           New Client

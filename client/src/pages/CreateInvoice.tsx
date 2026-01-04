@@ -18,6 +18,7 @@ import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
+import { Navigation } from "@/components/Navigation";
 
 export default function CreateInvoice() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -225,47 +226,14 @@ export default function CreateInvoice() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2">
-                <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-6" />
-              </Link>
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </Link>
-              <Link href="/invoices" className="text-sm font-medium text-foreground">Invoices</Link>
-              <Link href="/clients" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Clients
-                </Link>
-              <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
-                </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/settings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {user?.name || "Settings"}
-              </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Create Invoice</h1>
-              <p className="text-muted-foreground">Fill in the details to create a new invoice</p>
-            </div>
-            <Link href="/invoices">
-              <a>
-                <Button variant="outline">Cancel</Button>
-              </a>
-            </Link>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-foreground">Create Invoice</h1>
+            <p className="text-muted-foreground">Fill in the details to create a new invoice</p>
           </div>
 
           <div className="space-y-6">

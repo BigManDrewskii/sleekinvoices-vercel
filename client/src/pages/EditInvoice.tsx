@@ -14,6 +14,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
+import { Navigation } from "@/components/Navigation";
 
 export default function EditInvoice() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -229,33 +230,7 @@ export default function EditInvoice() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2">
-                <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-6" />
-              </Link>
-            <div className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </Link>
-              <Link href="/invoices" className="text-sm font-medium text-foreground">Invoices</Link>
-              <Link href="/clients" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Clients
-                </Link>
-              <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
-                </Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/settings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {user?.name || "Settings"}
-              </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
