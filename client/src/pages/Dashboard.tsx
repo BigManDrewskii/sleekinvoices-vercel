@@ -7,6 +7,7 @@ import { DollarSign, FileText, TrendingUp, AlertCircle, Plus } from "lucide-reac
 import { Link } from "wouter";
 import { UsageIndicator } from "@/components/UsageIndicator";
 import { Navigation } from "@/components/Navigation";
+import { UpgradePromoBanner } from "@/components/UpgradePromoBanner";
 
 export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -49,6 +50,11 @@ export default function Dashboard() {
               New Invoice
             </Link>
           </Button>
+        </div>
+
+        {/* Upgrade Promo Banner */}
+        <div className="mb-8">
+          <UpgradePromoBanner />
         </div>
 
         {/* Usage Indicator for Free Tier */}
@@ -151,13 +157,15 @@ export default function Dashboard() {
 
 function StatCard({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+    <Card className="hover-lift transition-all duration-200">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+        <div className="p-2 rounded-lg bg-primary/10">
           {icon}
         </div>
-        <h3 className="text-2xl font-bold text-foreground">{value}</h3>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold tracking-tight">{value}</div>
       </CardContent>
     </Card>
   );
