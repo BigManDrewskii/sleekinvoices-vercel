@@ -1182,11 +1182,16 @@ export const appRouter = router({
         throw new Error('Stripe price ID is still a placeholder. Please create a product in Stripe Dashboard and update STRIPE_PRO_PRICE_ID.');
       }
       
+      // Use the request host to build correct redirect URLs
+      const protocol = ctx.req.protocol || 'https';
+      const host = ctx.req.get('host') || 'localhost:3000';
+      const baseUrl = `${protocol}://${host}`;
+      
       const { url } = await createSubscriptionCheckout({
         customerId,
         priceId,
-        successUrl: `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/subscription/success`,
-        cancelUrl: `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/subscription`,
+        successUrl: `${baseUrl}/subscription/success`,
+        cancelUrl: `${baseUrl}/subscription`,
       });
       
       return { url };
