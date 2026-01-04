@@ -410,9 +410,7 @@ export default function CreateInvoice() {
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-4">
               <Link href="/invoices">
-                <a>
-                  <Button variant="outline">Cancel</Button>
-                </a>
+                <Button variant="outline">Cancel</Button>
               </Link>
               <Button
                 variant="outline"

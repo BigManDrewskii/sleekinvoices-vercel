@@ -172,3 +172,7 @@
 - [x] Show success/error toast notifications
 - [x] Test email delivery and template rendering
 - [x] Verify portal link in email works correctly
+
+## Bug Fixes
+- [x] Fix nested anchor tag error on /invoices/new page
+- [x] Locate and remove nested <a> tags causing React error (fixed 3 instances in CreateInvoice and EditInvoice)

@@ -219,9 +219,7 @@ export default function EditInvoice() {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Invoice Not Found</h1>
           <Link href="/invoices">
-            <a>
-              <Button>Back to Invoices</Button>
-            </a>
+            <Button>Back to Invoices</Button>
           </Link>
         </div>
       </div>
@@ -241,9 +239,7 @@ export default function EditInvoice() {
               <p className="text-muted-foreground">Update invoice {invoiceNumber}</p>
             </div>
             <Link href={`/invoices/${invoiceId}`}>
-              <a>
-                <Button variant="outline">Cancel</Button>
-              </a>
+              <Button variant="outline">Cancel</Button>
             </Link>
           </div>
 
