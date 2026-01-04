@@ -899,6 +899,108 @@ export const appRouter = router({
       }),
   }),
   
+  reminders: router({
+    getSettings: protectedProcedure
+      .query(async ({ ctx }) => {
+        const settings = await db.getReminderSettings(ctx.user.id);
+        if (!settings) {
+          // Return default settings
+          return {
+            enabled: true,
+            intervals: [3, 7, 14],
+            emailTemplate: null, // Will use DEFAULT_REMINDER_TEMPLATE
+            ccEmail: null,
+          };
+        }
+        return {
+          enabled: settings.enabled === 1,
+          intervals: JSON.parse(settings.intervals),
+          emailTemplate: settings.emailTemplate,
+          ccEmail: settings.ccEmail,
+        };
+      }),
+    
+    updateSettings: protectedProcedure
+      .input(z.object({
+        enabled: z.boolean(),
+        intervals: z.array(z.number()),
+        emailTemplate: z.string().optional(),
+        ccEmail: z.string().email().optional().nullable(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.upsertReminderSettings(ctx.user.id, input);
+        return { success: true };
+      }),
+    
+    sendManual: protectedProcedure
+      .input(z.object({ invoiceId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        // Get invoice
+        const invoice = await db.getInvoiceById(input.invoiceId, ctx.user.id);
+        if (!invoice) {
+          throw new Error('Invoice not found');
+        }
+        
+        // Get client
+        const client = await db.getClientById(invoice.clientId, ctx.user.id);
+        if (!client) {
+          throw new Error('Client not found');
+        }
+        
+        // Calculate days overdue
+        const dueDate = invoice.dueDate ? new Date(invoice.dueDate) : null;
+        if (!dueDate) {
+          throw new Error('Invoice has no due date');
+        }
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        dueDate.setHours(0, 0, 0, 0);
+        
+        const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysOverdue <= 0) {
+          throw new Error('Invoice is not overdue yet');
+        }
+        
+        // Get reminder settings
+        const settings = await db.getReminderSettings(ctx.user.id);
+        
+        // Send reminder
+        const { sendReminderEmail } = await import('./email');
+        const result = await sendReminderEmail({
+          invoice,
+          client,
+          user: ctx.user,
+          daysOverdue,
+          template: settings?.emailTemplate,
+          ccEmail: settings?.ccEmail || undefined,
+        });
+        
+        // Log the reminder
+        await db.logReminderSent({
+          invoiceId: invoice.id,
+          userId: ctx.user.id,
+          daysOverdue,
+          recipientEmail: client.email || 'N/A',
+          status: result.success ? 'sent' : 'failed',
+          errorMessage: result.error,
+        });
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to send reminder');
+        }
+        
+        return { success: true, messageId: result.messageId };
+      }),
+    
+    getLogs: protectedProcedure
+      .input(z.object({ invoiceId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getReminderLogs(input.invoiceId);
+      }),
+  }),
+  
   subscription: router({
     getStatus: protectedProcedure.query(async ({ ctx }) => {
       return {

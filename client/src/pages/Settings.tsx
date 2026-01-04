@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Save, Upload, User, Building2, LogOut } from "lucide-react";
+import { FileText, Save, Upload, User, Building2, LogOut, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -23,6 +25,24 @@ export default function Settings() {
   // Logo state
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  
+  // Reminder settings state
+  const [reminderEnabled, setReminderEnabled] = useState(true);
+  const [reminderIntervals, setReminderIntervals] = useState<number[]>([3, 7, 14]);
+  const [reminderTemplate, setReminderTemplate] = useState("");
+  const [reminderCcEmail, setReminderCcEmail] = useState("");
+  
+  // Fetch reminder settings
+  const { data: reminderSettings } = trpc.reminders.getSettings.useQuery();
+  const updateReminderSettings = trpc.reminders.updateSettings.useMutation({
+    onSuccess: () => {
+      toast.success("Reminder settings saved successfully");
+      utils.reminders.getSettings.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to save reminder settings");
+    },
+  });
 
   // Populate form when user data loads
   useEffect(() => {
@@ -34,6 +54,16 @@ export default function Settings() {
       setLogoPreview(user.logoUrl || null);
     }
   }, [user]);
+  
+  // Populate reminder settings when they load
+  useEffect(() => {
+    if (reminderSettings) {
+      setReminderEnabled(reminderSettings.enabled);
+      setReminderIntervals(reminderSettings.intervals);
+      setReminderTemplate(reminderSettings.emailTemplate || "");
+      setReminderCcEmail(reminderSettings.ccEmail || "");
+    }
+  }, [reminderSettings]);
 
   const utils = trpc.useUtils();
   
@@ -58,6 +88,23 @@ export default function Settings() {
     },
   });
 
+  const handleReminderIntervalToggle = (day: number) => {
+    if (reminderIntervals.includes(day)) {
+      setReminderIntervals(reminderIntervals.filter(d => d !== day));
+    } else {
+      setReminderIntervals([...reminderIntervals, day].sort((a, b) => a - b));
+    }
+  };
+  
+  const handleSaveReminderSettings = () => {
+    updateReminderSettings.mutate({
+      enabled: reminderEnabled,
+      intervals: reminderIntervals,
+      emailTemplate: reminderTemplate || undefined,
+      ccEmail: reminderCcEmail || null,
+    });
+  };
+  
   const handleSaveProfile = () => {
     updateProfile.mutate({
       name,
@@ -328,6 +375,117 @@ export default function Settings() {
                       </Button>
                     )}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Email Reminder Settings */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-5 w-5 text-primary" />
+                  <CardTitle>Email Reminder Settings</CardTitle>
+                </div>
+                <CardDescription>Automatically send payment reminders to clients with overdue invoices</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Enable/Disable */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="reminderEnabled">Enable Automated Reminders</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Send automatic email reminders for overdue invoices
+                    </p>
+                  </div>
+                  <Switch
+                    id="reminderEnabled"
+                    checked={reminderEnabled}
+                    onCheckedChange={setReminderEnabled}
+                  />
+                </div>
+                
+                {/* Reminder Intervals */}
+                <div className="space-y-3">
+                  <Label>Reminder Intervals</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Send reminders at these intervals after the due date
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    {[3, 7, 14, 30].map(day => (
+                      <div key={day} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`interval-${day}`}
+                          checked={reminderIntervals.includes(day)}
+                          onCheckedChange={() => handleReminderIntervalToggle(day)}
+                          disabled={!reminderEnabled}
+                        />
+                        <label
+                          htmlFor={`interval-${day}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {day} days
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {reminderIntervals.length === 0 && reminderEnabled && (
+                    <p className="text-sm text-destructive">
+                      Please select at least one reminder interval
+                    </p>
+                  )}
+                </div>
+                
+                {/* CC Email */}
+                <div className="space-y-2">
+                  <Label htmlFor="reminderCcEmail">CC Email Address (Optional)</Label>
+                  <Input
+                    id="reminderCcEmail"
+                    type="email"
+                    placeholder="accounting@yourcompany.com"
+                    value={reminderCcEmail}
+                    onChange={(e) => setReminderCcEmail(e.target.value)}
+                    disabled={!reminderEnabled}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Receive a copy of all reminder emails sent to clients
+                  </p>
+                </div>
+                
+                {/* Email Template */}
+                <div className="space-y-2">
+                  <Label htmlFor="reminderTemplate">Email Template (Optional)</Label>
+                  <Textarea
+                    id="reminderTemplate"
+                    placeholder="Leave blank to use the default template"
+                    value={reminderTemplate}
+                    onChange={(e) => setReminderTemplate(e.target.value)}
+                    disabled={!reminderEnabled}
+                    rows={10}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Available placeholders: {'{{'}clientName{'}}'}, {'{{'}invoiceNumber{'}}'}, {'{{'}invoiceAmount{'}}'}, {'{{'}dueDate{'}}'}, {'{{'}daysOverdue{'}}'}, {'{{'}invoiceUrl{'}}'}, {'{{'}companyName{'}}'}  
+                  </p>
+                </div>
+                
+                {/* Save Button */}
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSaveReminderSettings}
+                    disabled={updateReminderSettings.isPending || (reminderEnabled && reminderIntervals.length === 0)}
+                  >
+                    {updateReminderSettings.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Reminder Settings
+                      </>
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

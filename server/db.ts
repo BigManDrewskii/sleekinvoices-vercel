@@ -21,9 +21,12 @@ import {
   InsertPayment,
   Payment,
   stripeWebhookEvents,
-  InsertStripeWebhookEvent
+  InsertStripeWebhookEvent,
+  reminderSettings,
+  reminderLogs
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { DEFAULT_REMINDER_TEMPLATE } from './email';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -1359,4 +1362,111 @@ export async function isWebhookEventProcessed(eventId: string): Promise<boolean>
     .limit(1);
   
   return result.length > 0 && result[0]!.processed === 1;
+}
+
+
+// ============================================================================
+// REMINDER OPERATIONS
+// ============================================================================
+
+export async function getReminderSettings(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const settings = await db.select().from(reminderSettings).where(eq(reminderSettings.userId, userId)).limit(1);
+  return settings[0] || null;
+}
+
+export async function upsertReminderSettings(userId: number, data: {
+  enabled?: boolean;
+  intervals?: number[];
+  emailTemplate?: string;
+  ccEmail?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const existing = await getReminderSettings(userId);
+  
+  const settingsData = {
+    userId,
+    enabled: data.enabled !== undefined ? (data.enabled ? 1 : 0) : 1,
+    intervals: data.intervals ? JSON.stringify(data.intervals) : JSON.stringify([3, 7, 14]),
+    emailTemplate: data.emailTemplate || DEFAULT_REMINDER_TEMPLATE,
+    ccEmail: data.ccEmail || null,
+  };
+  
+  if (existing) {
+    await db.update(reminderSettings)
+      .set(settingsData)
+      .where(eq(reminderSettings.userId, userId));
+  } else {
+    await db.insert(reminderSettings).values(settingsData);
+  }
+  
+  return await getReminderSettings(userId);
+}
+
+export async function logReminderSent(data: {
+  invoiceId: number;
+  userId: number;
+  daysOverdue: number;
+  recipientEmail: string;
+  status: 'sent' | 'failed';
+  errorMessage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  await db.insert(reminderLogs).values({
+    invoiceId: data.invoiceId,
+    userId: data.userId,
+    daysOverdue: data.daysOverdue,
+    recipientEmail: data.recipientEmail,
+    status: data.status,
+    errorMessage: data.errorMessage || null,
+  });
+}
+
+export async function getReminderLogs(invoiceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return await db.select()
+    .from(reminderLogs)
+    .where(eq(reminderLogs.invoiceId, invoiceId))
+    .orderBy(desc(reminderLogs.sentAt));
+}
+
+export async function getLastReminderSent(invoiceId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const logs = await db.select()
+    .from(reminderLogs)
+    .where(eq(reminderLogs.invoiceId, invoiceId))
+    .orderBy(desc(reminderLogs.sentAt))
+    .limit(1);
+  
+  return logs[0] || null;
+}
+
+export async function wasReminderSentToday(invoiceId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const logs = await db.select()
+    .from(reminderLogs)
+    .where(
+      and(
+        eq(reminderLogs.invoiceId, invoiceId),
+        gte(reminderLogs.sentAt, today)
+      )
+    )
+    .limit(1);
+  
+  return logs.length > 0;
 }

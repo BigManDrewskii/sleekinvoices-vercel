@@ -358,3 +358,37 @@ export const stripeWebhookEvents = mysqlTable("stripeWebhookEvents", {
 
 export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;
 export type InsertStripeWebhookEvent = typeof stripeWebhookEvents.$inferInsert;
+
+/**
+ * Reminder settings for automated email reminders
+ */
+export const reminderSettings = mysqlTable("reminderSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // One setting per user
+  enabled: int("enabled").default(1).notNull(), // 1 = enabled, 0 = disabled
+  intervals: text("intervals").notNull(), // JSON array: [3, 7, 14]
+  emailTemplate: text("emailTemplate").notNull(), // Customizable template with placeholders
+  ccEmail: varchar("ccEmail", { length: 320 }), // Optional CC address
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReminderSettings = typeof reminderSettings.$inferSelect;
+export type InsertReminderSettings = typeof reminderSettings.$inferInsert;
+
+/**
+ * Reminder logs for tracking sent reminders
+ */
+export const reminderLogs = mysqlTable("reminderLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  invoiceId: int("invoiceId").notNull(),
+  userId: int("userId").notNull(),
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  daysOverdue: int("daysOverdue").notNull(),
+  recipientEmail: varchar("recipientEmail", { length: 320 }).notNull(),
+  status: mysqlEnum("status", ["sent", "failed"]).notNull(),
+  errorMessage: text("errorMessage"),
+});
+
+export type ReminderLog = typeof reminderLogs.$inferSelect;
+export type InsertReminderLog = typeof reminderLogs.$inferInsert;

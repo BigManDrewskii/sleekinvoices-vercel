@@ -33,4 +33,11 @@ export const systemRouter = router({
       const result = await detectAndMarkOverdueInvoices();
       return result;
     }),
+  
+  sendReminders: adminProcedure
+    .mutation(async () => {
+      const { sendOverdueReminders } = await import('../jobs/sendOverdueReminders');
+      await sendOverdueReminders();
+      return { success: true };
+    }),
 });

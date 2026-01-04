@@ -91,6 +91,16 @@ export default function ViewInvoice() {
     },
   });
 
+  const sendReminder = trpc.reminders.sendManual.useMutation({
+    onSuccess: () => {
+      toast.success("Payment reminder sent successfully");
+      utils.invoices.get.invalidate({ id: invoiceId });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send reminder");
+    },
+  });
+  
   const createPaymentLink = trpc.invoices.createPaymentLink.useMutation({
     onSuccess: (data) => {
       toast.success("Payment link created");
@@ -260,6 +270,18 @@ export default function ViewInvoice() {
               <Mail className="h-4 w-4 mr-2" />
               Send Email
             </Button>
+            {invoice.status === 'overdue' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => sendReminder.mutate({ invoiceId: invoice.id })}
+                disabled={sendReminder.isPending}
+                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Send Reminder
+              </Button>
+            )}
             {!invoice.stripePaymentLinkUrl && (
               <Button
                 variant="outline"

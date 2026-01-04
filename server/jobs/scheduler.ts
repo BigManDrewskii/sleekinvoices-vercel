@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { generateRecurringInvoices } from "./generateRecurringInvoices";
 import { detectAndMarkOverdueInvoices } from "./detectOverdueInvoices";
+import { sendOverdueReminders } from "./sendOverdueReminders";
 
 /**
  * Initialize all scheduled jobs
@@ -34,7 +35,18 @@ export function initializeScheduler() {
     }
   });
   
+  // Run overdue reminders daily at 9:00 AM
+  cron.schedule("0 9 * * *", async () => {
+    console.log("[Scheduler] Running daily overdue reminders...");
+    try {
+      await sendOverdueReminders();
+    } catch (error) {
+      console.error("[Scheduler] Overdue reminders failed:", error);
+    }
+  });
+  
   console.log("[Scheduler] Cron jobs initialized successfully");
   console.log("[Scheduler] - Recurring invoices: Daily at midnight");
   console.log("[Scheduler] - Overdue detection: Daily at 1:00 AM");
+  console.log("[Scheduler] - Overdue reminders: Daily at 9:00 AM");
 }

@@ -385,3 +385,233 @@ export async function sendPaymentReminderEmail(params: SendInvoiceEmailParams): 
     };
   }
 }
+
+
+/**
+ * Default reminder email template
+ */
+export const DEFAULT_REMINDER_TEMPLATE = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 32px 0;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 32px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #111827;
+    }
+    .alert {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 4px;
+    }
+    .alert-text {
+      color: #991b1b;
+      font-weight: 600;
+      margin: 0;
+    }
+    .invoice-details {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+    .detail-label {
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .detail-value {
+      color: #111827;
+      font-weight: 600;
+    }
+    .amount {
+      font-size: 24px;
+      color: #ef4444;
+    }
+    .button {
+      display: inline-block;
+      background: #ef4444;
+      color: white;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      margin: 24px 0;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .message {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Payment Reminder</h1>
+  </div>
+  
+  <div class="alert">
+    <p class="alert-text">⚠️ This invoice is {{daysOverdue}} days overdue</p>
+  </div>
+  
+  <div class="message">
+    <p>Dear {{clientName}},</p>
+    <p>This is a friendly reminder that invoice {{invoiceNumber}} is now {{daysOverdue}} days past due. We kindly request your prompt attention to this matter.</p>
+  </div>
+  
+  <div class="invoice-details">
+    <div class="detail-row">
+      <span class="detail-label">Invoice Number:</span>
+      <span class="detail-value">{{invoiceNumber}}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Original Due Date:</span>
+      <span class="detail-value">{{dueDate}}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Amount Due:</span>
+      <span class="detail-value amount">{{invoiceAmount}}</span>
+    </div>
+  </div>
+  
+  <div style="text-align: center;">
+    <a href="{{invoiceUrl}}" class="button">View & Pay Invoice</a>
+  </div>
+  
+  <div class="message">
+    <p>If you have already made this payment, please disregard this reminder. If you have any questions or concerns, please don't hesitate to contact us.</p>
+    <p>Thank you for your prompt attention to this matter.</p>
+    <p>Best regards,<br>{{companyName}}</p>
+  </div>
+  
+  <div class="footer">
+    <p>This is an automated reminder from {{companyName}}</p>
+  </div>
+</body>
+</html>
+`;
+
+interface RenderReminderEmailParams {
+  template: string;
+  invoice: Invoice;
+  client: Client;
+  user: User;
+  daysOverdue: number;
+  invoiceUrl: string;
+}
+
+/**
+ * Render reminder email template with placeholders replaced
+ */
+export function renderReminderEmail(params: RenderReminderEmailParams): string {
+  const { template, invoice, client, user, daysOverdue, invoiceUrl } = params;
+  
+  const placeholders: Record<string, string> = {
+    '{{clientName}}': client.name || 'Valued Customer',
+    '{{invoiceNumber}}': invoice.invoiceNumber || 'N/A',
+    '{{invoiceAmount}}': formatCurrency(invoice.total || 0),
+    '{{dueDate}}': formatDate(invoice.dueDate),
+    '{{daysOverdue}}': daysOverdue.toString(),
+    '{{invoiceUrl}}': invoiceUrl,
+    '{{companyName}}': user.companyName || user.name || 'Your Company',
+  };
+  
+  let rendered = template;
+  for (const [placeholder, value] of Object.entries(placeholders)) {
+    rendered = rendered.replace(new RegExp(placeholder, 'g'), value);
+  }
+  
+  return rendered;
+}
+
+interface SendReminderEmailParams {
+  invoice: Invoice;
+  client: Client;
+  user: User;
+  daysOverdue: number;
+  template?: string;
+  ccEmail?: string;
+}
+
+/**
+ * Send payment reminder email to client
+ */
+export async function sendReminderEmail(params: SendReminderEmailParams): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const { invoice, client, user, daysOverdue, template, ccEmail } = params;
+  
+  if (!client.email) {
+    return { success: false, error: 'Client email is not set' };
+  }
+  
+  if (!user.email) {
+    return { success: false, error: 'User email is not set' };
+  }
+  
+  try {
+    const resendClient = getResend();
+    
+    // Generate invoice URL (client portal)
+    const invoiceUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/portal/${invoice.id}`;
+    
+    // Render template
+    const emailHtml = renderReminderEmail({
+      template: template || DEFAULT_REMINDER_TEMPLATE,
+      invoice,
+      client,
+      user,
+      daysOverdue,
+      invoiceUrl,
+    });
+    
+    const emailOptions: any = {
+      from: `${user.companyName || user.name || 'InvoiceFlow'} <noreply@manus.im>`,
+      to: client.email,
+      subject: `Payment Reminder: Invoice ${invoice.invoiceNumber} is ${daysOverdue} days overdue`,
+      html: emailHtml,
+    };
+    
+    // Add CC if provided
+    if (ccEmail) {
+      emailOptions.cc = ccEmail;
+    }
+    
+    const result = await resendClient.emails.send(emailOptions);
+    
+    return { success: true, messageId: result.data?.id };
+  } catch (error: any) {
+    console.error('Failed to send reminder email:', error);
+    return { success: false, error: error.message };
+  }
+}
