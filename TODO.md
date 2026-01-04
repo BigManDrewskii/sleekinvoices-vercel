@@ -1115,3 +1115,8 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] Implement user-friendly error messages (DONE - toast notifications)
 - [x] Add error boundaries in React components (DONE - ErrorBoundary exists)
 - [x] Log errors for debugging (DONE - server-side logging)
+
+
+## 🔴 BUG FIX: Nested Anchor Tags
+
+- [x] Fix nested `<a>` tag error on Settings page

@@ -175,39 +175,27 @@ export default function Settings() {
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard">
-              <a className="flex items-center gap-2">
-                <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-6" />
-              </a>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-6" />
             </Link>
             <div className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </a>
+              <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Dashboard
               </Link>
-              <Link href="/invoices">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Invoices
-                </a>
+              <Link href="/invoices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Invoices
               </Link>
-              <Link href="/clients">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Clients
-                </a>
+              <Link href="/clients" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Clients
               </Link>
-              <Link href="/analytics">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                  Analytics
-                </a>
+              <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Analytics
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/settings">
-              <a className="text-sm font-medium text-foreground">
-                {user?.name || "Settings"}
-              </a>
+            <Link href="/settings" className="text-sm font-medium text-foreground">
+              {user?.name || "Settings"}
             </Link>
           </div>
         </div>
