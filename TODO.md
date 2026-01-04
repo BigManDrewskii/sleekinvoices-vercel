@@ -1120,3 +1120,14 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 ## 🔴 BUG FIX: Nested Anchor Tags
 
 - [x] Fix nested `<a>` tag error on Settings page
+
+
+## 🔴 AUDIT: Nested Anchor Tags Across All Pages
+
+- [x] Search for all Link components with nested <a> tags
+- [x] Fix nested anchors in Dashboard page
+- [x] Fix nested anchors in Invoices page
+- [x] Fix nested anchors in Clients page
+- [x] Fix nested anchors in Analytics page
+- [x] Fix nested anchors in CreateInvoice, EditInvoice, ViewInvoice pages
+- [x] Verify all fixes compile without errors
