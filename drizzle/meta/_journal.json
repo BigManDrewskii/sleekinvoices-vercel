@@ -57,6 +57,13 @@
       "when": 1767534764508,
       "tag": "0007_graceful_absorbing_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1767540644159,
+      "tag": "0008_shocking_vulture",
+      "breakpoints": true
     }
   ]
 }

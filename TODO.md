@@ -887,3 +887,40 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [ ] Monitor MRR and conversion rates
 - [ ] Set up failed payment alerts
 - [ ] Save final checkpoint
+
+
+---
+
+## 📊 PHASE 2: INVOICE LIMIT ENFORCEMENT (IN PROGRESS)
+
+### Database Schema
+- [x] Add usageTracking table to drizzle/schema.ts
+- [x] Run pnpm db:push to apply schema changes
+- [x] Verify table created successfully
+
+### Backend Implementation
+- [x] Add getCurrentMonthUsage(userId) to server/db.ts
+- [x] Add incrementInvoiceCount(userId) to server/db.ts
+- [x] Add canUserCreateInvoice(userId, status) to server/db.ts
+- [x] Update invoices.create to check limits before creation
+- [x] Call incrementInvoiceCount after successful creation
+
+### Frontend Implementation
+- [ ] Create UsageIndicator component
+- [ ] Add subscription.getUsage tRPC procedure
+- [ ] Display usage counter in Dashboard
+- [ ] Disable "New Invoice" button when limit reached
+- [ ] Create UpgradePrompt component
+- [ ] Show upgrade prompt when limit reached
+
+### Testing
+- [ ] Test free user: create 3 invoices (should succeed)
+- [ ] Test free user: try 4th invoice (should fail)
+- [ ] Test pro user: create 10+ invoices (should succeed)
+- [ ] Test month rollover behavior
+- [ ] Verify no regressions in existing features
+
+### Documentation
+- [ ] Update code comments and JSDoc
+- [ ] Document usage tracking logic
+- [ ] Mark Phase 2 complete in TODO.md

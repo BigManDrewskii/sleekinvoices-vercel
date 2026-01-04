@@ -23,13 +23,14 @@
 
 /**
  * Subscription status from Stripe
+ * - free: Free tier (never subscribed or subscription ended)
  * - active: Currently subscribed and paid
  * - trialing: In trial period (treated as Pro)
  * - canceled: Subscription canceled (reverts to free at period end)
  * - past_due: Payment failed (temporarily blocked)
- * - null: Never subscribed (free tier)
+ * - null: Legacy/fallback (treated as free)
  */
-export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing' | null;
+export type SubscriptionStatus = 'free' | 'active' | 'canceled' | 'past_due' | 'trialing' | null;
 
 /**
  * Subscription plan identifiers

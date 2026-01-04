@@ -148,6 +148,23 @@ export const appRouter = router({
         expenseIds: z.array(z.number()).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // ============================================================================
+        // INVOICE LIMIT ENFORCEMENT (Phase 2)
+        // Check if user can create invoice based on subscription status and usage
+        // Free users: 3 invoices/month | Pro users: unlimited
+        // ============================================================================
+        const canCreate = await db.canUserCreateInvoice(
+          ctx.user.id,
+          ctx.user.subscriptionStatus
+        );
+        
+        if (!canCreate) {
+          throw new Error(
+            'Monthly invoice limit reached. You have created 3 invoices this month. ' +
+            'Upgrade to Pro for unlimited invoices at $12/month.'
+          );
+        }
+        
         // Calculate totals
         const subtotal = input.lineItems.reduce((sum, item) => 
           sum + (item.quantity * item.rate), 0
@@ -205,6 +222,13 @@ export const appRouter = router({
             await db.linkExpenseToInvoice(expenseId, invoice.id, ctx.user.id);
           }
         }
+        
+        // ============================================================================
+        // INCREMENT USAGE COUNTER (Phase 2)
+        // Track invoice creation for free tier limit enforcement
+        // This runs AFTER successful creation to ensure accurate counting
+        // ============================================================================
+        await db.incrementInvoiceCount(ctx.user.id);
         
         return invoice;
       }),

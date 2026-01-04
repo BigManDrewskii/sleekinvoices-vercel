@@ -23,7 +23,8 @@ import {
   stripeWebhookEvents,
   InsertStripeWebhookEvent,
   reminderSettings,
-  reminderLogs
+  reminderLogs,
+  usageTracking
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { DEFAULT_REMINDER_TEMPLATE } from './email';
@@ -1833,4 +1834,116 @@ export async function linkExpenseToInvoice(expenseId: number, invoiceId: number,
     .where(eq(expenses.id, expenseId));
   
   return { success: true };
+}
+
+
+// ============================================================================
+// Usage Tracking (Invoice Limits for Free Tier)
+// ============================================================================
+
+/**
+ * Get current month's usage for a user
+ * Returns the number of invoices created this month
+ * 
+ * @param userId - User ID to check usage for
+ * @returns Object with invoicesCreated count (0 if no record exists)
+ * 
+ * @example
+ * const usage = await getCurrentMonthUsage(123);
+ * console.log(`User has created ${usage.invoicesCreated} invoices this month`);
+ */
+export async function getCurrentMonthUsage(userId: number): Promise<{ invoicesCreated: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get current month in YYYY-MM format
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  const [record] = await db
+    .select()
+    .from(usageTracking)
+    .where(and(
+      eq(usageTracking.userId, userId),
+      eq(usageTracking.month, currentMonth)
+    ))
+    .limit(1);
+
+  return {
+    invoicesCreated: record?.invoicesCreated ?? 0
+  };
+}
+
+/**
+ * Increment the invoice count for a user in the current month
+ * Creates a new record if one doesn't exist for this month
+ * Uses INSERT ... ON DUPLICATE KEY UPDATE for atomic upsert
+ * 
+ * @param userId - User ID to increment count for
+ * @returns The new invoice count after increment
+ * 
+ * @example
+ * const newCount = await incrementInvoiceCount(123);
+ * console.log(`User now has ${newCount} invoices this month`);
+ */
+export async function incrementInvoiceCount(userId: number): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get current month in YYYY-MM format
+  const now = new Date();
+  const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+  // Try to insert new record, or update existing one
+  await db
+    .insert(usageTracking)
+    .values({
+      userId,
+      month: currentMonth,
+      invoicesCreated: 1,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        invoicesCreated: sql`${usageTracking.invoicesCreated} + 1`,
+        updatedAt: sql`NOW()`,
+      },
+    });
+
+  // Fetch the updated count
+  const usage = await getCurrentMonthUsage(userId);
+  return usage.invoicesCreated;
+}
+
+/**
+ * Check if a user can create an invoice based on their subscription status and usage
+ * Pro users can always create invoices (unlimited)
+ * Free users are limited to 3 invoices per month
+ * 
+ * @param userId - User ID to check
+ * @param subscriptionStatus - User's subscription status from database
+ * @returns true if user can create invoice, false if limit reached
+ * 
+ * @example
+ * const canCreate = await canUserCreateInvoice(123, 'free');
+ * if (!canCreate) {
+ *   throw new Error('Monthly invoice limit reached');
+ * }
+ */
+export async function canUserCreateInvoice(
+  userId: number,
+  subscriptionStatus: 'free' | 'active' | 'canceled' | 'past_due' | 'trialing' | null
+): Promise<boolean> {
+  // Import subscription helpers from shared constants
+  const { isPro, canCreateInvoice } = await import('../shared/subscription.js');
+
+  // Pro users bypass all limits
+  if (isPro(subscriptionStatus)) {
+    return true;
+  }
+
+  // Get current month usage for free users
+  const usage = await getCurrentMonthUsage(userId);
+
+  // Check against free tier limit (3 invoices/month)
+  return canCreateInvoice(subscriptionStatus, usage.invoicesCreated);
 }
