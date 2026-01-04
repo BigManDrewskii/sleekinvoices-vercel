@@ -163,3 +163,12 @@
 - [x] Show portal link status (active/expired/revoked) in client list
 - [x] Add backend procedure to revoke portal access
 - [x] Test link generation and revocation flow
+
+## Email Portal Invitation System
+- [x] Design professional email template for portal invitations
+- [x] Add backend tRPC procedure to send portal invitation emails
+- [x] Integrate with Resend email service
+- [x] Add "Send Invite" button to PortalAccessDialog
+- [x] Show success/error toast notifications
+- [x] Test email delivery and template rendering
+- [x] Verify portal link in email works correctly

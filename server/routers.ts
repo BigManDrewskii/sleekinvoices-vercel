@@ -963,6 +963,53 @@ export const appRouter = router({
         await db.revokeClientPortalAccess(input.accessToken);
         return { success: true };
       }),
+    
+    // Send portal invitation email (protected)
+    sendInvitation: protectedProcedure
+      .input(z.object({ 
+        clientId: z.number(),
+        accessToken: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const client = await db.getClientById(input.clientId, ctx.user.id);
+        if (!client) {
+          throw new Error('Client not found');
+        }
+        
+        if (!client.email) {
+          throw new Error('Client does not have an email address');
+        }
+        
+        // Import email template
+        const { generatePortalInvitationEmail } = await import('./email-templates/portal-invitation');
+        
+        // Generate email content
+        const portalUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL?.replace('/api', '') || 'http://localhost:3000'}/portal/${input.accessToken}`;
+        const { subject, html } = generatePortalInvitationEmail({
+          clientName: client.name,
+          portalUrl,
+          companyName: ctx.user.companyName || ctx.user.name || 'SleekInvoices',
+          expiresInDays: 90,
+        });
+        
+        // Send email using Resend
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        
+        const result = await resend.emails.send({
+          from: `${ctx.user.name || ctx.user.companyName || 'SleekInvoices'} <portal@sleekinvoices.com>`,
+          replyTo: ctx.user.email || 'support@sleekinvoices.com',
+          to: [client.email],
+          subject,
+          html,
+        });
+        
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        
+        return { success: true };
+      }),
   }),
 
   payments: router({

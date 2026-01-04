@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Copy, ExternalLink, Key, Loader2, RefreshCw, Shield, ShieldOff } from "lucide-react";
+import { Copy, ExternalLink, Key, Loader2, Mail, RefreshCw, Shield, ShieldOff } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface PortalAccessDialogProps {
@@ -45,6 +45,15 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
     },
     onError: (error) => {
       toast.error(error.message || "Failed to revoke access");
+    },
+  });
+  
+  const sendInvitation = trpc.clientPortal.sendInvitation.useMutation({
+    onSuccess: () => {
+      toast.success(`Portal invitation sent to ${client.email}`);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send invitation");
     },
   });
   
@@ -157,6 +166,18 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
               {/* Actions */}
               <div className="flex gap-3">
                 <Button
+                  onClick={() => sendInvitation.mutate({ clientId: client.id, accessToken: activeAccess.accessToken })}
+                  disabled={sendInvitation.isPending || !client.email}
+                  className="flex-1"
+                >
+                  {sendInvitation.isPending ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Mail className="h-4 w-4 mr-2" />
+                  )}
+                  Send Invite
+                </Button>
+                <Button
                   variant="outline"
                   onClick={handleRevoke}
                   disabled={revokeAccess.isPending}
@@ -178,6 +199,12 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
+              
+              {!client.email && (
+                <p className="text-xs text-yellow-600 bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded">
+                  ⚠️ Client email is required to send invitations. Please add an email address to this client.
+                </p>
+              )}
             </>
           ) : (
             <>
