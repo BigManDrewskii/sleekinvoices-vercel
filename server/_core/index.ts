@@ -35,7 +35,7 @@ async function startServer() {
   
   // Stripe webhook endpoint (MUST be before JSON body parser for raw body)
   app.post(
-    "/api/webhooks/stripe",
+    "/api/stripe/webhook",
     express.raw({ type: "application/json" }),
     async (req, res) => {
       const { handleStripeWebhook } = await import("../webhooks/stripe");

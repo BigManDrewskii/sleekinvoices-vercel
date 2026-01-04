@@ -1012,3 +1012,14 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] LIVE Stripe keys added to production via Application secrets
 - [ ] Test webhook verification on production site
 - [ ] Test complete checkout flow with LIVE keys on production
+
+
+---
+
+## 🐛 WEBHOOK JSON RESPONSE FIX (Jan 4, 2026) - COMPLETE
+- [x] Investigate why webhook returns 200 but not valid JSON (was returning HTML)
+- [x] Found route mismatch: /api/webhooks/stripe vs /api/stripe/webhook
+- [x] Changed webhook route to /api/stripe/webhook
+- [ ] Publish changes to production site
+- [ ] Test webhook verification on production site
+- [ ] Confirm webhook works with Stripe Dashboard verification
