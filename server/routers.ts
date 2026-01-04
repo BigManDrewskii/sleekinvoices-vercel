@@ -1209,6 +1209,34 @@ export const appRouter = router({
       
       return { url };
     }),
+    
+    /**
+     * Manually sync subscription status from Stripe
+     * Useful when webhooks fail or for testing
+     */
+    syncStatus: protectedProcedure.mutation(async ({ ctx }) => {
+      if (!ctx.user.stripeCustomerId) {
+        throw new Error('No Stripe customer found. Please create a subscription first.');
+      }
+      
+      const { syncSubscriptionStatus } = await import('./stripe');
+      const syncResult = await syncSubscriptionStatus(ctx.user.stripeCustomerId);
+      
+      // Update user in database
+      await db.updateUserSubscription(ctx.user.id, {
+        subscriptionStatus: syncResult.status,
+        subscriptionId: syncResult.subscriptionId || undefined,
+        currentPeriodEnd: syncResult.currentPeriodEnd || undefined,
+      });
+      
+      return {
+        success: true,
+        status: syncResult.status,
+        message: syncResult.status === 'active' 
+          ? 'Pro subscription activated!' 
+          : `Subscription status: ${syncResult.status}`,
+      };
+    }),
   }),
 });
 

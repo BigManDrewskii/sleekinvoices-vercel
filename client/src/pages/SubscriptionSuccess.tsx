@@ -7,7 +7,7 @@ import { Link, useLocation } from "wouter";
 import { useEffect } from "react";
 
 export default function SubscriptionSuccess() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
 
   const { data: subscriptionStatus, isLoading } = trpc.subscription.getStatus.useQuery(
@@ -18,14 +18,19 @@ export default function SubscriptionSuccess() {
     }
   );
 
-  // Redirect to login if not authenticated
+  // Redirect to dashboard if already Pro (skip success page on refresh)
+  // But don't redirect immediately - let them see the success message first
+  // Only redirect if not authenticated after auth loads
   useEffect(() => {
-    if (!isAuthenticated) {
-      setLocation("/");
+    if (!authLoading && !isAuthenticated) {
+      // Give a small delay to avoid jarring redirect during Stripe return
+      const timer = setTimeout(() => setLocation("/"), 1000);
+      return () => clearTimeout(timer);
     }
-  }, [isAuthenticated, setLocation]);
+  }, [authLoading, isAuthenticated, setLocation]);
 
-  if (isLoading) {
+  // Show loading while auth or subscription data is loading
+  if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

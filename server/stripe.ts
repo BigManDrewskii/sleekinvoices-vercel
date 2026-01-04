@@ -176,3 +176,51 @@ export function verifyWebhookSignature(
   const stripe = getStripe();
   return stripe.webhooks.constructEvent(payload, signature, secret);
 }
+
+/**
+ * Sync user's subscription status from Stripe
+ * Useful for manual sync when webhooks fail or for testing
+ */
+export async function syncSubscriptionStatus(stripeCustomerId: string): Promise<{
+  status: 'free' | 'active' | 'canceled' | 'past_due';
+  subscriptionId: string | null;
+  currentPeriodEnd: Date | null;
+}> {
+  const stripe = getStripe();
+  
+  // Get all subscriptions for this customer
+  const subscriptions = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+    limit: 1,
+    status: 'all',
+  });
+  
+  // If no subscriptions, return free status
+  if (subscriptions.data.length === 0) {
+    return {
+      status: 'free',
+      subscriptionId: null,
+      currentPeriodEnd: null,
+    };
+  }
+  
+  // Get the most recent subscription
+  const subscription = subscriptions.data[0];
+  
+  // Map Stripe status to our status
+  let status: 'free' | 'active' | 'canceled' | 'past_due' = 'free';
+  
+  if (subscription.status === 'active') {
+    status = 'active';
+  } else if (subscription.status === 'canceled') {
+    status = 'canceled';
+  } else if (subscription.status === 'past_due') {
+    status = 'past_due';
+  }
+  
+  return {
+    status,
+    subscriptionId: subscription.id,
+    currentPeriodEnd: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : null,
+  };
+}

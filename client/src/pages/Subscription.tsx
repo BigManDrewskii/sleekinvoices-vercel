@@ -34,12 +34,29 @@ export default function Subscription() {
     },
   });
 
+  const utils = trpc.useUtils();
+  const syncStatus = trpc.subscription.syncStatus.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      // Refresh subscription status
+      utils.subscription.getStatus.invalidate();
+      utils.auth.me.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to sync subscription status");
+    },
+  });
+
   const handleUpgrade = () => {
     createCheckout.mutate();
   };
 
   const handleManageBilling = () => {
     createPortalSession.mutate();
+  };
+
+  const handleSyncStatus = () => {
+    syncStatus.mutate();
   };
 
   if (loading || statusLoading) {
@@ -125,11 +142,12 @@ export default function Subscription() {
                     </p>
                   )}
                 </div>
-                <div className="mt-6">
+                <div className="mt-6 flex gap-3">
                   <Button
                     variant="outline"
                     onClick={handleManageBilling}
                     disabled={createPortalSession.isPending}
+                    className="flex-1"
                   >
                     {createPortalSession.isPending ? (
                       <>
@@ -142,6 +160,20 @@ export default function Subscription() {
                         Manage Billing
                         <ExternalLink className="h-4 w-4 ml-2" />
                       </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleSyncStatus}
+                    disabled={syncStatus.isPending}
+                  >
+                    {syncStatus.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Syncing...
+                      </>
+                    ) : (
+                      "Sync Status"
                     )}
                   </Button>
                 </div>
