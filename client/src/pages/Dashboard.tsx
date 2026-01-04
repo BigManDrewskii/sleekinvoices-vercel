@@ -36,32 +36,28 @@ export default function Dashboard() {
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard">
-              <a className="flex items-center gap-2">
-                <FileText className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-foreground">InvoiceFlow</span>
-              </a>
+            <Link href="/dashboard" className="flex items-center gap-2">
+              <FileText className="h-6 w-6 text-primary" />
+              <span className="text-xl font-bold text-foreground">InvoiceFlow</span>
             </Link>
             <div className="hidden md:flex items-center gap-6">
-              <Link href="/dashboard">
-                <a className="text-sm font-medium text-foreground">Dashboard</a>
+              <Link href="/dashboard" className="text-sm font-medium text-foreground">
+                Dashboard
               </Link>
-              <Link href="/invoices">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Invoices</a>
+              <Link href="/invoices" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Invoices
               </Link>
-              <Link href="/clients">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Clients</a>
+              <Link href="/clients" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Clients
               </Link>
-              <Link href="/analytics">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">Analytics</a>
+              <Link href="/analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Analytics
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/settings">
-              <a className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {user?.name || "Settings"}
-              </a>
+            <Link href="/settings" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              {user?.name || "Settings"}
             </Link>
           </div>
         </div>
@@ -75,11 +71,9 @@ export default function Dashboard() {
             <p className="text-muted-foreground">Welcome back, {user?.name || "there"}!</p>
           </div>
           <Button asChild>
-            <Link href="/invoices/new">
-              <a className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                New Invoice
-              </a>
+            <Link href="/invoices/new" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New Invoice
             </Link>
           </Button>
         </div>
@@ -117,9 +111,7 @@ export default function Dashboard() {
                 <CardDescription>Your latest invoices and their status</CardDescription>
               </div>
               <Button variant="outline" size="sm" asChild>
-                <Link href="/invoices">
-                  <a>View All</a>
-                </Link>
+                <Link href="/invoices">View All</Link>
               </Button>
             </div>
           </CardHeader>
@@ -132,34 +124,34 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-foreground mb-2">No invoices yet</h3>
                 <p className="text-muted-foreground mb-4">Create your first invoice to get started</p>
                 <Button asChild>
-                  <Link href="/invoices/new">
-                    <a>Create Invoice</a>
-                  </Link>
+                  <Link href="/invoices/new">Create Invoice</Link>
                 </Button>
               </div>
             ) : (
               <div className="space-y-4">
                 {recentInvoices.map((invoice) => (
-                  <Link key={invoice.id} href={`/invoices/${invoice.id}`}>
-                    <a className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <FileText className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{invoice.invoiceNumber}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(invoice.issueDate).toLocaleDateString()}
-                          </p>
-                        </div>
+                  <Link 
+                    key={invoice.id} 
+                    href={`/invoices/${invoice.id}`}
+                    className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-primary" />
                       </div>
-                      <div className="flex items-center gap-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium status-${invoice.status}`}>
-                          {invoice.status.toUpperCase()}
-                        </span>
-                        <span className="font-semibold text-foreground">${Number(invoice.total).toFixed(2)}</span>
+                      <div>
+                        <p className="font-medium text-foreground">{invoice.invoiceNumber}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(invoice.issueDate).toLocaleDateString()}
+                        </p>
                       </div>
-                    </a>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium status-${invoice.status}`}>
+                        {invoice.status.toUpperCase()}
+                      </span>
+                      <span className="font-semibold text-foreground">${Number(invoice.total).toFixed(2)}</span>
+                    </div>
                   </Link>
                 ))}
               </div>

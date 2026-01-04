@@ -1,5 +1,12 @@
 # Invoice Generator - Implementation TODO
 
+## 🐛 BUG FIXES (Current)
+
+- [x] Fix nested `<a>` tag error on Dashboard page
+  - [x] Investigate Dashboard.tsx for nested Link components
+  - [x] Remove nested anchor tags from Recent Invoices section
+  - [x] Verify fix in browser
+
 ## ✅ COMPLETED PHASES
 
 ### Phase 1: Clients Management (Complete)
