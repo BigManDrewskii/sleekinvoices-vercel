@@ -262,7 +262,7 @@ export const expenses = mysqlTable("expenses", {
   
   // Tax and billable
   taxAmount: decimal("taxAmount", { precision: 10, scale: 2 }).default("0").notNull(),
-  isBillable: int("isBillable").default(0).notNull(), // 1 = billable, 0 = not billable
+  isBillable: boolean("isBillable").default(false).notNull(),
   clientId: int("clientId"), // If billable, which client
   invoiceId: int("invoiceId"), // If billed, which invoice
   

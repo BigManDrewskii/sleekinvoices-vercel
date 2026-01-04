@@ -813,7 +813,14 @@ export async function createExpense(expense: {
   amount: string;
   date: Date;
   description: string;
+  vendor?: string;
+  paymentMethod?: 'cash' | 'credit_card' | 'debit_card' | 'bank_transfer' | 'check' | 'other';
+  taxAmount?: string;
   receiptUrl?: string;
+  receiptKey?: string;
+  isBillable?: boolean;
+  clientId?: number;
+  invoiceId?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -1583,7 +1590,7 @@ export async function getClientProfitability(userId: number) {
         and(
           eq(expenses.userId, userId),
           eq(expenses.clientId, client.id),
-          eq(expenses.isBillable, 1)
+          eq(expenses.isBillable, true)
         )
       );
     

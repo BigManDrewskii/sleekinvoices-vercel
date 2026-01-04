@@ -1,6 +1,35 @@
 # Invoice Generator - Implementation TODO
 
-## 🐛 BUG FIXES (Current)
+## 🚧 CURRENT WORK: Phase 6A Frontend - Expense Tracking
+
+- [x] Backend complete (receipt upload, enhanced procedures, S3 integration)
+- [x] Component 1: Receipt Upload Component (45 min)
+  - [x] Drag-and-drop file input
+  - [x] Image/PDF preview
+  - [x] Upload progress and validation
+- [x] Component 2: Enhanced Expense Form (60 min)
+  - [x] Add vendor, payment method, tax fields
+  - [x] Integrate receipt upload
+  - [x] Add billable checkbox + client selector
+- [ ] Component 3: Expandable Row Detail View (60 min)
+  - [ ] Expand/collapse functionality
+  - [ ] Show all expense details in expanded view
+  - [ ] Receipt thumbnail/link display
+- [ ] Component 4: Billable Expense Workflow (45 min)
+  - [ ] Backend: getBillableUnlinked, linkToInvoice
+  - [ ] Frontend: Add expenses when creating invoice
+  - [ ] Auto-create line items from expenses
+- [ ] Component 5: Filtering & Stats (30 min)
+  - [ ] Filter by payment method, billable status, client
+  - [ ] Enhanced stats display
+- [ ] Component 6: Testing (60 min)
+  - [ ] 10 comprehensive tests for all features
+  - [ ] Target: 92+ total tests passing
+- [ ] Component 7: Final verification and checkpoint (30 min)
+
+See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
+
+## 🐛 BUG FIXES (Completed)
 
 - [x] Fix nested `<a>` tag error on Dashboard page
   - [x] Investigate Dashboard.tsx for nested Link components

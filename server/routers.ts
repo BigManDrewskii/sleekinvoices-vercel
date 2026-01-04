@@ -732,16 +732,22 @@ export const appRouter = router({
         amount: z.number(),
         date: z.date(),
         description: z.string(),
+        vendor: z.string().optional(),
+        paymentMethod: z.enum(['cash', 'credit_card', 'debit_card', 'bank_transfer', 'check', 'other']).optional(),
+        taxAmount: z.number().optional(),
         receiptUrl: z.string().optional(),
+        receiptKey: z.string().optional(),
+        isBillable: z.boolean().optional(),
+        clientId: z.number().optional(),
+        invoiceId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const { amount, taxAmount, ...rest } = input;
         return await db.createExpense({
           userId: ctx.user.id,
-          categoryId: input.categoryId,
-          amount: input.amount.toString(),
-          date: input.date,
-          description: input.description,
-          receiptUrl: input.receiptUrl,
+          amount: amount.toString(),
+          taxAmount: taxAmount?.toString(),
+          ...rest,
         });
       }),
     
@@ -752,20 +758,65 @@ export const appRouter = router({
         amount: z.number().optional(),
         date: z.date().optional(),
         description: z.string().optional(),
+        vendor: z.string().optional(),
+        paymentMethod: z.enum(['cash', 'credit_card', 'debit_card', 'bank_transfer', 'check', 'other']).optional(),
+        taxAmount: z.number().optional(),
         receiptUrl: z.string().optional(),
+        receiptKey: z.string().optional(),
+        isBillable: z.boolean().optional(),
+        clientId: z.number().optional(),
+        invoiceId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { id, amount, ...updates } = input;
+        const { id, amount, taxAmount, ...updates } = input;
         const dbUpdates: any = { ...updates };
         if (amount !== undefined) dbUpdates.amount = amount.toString();
+        if (taxAmount !== undefined) dbUpdates.taxAmount = taxAmount.toString();
         
         await db.updateExpense(id, ctx.user.id, dbUpdates);
         return { success: true };
       }),
     
+    uploadReceipt: protectedProcedure
+      .input(z.object({
+        fileData: z.string(), // base64 encoded
+        fileName: z.string(),
+        contentType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { storagePut } = await import('./storage');
+        
+        // Decode base64
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Generate unique key
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(7);
+        const fileKey = `receipts/${ctx.user.id}/${timestamp}-${randomSuffix}-${input.fileName}`;
+        
+        // Upload to S3
+        const { url, key } = await storagePut(fileKey, buffer, input.contentType);
+        
+        return { url, key };
+      }),
+    
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        // Get expense to check for receipt
+        const expense = await db.getExpenseById(input.id, ctx.user.id);
+        
+        // Delete receipt from S3 if exists
+        if (expense?.receiptKey) {
+          const { storageDelete } = await import('./storage');
+          try {
+            await storageDelete(expense.receiptKey);
+          } catch (error) {
+            console.error('Failed to delete receipt from S3:', error);
+            // Continue with expense deletion even if S3 delete fails
+          }
+        }
+        
         await db.deleteExpense(input.id, ctx.user.id);
         return { success: true };
       }),

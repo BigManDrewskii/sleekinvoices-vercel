@@ -8,12 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, DollarSign, Tag } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 
 export default function Expenses() {
   const { data: expenses, isLoading } = trpc.expenses.list.useQuery();
   const { data: categories } = trpc.expenses.categories.list.useQuery();
+  const { data: clients } = trpc.clients.list.useQuery();
   const createExpenseMutation = trpc.expenses.create.useMutation();
   const deleteExpenseMutation = trpc.expenses.delete.useMutation();
   const createCategoryMutation = trpc.expenses.categories.create.useMutation();
@@ -28,6 +31,12 @@ export default function Expenses() {
     amount: "",
     date: new Date().toISOString().split("T")[0],
     description: "",
+    vendor: "",
+    paymentMethod: "",
+    taxAmount: "",
+    receipt: null as { url: string; key: string } | null,
+    isBillable: false,
+    clientId: null as number | null,
   });
 
   const [categoryForm, setCategoryForm] = useState({
@@ -43,12 +52,24 @@ export default function Expenses() {
       return;
     }
 
+    if (expenseForm.isBillable && !expenseForm.clientId) {
+      toast.error("Please select a client for billable expenses");
+      return;
+    }
+
     try {
       await createExpenseMutation.mutateAsync({
         categoryId: expenseForm.categoryId,
         amount: parseFloat(expenseForm.amount),
         date: new Date(expenseForm.date),
         description: expenseForm.description,
+        vendor: expenseForm.vendor || undefined,
+        paymentMethod: (expenseForm.paymentMethod || undefined) as "cash" | "credit_card" | "debit_card" | "bank_transfer" | "check" | "other" | undefined,
+        taxAmount: expenseForm.taxAmount ? parseFloat(expenseForm.taxAmount) : undefined,
+        receiptUrl: expenseForm.receipt?.url,
+        receiptKey: expenseForm.receipt?.key,
+        isBillable: expenseForm.isBillable,
+        clientId: expenseForm.clientId || undefined,
       });
 
       utils.expenses.list.invalidate();
@@ -60,6 +81,12 @@ export default function Expenses() {
         amount: "",
         date: new Date().toISOString().split("T")[0],
         description: "",
+        vendor: "",
+        paymentMethod: "",
+        taxAmount: "",
+        receipt: null,
+        isBillable: false,
+        clientId: null,
       });
     } catch (error) {
       toast.error("Failed to add expense");
@@ -276,6 +303,105 @@ export default function Expenses() {
                     rows={3}
                     required
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="vendor">Vendor/Supplier</Label>
+                    <Input
+                      id="vendor"
+                      value={expenseForm.vendor}
+                      onChange={(e) => setExpenseForm({ ...expenseForm, vendor: e.target.value })}
+                      placeholder="e.g., Office Depot, Amazon"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="paymentMethod">Payment Method</Label>
+                    <Select
+                      value={expenseForm.paymentMethod}
+                      onValueChange={(v) => setExpenseForm({ ...expenseForm, paymentMethod: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="credit_card">Credit Card</SelectItem>
+                        <SelectItem value="debit_card">Debit Card</SelectItem>
+                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                        <SelectItem value="check">Check</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="taxAmount">Tax Amount</Label>
+                  <Input
+                    id="taxAmount"
+                    type="number"
+                    step="0.01"
+                    value={expenseForm.taxAmount}
+                    onChange={(e) => setExpenseForm({ ...expenseForm, taxAmount: e.target.value })}
+                    placeholder="0.00"
+                  />
+                  {expenseForm.taxAmount && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Total: {formatCurrency(parseFloat(expenseForm.amount || "0") + parseFloat(expenseForm.taxAmount || "0"))}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label>Receipt</Label>
+                  <ReceiptUpload
+                    value={expenseForm.receipt}
+                    onChange={(receipt) => setExpenseForm({ ...expenseForm, receipt })}
+                  />
+                </div>
+
+                <div className="space-y-3 border-t pt-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isBillable"
+                      checked={expenseForm.isBillable}
+                      onCheckedChange={(checked) => 
+                        setExpenseForm({ ...expenseForm, isBillable: checked as boolean, clientId: checked ? expenseForm.clientId : null })
+                      }
+                    />
+                    <Label htmlFor="isBillable" className="cursor-pointer">
+                      This is a billable expense
+                    </Label>
+                  </div>
+
+                  {expenseForm.isBillable && (
+                    <div>
+                      <Label htmlFor="clientId">Client</Label>
+                      <Select
+                        value={expenseForm.clientId?.toString() || ""}
+                        onValueChange={(v) => setExpenseForm({ ...expenseForm, clientId: parseInt(v) })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select client" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clients && clients.length > 0 ? (
+                            clients.map((client: any) => (
+                              <SelectItem key={client.id} value={client.id.toString()}>
+                                {client.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="0" disabled>
+                              No clients available
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
