@@ -839,11 +839,33 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Create the payment
         const payment = await db.createPayment({
           ...input,
           userId: ctx.user.id,
           status: "completed",
         });
+        
+        // Check payment status and update invoice if fully paid
+        const paymentStatus = await db.getInvoicePaymentStatus(input.invoiceId);
+        
+        console.log(`[Payment] Invoice ${input.invoiceId} payment status:`, paymentStatus);
+        
+        if (paymentStatus.status === 'paid') {
+          // Update invoice status to paid
+          await db.updateInvoice(input.invoiceId, ctx.user.id, {
+            status: 'paid',
+            amountPaid: paymentStatus.totalPaid.toString(),
+          });
+          console.log(`[Payment] Invoice ${input.invoiceId} marked as paid`);
+        } else if (paymentStatus.status === 'partial') {
+          // Update amount paid but keep status as sent
+          await db.updateInvoice(input.invoiceId, ctx.user.id, {
+            amountPaid: paymentStatus.totalPaid.toString(),
+          });
+          console.log(`[Payment] Invoice ${input.invoiceId} partially paid: $${paymentStatus.totalPaid}`);
+        }
+        
         return payment;
       }),
     

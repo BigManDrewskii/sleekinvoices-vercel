@@ -26,4 +26,11 @@ export const systemRouter = router({
         success: delivered,
       } as const;
     }),
+  
+  detectOverdueInvoices: adminProcedure
+    .mutation(async () => {
+      const { detectAndMarkOverdueInvoices } = await import('../jobs/detectOverdueInvoices');
+      const result = await detectAndMarkOverdueInvoices();
+      return result;
+    }),
 });

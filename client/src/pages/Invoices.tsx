@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/StatusBadge";
+import { PaymentStatusBadge } from "@/components/shared/PaymentStatusBadge";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -51,6 +52,11 @@ interface Invoice {
     email: string | null;
   };
   paymentLink: string | null;
+  // Payment information
+  totalPaid?: string;
+  amountDue?: string;
+  paymentStatus?: 'unpaid' | 'partial' | 'paid';
+  paymentProgress?: number;
 }
 
 export default function Invoices() {
@@ -58,6 +64,7 @@ export default function Invoices() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [paymentFilter, setPaymentFilter] = useState<string>("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
 
@@ -134,7 +141,11 @@ export default function Invoices() {
     
     const matchesStatus = statusFilter === "all" || invoice.status.toLowerCase() === statusFilter;
     
-    return matchesSearch && matchesStatus;
+    const matchesPayment = 
+      paymentFilter === "all" || 
+      (invoice.paymentStatus || "unpaid") === paymentFilter;
+    
+    return matchesSearch && matchesStatus && matchesPayment;
   });
 
   const handleDelete = (invoice: Invoice) => {
@@ -240,6 +251,17 @@ export default function Invoices() {
               <SelectItem value="canceled">Canceled</SelectItem>
             </SelectContent>
           </Select>
+          <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Payment status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Payments</SelectItem>
+              <SelectItem value="unpaid">Unpaid</SelectItem>
+              <SelectItem value="partial">Partially Paid</SelectItem>
+              <SelectItem value="paid">Fully Paid</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Invoices Table */}
@@ -277,6 +299,7 @@ export default function Invoices() {
                       <TableHead>Issue Date</TableHead>
                       <TableHead>Due Date</TableHead>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Payment</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -288,7 +311,23 @@ export default function Invoices() {
                         <TableCell>{invoice.client.name}</TableCell>
                         <TableCell>{formatDateShort(invoice.issueDate)}</TableCell>
                         <TableCell>{formatDateShort(invoice.dueDate)}</TableCell>
-                        <TableCell className="font-semibold">{formatCurrency(invoice.total)}</TableCell>
+                        <TableCell className="font-semibold">
+                          <div className="space-y-1">
+                            <div>{formatCurrency(invoice.total)}</div>
+                            {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
+                              <div className="text-xs text-muted-foreground">
+                                Paid: {formatCurrency(invoice.totalPaid || '0')}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {invoice.paymentStatus ? (
+                            <PaymentStatusBadge status={invoice.paymentStatus} />
+                          ) : (
+                            <PaymentStatusBadge status="unpaid" />
+                          )}
+                        </TableCell>
                         <TableCell>
                           <StatusBadge status={invoice.status} />
                         </TableCell>

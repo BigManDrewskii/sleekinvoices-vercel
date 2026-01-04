@@ -211,6 +211,10 @@ export async function createInvoice(invoice: InsertInvoice): Promise<Invoice> {
   return created[0]!;
 }
 
+/**
+ * Get all invoices for a user with payment information
+ * Includes payment status, total paid, and amount due
+ */
 export async function getInvoicesByUserId(userId: number) {
   const db = await getDb();
   if (!db) return [];
@@ -222,6 +226,8 @@ export async function getInvoicesByUserId(userId: number) {
     issueDate: invoices.issueDate,
     dueDate: invoices.dueDate,
     total: invoices.total,
+    amountPaid: invoices.amountPaid,
+    currency: invoices.currency,
     paymentLink: invoices.stripePaymentLinkUrl,
     clientId: invoices.clientId,
     clientName: clients.name,
@@ -232,20 +238,46 @@ export async function getInvoicesByUserId(userId: number) {
   .where(eq(invoices.userId, userId))
   .orderBy(desc(invoices.createdAt));
   
-  return results.map(r => ({
-    id: r.id,
-    invoiceNumber: r.invoiceNumber,
-    status: r.status,
-    issueDate: r.issueDate,
-    dueDate: r.dueDate,
-    total: r.total,
-    paymentLink: r.paymentLink,
-    client: {
-      id: r.clientId,
-      name: r.clientName || 'Unknown',
-      email: r.clientEmail,
-    },
-  }));
+  // Calculate payment status for each invoice
+  const invoicesWithPaymentStatus = await Promise.all(
+    results.map(async (r) => {
+      const totalPaid = await getTotalPaidForInvoice(r.id);
+      const invoiceTotal = Number(r.total);
+      const amountDue = Math.max(0, invoiceTotal - totalPaid);
+      
+      let paymentStatus: 'unpaid' | 'partial' | 'paid';
+      if (totalPaid === 0) {
+        paymentStatus = 'unpaid';
+      } else if (totalPaid >= invoiceTotal) {
+        paymentStatus = 'paid';
+      } else {
+        paymentStatus = 'partial';
+      }
+      
+      return {
+        id: r.id,
+        invoiceNumber: r.invoiceNumber,
+        status: r.status,
+        issueDate: r.issueDate,
+        dueDate: r.dueDate,
+        total: r.total,
+        currency: r.currency,
+        paymentLink: r.paymentLink,
+        // Payment information
+        totalPaid: totalPaid.toString(),
+        amountDue: amountDue.toString(),
+        paymentStatus,
+        paymentProgress: invoiceTotal > 0 ? Math.round((totalPaid / invoiceTotal) * 100) : 0,
+        client: {
+          id: r.clientId,
+          name: r.clientName || 'Unknown',
+          email: r.clientEmail,
+        },
+      };
+    })
+  );
+  
+  return invoicesWithPaymentStatus;
 }
 
 export async function getInvoiceById(invoiceId: number, userId: number): Promise<Invoice | undefined> {
@@ -345,25 +377,103 @@ export async function deleteLineItemsByInvoiceId(invoiceId: number) {
 // ANALYTICS OPERATIONS
 // ============================================================================
 
+/**
+ * Get invoice payment status for a single invoice
+ * Returns payment status and amounts
+ */
+export async function getInvoicePaymentStatus(invoiceId: number): Promise<{
+  status: 'unpaid' | 'partial' | 'paid';
+  totalPaid: number;
+  amountDue: number;
+  invoiceTotal: number;
+}> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get invoice
+  const invoiceResult = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
+  const invoice = invoiceResult[0];
+  
+  if (!invoice) {
+    throw new Error(`Invoice ${invoiceId} not found`);
+  }
+  
+  const invoiceTotal = Number(invoice.total);
+  const totalPaid = await getTotalPaidForInvoice(invoiceId);
+  const amountDue = Math.max(0, invoiceTotal - totalPaid);
+  
+  let status: 'unpaid' | 'partial' | 'paid';
+  if (totalPaid === 0) {
+    status = 'unpaid';
+  } else if (totalPaid >= invoiceTotal) {
+    status = 'paid';
+  } else {
+    status = 'partial';
+  }
+  
+  return {
+    status,
+    totalPaid,
+    amountDue,
+    invoiceTotal,
+  };
+}
+
+/**
+ * Get comprehensive invoice statistics based on actual payment data
+ * This uses the payments table to calculate accurate revenue and paid counts
+ */
 export async function getInvoiceStats(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  console.log(`[Analytics] Calculating stats for user ${userId}`);
+  
+  // Get all invoices for the user
   const allInvoices = await db.select().from(invoices).where(eq(invoices.userId, userId));
   
-  const totalRevenue = allInvoices
-    .filter(inv => inv.status === 'paid')
-    .reduce((sum, inv) => sum + Number(inv.total), 0);
+  console.log(`[Analytics] Found ${allInvoices.length} invoices`);
   
-  const outstandingBalance = allInvoices
-    .filter(inv => inv.status === 'sent' || inv.status === 'overdue')
-    .reduce((sum, inv) => sum + Number(inv.total), 0);
+  // Calculate payment status for each invoice
+  let totalRevenue = 0;
+  let outstandingBalance = 0;
+  let paidInvoices = 0;
+  let partiallyPaidInvoices = 0;
+  let unpaidInvoices = 0;
+  
+  for (const invoice of allInvoices) {
+    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    const invoiceTotal = Number(invoice.total);
+    
+    // Add to revenue (sum of all payments received)
+    totalRevenue += totalPaid;
+    
+    // Determine payment status
+    if (totalPaid === 0) {
+      unpaidInvoices++;
+      outstandingBalance += invoiceTotal;
+    } else if (totalPaid >= invoiceTotal) {
+      paidInvoices++;
+      // Fully paid, no outstanding balance
+    } else {
+      partiallyPaidInvoices++;
+      outstandingBalance += (invoiceTotal - totalPaid);
+    }
+  }
   
   const totalInvoices = allInvoices.length;
-  const paidInvoices = allInvoices.filter(inv => inv.status === 'paid').length;
   const overdueInvoices = allInvoices.filter(inv => inv.status === 'overdue').length;
+  const averageInvoiceValue = paidInvoices > 0 ? totalRevenue / paidInvoices : 0;
   
-  const averageInvoiceValue = totalInvoices > 0 ? totalRevenue / paidInvoices : 0;
+  console.log(`[Analytics] Stats calculated:`, {
+    totalRevenue,
+    outstandingBalance,
+    totalInvoices,
+    paidInvoices,
+    partiallyPaidInvoices,
+    unpaidInvoices,
+    overdueInvoices,
+  });
   
   return {
     totalRevenue,
@@ -371,6 +481,8 @@ export async function getInvoiceStats(userId: number) {
     outstandingAmount: outstandingBalance, // Alias for compatibility
     totalInvoices,
     paidInvoices,
+    partiallyPaidInvoices,
+    unpaidInvoices,
     overdueInvoices,
     averageInvoiceValue,
   };
