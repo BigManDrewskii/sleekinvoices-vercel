@@ -26,8 +26,7 @@ export default function Home() {
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <FileText className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">InvoiceFlow</span>
+            <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-8" />
           </div>
           <div className="flex items-center gap-4">
             <a href={getLoginUrl()} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
@@ -154,7 +153,7 @@ export default function Home() {
         <div className="bg-primary text-primary-foreground rounded-2xl p-12 text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Get Paid Faster?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of freelancers and small businesses using InvoiceFlow
+            Join thousands of freelancers and small businesses using SleekInvoices
           </p>
           <Button size="lg" variant="secondary" asChild className="text-lg px-8 py-6">
             <a href={getLoginUrl()}>Start Your Free Trial</a>
@@ -168,10 +167,10 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
               <FileText className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold text-foreground">InvoiceFlow</span>
+              <span className="text-lg font-bold text-foreground">SleekInvoices</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2026 InvoiceFlow. All rights reserved.
+              © 2026 SleekInvoices. All rights reserved.
             </p>
           </div>
         </div>

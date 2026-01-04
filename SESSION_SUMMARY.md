@@ -1,4 +1,4 @@
-# InvoiceFlow Development Session Summary
+# SleekInvoices Development Session Summary
 
 ## Session Overview
 

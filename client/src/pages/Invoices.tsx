@@ -180,7 +180,7 @@ export default function Invoices() {
             <Link href="/dashboard">
               <a className="flex items-center gap-2">
                 <FileText className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-foreground">InvoiceFlow</span>
+                <span className="text-xl font-bold text-foreground">SleekInvoices</span>
               </a>
             </Link>
             <div className="hidden md:flex items-center gap-6">

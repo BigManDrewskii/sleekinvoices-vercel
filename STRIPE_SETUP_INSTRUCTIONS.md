@@ -1,7 +1,7 @@
 # Stripe Product Setup Instructions
 
 ## Overview
-This document provides step-by-step instructions for creating the "InvoiceFlow Pro" subscription product in Stripe Dashboard and configuring the price ID in your application.
+This document provides step-by-step instructions for creating the "SleekInvoices Pro" subscription product in Stripe Dashboard and configuring the price ID in your application.
 
 **Time Required:** 5-10 minutes  
 **Prerequisites:** Stripe account (test mode or live mode)
@@ -25,10 +25,10 @@ This document provides step-by-step instructions for creating the "InvoiceFlow P
 
 ---
 
-## Step 3: Create InvoiceFlow Pro Product
+## Step 3: Create SleekInvoices Pro Product
 
 ### Product Information:
-- **Name:** `InvoiceFlow Pro`
+- **Name:** `SleekInvoices Pro`
 - **Description:** `Unlimited invoices, Stripe payments, email sending, and analytics`
 - **Statement descriptor:** `INVOICEFLOW PRO` (appears on customer's credit card statement)
 - **Image:** (optional) Upload a logo or product image
@@ -88,7 +88,7 @@ The environment variable is already configured in the Manus platform. You just n
 3. Click **"Upgrade to Pro"** button
 4. You should be redirected to Stripe Checkout
 5. The checkout page should show:
-   - Product name: "InvoiceFlow Pro"
+   - Product name: "SleekInvoices Pro"
    - Price: $12.00/month
    - Payment form
 
@@ -155,7 +155,7 @@ Before going live with subscriptions:
 ## Summary
 
 **What You Created:**
-- Product: "InvoiceFlow Pro"
+- Product: "SleekInvoices Pro"
 - Price: $12/month (recurring)
 - Price ID: `price_xxxxxxxxxxxxx`
 

@@ -1,4 +1,4 @@
-# InvoiceFlow - Professional Invoice Generator
+# SleekInvoices - Professional Invoice Generator
 
 A modern, elegant invoice generator built to compete with FreshBooks, offering 80% cost savings with superior UX.
 

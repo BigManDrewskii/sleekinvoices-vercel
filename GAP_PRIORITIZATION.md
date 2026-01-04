@@ -1,4 +1,4 @@
-# InvoiceFlow Gap Prioritization Analysis
+# SleekInvoices Gap Prioritization Analysis
 
 **Date:** January 4, 2026  
 **Method:** RICE Framework (Reach × Impact × Confidence ÷ Effort)  

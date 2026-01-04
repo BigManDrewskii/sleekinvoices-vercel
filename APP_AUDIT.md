@@ -1,4 +1,4 @@
-# InvoiceFlow Current App Audit
+# SleekInvoices Current App Audit
 
 **Date:** January 4, 2026  
 **Version:** 2e373c8e

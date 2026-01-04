@@ -8,7 +8,7 @@
 
 ## Overview
 
-Phase 4A introduces a comprehensive **Payment Reconciliation System** that enables automatic payment tracking via Stripe webhooks and manual payment recording. This feature transforms InvoiceFlow from a simple invoicing tool into a complete accounts receivable management platform.
+Phase 4A introduces a comprehensive **Payment Reconciliation System** that enables automatic payment tracking via Stripe webhooks and manual payment recording. This feature transforms SleekInvoices from a simple invoicing tool into a complete accounts receivable management platform.
 
 ---
 

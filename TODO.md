@@ -807,7 +807,7 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 ## 💎 SUBSCRIPTION SYSTEM IMPLEMENTATION
 
 ### Phase 1: Stripe Product & Pricing Setup (30 min)
-- [ ] Create "InvoiceFlow Pro" product in Stripe Dashboard
+- [ ] Create "SleekInvoices Pro" product in Stripe Dashboard
 - [ ] Set up $12/month recurring price
 - [ ] Copy price ID and add to environment variables
 - [ ] Create shared/subscription.ts with plan constants
@@ -924,3 +924,32 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [ ] Update code comments and JSDoc
 - [ ] Document usage tracking logic
 - [ ] Mark Phase 2 complete in TODO.md
+
+
+---
+
+## 🎨 REBRANDING: SleekInvoices → SleekInvoices
+
+### Asset Preparation
+- [x] Copy SleekInvoices-Wide.svg to client/public/
+- [x] Copy SleekInvoices-Icon.svg to client/public/
+- [x] Copy PNG versions to client/public/
+- [x] Generate favicon.ico from icon
+
+### Code Updates
+- [x] Replace "InvoiceFlow" text in all components
+- [x] Update navigation logo (Home.tsx, Dashboard.tsx, DashboardLayout.tsx)
+- [x] Update page titles and meta tags
+- [x] Update landing page branding
+- [x] Update subscription page references
+
+### Documentation Updates
+- [x] Update STRIPE_SETUP_INSTRUCTIONS.md product name
+- [x] Update SUBSCRIPTION_IMPLEMENTATION_PLAN.md references
+- [x] Update README.md if exists
+
+### Testing
+- [x] Verify all logos display correctly
+- [x] Check favicon in browser tab
+- [x] Verify no "InvoiceFlow" text remains
+- [ ] Test on mobile viewport

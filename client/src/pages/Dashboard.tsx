@@ -38,8 +38,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <FileText className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-foreground">InvoiceFlow</span>
+              <img src="/SleekInvoices-Wide.svg" alt="SleekInvoices" className="h-6" />
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link href="/dashboard" className="text-sm font-medium text-foreground">

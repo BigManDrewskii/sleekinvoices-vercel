@@ -136,7 +136,7 @@ Set up the foundation for the subscription system by creating shared constants, 
 
 ### 4.2 Document Stripe Product Creation Steps
 - [x] Write step-by-step instructions in comments (in routers.ts and STRIPE_SETUP_INSTRUCTIONS.md)
-- [x] Include product name: "InvoiceFlow Pro"
+- [x] Include product name: "SleekInvoices Pro"
 - [x] Include description
 - [x] Include pricing: $12/month recurring
 - [x] Note to copy price ID after creation

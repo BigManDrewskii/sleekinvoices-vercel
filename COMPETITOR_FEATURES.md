@@ -165,7 +165,7 @@
 
 ---
 
-## Missing from InvoiceFlow (High Priority)
+## Missing from SleekInvoices (High Priority)
 
 ### Critical Gaps
 1. **Estimates/Quotes** - Neither creation nor conversion to invoices
@@ -208,9 +208,9 @@
 
 ---
 
-## InvoiceFlow Unique Features
+## SleekInvoices Unique Features
 
-### Features InvoiceFlow Has That Competitors Don't Emphasize
+### Features SleekInvoices Has That Competitors Don't Emphasize
 1. **Client portal with token access** - Secure client self-service
 2. **Automated recurring invoice generation** - Daily cron job
 3. **Automated overdue detection** - Daily cron job
@@ -219,7 +219,7 @@
 6. **Payment status filters** - Filter by payment status
 7. **Payment history per invoice** - Detailed payment tracking
 
-### Features InvoiceFlow Matches
+### Features SleekInvoices Matches
 1. ✅ Customizable invoices
 2. ✅ Payment reminders (code exists, needs RESEND_API_KEY)
 3. ✅ Automatic late fees (via overdue detection)
@@ -248,17 +248,17 @@
 ### Price Comparison (Estimated)
 - **FreshBooks:** $19-$60/month (Lite to Premium)
 - **QuickBooks Online:** $30-$200/month (Simple Start to Advanced)
-- **InvoiceFlow:** $12/month (80% cost advantage claimed)
+- **SleekInvoices:** $12/month (80% cost advantage claimed)
 
 ### Feature Completeness Score
 - **FreshBooks:** 85/100 (Strong invoicing, time tracking, proposals)
 - **QuickBooks Online:** 95/100 (Enterprise accounting, payroll, inventory)
-- **InvoiceFlow:** 45/100 (Basic invoicing and payments)
+- **SleekInvoices:** 45/100 (Basic invoicing and payments)
 
 ### Target Market Fit
 - **FreshBooks:** Freelancers, consultants, creative agencies (1-10 employees)
 - **QuickBooks Online:** Small to medium businesses (1-40 employees)
-- **InvoiceFlow:** Solopreneurs, micro-businesses (1-3 employees)
+- **SleekInvoices:** Solopreneurs, micro-businesses (1-3 employees)
 
 ---
 
@@ -479,13 +479,13 @@
 |------------|-------|-------|
 | **Wave** | $0 (FREE) | Free core, paid add-ons (payments, payroll) |
 | **Zoho Invoice** | $0-$40/month | Free up to 1,000 invoices/year |
-| **InvoiceFlow** | $12/month | Flat monthly fee |
+| **SleekInvoices** | $12/month | Flat monthly fee |
 | **FreshBooks** | $19-$60/month | Tiered monthly plans |
 | **QuickBooks** | $30-$200/month | Tiered monthly plans |
 
 ### Feature Completeness Comparison
 
-| Feature Category | Wave | Zoho | InvoiceFlow | FreshBooks | QuickBooks |
+| Feature Category | Wave | Zoho | SleekInvoices | FreshBooks | QuickBooks |
 |-----------------|------|------|-------------|------------|------------|
 | **Invoicing** | ✅✅✅ | ✅✅✅ | ✅✅ | ✅✅✅ | ✅✅✅ |
 | **Estimates** | ✅ | ✅✅ | ❌ | ✅✅ | ✅✅ |
@@ -509,16 +509,16 @@
 ## Key Insights from Competitive Analysis
 
 ### 1. Wave's Disruptive Free Model
-Wave offers **completely free** core accounting and invoicing, making money only on payment processing (2.9% + $0.60) and payroll ($40/month). This is a major competitive threat to InvoiceFlow's $12/month model.
+Wave offers **completely free** core accounting and invoicing, making money only on payment processing (2.9% + $0.60) and payroll ($40/month). This is a major competitive threat to SleekInvoices's $12/month model.
 
-**InvoiceFlow's Challenge:** Must justify $12/month when Wave is free with similar features.
+**SleekInvoices's Challenge:** Must justify $12/month when Wave is free with similar features.
 
 ### 2. Zoho's Feature-Rich Free Tier
-Zoho Invoice offers **1,000 free invoices per year** with advanced features like time tracking, expense-to-invoice conversion, and customer portal. This is more generous than InvoiceFlow's offering.
+Zoho Invoice offers **1,000 free invoices per year** with advanced features like time tracking, expense-to-invoice conversion, and customer portal. This is more generous than SleekInvoices's offering.
 
-**InvoiceFlow's Challenge:** Must offer more value than Zoho's free tier to justify $12/month.
+**SleekInvoices's Challenge:** Must offer more value than Zoho's free tier to justify $12/month.
 
-### 3. Critical Missing Features in InvoiceFlow
+### 3. Critical Missing Features in SleekInvoices
 
 **Tier 1 (Must-Have):**
 1. **Estimates/Quotes** - All 4 competitors have this
@@ -530,9 +530,9 @@ Zoho Invoice offers **1,000 free invoices per year** with advanced features like
 **Tier 2 (Should-Have):**
 1. **Proposals with E-signatures** - FreshBooks has this
 2. **Project Management** - FreshBooks, Zoho have this
-3. **Customer Portal** - InvoiceFlow has basic, Zoho has advanced
+3. **Customer Portal** - SleekInvoices has basic, Zoho has advanced
 4. **Receipt Capture** - Wave, FreshBooks, QuickBooks have this
-5. **Multiple Payment Gateways** - Zoho has many, InvoiceFlow only Stripe
+5. **Multiple Payment Gateways** - Zoho has many, SleekInvoices only Stripe
 
 **Tier 3 (Nice-to-Have):**
 1. **Payroll** - Wave, QuickBooks have this
@@ -541,7 +541,7 @@ Zoho Invoice offers **1,000 free invoices per year** with advanced features like
 4. **Advanced Integrations** - Zoho, QuickBooks, FreshBooks have this
 5. **Custom Fields** - Zoho, QuickBooks have this
 
-### 4. InvoiceFlow's Competitive Advantages
+### 4. SleekInvoices's Competitive Advantages
 
 **Current Advantages:**
 1. ✅ **Client Portal with Token Access** - More secure than competitors
@@ -672,7 +672,7 @@ Zoho Invoice offers **1,000 free invoices per year** with advanced features like
 5. **White-Label Options**
    - Custom branding
    - Custom domain
-   - Remove InvoiceFlow branding
+   - Remove SleekInvoices branding
    - Reseller program
 
 ---
@@ -694,7 +694,7 @@ Zoho Invoice offers **1,000 free invoices per year** with advanced features like
 - **NPS:** 50+ Net Promoter Score
 
 ### Competitive Moat Strategy
-1. **Superior UX** - Make InvoiceFlow the easiest to use
+1. **Superior UX** - Make SleekInvoices the easiest to use
 2. **AI Integration** - Be the first with AI-powered insights
 3. **Modern Tech** - Fastest, most reliable platform
 4. **Niche Focus** - Dominate 2-3 specific industries

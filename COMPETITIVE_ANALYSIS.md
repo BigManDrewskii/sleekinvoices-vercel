@@ -1,4 +1,4 @@
-# InvoiceFlow Competitive Analysis & Gap Assessment
+# SleekInvoices Competitive Analysis & Gap Assessment
 
 **Analysis Date:** January 4, 2026  
 **Current Version:** 2e373c8e  

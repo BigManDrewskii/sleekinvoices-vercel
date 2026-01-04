@@ -1,7 +1,7 @@
 # Phase 6: Expense Tracking + Advanced Analytics + Invoice Customization
 
 ## Overview
-Implement three major feature sets to complete InvoiceFlow's financial management capabilities:
+Implement three major feature sets to complete SleekInvoices's financial management capabilities:
 1. **Expense Tracking** - Track business costs with receipt uploads and categorization
 2. **Advanced Analytics** - Aging reports, profitability analysis, cash flow projections
 3. **Invoice Template Customization** - Multiple templates with branding options
