@@ -27,7 +27,9 @@ import {
   usageTracking,
   customFields,
   invoiceCustomFieldValues,
-  invoiceViews
+  invoiceViews,
+  cryptoSubscriptionPayments,
+  InsertCryptoSubscriptionPayment
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { DEFAULT_REMINDER_TEMPLATE } from './email';
@@ -2435,4 +2437,68 @@ export async function getInvoiceViews(invoiceId: number) {
     .from(invoiceViews)
     .where(eq(invoiceViews.invoiceId, invoiceId))
     .orderBy(desc(invoiceViews.viewedAt));
+}
+
+
+// ============================================================================
+// CRYPTO SUBSCRIPTION PAYMENT OPERATIONS
+// ============================================================================
+
+export async function createCryptoSubscriptionPayment(data: {
+  userId: number;
+  paymentId: string;
+  paymentStatus: string;
+  priceAmount: string;
+  priceCurrency: string;
+  payCurrency: string;
+  payAmount: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(cryptoSubscriptionPayments).values({
+    userId: data.userId,
+    paymentId: data.paymentId,
+    paymentStatus: data.paymentStatus,
+    priceAmount: data.priceAmount,
+    priceCurrency: data.priceCurrency,
+    payCurrency: data.payCurrency,
+    payAmount: data.payAmount,
+  });
+
+  return { success: true };
+}
+
+export async function getCryptoSubscriptionPaymentByPaymentId(paymentId: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const result = await db
+    .select()
+    .from(cryptoSubscriptionPayments)
+    .where(eq(cryptoSubscriptionPayments.paymentId, paymentId))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+export async function updateCryptoSubscriptionPaymentStatus(
+  paymentId: string,
+  status: string,
+  confirmedAt?: Date
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const updateData: Record<string, unknown> = { paymentStatus: status };
+  if (confirmedAt) {
+    updateData.confirmedAt = confirmedAt;
+  }
+
+  await db
+    .update(cryptoSubscriptionPayments)
+    .set(updateData)
+    .where(eq(cryptoSubscriptionPayments.paymentId, paymentId));
+
+  return { success: true };
 }

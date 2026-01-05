@@ -3,14 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Check, CreditCard, ExternalLink } from "lucide-react";
+import { FileText, Check, CreditCard, ExternalLink, Bitcoin } from "lucide-react";
 import { Link } from "wouter";
+import { useState } from "react";
 import { toast } from "sonner";
 import { SUBSCRIPTION_PLANS } from "@shared/subscription";
 import { Navigation } from "@/components/Navigation";
+import { CryptoSubscriptionDialog } from "@/components/subscription/CryptoSubscriptionDialog";
 
 export default function Subscription() {
   const { user, loading, isAuthenticated } = useAuth();
+  const [cryptoDialogOpen, setCryptoDialogOpen] = useState(false);
 
   const { data: subscriptionStatus, isLoading: statusLoading } = trpc.subscription.getStatus.useQuery(
     undefined,
@@ -242,20 +245,36 @@ export default function Subscription() {
                   </li>
                 </ul>
                 {!isActive ? (
-                  <Button
-                    onClick={handleUpgrade}
-                    disabled={createCheckout.isPending}
-                    className="w-full"
-                  >
-                    {createCheckout.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                        Loading...
-                      </>
-                    ) : (
-                      "Upgrade to Pro"
-                    )}
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handleUpgrade}
+                      disabled={createCheckout.isPending}
+                      className="w-full"
+                    >
+                      {createCheckout.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Pay with Card
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setCryptoDialogOpen(true)}
+                      className="w-full"
+                    >
+                      <Bitcoin className="h-4 w-4 mr-2" />
+                      Pay with Crypto
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      BTC, ETH, USDT, and 300+ cryptocurrencies accepted
+                    </p>
+                  </div>
                 ) : (
                   <Button variant="outline" disabled className="w-full">
                     Current Plan
@@ -285,7 +304,8 @@ export default function Subscription() {
                   What payment methods do you accept?
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  We accept all major credit cards through Stripe's secure payment processing.
+                  We accept all major credit cards through Stripe, plus 300+ cryptocurrencies
+                  including Bitcoin, Ethereum, USDT, and more via NOWPayments.
                 </p>
               </div>
               <div>
@@ -301,6 +321,12 @@ export default function Subscription() {
           </Card>
         </div>
       </div>
+
+      {/* Crypto Subscription Dialog */}
+      <CryptoSubscriptionDialog
+        open={cryptoDialogOpen}
+        onOpenChange={setCryptoDialogOpen}
+      />
     </div>
   );
 }

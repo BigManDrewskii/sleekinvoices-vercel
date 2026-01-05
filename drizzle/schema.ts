@@ -590,3 +590,31 @@ export const invoiceViews = mysqlTable("invoiceViews", {
 
 export type InvoiceView = typeof invoiceViews.$inferSelect;
 export type InsertInvoiceView = typeof invoiceViews.$inferInsert;
+
+
+/**
+ * Crypto subscription payments table
+ * Tracks NOWPayments payments for Pro subscription upgrades
+ */
+export const cryptoSubscriptionPayments = mysqlTable("cryptoSubscriptionPayments", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  
+  // NOWPayments payment info
+  paymentId: varchar("paymentId", { length: 255 }).notNull().unique(),
+  paymentStatus: varchar("paymentStatus", { length: 50 }).notNull(),
+  
+  // Amount info
+  priceAmount: decimal("priceAmount", { precision: 10, scale: 2 }).notNull(),
+  priceCurrency: varchar("priceCurrency", { length: 10 }).notNull(),
+  payCurrency: varchar("payCurrency", { length: 10 }).notNull(),
+  payAmount: decimal("payAmount", { precision: 24, scale: 8 }).notNull(),
+  
+  // Tracking
+  confirmedAt: timestamp("confirmedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CryptoSubscriptionPayment = typeof cryptoSubscriptionPayments.$inferSelect;
+export type InsertCryptoSubscriptionPayment = typeof cryptoSubscriptionPayments.$inferInsert;

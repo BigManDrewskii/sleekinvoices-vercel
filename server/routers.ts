@@ -164,6 +164,7 @@ export const appRouter = router({
         paymentTerms: z.string().optional(),
         expenseIds: z.array(z.number()).optional(),
         templateId: z.number().optional(), // Template to use for this invoice
+        currency: z.string().default('USD'), // Invoice currency (fiat or crypto)
       }))
       .mutation(async ({ ctx, input }) => {
         // ============================================================================
@@ -220,6 +221,7 @@ export const appRouter = router({
           notes: input.notes,
           paymentTerms: input.paymentTerms,
           templateId: input.templateId, // Store selected template
+          currency: input.currency, // Invoice currency
         });
         
         // Create line items
@@ -1470,6 +1472,48 @@ export const appRouter = router({
      * Manually sync subscription status from Stripe
      * Useful when webhooks fail or for testing
      */
+    createCryptoCheckout: protectedProcedure
+      .input(z.object({
+        payCurrency: z.string().default('btc'),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { SUBSCRIPTION_PLANS } = await import('../shared/subscription.js');
+        
+        // Create NOWPayments payment for Pro subscription
+        const protocol = ctx.req.protocol || 'https';
+        const host = ctx.req.get('host') || 'localhost:3000';
+        const baseUrl = `${protocol}://${host}`;
+        
+        const payment = await nowpayments.createPayment({
+          priceAmount: SUBSCRIPTION_PLANS.PRO.price,
+          priceCurrency: 'usd',
+          payCurrency: input.payCurrency,
+          orderId: `sub_${ctx.user.id}_${Date.now()}`,
+          orderDescription: `SleekInvoices Pro Subscription - ${ctx.user.email}`,
+          ipnCallbackUrl: `${baseUrl}/api/webhooks/nowpayments`,
+          successUrl: `${baseUrl}/subscription/success?crypto=true`,
+          cancelUrl: `${baseUrl}/subscription`,
+        });
+        
+        // Store the payment reference for webhook processing
+        await db.createCryptoSubscriptionPayment({
+          userId: ctx.user.id,
+          paymentId: payment.payment_id,
+          paymentStatus: payment.payment_status,
+          priceAmount: SUBSCRIPTION_PLANS.PRO.price.toString(),
+          priceCurrency: 'usd',
+          payCurrency: input.payCurrency,
+          payAmount: payment.pay_amount?.toString() || '0',
+        });
+        
+        return {
+          paymentUrl: payment.invoice_url || '',
+          paymentId: payment.payment_id,
+          cryptoAmount: payment.pay_amount?.toString() || '0',
+          cryptoCurrency: input.payCurrency,
+        };
+      }),
+    
     syncStatus: protectedProcedure.mutation(async ({ ctx }) => {
       if (!ctx.user.stripeCustomerId) {
         throw new Error('No Stripe customer found. Please create a subscription first.');

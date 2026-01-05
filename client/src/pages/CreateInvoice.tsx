@@ -20,6 +20,8 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { Navigation } from "@/components/Navigation";
+import { CurrencySelector } from "@/components/CurrencySelector";
+import { getCurrencyDecimals, getCurrencySymbol, isCryptoCurrency } from "../../../shared/currencies";
 import { 
   toDecimal, 
   add, 
@@ -51,6 +53,7 @@ export default function CreateInvoice() {
   const [notes, setNotes] = useState<string>('');
   const [paymentTerms, setPaymentTerms] = useState<string>('Net 30');
   const [templateId, setTemplateId] = useState<number | null>(null);
+  const [currency, setCurrency] = useState<string>('USD');
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -198,6 +201,7 @@ export default function CreateInvoice() {
       paymentTerms,
       expenseIds: linkedExpenseIds.length > 0 ? linkedExpenseIds : undefined,
       templateId: templateId || undefined,
+      currency,
     });
   };
 
@@ -225,6 +229,7 @@ export default function CreateInvoice() {
       paymentTerms,
       expenseIds: linkedExpenseIds.length > 0 ? linkedExpenseIds : undefined,
       templateId: templateId || undefined,
+      currency,
     });
   };
 
@@ -272,7 +277,7 @@ export default function CreateInvoice() {
                   onChange={setTemplateId}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="invoice-number">Invoice Number</Label>
                     <Input 
@@ -281,6 +286,18 @@ export default function CreateInvoice() {
                       disabled 
                       aria-label="Invoice number (auto-generated)"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Currency</Label>
+                    <CurrencySelector
+                      value={currency}
+                      onChange={setCurrency}
+                      className="w-full"
+                    />
+                    {isCryptoCurrency(currency) && (
+                      <p className="text-xs text-amber-500">Crypto invoice - amounts in {currency}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">

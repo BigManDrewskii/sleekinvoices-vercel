@@ -1809,3 +1809,33 @@ Before marking a phase complete, verify:
 - [x] 4.5.1 Validate NOWPayments API credentials
 - [x] 4.5.2 Test payment creation flow
 - [x] 4.5.3 Test IPN webhook handling
+
+
+---
+
+## Phase 5: Multi-Currency Invoicing & Crypto Subscription
+
+### 5.1 Currency Definitions and Selector
+- [x] 5.1.1 Create `shared/currencies.ts` with fiat and crypto currency definitions
+- [x] 5.1.2 Create `CurrencySelector` component with Fiat/Crypto tabs
+- [x] 5.1.3 Add currency symbol display helper function
+- [x] 5.1.4 Add decimal precision helper based on currency type
+
+### 5.2 Invoice Multi-Currency Support
+- [x] 5.2.1 Update invoice creation form to use CurrencySelector
+- [x] 5.2.2 Display correct symbol based on selected currency
+- [x] 5.2.3 Adjust decimal input validation by currency type
+- [x] 5.2.4 Update invoice PDF to show correct currency symbol
+- [x] 5.2.5 Update invoice list to show currency indicator
+
+### 5.3 Pro Subscription Crypto Payment
+- [ ] 5.3.1 Create crypto subscription payment endpoint
+- [ ] 5.3.2 Add "Pay with Crypto" option to upgrade modal
+- [ ] 5.3.3 Handle subscription activation via NOWPayments IPN
+- [ ] 5.3.4 Add crypto payment option to Settings billing page
+- [ ] 5.3.5 Track crypto subscription payments in database
+
+### 5.4 Testing
+- [ ] 5.4.1 Test currency selector component
+- [ ] 5.4.2 Test multi-currency invoice creation
+- [ ] 5.4.3 Test crypto subscription payment flow

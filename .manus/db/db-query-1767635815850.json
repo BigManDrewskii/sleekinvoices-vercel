@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS cryptoSubscriptionPayments (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  paymentId VARCHAR(255) NOT NULL UNIQUE,\n  paymentStatus VARCHAR(50) NOT NULL,\n  priceAmount DECIMAL(10, 2) NOT NULL,\n  priceCurrency VARCHAR(10) NOT NULL,\n  payCurrency VARCHAR(10) NOT NULL,\n  payAmount DECIMAL(24, 8) NOT NULL,\n  confirmedAt TIMESTAMP NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute CREATE TABLE IF NOT EXISTS cryptoSubscriptionPayments (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  userId INT NOT NULL,\n  paymentId VARCHAR(255) NOT NULL UNIQUE,\n  paymentStatus VARCHAR(50) NOT NULL,\n  priceAmount DECIMAL(10, 2) NOT NULL,\n  priceCurrency VARCHAR(10) NOT NULL,\n  payCurrency VARCHAR(10) NOT NULL,\n  payAmount DECIMAL(24, 8) NOT NULL,\n  confirmedAt TIMESTAMP NULL,\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 629
+}

@@ -45,6 +45,7 @@ import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
+import { CurrencyBadge } from "@/components/CurrencySelector";
 
 interface Invoice {
   id: number;
@@ -64,6 +65,7 @@ interface Invoice {
   amountDue?: string;
   paymentStatus?: 'unpaid' | 'partial' | 'paid';
   paymentProgress?: number;
+  currency?: string;
 }
 
 export default function Invoices() {
@@ -343,7 +345,12 @@ export default function Invoices() {
                           <TableCell>{formatDateShort(invoice.dueDate)}</TableCell>
                           <TableCell className="font-semibold">
                             <div className="space-y-1">
-                              <div>{formatCurrency(invoice.total)}</div>
+                              <div className="flex items-center gap-2">
+                                {formatCurrency(invoice.total, invoice.currency)}
+                                {invoice.currency && invoice.currency !== 'USD' && (
+                                  <CurrencyBadge code={invoice.currency} />
+                                )}
+                              </div>
                               {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
                                 <div className="text-xs text-muted-foreground">
                                   Paid: {formatCurrency(invoice.totalPaid || '0')}

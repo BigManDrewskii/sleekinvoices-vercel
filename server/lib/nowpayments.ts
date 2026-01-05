@@ -146,6 +146,7 @@ interface PaymentResponse {
   time_limit?: string;
   burning_percent?: number;
   expiration_estimate_date?: string;
+  invoice_url?: string;
 }
 
 export async function createPayment(params: {

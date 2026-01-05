@@ -7,8 +7,8 @@
 
 import { Router, Request, Response } from 'express';
 import * as nowpayments from '../lib/nowpayments';
-import { getDb } from '../db';
-import { invoices, payments } from '../../drizzle/schema';
+import * as db from '../db';
+import { invoices, payments, users, cryptoSubscriptionPayments } from '../../drizzle/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
 const router = Router();
@@ -48,6 +48,13 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 
+    // Check if this is a subscription payment (format: sub_{userId}_{timestamp})
+    const subMatch = payload.order_id?.match(/^sub_(\d+)_/);
+    if (subMatch) {
+      // Handle subscription payment
+      return await handleSubscriptionPayment(payload, res);
+    }
+
     // Extract invoice ID from order_id (format: INV-{invoiceId}-{timestamp})
     const orderIdMatch = payload.order_id?.match(/^INV-(\d+)-/);
     if (!orderIdMatch) {
@@ -56,14 +63,14 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
     }
 
     const invoiceId = parseInt(orderIdMatch[1], 10);
-    const db = await getDb();
-    if (!db) {
+    const database = await db.getDb();
+    if (!database) {
       console.error('[NOWPayments IPN] Database not available');
       return res.status(500).json({ error: 'Database not available' });
     }
 
     // Get the invoice
-    const [invoice] = await db
+    const [invoice] = await database
       .select()
       .from(invoices)
       .where(eq(invoices.id, invoiceId));
@@ -91,7 +98,7 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
       const newStatus = newAmountPaid >= invoiceTotal ? 'paid' : invoice.status;
 
       // Update invoice
-      await db
+      await database
         .update(invoices)
         .set({
           amountPaid: newAmountPaid.toFixed(8),
@@ -102,7 +109,7 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
         .where(eq(invoices.id, invoiceId));
 
       // Record the payment
-      await db.insert(payments).values({
+      await database.insert(payments).values({
         invoiceId: invoiceId,
         userId: invoice.userId,
         amount: fiatPaid.toFixed(8),
@@ -146,5 +153,51 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+/**
+ * Handle subscription payment from NOWPayments
+ */
+async function handleSubscriptionPayment(payload: IPNPayload, res: Response) {
+  const userIdMatch = payload.order_id?.match(/^sub_(\d+)_/);
+  if (!userIdMatch) {
+    return res.status(400).json({ error: 'Invalid subscription order_id' });
+  }
+
+  const userId = parseInt(userIdMatch[1], 10);
+  const database = await db.getDb();
+  if (!database) {
+    return res.status(500).json({ error: 'Database not available' });
+  }
+
+  const status = payload.payment_status;
+  console.log('[NOWPayments IPN] Processing subscription payment:', {
+    userId,
+    status,
+    paymentId: payload.payment_id,
+  });
+
+  // Update the crypto subscription payment record
+  await db.updateCryptoSubscriptionPaymentStatus(
+    payload.payment_id.toString(),
+    status,
+    nowpayments.isPaymentComplete(status) ? new Date() : undefined
+  );
+
+  if (nowpayments.isPaymentComplete(status)) {
+    // Activate Pro subscription
+    await database
+      .update(users)
+      .set({
+        subscriptionStatus: 'active',
+        // Set period end to 30 days from now
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      })
+      .where(eq(users.id, userId));
+
+    console.log('[NOWPayments IPN] Pro subscription activated for user:', userId);
+  }
+
+  return res.status(200).json({ success: true });
+}
 
 export default router;
