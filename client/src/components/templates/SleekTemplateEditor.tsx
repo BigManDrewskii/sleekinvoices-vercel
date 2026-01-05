@@ -373,6 +373,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     weight={settings.headingWeight}
                     onFontChange={(f) => updateSetting('headingFont', f)}
                     onWeightChange={(w) => updateSetting('headingWeight', w)}
+                    previewType="heading"
                   />
                 </div>
 
@@ -383,6 +384,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     weight={settings.bodyWeight}
                     onFontChange={(f) => updateSetting('bodyFont', f)}
                     onWeightChange={(w) => updateSetting('bodyWeight', w)}
+                    previewType="body"
                   />
                 </div>
 

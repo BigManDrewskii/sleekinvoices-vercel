@@ -825,3 +825,14 @@
 - [x] Show key colors as swatches instead of PDF preview
 - [x] Add "Aa" typography demonstration
 - [x] Remove janky PDF preview from template cards
+
+
+## Live Font Preview (User Request - Jan 5, 2026)
+
+### Tasks
+- [x] Add live font preview in Google Font picker dropdown
+- [x] Show sample invoice text (e.g., "INVOICE", "$1,234.56") when hovering over fonts
+- [x] Ensure live preview updates immediately when font is selected
+- [x] Load fonts dynamically for preview before selection
+- [x] Separate preview types for heading vs body fonts
+- [x] Expanded font picker with side-by-side preview panel
