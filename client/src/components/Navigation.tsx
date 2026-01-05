@@ -37,6 +37,7 @@ export function Navigation() {
     { href: "/invoices", label: "Invoices" },
     { href: "/clients", label: "Clients" },
     { href: "/analytics", label: "Analytics" },
+    { href: "/templates", label: "Templates" },
   ];
 
   const isActive = (href: string) => {

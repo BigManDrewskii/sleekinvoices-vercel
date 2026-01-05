@@ -244,3 +244,6 @@
 
 ## Bug Fixes (Current)
 - [x] Fix "no invoice found" error when clicking "New Invoice" button on Dashboard
+
+## Navigation Enhancements
+- [x] Add 'Templates' link to sidebar navigation for custom template system discoverability
