@@ -477,7 +477,9 @@ export const appRouter = router({
     getAnalytics: protectedProcedure
       .input(z.object({ timeRange: z.enum(['7d', '30d', '90d', '1y']).default('30d') }))
       .query(async ({ ctx, input }) => {
-        const stats = await db.getInvoiceStats(ctx.user.id);
+        // Map timeRange to days for comparison
+        const periodDays = input.timeRange === '7d' ? 7 : input.timeRange === '30d' ? 30 : input.timeRange === '90d' ? 90 : 365;
+        const stats = await db.getInvoiceStats(ctx.user.id, periodDays);
         const months = input.timeRange === '7d' ? 1 : input.timeRange === '30d' ? 3 : input.timeRange === '90d' ? 6 : 12;
         const monthlyRevenue = await db.getMonthlyRevenue(ctx.user.id, months);
         const statusBreakdown = await db.getInvoiceStatusBreakdown(ctx.user.id);

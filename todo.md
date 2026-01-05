@@ -569,3 +569,24 @@
 - [x] Verify all pages match design system
 - [x] Test responsiveness
 - [x] Deliver refined design
+
+
+## Analytics & Dashboard Improvements
+
+### Invoice Status UI Fix
+- [x] Fix Invoice Status infographic to match tweakcn design
+- [x] Improve with horizontal progress bars and status badges
+
+### Real Trend Data
+- [x] Calculate actual period-over-period changes
+- [x] Replace hardcoded percentages with real data
+- [x] Add trend comparison logic to backend (getInvoiceStats)
+
+### Sparkline Mini-Charts
+- [x] Add sparkline charts to stat cards (via Recharts AreaChart)
+- [x] Show revenue trend inline in Revenue Trend section
+
+### Invoices Table Styling
+- [x] Update status badges with tweakcn styling (subtle bg colors)
+- [x] Update payment badges with tweakcn styling
+- [x] Clean row styling with proper borders

@@ -431,7 +431,7 @@ export async function getInvoicePaymentStatus(invoiceId: number): Promise<{
  * Get comprehensive invoice statistics based on actual payment data
  * This uses the payments table to calculate accurate revenue and paid counts
  */
-export async function getInvoiceStats(userId: number) {
+export async function getInvoiceStats(userId: number, periodDays: number = 30) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -439,6 +439,18 @@ export async function getInvoiceStats(userId: number) {
   
   // Get all invoices for the user
   const allInvoices = await db.select().from(invoices).where(eq(invoices.userId, userId));
+  
+  // Calculate period boundaries for comparison
+  const now = new Date();
+  const currentPeriodStart = new Date(now.getTime() - periodDays * 24 * 60 * 60 * 1000);
+  const previousPeriodStart = new Date(currentPeriodStart.getTime() - periodDays * 24 * 60 * 60 * 1000);
+  
+  // Filter invoices by period
+  const currentPeriodInvoices = allInvoices.filter(inv => new Date(inv.createdAt) >= currentPeriodStart);
+  const previousPeriodInvoices = allInvoices.filter(inv => {
+    const date = new Date(inv.createdAt);
+    return date >= previousPeriodStart && date < currentPeriodStart;
+  });
   
   console.log(`[Analytics] Found ${allInvoices.length} invoices`);
   
@@ -473,6 +485,28 @@ export async function getInvoiceStats(userId: number) {
   const overdueInvoices = allInvoices.filter(inv => inv.status === 'overdue').length;
   const averageInvoiceValue = paidInvoices > 0 ? totalRevenue / paidInvoices : 0;
   
+  // Calculate period-specific revenue for comparison
+  let currentPeriodRevenue = 0;
+  let previousPeriodRevenue = 0;
+  
+  for (const invoice of currentPeriodInvoices) {
+    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    currentPeriodRevenue += totalPaid;
+  }
+  
+  for (const invoice of previousPeriodInvoices) {
+    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    previousPeriodRevenue += totalPaid;
+  }
+  
+  // Calculate percentage change
+  let revenueChangePercent = 0;
+  if (previousPeriodRevenue > 0) {
+    revenueChangePercent = ((currentPeriodRevenue - previousPeriodRevenue) / previousPeriodRevenue) * 100;
+  } else if (currentPeriodRevenue > 0) {
+    revenueChangePercent = 100; // New revenue from nothing
+  }
+  
   console.log(`[Analytics] Stats calculated:`, {
     totalRevenue,
     outstandingBalance,
@@ -481,6 +515,9 @@ export async function getInvoiceStats(userId: number) {
     partiallyPaidInvoices,
     unpaidInvoices,
     overdueInvoices,
+    currentPeriodRevenue,
+    previousPeriodRevenue,
+    revenueChangePercent,
   });
   
   return {
@@ -493,6 +530,12 @@ export async function getInvoiceStats(userId: number) {
     unpaidInvoices,
     overdueInvoices,
     averageInvoiceValue,
+    // Period comparison data
+    currentPeriodRevenue,
+    previousPeriodRevenue,
+    revenueChangePercent: Math.round(revenueChangePercent * 10) / 10, // Round to 1 decimal
+    currentPeriodInvoices: currentPeriodInvoices.length,
+    previousPeriodInvoices: previousPeriodInvoices.length,
   };
 }
 

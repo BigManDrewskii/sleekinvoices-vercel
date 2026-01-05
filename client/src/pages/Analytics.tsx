@@ -5,28 +5,27 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/utils";
 import { TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   AreaChart,
   Area,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 import { Navigation } from "@/components/Navigation";
 
 // Status colors matching the design system
-const STATUS_COLORS = {
-  draft: "#94a3b8",
-  sent: "#6695ff",
-  paid: "#22c55e",
-  overdue: "#ff4379",
-  canceled: "#64748b",
+const STATUS_COLORS: Record<string, { bg: string; text: string; fill: string }> = {
+  draft: { bg: "bg-slate-500/10", text: "text-slate-400", fill: "#94a3b8" },
+  sent: { bg: "bg-blue-500/10", text: "text-blue-400", fill: "#6695ff" },
+  paid: { bg: "bg-green-500/10", text: "text-green-400", fill: "#22c55e" },
+  overdue: { bg: "bg-red-500/10", text: "text-red-400", fill: "#ff4379" },
+  canceled: { bg: "bg-slate-500/10", text: "text-slate-500", fill: "#64748b" },
 };
 
 // Chart gradient colors
@@ -72,6 +71,7 @@ export default function Analytics() {
     outstandingAmount = 0,
     monthlyRevenue = [],
     statusBreakdown = [],
+    revenueChangePercent = 0,
   } = analytics || {};
 
   // Calculate net profit
@@ -89,14 +89,24 @@ export default function Analytics() {
     revenue: parseFloat(item.revenue),
   }));
 
-  // Format status breakdown for pie chart
+  // Create sparkline data from monthly revenue (last 7 points)
+  const sparklineData = revenueChartData.slice(-7).map((item, index) => ({
+    value: item.revenue,
+    index,
+  }));
+
+  // Format status breakdown for display
   const statusChartData = statusBreakdown
     .filter((item: any) => item.count > 0)
     .map((item: any) => ({
       name: item.status.charAt(0).toUpperCase() + item.status.slice(1),
+      status: item.status,
       value: item.count,
       amount: parseFloat(item.totalAmount),
     }));
+
+  // Calculate total for percentages
+  const totalStatusCount = statusChartData.reduce((sum: number, item: any) => sum + item.value, 0);
 
   // Time range labels
   const timeRangeLabels = {
@@ -136,24 +146,54 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Key Metrics - 4 stat cards like tweakcn dashboard */}
+          {/* Key Metrics - 4 stat cards with sparklines */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Total Revenue */}
+            {/* Total Revenue with Sparkline */}
             <Card className="border-border">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
-                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                    <ArrowUpRight className="h-3 w-3" />
-                    +12.5%
-                  </span>
+                  {revenueChangePercent !== 0 && (
+                    <span className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${
+                      revenueChangePercent >= 0 
+                        ? "bg-green-500/10 text-green-500" 
+                        : "bg-red-500/10 text-red-500"
+                    }`}>
+                      {revenueChangePercent >= 0 ? (
+                        <ArrowUpRight className="h-3 w-3" />
+                      ) : (
+                        <ArrowDownRight className="h-3 w-3" />
+                      )}
+                      {revenueChangePercent >= 0 ? "+" : ""}{revenueChangePercent}%
+                    </span>
+                  )}
                 </div>
                 <p className="text-3xl font-bold mt-2 tracking-tight">
                   {formatCurrency(revenueNum)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                  <TrendingUp className="h-3 w-3 text-green-500" />
-                  {paidInvoices} paid invoices
+                {/* Mini Sparkline */}
+                {sparklineData.length > 1 && (
+                  <div className="mt-3 h-10">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={sparklineData}>
+                        <Line 
+                          type="monotone" 
+                          dataKey="value" 
+                          stroke={CHART_GRADIENT_START}
+                          strokeWidth={1.5}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                  {revenueChangePercent >= 0 ? (
+                    <TrendingUp className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <TrendingDown className="h-3 w-3 text-red-500" />
+                  )}
+                  {revenueChangePercent >= 0 ? "Trending up" : "Trending down"} this period
                 </p>
               </CardContent>
             </Card>
@@ -221,7 +261,7 @@ export default function Analytics() {
             </Card>
           </div>
 
-          {/* Revenue Chart - Full width area chart like tweakcn */}
+          {/* Revenue Chart - Full width area chart */}
           <Card className="border-border">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -293,66 +333,46 @@ export default function Analytics() {
 
           {/* Two column: Invoice Status + Aging Report */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Invoice Status */}
+            {/* Invoice Status - Improved Table UI */}
             <Card className="border-border">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-medium">Invoice Status</CardTitle>
                 <CardDescription>Distribution by status</CardDescription>
               </CardHeader>
               <CardContent>
                 {statusChartData.length > 0 ? (
-                  <div className="flex items-center gap-6">
-                    <ResponsiveContainer width={160} height={160}>
-                      <PieChart>
-                        <Pie
-                          data={statusChartData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={45}
-                          outerRadius={70}
-                          paddingAngle={3}
-                          dataKey="value"
-                          strokeWidth={0}
-                        >
-                          {statusChartData.map((entry: any, index: number) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={STATUS_COLORS[entry.name.toLowerCase() as keyof typeof STATUS_COLORS] || "#94a3b8"}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: any, name: string, props: any) => [
-                            `${value} invoices`,
-                            props.payload.name
-                          ]}
-                          contentStyle={{
-                            backgroundColor: "hsl(var(--card))",
-                            border: "1px solid hsl(var(--border))",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex-1 space-y-3">
-                      {statusChartData.map((entry: any) => (
-                        <div key={entry.name} className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div 
-                              className="w-3 h-3 rounded-full" 
-                              style={{ backgroundColor: STATUS_COLORS[entry.name.toLowerCase() as keyof typeof STATUS_COLORS] || "#94a3b8" }}
-                            />
-                            <span className="text-sm text-muted-foreground">{entry.name}</span>
+                  <div className="space-y-3">
+                    {statusChartData.map((entry: any) => {
+                      const config = STATUS_COLORS[entry.status] || STATUS_COLORS.draft;
+                      const percentage = totalStatusCount > 0 ? (entry.value / totalStatusCount) * 100 : 0;
+                      
+                      return (
+                        <div key={entry.name} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+                                {entry.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium">{entry.value}</span>
+                              <span className="text-sm text-muted-foreground w-24 text-right">
+                                {formatCurrency(entry.amount)}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <span className="text-sm font-medium">{entry.value}</span>
-                            <span className="text-xs text-muted-foreground ml-2">
-                              ({formatCurrency(entry.amount)})
-                            </span>
+                          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                            <div 
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ 
+                                width: `${percentage}%`,
+                                backgroundColor: config.fill
+                              }}
+                            />
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="h-[160px] flex items-center justify-center text-muted-foreground">
@@ -364,7 +384,7 @@ export default function Analytics() {
 
             {/* Accounts Receivable Aging */}
             <Card className="border-border">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-medium">Receivables Aging</CardTitle>
                 <CardDescription>Outstanding invoices by days overdue</CardDescription>
               </CardHeader>
@@ -372,11 +392,11 @@ export default function Analytics() {
                 {agingReport ? (
                   <div className="space-y-3">
                     {[
-                      { label: "Current", data: agingReport.current, color: "bg-green-500" },
-                      { label: "1-30 Days", data: agingReport.days_0_30, color: "bg-yellow-500" },
-                      { label: "31-60 Days", data: agingReport.days_31_60, color: "bg-orange-500" },
-                      { label: "61-90 Days", data: agingReport.days_61_90, color: "bg-red-500" },
-                      { label: "90+ Days", data: agingReport.days_90_plus, color: "bg-red-600" },
+                      { label: "Current", data: agingReport.current, color: "#22c55e" },
+                      { label: "1-30 Days", data: agingReport.days_0_30, color: "#eab308" },
+                      { label: "31-60 Days", data: agingReport.days_31_60, color: "#f97316" },
+                      { label: "61-90 Days", data: agingReport.days_61_90, color: "#ef4444" },
+                      { label: "90+ Days", data: agingReport.days_90_plus, color: "#dc2626" },
                     ].map((item) => {
                       const totalAging = 
                         agingReport.current.amount + 
@@ -387,23 +407,29 @@ export default function Analytics() {
                       const percentage = totalAging > 0 ? (item.data.amount / totalAging) * 100 : 0;
                       
                       return (
-                        <div key={item.label}>
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                        <div key={item.label} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="w-2.5 h-2.5 rounded-full" 
+                                style={{ backgroundColor: item.color }}
+                              />
                               <span className="text-sm text-muted-foreground">{item.label}</span>
                             </div>
-                            <div className="text-right">
+                            <div className="flex items-center gap-4">
                               <span className="text-sm font-medium">{item.data.count}</span>
-                              <span className="text-xs text-muted-foreground ml-2">
+                              <span className="text-sm text-muted-foreground w-24 text-right">
                                 {formatCurrency(item.data.amount)}
                               </span>
                             </div>
                           </div>
                           <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                             <div 
-                              className={`h-full rounded-full ${item.color} transition-all duration-300`}
-                              style={{ width: `${Math.max(percentage, item.data.count > 0 ? 5 : 0)}%` }}
+                              className="h-full rounded-full transition-all duration-300"
+                              style={{ 
+                                width: `${Math.max(percentage, item.data.count > 0 ? 5 : 0)}%`,
+                                backgroundColor: item.color
+                              }}
                             />
                           </div>
                         </div>
@@ -422,36 +448,36 @@ export default function Analytics() {
           {/* Expenses by Category - only show if data exists */}
           {expenseStats?.expensesByCategory && expenseStats.expensesByCategory.length > 0 && (
             <Card className="border-border">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-medium">Expenses by Category</CardTitle>
                 <CardDescription>Breakdown of expenses (last 6 months)</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {expenseStats.expensesByCategory.map((cat: any) => {
                     const percentage = totalExpenses > 0 
                       ? (parseFloat(cat.total) / totalExpenses) * 100 
                       : 0;
                     return (
-                      <div key={cat.categoryId}>
-                        <div className="flex items-center justify-between mb-2">
+                      <div key={cat.categoryId} className="space-y-2">
+                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div
-                              className="w-3 h-3 rounded-full"
+                              className="w-2.5 h-2.5 rounded-full"
                               style={{ backgroundColor: cat.categoryColor || "hsl(var(--primary))" }}
                             />
                             <span className="text-sm">{cat.categoryName || "Uncategorized"}</span>
                           </div>
-                          <div className="text-right">
+                          <div className="flex items-center gap-4">
                             <span className="text-sm font-medium">
                               {formatCurrency(parseFloat(cat.total))}
                             </span>
-                            <span className="text-xs text-muted-foreground ml-2">
-                              ({percentage.toFixed(1)}%)
+                            <span className="text-xs text-muted-foreground w-16 text-right">
+                              {percentage.toFixed(1)}%
                             </span>
                           </div>
                         </div>
-                        <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
                           <div 
                             className="h-full rounded-full transition-all duration-500"
                             style={{ 

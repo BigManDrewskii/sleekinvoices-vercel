@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Circle, Clock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface PaymentStatusBadgeProps {
   status: 'unpaid' | 'partial' | 'paid';
@@ -10,27 +10,35 @@ export function PaymentStatusBadge({ status, className }: PaymentStatusBadgeProp
   const config = {
     unpaid: {
       label: "Unpaid",
-      variant: "destructive" as const,
+      bgClass: "bg-red-500/10",
+      textClass: "text-red-400",
       icon: Circle,
     },
     partial: {
-      label: "Partially Paid",
-      variant: "secondary" as const,
+      label: "Partial",
+      bgClass: "bg-yellow-500/10",
+      textClass: "text-yellow-400",
       icon: Clock,
     },
     paid: {
       label: "Paid",
-      variant: "default" as const,
+      bgClass: "bg-green-500/10",
+      textClass: "text-green-400",
       icon: CheckCircle2,
     },
   };
 
-  const { label, variant, icon: Icon } = config[status];
+  const { label, bgClass, textClass, icon: Icon } = config[status];
 
   return (
-    <Badge variant={variant} className={className}>
-      <Icon className="w-3 h-3 mr-1" />
+    <span className={cn(
+      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+      bgClass,
+      textClass,
+      className
+    )}>
+      <Icon className="w-3 h-3" />
       {label}
-    </Badge>
+    </span>
   );
 }

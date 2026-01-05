@@ -6,14 +6,18 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
+  // Capitalize first letter only (not all uppercase)
+  const displayStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  
   return (
     <span
       className={cn(
-        `px-3 py-1 rounded-full text-xs font-medium status-${status.toLowerCase()}`,
+        "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
+        `status-${status.toLowerCase()}`,
         className
       )}
     >
-      {status.toUpperCase()}
+      {displayStatus}
     </span>
   );
 }
