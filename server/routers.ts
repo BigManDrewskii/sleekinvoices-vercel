@@ -75,6 +75,8 @@ export const appRouter = router({
         address: z.string().optional(),
         phone: z.string().optional(),
         notes: z.string().optional(),
+        vatNumber: z.string().max(50).optional(), // EU VAT number (e.g., DE123456789)
+        taxExempt: z.boolean().optional(), // Tax exempt status
       }))
       .mutation(async ({ ctx, input }) => {
         return await db.createClient({
@@ -92,6 +94,8 @@ export const appRouter = router({
         address: z.string().optional(),
         phone: z.string().optional(),
         notes: z.string().optional(),
+        vatNumber: z.string().max(50).nullable().optional(), // EU VAT number (e.g., DE123456789)
+        taxExempt: z.boolean().optional(), // Tax exempt status
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
@@ -104,6 +108,16 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.deleteClient(input.id, ctx.user.id);
         return { success: true };
+      }),
+    
+    // VIES VAT Validation
+    validateVAT: protectedProcedure
+      .input(z.object({
+        vatNumber: z.string().min(3).max(50),
+      }))
+      .mutation(async ({ input }) => {
+        const { validateVATNumber } = await import('./lib/vat-validation');
+        return await validateVATNumber(input.vatNumber);
       }),
   }),
 

@@ -1474,41 +1474,41 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 - [x] 1.5.3 Write vitest test for encryption/decryption round-trip
 
 #### 1.6 Backend: Client VAT Field
-- [ ] 1.6.1 Update `clients.create` procedure to accept `vatNumber` and `taxExempt`
-- [ ] 1.6.2 Update `clients.update` procedure to accept `vatNumber` and `taxExempt`
-- [ ] 1.6.3 Update `clients.list` and `clients.get` to return VAT fields
-- [ ] 1.6.4 Write vitest test for client CRUD with VAT fields
+- [x] 1.6.1 Update `clients.create` procedure to accept `vatNumber` and `taxExempt`
+- [x] 1.6.2 Update `clients.update` procedure to accept `vatNumber` and `taxExempt`
+- [x] 1.6.3 Update `clients.list` and `clients.get` to return VAT fields
+- [x] 1.6.4 Write vitest test for client CRUD with VAT fields
 
 #### 1.7 Backend: VIES VAT Validation
-- [ ] 1.7.1 Create `server/lib/vat-validation.ts` utility
+- [x] 1.7.1 Create `server/lib/vat-validation.ts` utility
   - Function: `validateVATNumber(vatNumber: string): Promise<{valid: boolean, name?: string, address?: string}>`
   - Use VIES SOAP API (https://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl)
   - Handle network errors gracefully (return {valid: false} on timeout)
-- [ ] 1.7.2 Create `clients.validateVAT` procedure that calls the validation utility
-- [ ] 1.7.3 Write vitest test with mock VIES responses
+- [x] 1.7.2 Create `clients.validateVAT` procedure that calls the validation utility
+- [x] 1.7.3 Write vitest test with mock VIES responses
 
 #### 1.8 Frontend: Client Dialog VAT Field
-- [ ] 1.8.1 Add `vatNumber` input field to `ClientDialog.tsx`
+- [x] 1.8.1 Add `vatNumber` input field to `ClientDialog.tsx`
   - Label: "VAT / Tax ID"
   - Placeholder: "e.g., DE123456789"
   - Position: After address field
-- [ ] 1.8.2 Add `taxExempt` checkbox to `ClientDialog.tsx`
+- [x] 1.8.2 Add `taxExempt` checkbox to `ClientDialog.tsx`
   - Label: "Tax Exempt"
   - Position: After VAT field
-- [ ] 1.8.3 Add "Validate VAT" button next to VAT input
+- [x] 1.8.3 Add "Validate VAT" button next to VAT input
   - Shows loading spinner during validation
   - Shows checkmark if valid, X if invalid
   - Auto-fills company name if VIES returns it
-- [ ] 1.8.4 Update form state and submission to include VAT fields
+- [x] 1.8.4 Update form state and submission to include VAT fields
 
 #### 1.9 Frontend: Decimal Precision Handling
-- [ ] 1.9.1 Install `decimal.js` package: `pnpm add decimal.js`
-- [ ] 1.9.2 Create `client/src/lib/decimal-utils.ts` utility
+- [x] 1.9.1 Install `decimal.js` package: `pnpm add decimal.js`
+- [x] 1.9.2 Create `client/src/lib/decimal-utils.ts` utility
   - Function: `formatCryptoAmount(amount: string, currency: string): string`
   - Function: `parseCryptoAmount(input: string): string`
   - Function: `calculateLineItemTotal(quantity: string, rate: string): string`
   - Function: `getDecimalPlaces(currency: string): number` (2 for fiat, 8 for crypto)
-- [ ] 1.9.3 Update invoice line item inputs to use decimal.js for calculations
+- [x] 1.9.3 Update invoice line item inputs to use decimal.js for calculations
 - [ ] 1.9.4 Update invoice total calculations to use decimal.js
 - [ ] 1.9.5 Write unit tests for decimal utility functions
 
