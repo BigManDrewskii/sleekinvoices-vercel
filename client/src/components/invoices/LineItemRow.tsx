@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { multiply, formatDecimal } from "@/lib/decimal";
 
 export interface LineItem {
   id: string;
@@ -18,7 +19,8 @@ interface LineItemRowProps {
 }
 
 export function LineItemRow({ item, onChange, onDelete, canDelete }: LineItemRowProps) {
-  const amount = item.quantity * item.rate;
+  // Use decimal.js for precise calculation
+  const amount = parseFloat(formatDecimal(multiply(item.quantity, item.rate), 2));
 
   const handleChange = (field: keyof LineItem, value: string | number) => {
     onChange({ ...item, [field]: value });
@@ -41,7 +43,7 @@ export function LineItemRow({ item, onChange, onDelete, canDelete }: LineItemRow
           type="number"
           placeholder="Qty"
           min="0"
-          step="0.01"
+          step="0.00000001"
           value={item.quantity || ''}
           onChange={(e) => handleChange('quantity', parseFloat(e.target.value) || 0)}
         />
@@ -55,7 +57,7 @@ export function LineItemRow({ item, onChange, onDelete, canDelete }: LineItemRow
             type="number"
             placeholder="0.00"
             min="0"
-            step="0.01"
+            step="0.00000001"
             value={item.rate || ''}
             onChange={(e) => handleChange('rate', parseFloat(e.target.value) || 0)}
             className="pl-7"

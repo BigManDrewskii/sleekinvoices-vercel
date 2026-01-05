@@ -369,7 +369,8 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
         <div class="company-details">
           ${user.companyAddress ? `${user.companyAddress}<br>` : ''}
           ${user.email ? `${user.email}<br>` : ''}
-          ${user.companyPhone ? `${user.companyPhone}` : ''}
+          ${user.companyPhone ? `${user.companyPhone}<br>` : ''}
+          ${user.taxId ? `<span style="font-weight: 600;">VAT:</span> ${user.taxId}` : ''}
         </div>
         ` : ''}
       </div>
@@ -396,7 +397,8 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
           ${client.companyName ? `${client.companyName}<br>` : ''}
           ${client.address ? `${client.address}<br>` : ''}
           ${client.email ? `${client.email}<br>` : ''}
-          ${client.phone ? `${client.phone}` : ''}
+          ${client.phone ? `${client.phone}<br>` : ''}
+          ${client.vatNumber ? `<span style="font-weight: 600;">VAT:</span> ${client.vatNumber}` : ''}
         </div>
       </div>
       <div class="invoice-info">
@@ -447,10 +449,16 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
         <span class="total-value" style="color: ${accentColor};">-${formatCurrency(invoice.discountAmount)}</span>
       </div>
       ` : ''}
-      ${showTaxField && Number(invoice.taxAmount) > 0 ? `
+      ${showTaxField && Number(invoice.taxAmount) > 0 && !client.taxExempt ? `
       <div class="total-row">
         <span class="total-label">Tax (${invoice.taxRate}%)</span>
         <span class="total-value">${formatCurrency(invoice.taxAmount)}</span>
+      </div>
+      ` : ''}
+      ${client.taxExempt && client.vatNumber ? `
+      <div class="total-row">
+        <span class="total-label" style="font-size: ${fontSize - 2}px; color: ${primaryColor};">Reverse Charge - VAT 0%</span>
+        <span class="total-value">${formatCurrency(0)}</span>
       </div>
       ` : ''}
       <div class="total-row grand-total">
@@ -473,6 +481,13 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
         <div class="notes-content">${invoice.paymentTerms}</div>
       </div>
       ` : ''}
+    </div>
+    ` : ''}
+    
+    ${client.taxExempt && client.vatNumber ? `
+    <div style="margin-top: 32px; padding: 16px; background: ${primaryColor}10; border-left: 4px solid ${primaryColor}; font-size: ${fontSize - 1}px;">
+      <strong style="color: ${primaryColor};">Reverse Charge Notice:</strong><br>
+      VAT reverse charge applies. The customer is liable for VAT in their country of establishment under Article 196 of Council Directive 2006/112/EC.
     </div>
     ` : ''}
     

@@ -15,7 +15,8 @@ import { PortalAccessDialog } from "@/components/clients/PortalAccessDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key } from "lucide-react";
+import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -29,6 +30,8 @@ interface Client {
   address: string | null;
   companyName: string | null;
   notes: string | null;
+  vatNumber: string | null;
+  taxExempt: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -173,6 +176,7 @@ export default function Clients() {
                       <TableHead>Name</TableHead>
                       <TableHead>Contact</TableHead>
                       <TableHead>Company</TableHead>
+                      <TableHead>VAT</TableHead>
                       <TableHead>Address</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -204,6 +208,21 @@ export default function Clients() {
                           {client.companyName || (
                             <span className="text-muted-foreground">—</span>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            {client.vatNumber ? (
+                              <span className="text-sm font-mono">{client.vatNumber}</span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                            {client.taxExempt && (
+                              <Badge variant="secondary" className="text-xs flex items-center gap-1 w-fit">
+                                <ShieldCheck className="h-3 w-3" />
+                                Tax Exempt
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {client.address ? (
@@ -281,6 +300,18 @@ export default function Clients() {
                           <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                           <span className="line-clamp-2">{client.address}</span>
                         </div>
+                      )}
+                      {client.vatNumber && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">VAT:</span>
+                          <span className="font-mono">{client.vatNumber}</span>
+                        </div>
+                      )}
+                      {client.taxExempt && (
+                        <Badge variant="secondary" className="text-xs flex items-center gap-1 w-fit">
+                          <ShieldCheck className="h-3 w-3" />
+                          Tax Exempt
+                        </Badge>
                       )}
                       {!client.email && !client.phone && !client.address && (
                         <p className="text-muted-foreground">No contact information</p>

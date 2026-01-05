@@ -1526,27 +1526,27 @@ See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 ### Phase 2: Payment Architecture ("Get Paid")
 
 #### 2.1 Stripe Connect Setup
-- [ ] 2.1.1 Register SleekInvoices as a Stripe Connect platform (if not already)
-- [ ] 2.1.2 Add Stripe Connect environment variables
+- [x] 2.1.1 Register SleekInvoices as a Stripe Connect platform (if not already)
+- [x] 2.1.2 Add Stripe Connect environment variables
   - `STRIPE_CONNECT_CLIENT_ID`
   - `STRIPE_CONNECT_REDIRECT_URI`
-- [ ] 2.1.3 Create `server/lib/stripe-connect.ts` utility
+- [x] 2.1.3 Create `server/lib/stripe-connect.ts` utility
   - Function: `generateConnectUrl(userId: string): string` - OAuth URL
   - Function: `exchangeCodeForAccount(code: string): Promise<StripeAccount>`
   - Function: `createPaymentIntent(accountId: string, amount: number, currency: string): Promise<PaymentIntent>`
-- [ ] 2.1.4 Write vitest test for Stripe Connect URL generation
+- [x] 2.1.4 Write vitest test for Stripe Connect URL generation
 
 #### 2.2 Coinbase Commerce Setup
-- [ ] 2.2.1 Install Coinbase Commerce SDK: `pnpm add coinbase-commerce-node`
-- [ ] 2.2.2 Create `server/lib/coinbase-commerce.ts` utility
+- [x] 2.2.1 Install Coinbase Commerce SDK: `pnpm add coinbase-commerce-node`
+- [x] 2.2.2 Create `server/lib/coinbase-commerce.ts` utility
   - Function: `createCharge(apiKey: string, invoiceId: string, amount: string, currency: string): Promise<Charge>`
   - Function: `verifyWebhookSignature(payload: string, signature: string, secret: string): boolean`
-- [ ] 2.2.3 Write vitest test with mocked Coinbase responses
+- [x] 2.2.3 Write vitest test with mocked Coinbase responses
 
 #### 2.3 Backend: Payment Gateways Router
-- [ ] 2.3.1 Create `server/routers/payment-gateways.ts` router
-- [ ] 2.3.2 Implement `paymentGateways.list` - returns user's configured gateways (masked keys)
-- [ ] 2.3.3 Implement `paymentGateways.getStripeConnectUrl` - returns OAuth URL
+- [x] 2.3.1 Create `server/routers/payment-gateways.ts` router
+- [x] 2.3.2 Implement `paymentGateways.list` - returns user's configured gateways (masked keys)
+- [x] 2.3.3 Implement `paymentGateways.getStripeConnectUrl` - returns OAuth URL
 - [ ] 2.3.4 Implement `paymentGateways.completeStripeConnect` - exchanges code, saves encrypted account ID
 - [ ] 2.3.5 Implement `paymentGateways.disconnectStripe` - removes Stripe connection
 - [ ] 2.3.6 Implement `paymentGateways.saveCoinbaseKey` - encrypts and saves API key
@@ -1730,3 +1730,26 @@ Before marking a phase complete, verify:
 - Bitcoin: 8 decimal places (0.00000001 = 1 satoshi)
 - Ethereum: 18 decimal places internally, display 8 (0.00000001)
 - USDC/USDT: 6 decimal places (0.000001)
+
+
+---
+
+## Phase 2: VAT Display and Decimal Integration
+
+### 2.1 Display VAT on Invoice PDFs
+- [x] 2.1.1 Update PDF template to show client VAT number
+- [x] 2.1.2 Add reverse charge notice for tax-exempt EU clients
+- [x] 2.1.3 Show seller VAT number on invoice
+- [x] 2.1.4 Conditionally hide tax line for reverse charge invoices
+
+### 2.2 Integrate Decimal Utilities in Invoice Form
+- [x] 2.2.1 Replace arithmetic in line item calculations
+- [x] 2.2.2 Update subtotal calculation with decimal.js
+- [x] 2.2.3 Update tax calculation with decimal.js
+- [x] 2.2.4 Update discount calculation with decimal.js
+- [x] 2.2.5 Update total calculation with decimal.js
+
+### 2.3 Add VAT Column to Clients List
+- [x] 2.3.1 Add VAT Number column to clients table
+- [x] 2.3.2 Add Tax Exempt badge/indicator
+- [x] 2.3.3 Make VAT column sortable/filterable

@@ -20,6 +20,15 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { Navigation } from "@/components/Navigation";
+import { 
+  toDecimal, 
+  add, 
+  subtract, 
+  multiply, 
+  divide, 
+  percentage as calcPercentage,
+  formatDecimal 
+} from "@/lib/decimal";
 
 export default function CreateInvoice() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -70,30 +79,34 @@ export default function CreateInvoice() {
     },
   });
 
-  // Calculations
+  // Calculations using decimal.js for precision
   const calculations = useMemo(() => {
+    // Calculate subtotal with precise decimal arithmetic
     const subtotal = lineItems.reduce((sum, item) => {
-      return sum + (item.quantity * item.rate);
-    }, 0);
+      const itemAmount = multiply(item.quantity, item.rate);
+      return add(sum, itemAmount);
+    }, toDecimal(0));
 
-    let discountAmount = 0;
+    // Calculate discount amount
+    let discountAmount = toDecimal(0);
     if (discountValue > 0) {
       if (discountType === 'percentage') {
-        discountAmount = (subtotal * discountValue) / 100;
+        discountAmount = calcPercentage(subtotal, discountValue);
       } else {
-        discountAmount = discountValue;
+        discountAmount = toDecimal(discountValue);
       }
     }
 
-    const afterDiscount = subtotal - discountAmount;
-    const taxAmount = (afterDiscount * taxRate) / 100;
-    const total = afterDiscount + taxAmount;
+    // Calculate tax on amount after discount
+    const afterDiscount = subtract(subtotal, discountAmount);
+    const taxAmount = calcPercentage(afterDiscount, taxRate);
+    const total = add(afterDiscount, taxAmount);
 
     return {
-      subtotal,
-      discountAmount,
-      taxAmount,
-      total,
+      subtotal: parseFloat(formatDecimal(subtotal, 2)),
+      discountAmount: parseFloat(formatDecimal(discountAmount, 2)),
+      taxAmount: parseFloat(formatDecimal(taxAmount, 2)),
+      total: parseFloat(formatDecimal(total, 2)),
     };
   }, [lineItems, taxRate, discountType, discountValue]);
 
