@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { TEMPLATE_PRESETS } from "@shared/template-presets";
 import { TemplatePreview } from "./TemplatePreview";
 import { CollapsibleSection, ColorInput, SliderInput } from "@/components/ui/collapsible-section";
+import { applyHSLAdjustments, hexToHSL, type HSLAdjustments } from "@/lib/hsl-utils";
 
 interface TemplateEditorProps {
   templateId?: number | null;
@@ -66,7 +67,20 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [showColorPresets, setShowColorPresets] = useState(true);
+  
+  // HSL Adjustment state
+  const [hueShift, setHueShift] = useState(0);
+  const [saturationMult, setSaturationMult] = useState(1);
+  const [lightnessMult, setLightnessMult] = useState(1);
+  
   const { data: user } = trpc.auth.me.useQuery();
+  
+  // Compute adjusted colors based on HSL settings
+  const hslAdjustments: HSLAdjustments = { hueShift, saturationMult, lightnessMult };
+  const adjustedPrimaryColor = applyHSLAdjustments(primaryColor, hslAdjustments);
+  const adjustedSecondaryColor = applyHSLAdjustments(secondaryColor, hslAdjustments);
+  const adjustedAccentColor = applyHSLAdjustments(accentColor, hslAdjustments);
+  const adjustedBackgroundColor = applyHSLAdjustments(backgroundColor, hslAdjustments);
 
   // Handle logo file selection and upload
   const handleLogoFileChange = async (file: File | null) => {
@@ -163,9 +177,9 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
     const templateData = {
       name,
       templateType: templateType as any,
-      primaryColor,
-      secondaryColor,
-      accentColor,
+      primaryColor: adjustedPrimaryColor,
+      secondaryColor: adjustedSecondaryColor,
+      accentColor: adjustedAccentColor,
       headingFont,
       bodyFont,
       fontSize,
@@ -207,9 +221,9 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
     userId: 0,
     name,
     templateType: templateType as any,
-    primaryColor,
-    secondaryColor,
-    accentColor,
+    primaryColor: adjustedPrimaryColor,
+    secondaryColor: adjustedSecondaryColor,
+    accentColor: adjustedAccentColor,
     headingFont,
     bodyFont,
     fontSize,
@@ -388,6 +402,73 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
                   value={backgroundColor}
                   onChange={setBackgroundColor}
                 />
+              </div>
+            </CollapsibleSection>
+
+            {/* HSL Adjustments */}
+            <CollapsibleSection title="HSL Adjustments" defaultOpen={false}>
+              <div className="space-y-5">
+                {/* Color preview swatches showing before/after */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Preview (Original → Adjusted)</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 space-y-1">
+                      <div className="flex gap-1">
+                        <div className="h-6 flex-1 rounded" style={{ backgroundColor: primaryColor }} title={`Original: ${primaryColor}`} />
+                        <div className="h-6 flex-1 rounded ring-2 ring-primary/50" style={{ backgroundColor: adjustedPrimaryColor }} title={`Adjusted: ${adjustedPrimaryColor}`} />
+                      </div>
+                      <div className="flex gap-1">
+                        <div className="h-6 flex-1 rounded" style={{ backgroundColor: secondaryColor }} title={`Original: ${secondaryColor}`} />
+                        <div className="h-6 flex-1 rounded ring-2 ring-primary/50" style={{ backgroundColor: adjustedSecondaryColor }} title={`Adjusted: ${adjustedSecondaryColor}`} />
+                      </div>
+                      <div className="flex gap-1">
+                        <div className="h-6 flex-1 rounded" style={{ backgroundColor: accentColor }} title={`Original: ${accentColor}`} />
+                        <div className="h-6 flex-1 rounded ring-2 ring-primary/50" style={{ backgroundColor: adjustedAccentColor }} title={`Adjusted: ${adjustedAccentColor}`} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <SliderInput
+                  label="Hue Shift"
+                  value={hueShift}
+                  onChange={setHueShift}
+                  min={-180}
+                  max={180}
+                  step={1}
+                  unit="deg"
+                />
+                <SliderInput
+                  label="Saturation Multiplier"
+                  value={saturationMult}
+                  onChange={setSaturationMult}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  unit="x"
+                />
+                <SliderInput
+                  label="Lightness Multiplier"
+                  value={lightnessMult}
+                  onChange={setLightnessMult}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  unit="x"
+                />
+
+                {/* Reset button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHueShift(0);
+                    setSaturationMult(1);
+                    setLightnessMult(1);
+                  }}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Reset to defaults
+                </button>
               </div>
             </CollapsibleSection>
 

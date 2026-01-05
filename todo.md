@@ -715,3 +715,18 @@
 - [x] Make preview window more elegant with backdrop blur and subtle background
 - [x] Add Primary/Secondary color sections with foreground options
 
+
+
+## HSL Adjustment Sliders (User Request)
+
+### Features to Implement
+- [x] Create HSL Adjustments collapsible section in template editor
+- [x] Add Hue Shift slider (-180 to 180 degrees)
+- [x] Add Saturation Multiplier slider (0 to 2x)
+- [x] Add Lightness Multiplier slider (0 to 2x)
+- [x] Implement hex-to-HSL and HSL-to-hex conversion utilities (hsl-utils.ts)
+- [x] Apply HSL adjustments to all template colors in real-time
+- [x] Store HSL adjustment values in template settings (adjusted colors saved)
+- [x] Update live preview with HSL-adjusted colors
+- [x] Add color preview swatches showing original vs adjusted
+- [x] Add Reset to defaults button
