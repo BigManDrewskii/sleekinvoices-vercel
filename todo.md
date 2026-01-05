@@ -537,3 +537,35 @@
 - [x] Verify all changes respect design system
 - [x] Test responsiveness
 - [x] Deliver refined Analytics page
+
+
+## Design System Overhaul - tweakcn Theme Implementation
+
+### Phase 1: Extract Design Tokens
+- [x] Visit tweakcn theme page and extract exact color values
+- [x] Document all color tokens (background, foreground, primary, secondary, etc.)
+- [x] Note chart colors and visualization styling
+- [x] Document card styling, borders, and shadows
+
+### Phase 2: Update CSS Design System
+- [x] Update index.css with tweakcn color values
+- [x] Apply proper OKLCH color format
+- [x] Update chart colors for professional look
+- [x] Ensure all semantic colors are properly defined
+
+### Phase 3: Refine Analytics Page
+- [x] Apply new design system to Analytics page
+- [x] Update chart styling to match tweakcn mockups
+- [x] Improve card layouts and spacing
+- [x] Add professional area charts like in mockups
+
+### Phase 4: Update Other Pages
+- [x] Update Dashboard with new design
+- [x] Update Navigation styling
+- [x] Update all cards and components
+- [x] Ensure consistency across entire app
+
+### Phase 5: Test and Deliver
+- [x] Verify all pages match design system
+- [x] Test responsiveness
+- [x] Deliver refined design
