@@ -33,21 +33,28 @@ export default function InvoiceTemplates() {
   const deleteMutation = trpc.templates.delete.useMutation();
   const initializeMutation = trpc.templates.initializeTemplates.useMutation();
   
-  // Auto-initialize templates if user has none
+  // Auto-initialize templates if user doesn't have the preset templates
   useEffect(() => {
-    if (!isLoading && templates && templates.length === 0 && !isInitializing) {
-      setIsInitializing(true);
-      initializeMutation.mutate(undefined, {
-        onSuccess: (data) => {
-          toast.success(`${data.count} templates initialized`);
-          refetch();
-          setIsInitializing(false);
-        },
-        onError: () => {
-          toast.error("Failed to initialize templates");
-          setIsInitializing(false);
-        },
-      });
+    if (!isLoading && templates && !isInitializing) {
+      // Check if user has any of the 6 preset templates
+      const presetNames = ["Modern", "Classic", "Minimal", "Bold", "Professional", "Creative"];
+      const hasPresets = templates.some(t => presetNames.includes(t.name));
+      
+      // If user has no preset templates, initialize them
+      if (!hasPresets) {
+        setIsInitializing(true);
+        initializeMutation.mutate(undefined, {
+          onSuccess: (data) => {
+            toast.success(`${data.count} templates initialized`);
+            refetch();
+            setIsInitializing(false);
+          },
+          onError: () => {
+            toast.error("Failed to initialize templates");
+            setIsInitializing(false);
+          },
+        });
+      }
     }
   }, [isLoading, templates, isInitializing]);
 

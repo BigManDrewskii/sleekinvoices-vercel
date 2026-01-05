@@ -768,15 +768,26 @@ export const appRouter = router({
       .mutation(async ({ ctx }) => {
         const { TEMPLATE_PRESETS } = await import('../shared/template-presets');
         
-        // Check if user already has templates
+        // Check if user already has the preset templates
         const existingTemplates = await db.getInvoiceTemplatesByUserId(ctx.user.id);
-        if (existingTemplates.length > 0) {
+        const presetNames = TEMPLATE_PRESETS.map(p => p.name);
+        const existingPresetNames = existingTemplates.map(t => t.name);
+        const hasAllPresets = presetNames.every(name => existingPresetNames.includes(name));
+        
+        if (hasAllPresets) {
           return { success: true, message: 'Templates already initialized', count: existingTemplates.length };
         }
         
-        // Create all 6 template presets for the user
+        // Create only missing template presets for the user
         let createdCount = 0;
+        const hasDefaultTemplate = existingTemplates.some(t => t.isDefault);
+        
         for (const preset of TEMPLATE_PRESETS) {
+          // Skip if template with this name already exists
+          if (existingPresetNames.includes(preset.name)) {
+            continue;
+          }
+          
           await db.createInvoiceTemplate({
             userId: ctx.user.id,
             name: preset.name,
@@ -799,7 +810,8 @@ export const appRouter = router({
             footerText: preset.footerText,
             language: preset.language,
             dateFormat: preset.dateFormat,
-            isDefault: createdCount === 0, // First template (Modern) is default
+            // Only set as default if user has no default template and this is Modern
+            isDefault: !hasDefaultTemplate && preset.name === "Modern",
           });
           createdCount++;
         }
