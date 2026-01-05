@@ -52,6 +52,26 @@ async function startServer() {
   app.use("/api/trpc", standardRateLimit);
   app.use("/api/stripe/webhook", strictRateLimit);
   app.use("/api/oauth", strictRateLimit);
+  app.use("/api/upload", standardRateLimit);
+  
+  // Logo upload endpoint
+  app.post("/api/upload/logo", async (req, res) => {
+    try {
+      const { file, userId } = req.body;
+      if (!file || !userId) {
+        return res.status(400).json({ error: "Missing file or userId" });
+      }
+      const buffer = Buffer.from(file, 'base64');
+      const { storagePut } = await import("../storage");
+      const timestamp = Date.now();
+      const filename = `logos/${userId}/logo-${timestamp}.png`;
+      const { url } = await storagePut(filename, buffer, 'image/png');
+      res.json({ url });
+    } catch (error: any) {
+      console.error("Logo upload error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
   
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);

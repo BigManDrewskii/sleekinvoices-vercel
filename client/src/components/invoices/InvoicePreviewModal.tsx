@@ -80,6 +80,9 @@ export function InvoicePreviewModal({
   const secondaryColor = template?.secondaryColor || "#4f46e5";
   const headingFont = template?.headingFont || "Inter";
   const bodyFont = template?.bodyFont || "Inter";
+  const logoUrl = template?.logoUrl;
+  const logoWidth = template?.logoWidth || 120;
+  const logoPosition = template?.logoPosition || "left";
 
   const handleTemplateChange = (newTemplateId: number | null) => {
     setPreviewTemplateId(newTemplateId);
@@ -115,26 +118,39 @@ export function InvoicePreviewModal({
           }}
         >
           {/* Header */}
-          <div className="flex justify-between items-start mb-8 pb-4 border-b-2" style={{ borderColor: primaryColor }}>
-            <div>
-              <h1 
-                className="text-4xl font-bold mb-1"
-                style={{ 
-                  color: primaryColor,
-                  fontFamily: headingFont,
-                }}
-              >
-                INVOICE
-              </h1>
-              <p className="text-lg text-gray-600">{invoiceNumber}</p>
-            </div>
-            <div className="text-right">
-              {companyName && (
-                <p className="font-semibold text-gray-900 text-lg">{companyName}</p>
-              )}
-              {companyAddress && (
-                <p className="text-sm text-gray-600 whitespace-pre-line mt-1">{companyAddress}</p>
-              )}
+          <div className="mb-8 pb-4 border-b-2" style={{ borderColor: primaryColor }}>
+            {/* Logo Section */}
+            {logoUrl && (
+              <div className={`mb-4 ${logoPosition === 'center' ? 'text-center' : logoPosition === 'right' ? 'text-right' : ''}`}>
+                <img 
+                  src={logoUrl} 
+                  alt="Company Logo" 
+                  className="rounded"
+                  style={{ width: `${logoWidth}px`, height: 'auto', maxHeight: '60px', objectFit: 'contain' }}
+                />
+              </div>
+            )}
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 
+                  className="text-4xl font-bold mb-1"
+                  style={{ 
+                    color: primaryColor,
+                    fontFamily: headingFont,
+                  }}
+                >
+                  INVOICE
+                </h1>
+                <p className="text-lg text-gray-600">{invoiceNumber}</p>
+              </div>
+              <div className="text-right">
+                {companyName && (
+                  <p className="font-semibold text-gray-900 text-lg">{companyName}</p>
+                )}
+                {companyAddress && (
+                  <p className="text-sm text-gray-600 whitespace-pre-line mt-1">{companyAddress}</p>
+                )}
+              </div>
             </div>
           </div>
 

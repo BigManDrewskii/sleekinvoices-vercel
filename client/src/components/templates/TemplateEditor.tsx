@@ -53,6 +53,42 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
   const [language, setLanguage] = useState("en");
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
   const [isDefault, setIsDefault] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const { data: user } = trpc.auth.me.useQuery();
+
+  // Handle logo file selection and upload
+  const handleLogoFileChange = async (file: File | null) => {
+    if (!file || !user) return;
+    
+    setIsUploadingLogo(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = (e.target?.result as string).split(',')[1];
+        const response = await fetch('/api/upload/logo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: base64, userId: user.id }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Upload failed');
+        }
+        
+        const { url } = await response.json();
+        setLogoUrl(url);
+        setLogoFile(null);
+        toast.success('Logo uploaded successfully');
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast.error('Failed to upload logo');
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
 
   // Load existing template data
   useEffect(() => {
@@ -78,6 +114,7 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
       setLanguage(existingTemplate.language);
       setDateFormat(existingTemplate.dateFormat);
       setIsDefault(existingTemplate.isDefault);
+      setLogoUrl(existingTemplate.logoUrl || null);
     }
   }, [existingTemplate]);
 
@@ -123,6 +160,7 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
       headingFont,
       bodyFont,
       fontSize,
+      logoUrl: logoUrl || undefined,
       logoPosition: logoPosition as any,
       logoWidth,
       headerLayout: headerLayout as any,
@@ -166,7 +204,7 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
     headingFont,
     bodyFont,
     fontSize,
-    logoUrl: null,
+    logoUrl: logoUrl || undefined,
     logoPosition: logoPosition as any,
     logoWidth,
     headerLayout: headerLayout as any,
@@ -453,6 +491,46 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
                           <SelectItem value="right">Right</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="logoUpload">Company Logo</Label>
+                      <div className="space-y-3">
+                        <input
+                          id="logoUpload"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              handleLogoFileChange(file);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => document.getElementById('logoUpload')?.click()}
+                          disabled={isUploadingLogo}
+                          className="w-full"
+                        >
+                          {isUploadingLogo ? 'Uploading...' : logoFile ? logoFile.name : 'Choose Logo File'}
+                        </Button>
+                        {logoUrl && (
+                          <div className="flex items-center gap-2">
+                            <img src={logoUrl} alt="Logo preview" className="h-10 object-contain" />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setLogoUrl(null)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div className="space-y-2">

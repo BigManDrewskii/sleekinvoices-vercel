@@ -47,6 +47,7 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
   const headingFont = template?.headingFont || 'Inter, sans-serif';
   const bodyFont = template?.bodyFont || 'Inter, sans-serif';
   const fontSize = template?.fontSize || 14;
+  const logoUrl = template?.logoUrl;
   const logoPosition = template?.logoPosition || 'left';
   const logoWidth = template?.logoWidth || 150;
   const headerLayout = template?.headerLayout || 'standard';
@@ -362,7 +363,7 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
   <div class="invoice-container">
     <div class="header">
       <div class="company-info">
-        ${user.logoUrl && template?.logoUrl !== null ? `<img src="${user.logoUrl}" alt="Logo" class="company-logo">` : ''}
+        ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="company-logo">` : ''}
         <div class="company-name">${user.companyName || user.name || 'Your Company'}</div>
         ${showCompanyAddress ? `
         <div class="company-details">

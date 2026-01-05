@@ -59,7 +59,7 @@
 - [x] Test template initialization (1 test passing)
 - [x] Test all edge cases (delete default, field visibility)
 - [x] All 13 tests passing
-- [ ] Save final checkpoint
+- [x] Save final checkpoint
 
 ## Console Warning Cleanup
 - [x] Suppress benign ResizeObserver warnings in browser console
@@ -77,3 +77,41 @@
 - [x] Remove decorative/unnecessary icons (10 instances removed)
 - [x] Implement strategic icon placement
 - [x] Ensure consistent icon sizing and spacing
+## Logo Upload Feature
+
+### Phase 1: Logo Upload UI
+- [x] Create logo upload UI component in Templates editor
+- [x] Add file input with drag-drop support
+- [x] Add preview and remove functionality
+
+### Phase 2: Backend S3 Upload
+- [x] Implement S3 upload endpoint on backend (/api/upload/logo)
+- [x] Use multer for file handling
+- [x] Use @aws-sdk/client-s3 for S3 integration
+- [x] Return public URL from S3
+
+### Phase 3: Template Preview Logo Display
+- [x] Update TemplatePreview component to display uploaded logo
+- [x] Apply logoPosition (left/center/right) styling
+- [x] Apply logoWidth setting
+- [x] Show placeholder when no logo uploaded
+
+### Phase 4: Invoice Preview Modal Logo Display
+- [x] Update InvoicePreviewModal to display template logo
+- [x] Apply template logo settings in invoice preview
+- [x] Logo displays correctly with all header layouts
+
+### Phase 5: PDF Generation Logo
+- [x] Update server/pdf.ts to include logo from template
+- [x] Apply logoUrl, logoPosition, and logoWidth in PDF
+- [x] Logo renders correctly in generated PDFs
+
+### Phase 6: Comprehensive Testing
+- [x] Create 14 comprehensive vitest tests
+- [x] Test logo URL storage (S3 URLs, null handling)
+- [x] Test logo positioning (left, center, right)
+- [x] Test logo width settings (80-200px)
+- [x] Test file format support (PNG, JPG, SVG)
+- [x] Test logo with template customization
+- [x] Test multiple templates with different logos
+- [x] All 14 tests passing

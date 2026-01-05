@@ -8,6 +8,7 @@ interface TemplatePreviewProps {
     headingFont: string;
     bodyFont: string;
     fontSize: number;
+    logoUrl?: string | null;
     logoPosition: string;
     logoWidth: number;
     headerLayout: string;
@@ -65,12 +66,21 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
         {template.headerLayout === "split" ? (
           <>
             <div>
-              <div 
-                className="h-12 w-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500"
-                style={{ width: `${template.logoWidth}px` }}
-              >
-                Logo
-              </div>
+              {template.logoUrl ? (
+                <img 
+                  src={template.logoUrl} 
+                  alt="Company Logo" 
+                  className="rounded"
+                  style={{ width: `${template.logoWidth}px`, height: 'auto', maxHeight: '60px', objectFit: 'contain' }}
+                />
+              ) : (
+                <div 
+                  className="h-12 w-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500"
+                  style={{ width: `${template.logoWidth}px` }}
+                >
+                  Logo
+                </div>
+              )}
             </div>
             <div className="text-right">
               <h1 
@@ -93,12 +103,21 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
         ) : (
           <>
             <div className={logoAlignClass}>
-              <div 
-                className="h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-4"
-                style={{ width: `${template.logoWidth}px` }}
-              >
-                Logo
-              </div>
+              {template.logoUrl ? (
+                <img 
+                  src={template.logoUrl} 
+                  alt="Company Logo" 
+                  className="rounded mb-4"
+                  style={{ width: `${template.logoWidth}px`, height: 'auto', maxHeight: '60px', objectFit: 'contain' }}
+                />
+              ) : (
+                <div 
+                  className="h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-4"
+                  style={{ width: `${template.logoWidth}px` }}
+                >
+                  Logo
+                </div>
+              )}
             </div>
             <h1 
               className="text-3xl font-bold mb-4"
