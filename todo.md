@@ -210,3 +210,129 @@
 - [x] Document optimization settings
 - [x] Document supported formats
 - [x] Save checkpoint with feature
+
+
+## UI/UX Improvements - Based on Professional Review
+
+### Phase 1: High Priority Improvements
+
+#### 1. Invoice Table Actions Redesign
+- [x] Replace 6 icon buttons with Actions dropdown menu
+- [x] Add proper hover states and focus indicators
+- [x] Add tooltips to action buttons
+- [x] Ensure accessibility with aria-labels
+
+#### 2. Pagination Implementation
+- [x] Add pagination to Invoices table (10-15 items per page)
+- [x] Add pagination to Clients table (15-20 items per page)
+- [x] Add page size selector (10, 25, 50, 100)
+- [x] Show total count and current range
+- [x] Style pagination consistently with existing buttons
+
+#### 3. Invoice Number Improvement
+- [x] Generate shorter, user-friendly invoice numbers (INV-2026-0001)
+- [x] Implement truncation with ellipsis for long numbers
+- [x] Add click-to-copy functionality
+- [x] Add tooltip showing full invoice number
+
+#### 4. Global Search Implementation
+- [x] Add search input in navigation header
+- [x] Search across invoices, clients, amounts
+- [x] Show results in dropdown with categorized sections
+- [x] Implement Cmd/Ctrl + K keyboard shortcut
+- [x] Style consistently with existing search bars
+
+#### 5. Dashboard Monthly Usage Enhancement
+- [x] Add circular progress indicator or progress bar
+- [x] Show "X of Y invoices used this month"
+- [x] Add percentage display
+- [x] Implement color coding (green 0-70%, yellow 70-90%, red 90-100%)
+- [x] Show trend indicator if no limit exists
+
+### Phase 2: Medium Priority Improvements
+
+#### 6. Trend Indicators on Dashboard
+- [x] Add up/down arrow icons to metric cards
+- [x] Display percentage change from previous period
+- [x] Use green for positive trends, red for negative
+- [x] Add subtle animation on page load
+
+#### 7. Sortable Table Columns
+- [x] Add sort indicators to column headers
+- [x] Enable click-to-sort functionality
+- [x] Support ascending/descending toggle
+- [x] Apply to: Invoice #, Client, Issue Date, Due Date, Amount, Status
+- [x] Maintain sort state visually
+
+#### 8. Settings Page Navigation
+- [ ] Add sticky left sidebar with section links
+- [ ] Include: Personal Info, Company Info, Logo, Email Reminders, Account Actions
+- [ ] Implement smooth scroll to section
+- [ ] Highlight active section based on scroll position
+- [ ] Make sidebar collapsible on smaller screens
+
+#### 9. Template Preview Enhancement
+- [ ] Replace gradient images with actual invoice previews
+- [ ] Use sample data (fictional company, client, line items)
+- [ ] Show thumbnail that expands to full preview
+- [ ] Add "Preview with my data" option
+
+#### 10. Breadcrumb Navigation
+- [ ] Add breadcrumbs for deep pages
+- [ ] Invoice detail: Dashboard > Invoices > INV-2026-0001
+- [ ] Edit invoice: Dashboard > Invoices > INV-2026-0001 > Edit
+- [ ] Client detail: Dashboard > Clients > [Client Name]
+- [ ] Style with ">" separators
+
+### Phase 3: Polish Improvements
+
+#### 11. Keyboard Shortcuts
+- [ ] Implement N: New Invoice
+- [ ] Implement Cmd/Ctrl + K: Focus global search
+- [ ] Implement Escape: Close modals/dropdowns
+- [ ] Implement Arrow keys: Navigate tables/dropdowns
+- [ ] Add keyboard shortcut help modal (? key)
+
+#### 12. Visual Email Template Editor
+- [ ] Replace raw HTML editor with WYSIWYG editor
+- [ ] Support: Bold, italic, headings, links, images
+- [ ] Show placeholder variables as styled tags
+- [ ] Include Preview button
+- [ ] Keep Edit HTML option for advanced users
+
+#### 13. Client Avatars
+- [ ] Generate initials-based avatars
+- [ ] Use consistent background colors based on name hash
+- [ ] Display as circular avatars in client list
+- [ ] Size: 32-40px diameter
+
+#### 14. Analytics Export
+- [ ] Add Export button in Analytics header
+- [ ] Support formats: CSV, PDF
+- [ ] Allow export of individual charts or full report
+- [ ] Include date range in filename
+
+#### 15. Invoice Activity Log
+- [ ] Add activity log section to Invoice Detail page
+- [ ] Log events: Created, Sent, Viewed, Paid, Edited, Reminder Sent
+- [ ] Show timestamp and user/system
+- [ ] Style as timeline with icons
+
+### Accessibility Enhancements (All Phases)
+- [ ] Add visible focus states (2px green outline) to all interactive elements
+- [ ] Add aria-labels to all icon-only buttons
+- [ ] Ensure form inputs have associated labels
+- [ ] Use icons AND text for state indicators
+- [ ] Implement logical keyboard navigation
+- [ ] Add skip-to-content link at top of page
+- [ ] Ensure color contrast meets WCAG AA standards
+- [ ] Test with screen readers
+
+### Testing Checklist
+- [ ] All existing functionality still works
+- [ ] Test on desktop (1920px, 1440px, 1024px)
+- [ ] Dark theme consistency maintained
+- [ ] No console errors or warnings
+- [ ] Keyboard navigation works for all new elements
+- [ ] Screen reader announces new elements correctly
+- [ ] Mobile responsiveness verified

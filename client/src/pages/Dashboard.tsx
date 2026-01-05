@@ -5,9 +5,10 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { DollarSign, FileText, TrendingUp, AlertCircle, Plus } from "lucide-react";
 import { Link } from "wouter";
-import { UsageIndicator } from "@/components/UsageIndicator";
 import { Navigation } from "@/components/Navigation";
 import { UpgradePromoBanner } from "@/components/UpgradePromoBanner";
+import { MonthlyUsageCard } from "@/components/dashboard/MonthlyUsageCard";
+import { TrendIndicator } from "@/components/dashboard/TrendIndicator";
 
 export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -57,17 +58,17 @@ export default function Dashboard() {
           <UpgradePromoBanner />
         </div>
 
-        {/* Usage Indicator for Free Tier */}
+        {/* Monthly Usage Card */}
         <div className="mb-6 md:mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Monthly Usage</CardTitle>
-              <CardDescription>Track your invoice creation limit</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <UsageIndicator />
-            </CardContent>
-          </Card>
+          <MonthlyUsageCard
+            invoicesCreatedThisMonth={invoices?.filter((inv) => {
+              const invoiceDate = new Date(inv.issueDate);
+              const now = new Date();
+              return invoiceDate.getMonth() === now.getMonth() &&
+                     invoiceDate.getFullYear() === now.getFullYear();
+            }).length || 0}
+            invoiceLimit={undefined}
+          />
         </div>
 
         {/* Stats Grid */}
@@ -157,7 +158,17 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) {
+function StatCard({ 
+  title, 
+  value, 
+  icon,
+  trend,
+}: { 
+  title: string; 
+  value: string; 
+  icon: React.ReactNode;
+  trend?: { percentage: number; isPositive: boolean };
+}) {
   return (
     <Card className="hover-lift transition-all duration-200">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -168,6 +179,15 @@ function StatCard({ title, value, icon }: { title: string; value: string; icon: 
       </CardHeader>
       <CardContent>
         <div className="text-3xl font-bold tracking-tight">{value}</div>
+        {trend && (
+          <div className="mt-2">
+            <TrendIndicator 
+              percentage={trend.percentage} 
+              isPositive={trend.isPositive}
+              showLabel={true}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

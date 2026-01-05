@@ -21,6 +21,9 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { PaymentStatusBadge } from "@/components/shared/PaymentStatusBadge";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { InvoiceListSkeleton } from "@/components/skeletons/InvoiceListSkeleton";
+import { InvoiceActionsMenu } from "@/components/invoices/InvoiceActionsMenu";
+import { InvoiceNumberCell } from "@/components/invoices/InvoiceNumberCell";
+import { Pagination } from "@/components/shared/Pagination";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
@@ -37,6 +40,8 @@ import {
   File,
 } from "lucide-react";
 import { useState } from "react";
+import { useTableSort } from "@/hooks/useTableSort";
+import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
@@ -69,6 +74,9 @@ export default function Invoices() {
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const { sort, handleSort, sortData } = useTableSort({ defaultKey: "invoiceNumber" });
 
   const { data: invoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -148,7 +156,24 @@ export default function Invoices() {
       (invoice.paymentStatus || "unpaid") === paymentFilter;
     
     return matchesSearch && matchesStatus && matchesPayment;
-  });
+  }) || [];
+
+  // Sort the filtered invoices
+  const sortedInvoices = sortData(filteredInvoices);
+
+  // Pagination logic
+  const totalItems = sortedInvoices.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const paginatedInvoices = sortedInvoices.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Reset to page 1 when filters change
+  const handleFilterChange = (setter: (val: string) => void, val: string) => {
+    setter(val);
+    setCurrentPage(1);
+  };
 
   const handleDelete = (invoice: Invoice) => {
     setInvoiceToDelete(invoice);
@@ -197,11 +222,14 @@ export default function Invoices() {
             <Input
               placeholder="Search by invoice number or client name..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
               className="pl-10"
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={(val) => handleFilterChange(setStatusFilter, val)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
@@ -214,7 +242,7 @@ export default function Invoices() {
               <SelectItem value="canceled">Canceled</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={paymentFilter} onValueChange={setPaymentFilter}>
+          <Select value={paymentFilter} onValueChange={(val) => handleFilterChange(setPaymentFilter, val)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Payment status" />
             </SelectTrigger>
@@ -232,7 +260,7 @@ export default function Invoices() {
           <CardHeader>
             <CardTitle>All Invoices</CardTitle>
             <CardDescription>
-              {filteredInvoices?.length || 0} invoice{filteredInvoices?.length !== 1 ? "s" : ""} found
+              {totalItems} invoice{totalItems !== 1 ? "s" : ""} found
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -248,215 +276,217 @@ export default function Invoices() {
                   Create Invoice
                 </Button>
               </div>
-            ) : filteredInvoices && filteredInvoices.length === 0 ? (
+            ) : filteredInvoices.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No invoices match your filters
               </div>
             ) : (
               <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Invoice #</TableHead>
-                      <TableHead>Client</TableHead>
-                      <TableHead>Issue Date</TableHead>
-                      <TableHead>Due Date</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Payment</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredInvoices?.map((invoice) => (
-                      <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                        <TableCell>{invoice.client.name}</TableCell>
-                        <TableCell>{formatDateShort(invoice.issueDate)}</TableCell>
-                        <TableCell>{formatDateShort(invoice.dueDate)}</TableCell>
-                        <TableCell className="font-semibold">
-                          <div className="space-y-1">
-                            <div>{formatCurrency(invoice.total)}</div>
-                            {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
-                              <div className="text-xs text-muted-foreground">
-                                Paid: {formatCurrency(invoice.totalPaid || '0')}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {invoice.paymentStatus ? (
-                            <PaymentStatusBadge status={invoice.paymentStatus} />
-                          ) : (
-                            <PaymentStatusBadge status="unpaid" />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={invoice.status} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setLocation(`/invoices/${invoice.id}`)}
-                              title="View invoice"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setLocation(`/invoices/${invoice.id}/edit`)}
-                              title="Edit invoice"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDownloadPDF(invoice.id)}
-                              disabled={generatePDF.isPending}
-                              title="Download PDF"
-                            >
-                              <Download className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleSendEmail(invoice.id)}
-                              disabled={sendEmail.isPending}
-                              title="Send email"
-                            >
-                              <Mail className="h-4 w-4" />
-                            </Button>
-                            {!invoice.paymentLink && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCreatePaymentLink(invoice.id)}
-                                disabled={createPaymentLink.isPending}
-                                title="Create payment link"
-                              >
-                                <LinkIcon className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(invoice)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              title="Delete invoice"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <SortableTableHeader
+                          label="Invoice #"
+                          sortKey="invoiceNumber"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Client"
+                          sortKey="client.name"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Issue Date"
+                          sortKey="issueDate"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Due Date"
+                          sortKey="dueDate"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Amount"
+                          sortKey="total"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Payment"
+                          sortKey="paymentStatus"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <SortableTableHeader
+                          label="Status"
+                          sortKey="status"
+                          currentSort={sort}
+                          onSort={handleSort}
+                        />
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {/* Mobile Card View */}
-              <div className="md:hidden space-y-4">
-                {filteredInvoices?.map((invoice) => (
-                  <div key={invoice.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-semibold text-foreground">{invoice.invoiceNumber}</p>
-                        <p className="text-sm text-muted-foreground">{invoice.client.name}</p>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedInvoices?.map((invoice) => (
+                        <TableRow key={invoice.id} className="group">
+                          <TableCell>
+                            <InvoiceNumberCell invoiceNumber={invoice.invoiceNumber} />
+                          </TableCell>
+                          <TableCell>{invoice.client.name}</TableCell>
+                          <TableCell>{formatDateShort(invoice.issueDate)}</TableCell>
+                          <TableCell>{formatDateShort(invoice.dueDate)}</TableCell>
+                          <TableCell className="font-semibold">
+                            <div className="space-y-1">
+                              <div>{formatCurrency(invoice.total)}</div>
+                              {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
+                                <div className="text-xs text-muted-foreground">
+                                  Paid: {formatCurrency(invoice.totalPaid || '0')}
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {invoice.paymentStatus ? (
+                              <PaymentStatusBadge status={invoice.paymentStatus} />
+                            ) : (
+                              <PaymentStatusBadge status="unpaid" />
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <StatusBadge status={invoice.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <InvoiceActionsMenu
+                              invoiceId={invoice.id}
+                              invoiceNumber={invoice.invoiceNumber}
+                              hasPaymentLink={!!invoice.paymentLink}
+                              onView={() => setLocation(`/invoices/${invoice.id}`)}
+                              onEdit={() => setLocation(`/invoices/${invoice.id}/edit`)}
+                              onDownloadPDF={() => handleDownloadPDF(invoice.id)}
+                              onSendEmail={() => handleSendEmail(invoice.id)}
+                              onCreatePaymentLink={() => handleCreatePaymentLink(invoice.id)}
+                              onDelete={() => handleDelete(invoice)}
+                              isLoading={{
+                                pdf: generatePDF.isPending,
+                                email: sendEmail.isPending,
+                                paymentLink: createPaymentLink.isPending,
+                              }}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-4">
+                  {paginatedInvoices?.map((invoice) => (
+                    <div key={invoice.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold text-foreground">{invoice.invoiceNumber}</p>
+                          <p className="text-sm text-muted-foreground">{invoice.client.name}</p>
+                        </div>
+                        <div className="flex gap-1">
+                          <StatusBadge status={invoice.status} />
+                        </div>
                       </div>
-                      <div className="flex gap-1">
-                        <StatusBadge status={invoice.status} />
+                      
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Issue Date</p>
+                          <p className="font-medium">{formatDateShort(invoice.issueDate)}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Due Date</p>
+                          <p className="font-medium">{formatDateShort(invoice.dueDate)}</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Issue Date</p>
-                        <p className="font-medium">{formatDateShort(invoice.issueDate)}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Due Date</p>
-                        <p className="font-medium">{formatDateShort(invoice.dueDate)}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Amount</p>
-                        <p className="text-lg font-bold">{formatCurrency(invoice.total)}</p>
-                        {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
-                          <p className="text-xs text-muted-foreground">Paid: {formatCurrency(invoice.totalPaid || '0')}</p>
+                      
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Amount</p>
+                          <p className="text-lg font-bold">{formatCurrency(invoice.total)}</p>
+                          {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
+                            <p className="text-xs text-muted-foreground">Paid: {formatCurrency(invoice.totalPaid || '0')}</p>
+                          )}
+                        </div>
+                        {invoice.paymentStatus ? (
+                          <PaymentStatusBadge status={invoice.paymentStatus} />
+                        ) : (
+                          <PaymentStatusBadge status="unpaid" />
                         )}
                       </div>
-                      {invoice.paymentStatus ? (
-                        <PaymentStatusBadge status={invoice.paymentStatus} />
-                      ) : (
-                        <PaymentStatusBadge status="unpaid" />
-                      )}
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setLocation(`/invoices/${invoice.id}`)}
-                        className="flex-1"
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setLocation(`/invoices/${invoice.id}/edit`)}
-                        className="flex-1"
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownloadPDF(invoice.id)}
-                        disabled={generatePDF.isPending}
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleSendEmail(invoice.id)}
-                        disabled={sendEmail.isPending}
-                      >
-                        <Mail className="h-4 w-4" />
-                      </Button>
-                      {!invoice.paymentLink && (
+                      
+                      <div className="flex flex-wrap gap-2 pt-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleCreatePaymentLink(invoice.id)}
-                          disabled={createPaymentLink.isPending}
+                          onClick={() => setLocation(`/invoices/${invoice.id}`)}
+                          className="flex-1"
                         >
-                          <LinkIcon className="h-4 w-4" />
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(invoice)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLocation(`/invoices/${invoice.id}/edit`)}
+                          className="flex-1"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                        <InvoiceActionsMenu
+                          invoiceId={invoice.id}
+                          invoiceNumber={invoice.invoiceNumber}
+                          hasPaymentLink={!!invoice.paymentLink}
+                          onView={() => setLocation(`/invoices/${invoice.id}`)}
+                          onEdit={() => setLocation(`/invoices/${invoice.id}/edit`)}
+                          onDownloadPDF={() => handleDownloadPDF(invoice.id)}
+                          onSendEmail={() => handleSendEmail(invoice.id)}
+                          onCreatePaymentLink={() => handleCreatePaymentLink(invoice.id)}
+                          onDelete={() => handleDelete(invoice)}
+                          isLoading={{
+                            pdf: generatePDF.isPending,
+                            email: sendEmail.isPending,
+                            paymentLink: createPaymentLink.isPending,
+                          }}
+                        />
+                      </div>
                     </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="border-t pt-4 mt-4">
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      pageSize={pageSize}
+                      totalItems={totalItems}
+                      onPageChange={setCurrentPage}
+                      onPageSizeChange={(size) => {
+                        setPageSize(size);
+                        setCurrentPage(1);
+                      }}
+                      pageSizeOptions={[10, 15, 25, 50]}
+                    />
                   </div>
-                ))}
-              </div>
+                )}
+                {totalItems === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No invoices match your filters
+                  </div>
+                )}
               </>
             )}
           </CardContent>

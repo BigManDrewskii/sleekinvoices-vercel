@@ -19,6 +19,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { GlobalSearch } from "@/components/GlobalSearch";
 
 export function Navigation() {
   const [location] = useLocation();
@@ -80,12 +81,17 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6 flex-1 px-6">
             <NavLinks />
           </div>
 
+          {/* Global Search */}
+          <div className="hidden md:block flex-1 max-w-md">
+            <GlobalSearch />
+          </div>
+
           {/* Right Side */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
