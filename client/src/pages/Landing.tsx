@@ -32,18 +32,12 @@ export default function Landing() {
       <section className="pt-32 pb-20 md:pt-40 md:pb-32">
         <div className="container max-w-5xl mx-auto px-4 text-center">
           {/* Sleeky Mascot */}
-          <div className="mb-6">
+          <div className="mb-8">
             <img
               src="/sleeky.svg"
               alt="Sleeky - SleekInvoices mascot"
-              className="h-32 sm:h-40 md:h-48 mx-auto"
+              className="h-48 sm:h-56 md:h-64 lg:h-72 mx-auto"
             />
-          </div>
-
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 text-primary rounded-full text-sm font-medium mb-8">
-            <Sparkles className="h-4 w-4" />
-            Professional Invoicing Made Simple
           </div>
 
           {/* Main headline */}
@@ -92,30 +86,6 @@ export default function Landing() {
               <Check className="h-4 w-4 text-green-500" />
               Cancel anytime
             </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-12 border-y border-border/50">
-        <div className="container max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">10K+</div>
-              <div className="text-sm text-muted-foreground">Invoices Sent</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">$2M+</div>
-              <div className="text-sm text-muted-foreground">Processed</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">98%</div>
-              <div className="text-sm text-muted-foreground">Satisfaction</div>
-            </div>
-            <div>
-              <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">24h</div>
-              <div className="text-sm text-muted-foreground">Avg. Payment</div>
-            </div>
           </div>
         </div>
       </section>
