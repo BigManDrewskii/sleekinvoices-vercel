@@ -45,7 +45,7 @@ export default function Dashboard() {
             <p className="text-sm sm:text-base text-muted-foreground">Welcome back, {user?.name || "there"}!</p>
           </div>
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/invoices/new" className="flex items-center gap-2 justify-center">
+            <Link href="/invoices/create" className="flex items-center gap-2 justify-center">
               <Plus className="h-4 w-4" />
               New Invoice
             </Link>
@@ -116,7 +116,7 @@ export default function Dashboard() {
                 <h3 className="text-lg font-semibold text-foreground mb-2">No invoices yet</h3>
                 <p className="text-muted-foreground mb-4">Create your first invoice to get started</p>
                 <Button asChild>
-                  <Link href="/invoices/new">Create Invoice</Link>
+                  <Link href="/invoices/create">Create Invoice</Link>
                 </Button>
               </div>
             ) : (

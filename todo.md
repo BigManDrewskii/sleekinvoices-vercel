@@ -241,3 +241,6 @@
 - [x] Test field validation (template types, logo positions, layouts)
 - [x] Test default template management
 - [x] All tests passing (12/12)
+
+## Bug Fixes (Current)
+- [x] Fix "no invoice found" error when clicking "New Invoice" button on Dashboard
