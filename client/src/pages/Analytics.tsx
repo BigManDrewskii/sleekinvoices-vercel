@@ -37,6 +37,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Navigation } from "@/components/Navigation";
+import { AnalyticsMetricCard } from "@/components/analytics/AnalyticsMetricCard";
+import { AnalyticsDateRangeFilter } from "@/components/analytics/AnalyticsDateRangeFilter";
 
 const STATUS_COLORS = {
   draft: "#94a3b8",
@@ -156,56 +158,54 @@ export default function Analytics() {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  From {paidInvoices} paid invoices
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <AnalyticsMetricCard
+              title="Total Revenue"
+              value={formatCurrency(totalRevenue)}
+              icon={<DollarSign className="h-5 w-5" />}
+              subtitle={`From ${paidInvoices} paid invoices`}
+              trend={{
+                value: 12.5,
+                isPositive: true,
+                label: "vs last period",
+              }}
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(outstandingAmount)}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {totalInvoices - paidInvoices} unpaid invoices
-                </p>
-              </CardContent>
-            </Card>
+            <AnalyticsMetricCard
+              title="Outstanding"
+              value={formatCurrency(outstandingAmount)}
+              icon={<AlertCircle className="h-5 w-5" />}
+              subtitle={`${totalInvoices - paidInvoices} unpaid invoices`}
+              trend={{
+                value: 8.2,
+                isPositive: false,
+                label: "vs last period",
+              }}
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{totalInvoices}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {Math.round((paidInvoices / (totalInvoices || 1)) * 100)}% paid
-                </p>
-              </CardContent>
-            </Card>
+            <AnalyticsMetricCard
+              title="Total Invoices"
+              value={totalInvoices}
+              icon={<FileText className="h-5 w-5" />}
+              subtitle={`${Math.round((paidInvoices / (totalInvoices || 1)) * 100)}% paid`}
+              trend={{
+                value: 5.3,
+                isPositive: true,
+                label: "vs last period",
+              }}
+            />
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Value</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(averageInvoiceValue)}</div>
-                <p className="text-xs text-muted-foreground mt-1">Per invoice</p>
-              </CardContent>
-            </Card>
+            <AnalyticsMetricCard
+              title="Average Value"
+              value={formatCurrency(averageInvoiceValue)}
+              icon={<TrendingUp className="h-5 w-5" />}
+              subtitle="Per invoice"
+              trend={{
+                value: 3.1,
+                isPositive: true,
+                label: "vs last period",
+              }}
+            />
           </div>
 
           {/* Profit & Loss */}
