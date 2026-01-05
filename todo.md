@@ -730,3 +730,74 @@
 - [x] Update live preview with HSL-adjusted colors
 - [x] Add color preview swatches showing original vs adjusted
 - [x] Add Reset to defaults button
+
+
+## Sleek - Default Template (Focused Approach)
+
+### Research Phase
+- [ ] Research best practices for invoice template editors
+- [ ] Study Google Fonts API integration patterns
+- [ ] Analyze successful invoice template designs
+
+### Google Fonts Integration
+- [x] Implement Google Fonts API integration (google-fonts.ts)
+- [x] Create font picker component with search/filter (google-font-picker.tsx)
+- [x] Add font weight/style options (Light, Regular, Medium, Bold, etc.)
+- [x] Implement font preview in selector
+- [x] Handle font loading and caching
+
+### Sleek Default Template Design
+- [ ] Design minimalist template matching SleekInvoices brand
+- [ ] Create fully dynamic template with all editable fields
+- [ ] Implement clean, professional invoice layout
+- [ ] Ensure responsive design for PDF export
+
+### Editor Sidebar (Accordion-Based)
+- [ ] Streamline accordion sections for clarity
+- [ ] Implement simple 4-color system (Primary, Secondary, Accent, Background)
+- [ ] Integrate Google Fonts picker with weight options
+- [ ] Add layout and field visibility controls
+- [ ] Create intuitive user experience
+
+### Live Preview
+- [ ] Side-by-side layout (editor left, preview right)
+- [ ] Real-time updates as settings change
+- [ ] Accurate representation of final invoice
+
+
+## Sleek - Default Template (User Request - Jan 5, 2026)
+
+### Requirements
+- Minimalist design matching SleekInvoices brand identity
+- Fully dynamic and editable
+- Accordion-based editor sidebar
+- Side-by-side layout (editor left, preview right)
+- Full Google Fonts library with weight options
+- Simple 4-color system (Primary, Secondary, Accent, Background)
+
+### Template Design
+- [x] Create "Sleek - Default" template component (SleekDefaultTemplate.tsx)
+- [x] Minimalist design matching SleekInvoices brand
+- [x] Fully dynamic and editable fields
+- [x] Clean, professional layout
+
+### Google Fonts Integration
+- [x] Implement Google Fonts service (google-fonts.ts)
+- [x] Create font picker component with search/filter (google-font-picker.tsx)
+- [x] Add font weight/style options (Thin to Black, 100-900)
+- [x] Implement font preview in selector
+- [x] Handle font loading and caching
+- [x] 100+ fonts available (Inter, Roboto, Playfair Display, etc.)
+
+### Editor Sidebar
+- [x] Create new SleekTemplateEditor component (SleekTemplateEditor.tsx)
+- [x] Accordion-based organization (Brand Identity, Colors, Typography, Layout, Field Visibility, Footer)
+- [x] Side-by-side layout (editor left, preview right)
+- [x] Simple 4-color system (Primary, Secondary, Accent, Background)
+- [x] 10 brand color presets (Ocean, Forest, Sunset, Berry, Slate, Rose, Indigo, Teal, Midnight, Charcoal)
+
+### Live Preview
+- [x] Real-time invoice preview with all customizations
+- [x] Font changes update immediately
+- [x] Color changes update immediately
+- [x] Layout changes update immediately

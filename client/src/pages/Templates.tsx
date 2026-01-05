@@ -6,7 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { TemplateEditor } from "@/components/templates/TemplateEditor";
+import { SleekTemplateEditor } from "@/components/templates/SleekTemplateEditor";
 import { TemplatePreview } from "@/components/templates/TemplatePreview";
+import { SleekDefaultTemplate, defaultSleekSettings } from "@/components/templates/SleekDefaultTemplate";
 import { MiniInvoicePreview } from "@/components/templates/MiniInvoicePreview";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -117,6 +119,22 @@ export default function InvoiceTemplates() {
 
   // Show template editor when editing (selectedTemplateId can be null for new templates)
   if (isEditing) {
+    // Use the new Sleek Template Editor for new templates or Sleek templates
+    const isSleekTemplate = !selectedTemplateId || selectedTemplate?.name?.toLowerCase().includes('sleek');
+    
+    if (isSleekTemplate) {
+      return (
+        <SleekTemplateEditor
+          templateId={selectedTemplateId}
+          onComplete={handleEditComplete}
+          onCancel={() => {
+            setIsEditing(false);
+            setSelectedTemplateId(null);
+          }}
+        />
+      );
+    }
+    
     return (
       <TemplateEditor
         templateId={selectedTemplateId}
