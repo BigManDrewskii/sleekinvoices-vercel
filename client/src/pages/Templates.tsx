@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Plus, Eye, Edit, Trash2, Check, Palette, Type, Layout, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,30 @@ export default function InvoiceTemplates() {
   const [isEditing, setIsEditing] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [deleteTemplateId, setDeleteTemplateId] = useState<number | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   const { data: templates, isLoading, refetch } = trpc.templates.list.useQuery();
   const setDefaultMutation = trpc.templates.setDefault.useMutation();
   const deleteMutation = trpc.templates.delete.useMutation();
+  const initializeMutation = trpc.templates.initializeTemplates.useMutation();
+  
+  // Auto-initialize templates if user has none
+  useEffect(() => {
+    if (!isLoading && templates && templates.length === 0 && !isInitializing) {
+      setIsInitializing(true);
+      initializeMutation.mutate(undefined, {
+        onSuccess: (data) => {
+          toast.success(`${data.count} templates initialized`);
+          refetch();
+          setIsInitializing(false);
+        },
+        onError: () => {
+          toast.error("Failed to initialize templates");
+          setIsInitializing(false);
+        },
+      });
+    }
+  }, [isLoading, templates, isInitializing]);
 
   const selectedTemplate = templates?.find(t => t.id === selectedTemplateId);
 

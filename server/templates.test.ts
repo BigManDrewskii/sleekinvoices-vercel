@@ -305,5 +305,76 @@ describe('Invoice Template System', () => {
     });
   });
 
+  describe('Template Initialization', () => {
+    it('should initialize 6 templates for new users', async () => {
+      // Create a new test user
+      const openId = `test-init-${Date.now()}`;
+      await db.upsertUser({
+        openId,
+        name: "Init Test User",
+        email: "init@test.com",
+      });
+      
+      const testUser = await db.getUserByOpenId(openId);
+      if (!testUser) throw new Error('Failed to create test user');
+
+      // Verify user has no templates initially
+      const initialTemplates = await db.getInvoiceTemplatesByUserId(testUser.id);
+      expect(initialTemplates.length).toBe(0);
+
+      // Initialize templates
+      const { TEMPLATE_PRESETS } = await import('../shared/template-presets');
+      
+      for (const preset of TEMPLATE_PRESETS) {
+        await db.createInvoiceTemplate({
+          userId: testUser.id,
+          name: preset.name,
+          templateType: preset.templateType,
+          primaryColor: preset.primaryColor,
+          secondaryColor: preset.secondaryColor,
+          accentColor: preset.accentColor,
+          headingFont: preset.headingFont,
+          bodyFont: preset.bodyFont,
+          fontSize: preset.fontSize,
+          logoPosition: preset.logoPosition,
+          logoWidth: preset.logoWidth,
+          headerLayout: preset.headerLayout,
+          footerLayout: preset.footerLayout,
+          showCompanyAddress: preset.showCompanyAddress,
+          showPaymentTerms: preset.showPaymentTerms,
+          showTaxField: preset.showTaxField,
+          showDiscountField: preset.showDiscountField,
+          showNotesField: preset.showNotesField,
+          footerText: preset.footerText,
+          language: preset.language,
+          dateFormat: preset.dateFormat,
+          isDefault: preset.name === "Modern", // First template is default
+        });
+      }
+
+      // Verify all 6 templates were created
+      const createdTemplates = await db.getInvoiceTemplatesByUserId(testUser.id);
+      expect(createdTemplates.length).toBe(6);
+
+      // Verify template names
+      const templateNames = createdTemplates.map(t => t.name).sort();
+      expect(templateNames).toEqual(["Bold", "Classic", "Creative", "Minimal", "Modern", "Professional"]);
+
+      // Verify Modern is the default
+      const defaultTemplate = createdTemplates.find(t => t.isDefault);
+      expect(defaultTemplate?.name).toBe("Modern");
+      
+      // Verify each template has correct properties
+      const modernTemplate = createdTemplates.find(t => t.name === "Modern");
+      expect(modernTemplate?.templateType).toBe("modern");
+      expect(modernTemplate?.primaryColor).toBe("#5f6fff");
+      expect(modernTemplate?.headingFont).toBe("Inter");
+      
+      const classicTemplate = createdTemplates.find(t => t.name === "Classic");
+      expect(classicTemplate?.templateType).toBe("classic");
+      expect(classicTemplate?.primaryColor).toBe("#1e3a8a");
+      expect(classicTemplate?.headingFont).toBe("Georgia");
+    });
+  });
 
 });

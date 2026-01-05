@@ -763,6 +763,49 @@ export const appRouter = router({
         await db.setDefaultTemplate(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    initializeTemplates: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { TEMPLATE_PRESETS } = await import('../shared/template-presets');
+        
+        // Check if user already has templates
+        const existingTemplates = await db.getInvoiceTemplatesByUserId(ctx.user.id);
+        if (existingTemplates.length > 0) {
+          return { success: true, message: 'Templates already initialized', count: existingTemplates.length };
+        }
+        
+        // Create all 6 template presets for the user
+        let createdCount = 0;
+        for (const preset of TEMPLATE_PRESETS) {
+          await db.createInvoiceTemplate({
+            userId: ctx.user.id,
+            name: preset.name,
+            templateType: preset.templateType,
+            primaryColor: preset.primaryColor,
+            secondaryColor: preset.secondaryColor,
+            accentColor: preset.accentColor,
+            headingFont: preset.headingFont,
+            bodyFont: preset.bodyFont,
+            fontSize: preset.fontSize,
+            logoPosition: preset.logoPosition,
+            logoWidth: preset.logoWidth,
+            headerLayout: preset.headerLayout,
+            footerLayout: preset.footerLayout,
+            showCompanyAddress: preset.showCompanyAddress,
+            showPaymentTerms: preset.showPaymentTerms,
+            showTaxField: preset.showTaxField,
+            showDiscountField: preset.showDiscountField,
+            showNotesField: preset.showNotesField,
+            footerText: preset.footerText,
+            language: preset.language,
+            dateFormat: preset.dateFormat,
+            isDefault: createdCount === 0, // First template (Modern) is default
+          });
+          createdCount++;
+        }
+        
+        return { success: true, message: 'Templates initialized successfully', count: createdCount };
+      }),
   }),
 
   customFields: router({
