@@ -352,3 +352,57 @@
 - [ ] Update PDF generation to use appropriate logo based on context
 - [x] Add tests for responsive logo switching (35 tests passing)
 - [x] Test with various logo and monogram sizes
+
+
+## Comprehensive Brand Asset System
+
+### Favicon & Web Manifest Integration
+- [x] Copy all favicon files to public directory (favicon.ico, favicon-16x16.png, favicon-32x32.png, apple-touch-icon.png)
+- [x] Copy Android Chrome icons (192x192, 512x512) to public directory
+- [x] Copy site.webmanifest to public directory
+- [x] Update index.html with favicon meta tags and manifest link
+- [x] Configure web app manifest for PWA support
+
+### Logo Variations Organization
+- [x] Copy Wide logo (SVG + PNG variants @1x, @2x, @3x) to public/logos/wide/
+- [x] Copy Compact logo (SVG + PNG variants @1x, @2x, @3x) to public/logos/compact/
+- [x] Copy Monogram White (SVG + PNG variants @1x, @2x, @3x) to public/logos/monogram/
+- [x] Create logo asset constants file (logoAssets.ts)
+- [x] Document logo usage guidelines and breakpoints
+
+### Responsive Logo System Enhancement
+- [x] Update ResponsiveLogo component to use new logo asset system
+- [x] Implement srcset for high-DPI displays (@2x, @3x)
+- [x] Add fallback chain: SVG → PNG @1x → PNG @2x
+- [x] Optimize image loading with lazy loading attributes
+- [x] Test across all device pixel ratios (1x, 2x, 3x)
+
+### Navigation & Header Branding
+- [x] Update Navigation component to use optimized logo variants
+- [x] Implement responsive logo switching based on viewport width
+- [x] Add brand name visibility on desktop (md+)
+- [x] Hide brand name on mobile for space efficiency
+- [x] Ensure proper spacing and alignment
+
+### Invoice & Template Branding
+- [ ] Update TemplatePreview to use new logo system
+- [ ] Update InvoicePreviewModal to use new logo system
+- [ ] Update PDF generation to use optimized logos
+- [ ] Implement logo selection in template editor
+- [ ] Add preview of selected logo variant
+
+### PWA & Mobile App Integration
+- [x] Configure web app manifest (name, description, icons, colors)
+- [x] Set theme color for browser UI
+- [x] Configure display mode (standalone)
+- [x] Set start URL and scope
+- [ ] Test PWA installation on mobile devices
+
+### Brand Consistency Testing
+- [x] Test favicon display in browser tabs (57 tests passing)
+- [ ] Test Apple touch icon on iOS home screen
+- [ ] Test Android Chrome icons on Android devices
+- [x] Verify logo display across all breakpoints (57 tests passing)
+- [x] Test high-DPI displays (2x, 3x pixel ratios) (57 tests passing)
+- [ ] Verify logo rendering in dark mode
+- [ ] Test logo rendering in light mode (if applicable)
