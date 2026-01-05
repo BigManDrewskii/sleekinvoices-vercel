@@ -511,6 +511,12 @@ export const appRouter = router({
       return await db.getClientProfitability(ctx.user.id);
     }),
     
+    getTopClients: protectedProcedure
+      .input(z.object({ limit: z.number().default(5) }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getTopClientsByRevenue(ctx.user.id, input?.limit ?? 5);
+      }),
+    
     getCashFlowProjection: protectedProcedure
       .input(z.object({ months: z.number().default(6) }))
       .query(async ({ ctx, input }) => {

@@ -520,6 +520,33 @@ export async function getInvoiceStats(userId: number, periodDays: number = 30) {
     revenueChangePercent,
   });
   
+  // Calculate Days Sales Outstanding (DSO)
+  // DSO = (Accounts Receivable / Total Credit Sales) × Number of Days
+  // For simplicity, we use: Average days from invoice date to payment date for paid invoices
+  let totalDaysToPayment = 0;
+  let paidInvoicesWithPaymentDate = 0;
+  
+  for (const invoice of allInvoices) {
+    if (invoice.status === 'paid' || invoice.paidAt) {
+      const invoiceDate = new Date(invoice.issueDate);
+      const paidDate = invoice.paidAt ? new Date(invoice.paidAt) : new Date();
+      const daysToPayment = Math.floor((paidDate.getTime() - invoiceDate.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysToPayment >= 0) {
+        totalDaysToPayment += daysToPayment;
+        paidInvoicesWithPaymentDate++;
+      }
+    }
+  }
+  
+  const dso = paidInvoicesWithPaymentDate > 0 
+    ? Math.round(totalDaysToPayment / paidInvoicesWithPaymentDate) 
+    : 0;
+  
+  // Calculate Collection Rate (percentage of invoices that got paid)
+  const collectionRate = totalInvoices > 0 
+    ? Math.round((paidInvoices / totalInvoices) * 100) 
+    : 0;
+  
   return {
     totalRevenue,
     outstandingBalance,
@@ -536,6 +563,9 @@ export async function getInvoiceStats(userId: number, periodDays: number = 30) {
     revenueChangePercent: Math.round(revenueChangePercent * 10) / 10, // Round to 1 decimal
     currentPeriodInvoices: currentPeriodInvoices.length,
     previousPeriodInvoices: previousPeriodInvoices.length,
+    // New metrics
+    dso, // Days Sales Outstanding
+    collectionRate, // Percentage of invoices collected
   };
 }
 
@@ -1795,6 +1825,71 @@ export async function getClientProfitability(userId: number) {
   
   // Sort by profit descending
   return profitability.sort((a, b) => b.profit - a.profit);
+}
+
+/**
+ * Get top clients by revenue (for analytics dashboard)
+ */
+export async function getTopClientsByRevenue(userId: number, limit: number = 5) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // Get all clients
+  const allClients = await db.select().from(clients).where(eq(clients.userId, userId));
+  
+  const clientRevenue = [];
+  
+  for (const client of allClients) {
+    // Get all invoices for this client
+    const clientInvoices = await db.select()
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.userId, userId),
+          eq(invoices.clientId, client.id)
+        )
+      );
+    
+    // Calculate total revenue from payments
+    let totalRevenue = 0;
+    let totalInvoiced = 0;
+    let invoiceCount = 0;
+    
+    for (const invoice of clientInvoices) {
+      totalInvoiced += Number(invoice.total);
+      invoiceCount++;
+      
+      // Get payments for this invoice
+      const invoicePayments = await db.select()
+        .from(payments)
+        .where(
+          and(
+            eq(payments.invoiceId, invoice.id),
+            eq(payments.status, 'completed')
+          )
+        );
+      
+      for (const payment of invoicePayments) {
+        totalRevenue += Number(payment.amount);
+      }
+    }
+    
+    if (totalInvoiced > 0 || totalRevenue > 0) {
+      clientRevenue.push({
+        clientId: client.id,
+        clientName: client.name,
+        totalRevenue,
+        totalInvoiced,
+        invoiceCount,
+        paymentRate: totalInvoiced > 0 ? Math.round((totalRevenue / totalInvoiced) * 100) : 0,
+      });
+    }
+  }
+  
+  // Sort by total invoiced (shows potential value) and take top N
+  return clientRevenue
+    .sort((a, b) => b.totalInvoiced - a.totalInvoiced)
+    .slice(0, limit);
 }
 
 /**
