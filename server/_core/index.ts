@@ -54,19 +54,44 @@ async function startServer() {
   app.use("/api/oauth", strictRateLimit);
   app.use("/api/upload", standardRateLimit);
   
-  // Logo upload endpoint
+  // Logo upload endpoint with image optimization
   app.post("/api/upload/logo", async (req, res) => {
     try {
-      const { file, userId } = req.body;
+      const { file, userId, filename } = req.body;
       if (!file || !userId) {
         return res.status(400).json({ error: "Missing file or userId" });
       }
+      
       const buffer = Buffer.from(file, 'base64');
       const { storagePut } = await import("../storage");
+      const { optimizeImage, getFileExtension } = await import("../image-optimization");
+      
+      const optimization = await optimizeImage(buffer, filename || 'logo.png');
+      
       const timestamp = Date.now();
-      const filename = `logos/${userId}/logo-${timestamp}.png`;
-      const { url } = await storagePut(filename, buffer, 'image/png');
-      res.json({ url });
+      const ext = getFileExtension(optimization.format);
+      const storageFilename = `logos/${userId}/logo-${timestamp}.${ext}`;
+      
+      const mimeTypeMap: Record<string, string> = {
+        'png': 'image/png',
+        'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'webp': 'image/webp',
+        'svg': 'image/svg+xml',
+      };
+      const mimeType = mimeTypeMap[optimization.format] || 'image/png';
+      
+      const { url } = await storagePut(storageFilename, optimization.buffer, mimeType);
+      
+      res.json({ 
+        url,
+        optimization: {
+          originalSize: optimization.originalSize,
+          optimizedSize: optimization.optimizedSize,
+          compressionRatio: optimization.compressionRatio,
+          format: optimization.format,
+        }
+      });
     } catch (error: any) {
       console.error("Logo upload error:", error);
       res.status(500).json({ error: error.message });

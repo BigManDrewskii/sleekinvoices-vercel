@@ -115,3 +115,98 @@
 - [x] Test logo with template customization
 - [x] Test multiple templates with different logos
 - [x] All 14 tests passing
+
+
+## Logo Image Optimization Feature
+
+### Phase 1: Research and Planning
+- [ ] Research image optimization best practices (compression, formats, quality)
+- [ ] Evaluate Sharp library for image processing
+- [ ] Plan optimization strategy (WebP conversion, quality levels, size limits)
+- [ ] Design fallback format support (PNG, JPG, SVG)
+
+### Phase 2: Dependencies
+- [ ] Install Sharp library for image processing
+- [ ] Configure Sharp for optimal performance
+- [ ] Add TypeScript types for Sharp
+
+### Phase 3: Optimization Utilities
+- [ ] Create image optimization utility functions
+- [ ] Implement WebP conversion with fallback
+- [ ] Implement JPEG compression
+- [ ] Implement PNG optimization
+- [ ] Add file size validation and limits
+
+### Phase 4: Upload Endpoint Integration
+- [ ] Update /api/upload/logo endpoint to use optimization
+- [ ] Apply optimization before S3 upload
+- [ ] Return optimized image URL
+- [ ] Handle optimization errors gracefully
+
+### Phase 5: Format Support
+- [ ] Support PNG format with optimization
+- [ ] Support JPG/JPEG format with compression
+- [ ] Support SVG format (pass-through, no compression)
+- [ ] Support WebP format (pass-through)
+- [ ] Add format detection and validation
+
+### Phase 6: Testing
+- [ ] Create image optimization tests
+- [ ] Test WebP conversion
+- [ ] Test JPEG compression
+- [ ] Test PNG optimization
+- [ ] Test SVG handling
+- [ ] Test file size validation
+- [ ] Test error handling
+
+### Phase 7: Documentation and Delivery
+- [ ] Update API documentation
+- [ ] Document optimization settings
+- [ ] Save checkpoint with optimization feature
+
+## Logo Image Optimization Feature
+
+### Phase 1: Research and Planning
+- [x] Research image optimization best practices
+- [x] Evaluate Sharp library for image processing
+- [x] Plan optimization strategy
+- [x] Design fallback format support
+
+### Phase 2: Dependencies
+- [x] Install Sharp library (v0.34.5)
+- [x] Configure Sharp for optimal performance
+
+### Phase 3: Optimization Utilities
+- [x] Create image optimization utility functions
+- [x] Implement WebP conversion with fallback
+- [x] Implement JPEG compression (quality: 85)
+- [x] Implement PNG optimization (compression: 9)
+- [x] Add file size validation (5MB max)
+- [x] Format detection from buffer signatures
+
+### Phase 4: Upload Endpoint Integration
+- [x] Update /api/upload/logo endpoint with optimization
+- [x] Apply optimization before S3 upload
+- [x] Return optimized URL with metrics
+- [x] Return compression ratio and size savings
+
+### Phase 5: Format Support
+- [x] Support PNG format with optimization
+- [x] Support JPG/JPEG format with compression
+- [x] Support SVG format (pass-through)
+- [x] Support WebP format (pass-through)
+- [x] Automatic MIME type detection
+
+### Phase 6: Testing
+- [x] Create comprehensive tests (37 tests)
+- [x] Test format detection
+- [x] Test file validation
+- [x] Test compression and optimization
+- [x] Test error handling
+- [x] All 37 tests passing
+
+### Phase 7: Documentation and Delivery
+- [x] Update API documentation
+- [x] Document optimization settings
+- [x] Document supported formats
+- [x] Save checkpoint with feature
