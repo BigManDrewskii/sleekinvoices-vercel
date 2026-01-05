@@ -871,3 +871,23 @@
 - [ ] Add Crypto QR Code toggle to template settings
 - [ ] Display VAT number on invoice PDF
 - [ ] Add dynamic payment instructions section
+
+
+## Phase 2: Backend API - Crypto Subscription Duration Support (COMPLETED)
+
+- [x] 2.1 Add subscriptionEndDate column to users table
+- [x] 2.2 Add subscriptionSource column to users table  
+- [x] 2.3 Add months column to cryptoSubscriptionPayments table
+- [x] 2.4 Add isExtension column to cryptoSubscriptionPayments table
+- [x] 2.5 Run database migration
+- [x] 2.6 Add CRYPTO_SUBSCRIPTION_TIERS constants to shared/subscription.ts
+- [x] 2.7 Add getCryptoTierByMonths helper function
+- [x] 2.8 Add getCryptoPrice helper function
+- [x] 2.9 Add getCryptoSavings helper function
+- [x] 2.10 Create server/lib/subscription-utils.ts with date helpers
+- [x] 2.11 Update createCryptoCheckout mutation to accept months parameter
+- [x] 2.12 Create extendCryptoSubscription mutation for Pro users
+- [x] 2.13 Update NOWPayments webhook to handle duration-based payments
+- [x] 2.14 Update getStatus query with daysRemaining and timeRemaining
+- [x] 2.15 Write unit tests for pricing calculations
+- [x] 2.16 Write unit tests for subscription date utilities
