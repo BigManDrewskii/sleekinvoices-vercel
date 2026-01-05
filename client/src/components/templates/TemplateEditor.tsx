@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { TEMPLATE_PRESETS } from "@shared/template-presets";
 import { TemplatePreview } from "./TemplatePreview";
+import { CollapsibleSection, ColorInput, SliderInput } from "@/components/ui/collapsible-section";
 
 interface TemplateEditorProps {
   templateId?: number | null;
@@ -19,8 +18,14 @@ interface TemplateEditorProps {
   onCancel: () => void;
 }
 
-export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEditorProps) {
+// Extended color presets grid
+const COLOR_PRESETS = [
+  '#fbbf24', '#22c55e', '#a855f7', '#ec4899', '#f43f5e', '#ef4444', '#f97316', '#84cc16',
+  '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6', '#a78bfa', '#64748b',
+  '#94a3b8', '#cbd5e1', '#1e293b', '#0f172a',
+];
 
+export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEditorProps) {
   const isNew = !templateId;
 
   const { data: existingTemplate } = trpc.templates.get.useQuery(
@@ -35,11 +40,16 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
   const [name, setName] = useState("");
   const [templateType, setTemplateType] = useState<string>("modern");
   const [primaryColor, setPrimaryColor] = useState("#5f6fff");
+  const [primaryForeground, setPrimaryForeground] = useState("#ffffff");
   const [secondaryColor, setSecondaryColor] = useState("#252f33");
+  const [secondaryForeground, setSecondaryForeground] = useState("#f1f6f9");
   const [accentColor, setAccentColor] = useState("#10b981");
+  const [backgroundColor, setBackgroundColor] = useState("#ffffff");
   const [headingFont, setHeadingFont] = useState("Inter");
   const [bodyFont, setBodyFont] = useState("Inter");
   const [fontSize, setFontSize] = useState(14);
+  const [letterSpacing, setLetterSpacing] = useState(0);
+  const [lineHeight, setLineHeight] = useState(1.5);
   const [logoPosition, setLogoPosition] = useState<string>("left");
   const [logoWidth, setLogoWidth] = useState(150);
   const [headerLayout, setHeaderLayout] = useState<string>("standard");
@@ -54,8 +64,8 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
   const [isDefault, setIsDefault] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [showColorPresets, setShowColorPresets] = useState(true);
   const { data: user } = trpc.auth.me.useQuery();
 
   // Handle logo file selection and upload
@@ -79,7 +89,6 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
         
         const { url } = await response.json();
         setLogoUrl(url);
-        setLogoFile(null);
         toast.success('Logo uploaded successfully');
       };
       reader.readAsDataURL(file);
@@ -227,34 +236,34 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="border-b bg-card sticky top-0 z-10">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={onCancel}>
-              <ArrowLeft className="h-5 w-5" />
+      <div className="border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container flex items-center justify-between py-3">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={onCancel} className="h-8 w-8">
+              <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-lg font-semibold">
                 {isNew ? "Create Template" : "Edit Template"}
               </h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Customize your invoice appearance
               </p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" size="sm" onClick={onCancel}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-3.5 w-3.5 mr-1.5" />
                   Save Template
                 </>
               )}
@@ -264,30 +273,27 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
       </div>
 
       {/* Content */}
-      <div className="container py-8">
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Editor Panel */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Name and template style</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+      <div className="container py-6">
+        <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
+          {/* Editor Panel - Scrollable */}
+          <div className="space-y-3 max-h-[calc(100vh-120px)] overflow-y-auto pr-2 scrollbar-thin">
+            {/* Basic Info */}
+            <CollapsibleSection title="Basic Information" defaultOpen={true}>
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Template Name</Label>
+                  <Label className="text-xs text-muted-foreground">Template Name</Label>
                   <Input
-                    id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g., My Custom Template"
+                    className="h-9 bg-muted/30 border-border/50"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="templateType">Template Style</Label>
+                  <Label className="text-xs text-muted-foreground">Template Style</Label>
                   <Select value={templateType} onValueChange={setTemplateType}>
-                    <SelectTrigger id="templateType">
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -301,412 +307,341 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
                   </Select>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="isDefault">Set as default template</Label>
-                  <Switch
-                    id="isDefault"
-                    checked={isDefault}
-                    onCheckedChange={setIsDefault}
+                <div className="flex items-center justify-between py-1">
+                  <Label className="text-sm">Set as default</Label>
+                  <Switch checked={isDefault} onCheckedChange={setIsDefault} />
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Color Presets */}
+            <CollapsibleSection title="Color Presets" defaultOpen={true}>
+              <div className="space-y-3">
+                <div className="grid grid-cols-10 gap-1.5">
+                  {COLOR_PRESETS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setPrimaryColor(color)}
+                      className="w-full aspect-square rounded-md transition-transform hover:scale-110 ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      style={{ backgroundColor: color }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowColorPresets(!showColorPresets)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                >
+                  {showColorPresets ? "Hide" : "Show"} presets
+                </button>
+              </div>
+            </CollapsibleSection>
+
+            {/* Primary Colors */}
+            <CollapsibleSection title="Primary Colors" defaultOpen={true}>
+              <div className="space-y-4">
+                <ColorInput
+                  label="Primary"
+                  value={primaryColor}
+                  onChange={setPrimaryColor}
+                  showSwap
+                />
+                <ColorInput
+                  label="Primary Foreground"
+                  value={primaryForeground}
+                  onChange={setPrimaryForeground}
+                  showSwap
+                />
+              </div>
+            </CollapsibleSection>
+
+            {/* Secondary Colors */}
+            <CollapsibleSection title="Secondary Colors" defaultOpen={true}>
+              <div className="space-y-4">
+                <ColorInput
+                  label="Secondary"
+                  value={secondaryColor}
+                  onChange={setSecondaryColor}
+                  showSwap
+                />
+                <ColorInput
+                  label="Secondary Foreground"
+                  value={secondaryForeground}
+                  onChange={setSecondaryForeground}
+                  showSwap
+                />
+              </div>
+            </CollapsibleSection>
+
+            {/* Accent & Background */}
+            <CollapsibleSection title="Accent & Background" defaultOpen={true}>
+              <div className="space-y-4">
+                <ColorInput
+                  label="Accent Color"
+                  value={accentColor}
+                  onChange={setAccentColor}
+                />
+                <ColorInput
+                  label="Background Color"
+                  value={backgroundColor}
+                  onChange={setBackgroundColor}
+                />
+              </div>
+            </CollapsibleSection>
+
+            {/* Font Family */}
+            <CollapsibleSection title="Font Family" defaultOpen={false}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Sans-Serif Font</Label>
+                  <Select value={headingFont} onValueChange={setHeadingFont}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue placeholder="Choose a sans-serif font..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Inter">Inter</SelectItem>
+                      <SelectItem value="Roboto">Roboto</SelectItem>
+                      <SelectItem value="Helvetica">Helvetica</SelectItem>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Montserrat">Montserrat</SelectItem>
+                      <SelectItem value="Open Sans">Open Sans</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Serif Font</Label>
+                  <Select value={bodyFont} onValueChange={setBodyFont}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue placeholder="Choose a serif font..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Georgia">Georgia</SelectItem>
+                      <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+                      <SelectItem value="Merriweather">Merriweather</SelectItem>
+                      <SelectItem value="Playfair Display">Playfair Display</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Monospace Font</Label>
+                  <Select defaultValue="monospace">
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue placeholder="Choose a monospace font..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monospace">System Monospace</SelectItem>
+                      <SelectItem value="JetBrains Mono">JetBrains Mono</SelectItem>
+                      <SelectItem value="Fira Code">Fira Code</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* Typography Settings */}
+            <CollapsibleSection title="Typography Settings" defaultOpen={false}>
+              <div className="space-y-5">
+                <SliderInput
+                  label="Font Size"
+                  value={fontSize}
+                  onChange={setFontSize}
+                  min={10}
+                  max={20}
+                  unit="px"
+                />
+                <SliderInput
+                  label="Letter Spacing"
+                  value={letterSpacing}
+                  onChange={setLetterSpacing}
+                  min={-2}
+                  max={10}
+                  step={0.5}
+                  unit="em"
+                />
+                <SliderInput
+                  label="Line Height"
+                  value={lineHeight}
+                  onChange={setLineHeight}
+                  min={1}
+                  max={2.5}
+                  step={0.1}
+                  unit="x"
+                />
+              </div>
+            </CollapsibleSection>
+
+            {/* Layout Options */}
+            <CollapsibleSection title="Layout Options" defaultOpen={false}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Header Layout</Label>
+                  <Select value={headerLayout} onValueChange={setHeaderLayout}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="centered">Centered</SelectItem>
+                      <SelectItem value="split">Split</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Footer Layout</Label>
+                  <Select value={footerLayout} onValueChange={setFooterLayout}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="simple">Simple</SelectItem>
+                      <SelectItem value="detailed">Detailed</SelectItem>
+                      <SelectItem value="minimal">Minimal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Logo Position</Label>
+                  <Select value={logoPosition} onValueChange={setLogoPosition}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">Left</SelectItem>
+                      <SelectItem value="center">Center</SelectItem>
+                      <SelectItem value="right">Right</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <SliderInput
+                  label="Logo Width"
+                  value={logoWidth}
+                  onChange={setLogoWidth}
+                  min={80}
+                  max={300}
+                  unit="px"
+                />
+              </div>
+            </CollapsibleSection>
+
+            {/* Logo Upload */}
+            <CollapsibleSection title="Company Logo" defaultOpen={false}>
+              <div className="space-y-3">
+                <input
+                  id="logoUpload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleLogoFileChange(file);
+                  }}
+                  className="hidden"
+                />
+                
+                {logoUrl ? (
+                  <div className="relative group">
+                    <img 
+                      src={logoUrl} 
+                      alt="Logo preview" 
+                      className="w-full h-24 object-contain bg-muted/30 rounded-lg border border-border/50"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setLogoUrl(null)}
+                      className="absolute top-2 right-2 p-1 bg-destructive text-destructive-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('logoUpload')?.click()}
+                    disabled={isUploadingLogo}
+                    className="w-full h-24 border-2 border-dashed border-border/50 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-muted/20 transition-colors"
+                  >
+                    {isUploadingLogo ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">Click to upload logo</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </CollapsibleSection>
+
+            {/* Field Visibility */}
+            <CollapsibleSection title="Field Visibility" defaultOpen={false}>
+              <div className="space-y-3">
+                {[
+                  { id: 'showCompanyAddress', label: 'Company Address', value: showCompanyAddress, onChange: setShowCompanyAddress },
+                  { id: 'showPaymentTerms', label: 'Payment Terms', value: showPaymentTerms, onChange: setShowPaymentTerms },
+                  { id: 'showTaxField', label: 'Tax Field', value: showTaxField, onChange: setShowTaxField },
+                  { id: 'showDiscountField', label: 'Discount Field', value: showDiscountField, onChange: setShowDiscountField },
+                  { id: 'showNotesField', label: 'Notes Field', value: showNotesField, onChange: setShowNotesField },
+                ].map((field) => (
+                  <div key={field.id} className="flex items-center justify-between py-1">
+                    <Label className="text-sm">{field.label}</Label>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </div>
+                ))}
+              </div>
+            </CollapsibleSection>
+
+            {/* Date & Footer */}
+            <CollapsibleSection title="Date & Footer" defaultOpen={false}>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Date Format</Label>
+                  <Select value={dateFormat} onValueChange={setDateFormat}>
+                    <SelectTrigger className="h-9 bg-muted/30 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                      <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                      <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                      <SelectItem value="MMM DD, YYYY">MMM DD, YYYY</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Footer Text</Label>
+                  <Textarea
+                    value={footerText}
+                    onChange={(e) => setFooterText(e.target.value)}
+                    placeholder="Thank you for your business!"
+                    rows={2}
+                    className="bg-muted/30 border-border/50 resize-none"
                   />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Tabs defaultValue="colors" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="colors">Colors</TabsTrigger>
-                <TabsTrigger value="typography">Typography</TabsTrigger>
-                <TabsTrigger value="layout">Layout</TabsTrigger>
-                <TabsTrigger value="fields">Fields</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="colors">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Color Scheme</CardTitle>
-                    <CardDescription>Customize your brand colors</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Brand Color Presets */}
-                    <div className="space-y-3">
-                      <Label>Quick Presets</Label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {[
-                          { name: 'Ocean', primary: '#0ea5e9', secondary: '#0c4a6e', accent: '#06b6d4' },
-                          { name: 'Forest', primary: '#22c55e', secondary: '#14532d', accent: '#84cc16' },
-                          { name: 'Sunset', primary: '#f97316', secondary: '#7c2d12', accent: '#eab308' },
-                          { name: 'Berry', primary: '#a855f7', secondary: '#581c87', accent: '#ec4899' },
-                          { name: 'Slate', primary: '#64748b', secondary: '#1e293b', accent: '#94a3b8' },
-                          { name: 'Rose', primary: '#f43f5e', secondary: '#881337', accent: '#fb7185' },
-                          { name: 'Indigo', primary: '#6366f1', secondary: '#312e81', accent: '#818cf8' },
-                          { name: 'Teal', primary: '#14b8a6', secondary: '#134e4a', accent: '#2dd4bf' },
-                        ].map((preset) => (
-                          <button
-                            key={preset.name}
-                            type="button"
-                            onClick={() => {
-                              setPrimaryColor(preset.primary);
-                              setSecondaryColor(preset.secondary);
-                              setAccentColor(preset.accent);
-                            }}
-                            className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:border-primary transition-colors"
-                          >
-                            <div className="flex gap-0.5">
-                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: preset.primary }} />
-                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: preset.secondary }} />
-                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: preset.accent }} />
-                            </div>
-                            <span className="text-xs text-muted-foreground">{preset.name}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-3">
-                      <div className="space-y-2">
-                        <Label htmlFor="primaryColor">Primary Color</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="primaryColor"
-                            type="color"
-                            value={primaryColor}
-                            onChange={(e) => setPrimaryColor(e.target.value)}
-                            className="w-16 h-10 p-1"
-                          />
-                          <Input
-                            value={primaryColor}
-                            onChange={(e) => setPrimaryColor(e.target.value)}
-                            placeholder="#5f6fff"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="secondaryColor">Secondary Color</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="secondaryColor"
-                            type="color"
-                            value={secondaryColor}
-                            onChange={(e) => setSecondaryColor(e.target.value)}
-                            className="w-16 h-10 p-1"
-                          />
-                          <Input
-                            value={secondaryColor}
-                            onChange={(e) => setSecondaryColor(e.target.value)}
-                            placeholder="#252f33"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="accentColor">Accent Color</Label>
-                        <div className="flex gap-2">
-                          <Input
-                            id="accentColor"
-                            type="color"
-                            value={accentColor}
-                            onChange={(e) => setAccentColor(e.target.value)}
-                            className="w-16 h-10 p-1"
-                          />
-                          <Input
-                            value={accentColor}
-                            onChange={(e) => setAccentColor(e.target.value)}
-                            placeholder="#10b981"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="typography">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Typography</CardTitle>
-                    <CardDescription>Font family and size settings</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Font Pairing Suggestions */}
-                    <div className="space-y-3">
-                      <Label>Recommended Pairings</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { name: 'Modern Clean', heading: 'Inter', body: 'Inter' },
-                          { name: 'Classic Elegance', heading: 'Georgia', body: 'Arial' },
-                          { name: 'Bold Statement', heading: 'Montserrat', body: 'Open Sans' },
-                          { name: 'Professional', heading: 'Helvetica', body: 'Helvetica' },
-                          { name: 'Friendly', heading: 'Open Sans', body: 'Open Sans' },
-                          { name: 'Traditional', heading: 'Georgia', body: 'Georgia' },
-                        ].map((pairing) => (
-                          <button
-                            key={pairing.name}
-                            type="button"
-                            onClick={() => {
-                              setHeadingFont(pairing.heading);
-                              setBodyFont(pairing.body);
-                            }}
-                            className="flex flex-col items-start gap-1 p-3 rounded-lg border border-border hover:border-primary transition-colors text-left"
-                          >
-                            <span className="text-sm font-medium">{pairing.name}</span>
-                            <span className="text-xs text-muted-foreground">{pairing.heading} + {pairing.body}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="headingFont">Heading Font</Label>
-                      <Select value={headingFont} onValueChange={setHeadingFont}>
-                        <SelectTrigger id="headingFont">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Inter">Inter</SelectItem>
-                          <SelectItem value="Roboto">Roboto</SelectItem>
-                          <SelectItem value="Helvetica">Helvetica</SelectItem>
-                          <SelectItem value="Arial">Arial</SelectItem>
-                          <SelectItem value="Arial Black">Arial Black</SelectItem>
-                          <SelectItem value="Georgia">Georgia</SelectItem>
-                          <SelectItem value="Montserrat">Montserrat</SelectItem>
-                          <SelectItem value="Open Sans">Open Sans</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bodyFont">Body Font</Label>
-                      <Select value={bodyFont} onValueChange={setBodyFont}>
-                        <SelectTrigger id="bodyFont">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Inter">Inter</SelectItem>
-                          <SelectItem value="Roboto">Roboto</SelectItem>
-                          <SelectItem value="Helvetica">Helvetica</SelectItem>
-                          <SelectItem value="Arial">Arial</SelectItem>
-                          <SelectItem value="Georgia">Georgia</SelectItem>
-                          <SelectItem value="Open Sans">Open Sans</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="fontSize">Font Size (px)</Label>
-                      <Input
-                        id="fontSize"
-                        type="number"
-                        min="10"
-                        max="20"
-                        value={fontSize}
-                        onChange={(e) => setFontSize(parseInt(e.target.value) || 14)}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="layout">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Layout Options</CardTitle>
-                    <CardDescription>Header, footer, and logo positioning</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="headerLayout">Header Layout</Label>
-                      <Select value={headerLayout} onValueChange={setHeaderLayout}>
-                        <SelectTrigger id="headerLayout">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="standard">Standard</SelectItem>
-                          <SelectItem value="centered">Centered</SelectItem>
-                          <SelectItem value="split">Split</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="footerLayout">Footer Layout</Label>
-                      <Select value={footerLayout} onValueChange={setFooterLayout}>
-                        <SelectTrigger id="footerLayout">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="simple">Simple</SelectItem>
-                          <SelectItem value="detailed">Detailed</SelectItem>
-                          <SelectItem value="minimal">Minimal</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="logoPosition">Logo Position</Label>
-                      <Select value={logoPosition} onValueChange={setLogoPosition}>
-                        <SelectTrigger id="logoPosition">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="left">Left</SelectItem>
-                          <SelectItem value="center">Center</SelectItem>
-                          <SelectItem value="right">Right</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="logoUpload">Company Logo</Label>
-                      <div className="space-y-3">
-                        <input
-                          id="logoUpload"
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              handleLogoFileChange(file);
-                            }
-                          }}
-                          className="hidden"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => document.getElementById('logoUpload')?.click()}
-                          disabled={isUploadingLogo}
-                          className="w-full"
-                        >
-                          {isUploadingLogo ? 'Uploading...' : logoFile ? logoFile.name : 'Choose Logo File'}
-                        </Button>
-                        {logoUrl && (
-                          <div className="flex items-center gap-2">
-                            <img src={logoUrl} alt="Logo preview" className="h-10 object-contain" />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setLogoUrl(null)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="logoWidth">Logo Width (px)</Label>
-                      <Input
-                        id="logoWidth"
-                        type="number"
-                        min="80"
-                        max="300"
-                        value={logoWidth}
-                        onChange={(e) => setLogoWidth(parseInt(e.target.value) || 150)}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="footerText">Footer Text</Label>
-                      <Textarea
-                        id="footerText"
-                        value={footerText}
-                        onChange={(e) => setFooterText(e.target.value)}
-                        placeholder="Thank you for your business!"
-                        rows={3}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="fields">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Field Visibility</CardTitle>
-                    <CardDescription>Show or hide invoice fields</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="showCompanyAddress">Company Address</Label>
-                      <Switch
-                        id="showCompanyAddress"
-                        checked={showCompanyAddress}
-                        onCheckedChange={setShowCompanyAddress}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="showPaymentTerms">Payment Terms</Label>
-                      <Switch
-                        id="showPaymentTerms"
-                        checked={showPaymentTerms}
-                        onCheckedChange={setShowPaymentTerms}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="showTaxField">Tax Field</Label>
-                      <Switch
-                        id="showTaxField"
-                        checked={showTaxField}
-                        onCheckedChange={setShowTaxField}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="showDiscountField">Discount Field</Label>
-                      <Switch
-                        id="showDiscountField"
-                        checked={showDiscountField}
-                        onCheckedChange={setShowDiscountField}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="showNotesField">Notes Field</Label>
-                      <Switch
-                        id="showNotesField"
-                        checked={showNotesField}
-                        onCheckedChange={setShowNotesField}
-                      />
-                    </div>
-
-                    <div className="pt-4 space-y-4 border-t">
-                      <div className="space-y-2">
-                        <Label htmlFor="dateFormat">Date Format</Label>
-                        <Select value={dateFormat} onValueChange={setDateFormat}>
-                          <SelectTrigger id="dateFormat">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                            <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                            <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-                            <SelectItem value="MMM DD, YYYY">MMM DD, YYYY</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+              </div>
+            </CollapsibleSection>
           </div>
 
-          {/* Preview Panel */}
-          <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Live Preview</CardTitle>
-                <CardDescription>See how your invoice will look</CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-auto max-h-[calc(100vh-16rem)]">
-                <TemplatePreview template={currentTemplate} />
-              </CardContent>
-            </Card>
+          {/* Preview Panel - Fixed */}
+          <div className="lg:sticky lg:top-[72px] lg:h-[calc(100vh-96px)]">
+            <div className="h-full rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden flex flex-col">
+              <div className="px-4 py-3 border-b border-border/50 bg-muted/20">
+                <h3 className="text-sm font-medium">Live Preview</h3>
+                <p className="text-xs text-muted-foreground">See how your invoice will look</p>
+              </div>
+              <div className="flex-1 overflow-auto p-4" style={{ backgroundColor: backgroundColor + '10' }}>
+                <div className="transform scale-[0.85] origin-top">
+                  <TemplatePreview template={currentTemplate} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
