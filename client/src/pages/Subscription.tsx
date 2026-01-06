@@ -210,6 +210,12 @@ export default function Subscription() {
                       "Sync Status"
                     )}
                   </Button>
+                  <Link href="/subscription/history">
+                    <Button variant="ghost">
+                      <Clock className="h-4 w-4 mr-2" />
+                      Payment History
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

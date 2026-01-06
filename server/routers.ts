@@ -1411,6 +1411,68 @@ export const appRouter = router({
     }),
     
     /**
+     * Get subscription payment history
+     * Returns all crypto payments and subscription events
+     */
+    getHistory: protectedProcedure.query(async ({ ctx }) => {
+      const cryptoPayments = await db.getSubscriptionHistory(ctx.user.id);
+      
+      // Transform crypto payments into history items
+      const historyItems = cryptoPayments.map(payment => ({
+        id: `crypto_${payment.id}`,
+        type: 'crypto' as const,
+        status: payment.paymentStatus,
+        amount: parseFloat(payment.priceAmount),
+        currency: payment.priceCurrency.toUpperCase(),
+        cryptoCurrency: payment.payCurrency.toUpperCase(),
+        cryptoAmount: parseFloat(payment.payAmount),
+        months: payment.months,
+        isExtension: payment.isExtension,
+        date: payment.confirmedAt || payment.createdAt,
+        createdAt: payment.createdAt,
+      }));
+      
+      // Add Stripe subscription info if available
+      const stripeItems: Array<{
+        id: string;
+        type: 'stripe';
+        status: string;
+        amount: number;
+        currency: string;
+        months: number;
+        isExtension: boolean;
+        date: Date;
+        createdAt: Date;
+      }> = [];
+      
+      if (ctx.user.stripeCustomerId && ctx.user.subscriptionId) {
+        // Add current Stripe subscription as a history item
+        stripeItems.push({
+          id: `stripe_${ctx.user.subscriptionId}`,
+          type: 'stripe',
+          status: ctx.user.subscriptionStatus,
+          amount: 12, // Monthly price
+          currency: 'USD',
+          months: 1, // Stripe is monthly recurring
+          isExtension: false,
+          date: ctx.user.createdAt,
+          createdAt: ctx.user.createdAt,
+        });
+      }
+      
+      // Combine and sort by date descending
+      const allItems = [...historyItems, ...stripeItems].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      
+      return {
+        items: allItems,
+        totalCryptoPayments: cryptoPayments.length,
+        hasStripeSubscription: !!ctx.user.subscriptionId,
+      };
+    }),
+    
+    /**
      * Get current month's usage for invoice limit tracking
      * Returns invoices created this month and the limit based on subscription
      */

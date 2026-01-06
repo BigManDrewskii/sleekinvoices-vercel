@@ -928,3 +928,27 @@
 - [x] 4.4.1 Write webhook handler tests
 - [x] 4.4.2 Test expiration display
 - [x] 4.4.3 Test email sending
+
+
+## Phase 5: Subscription History Page
+
+### 5.1 Backend API
+- [x] 5.1.1 Create getHistory query to fetch all subscription payments
+- [x] 5.1.2 Include crypto payments from cryptoSubscriptionPayments table
+- [x] 5.1.3 Include Stripe payments from subscription events
+- [x] 5.1.4 Return combined timeline sorted by date
+
+### 5.2 Frontend Page
+- [x] 5.2.1 Create SubscriptionHistory page component
+- [x] 5.2.2 Display payment timeline with dates and amounts
+- [x] 5.2.3 Show payment method (Stripe vs Crypto)
+- [x] 5.2.4 Display subscription duration for each payment
+- [x] 5.2.5 Add status badges (completed, pending, failed)
+
+### 5.3 Navigation
+- [x] 5.3.1 Add route in App.tsx
+- [x] 5.3.2 Add link from Subscription page
+
+### 5.4 Testing
+- [x] 5.4.1 Write API tests for getHistory
+- [x] 5.4.2 Test empty state display

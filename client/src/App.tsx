@@ -24,6 +24,7 @@ const Analytics = lazy(() => import("./pages/Analytics"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Subscription = lazy(() => import("./pages/Subscription"));
 const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
+const SubscriptionHistory = lazy(() => import("./pages/SubscriptionHistory"));
 const RecurringInvoices = lazy(() => import("./pages/RecurringInvoices"));
 const CreateRecurringInvoice = lazy(() => import("./pages/CreateRecurringInvoice"));
 const Templates = lazy(() => import("./pages/Templates"));
@@ -62,6 +63,7 @@ function Router() {
         <Route path={"/settings"} component={Settings} />
         <Route path={"/subscription"} component={Subscription} />
         <Route path={"/subscription/success"} component={SubscriptionSuccess} />
+        <Route path={"/subscription/history"} component={SubscriptionHistory} />
         <Route path={"/recurring-invoices"} component={RecurringInvoices} />
         <Route path={"/recurring-invoices/create"} component={CreateRecurringInvoice} />
         <Route path={"/templates"} component={Templates} />

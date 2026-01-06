@@ -2506,3 +2506,33 @@ export async function updateCryptoSubscriptionPaymentStatus(
 
   return { success: true };
 }
+
+
+/**
+ * Get subscription payment history for a user
+ * Returns all crypto subscription payments ordered by date
+ */
+export async function getSubscriptionHistory(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const payments = await db
+    .select({
+      id: cryptoSubscriptionPayments.id,
+      paymentId: cryptoSubscriptionPayments.paymentId,
+      paymentStatus: cryptoSubscriptionPayments.paymentStatus,
+      priceAmount: cryptoSubscriptionPayments.priceAmount,
+      priceCurrency: cryptoSubscriptionPayments.priceCurrency,
+      payCurrency: cryptoSubscriptionPayments.payCurrency,
+      payAmount: cryptoSubscriptionPayments.payAmount,
+      months: cryptoSubscriptionPayments.months,
+      isExtension: cryptoSubscriptionPayments.isExtension,
+      confirmedAt: cryptoSubscriptionPayments.confirmedAt,
+      createdAt: cryptoSubscriptionPayments.createdAt,
+    })
+    .from(cryptoSubscriptionPayments)
+    .where(eq(cryptoSubscriptionPayments.userId, userId))
+    .orderBy(desc(cryptoSubscriptionPayments.createdAt));
+
+  return payments;
+}
