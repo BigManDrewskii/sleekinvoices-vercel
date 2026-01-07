@@ -66,14 +66,31 @@ export default function Estimates() {
   const utils = trpc.useUtils();
 
   const deleteEstimate = trpc.estimates.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Estimate deleted successfully");
-      utils.estimates.list.invalidate();
+    // Optimistic update: immediately remove from UI
+    onMutate: async ({ id }) => {
+      await utils.estimates.list.cancel();
+      const previousEstimates = utils.estimates.list.getData();
+      
+      utils.estimates.list.setData(undefined, (old) => 
+        old?.filter((estimate) => estimate.id !== id)
+      );
+      
       setDeleteDialogOpen(false);
       setEstimateToDelete(null);
+      
+      return { previousEstimates };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.success("Estimate deleted successfully");
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousEstimates) {
+        utils.estimates.list.setData(undefined, context.previousEstimates);
+      }
       toast.error(error.message || "Failed to delete estimate");
+    },
+    onSettled: () => {
+      utils.estimates.list.invalidate();
     },
   });
 
@@ -89,22 +106,82 @@ export default function Estimates() {
   });
 
   const markAsSent = trpc.estimates.markAsSent.useMutation({
+    // Optimistic update: immediately update status
+    onMutate: async ({ id }) => {
+      await utils.estimates.list.cancel();
+      const previousEstimates = utils.estimates.list.getData();
+      
+      utils.estimates.list.setData(undefined, (old) => 
+        old?.map((estimate) => 
+          estimate.id === id ? { ...estimate, status: 'sent' } : estimate
+        )
+      );
+      
+      return { previousEstimates };
+    },
     onSuccess: () => {
       toast.success("Estimate marked as sent");
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousEstimates) {
+        utils.estimates.list.setData(undefined, context.previousEstimates);
+      }
+    },
+    onSettled: () => {
       utils.estimates.list.invalidate();
     },
   });
 
   const markAsAccepted = trpc.estimates.markAsAccepted.useMutation({
+    // Optimistic update: immediately update status
+    onMutate: async ({ id }) => {
+      await utils.estimates.list.cancel();
+      const previousEstimates = utils.estimates.list.getData();
+      
+      utils.estimates.list.setData(undefined, (old) => 
+        old?.map((estimate) => 
+          estimate.id === id ? { ...estimate, status: 'accepted' } : estimate
+        )
+      );
+      
+      return { previousEstimates };
+    },
     onSuccess: () => {
       toast.success("Estimate marked as accepted");
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousEstimates) {
+        utils.estimates.list.setData(undefined, context.previousEstimates);
+      }
+    },
+    onSettled: () => {
       utils.estimates.list.invalidate();
     },
   });
 
   const markAsRejected = trpc.estimates.markAsRejected.useMutation({
+    // Optimistic update: immediately update status
+    onMutate: async ({ id }) => {
+      await utils.estimates.list.cancel();
+      const previousEstimates = utils.estimates.list.getData();
+      
+      utils.estimates.list.setData(undefined, (old) => 
+        old?.map((estimate) => 
+          estimate.id === id ? { ...estimate, status: 'rejected' } : estimate
+        )
+      );
+      
+      return { previousEstimates };
+    },
     onSuccess: () => {
       toast.success("Estimate marked as rejected");
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousEstimates) {
+        utils.estimates.list.setData(undefined, context.previousEstimates);
+      }
+    },
+    onSettled: () => {
       utils.estimates.list.invalidate();
     },
   });

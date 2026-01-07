@@ -76,28 +76,99 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
   });
   
   const createClient = trpc.clients.create.useMutation({
-    onSuccess: (data) => {
-      toast.success("Client created successfully");
-      utils.clients.list.invalidate();
+    // Optimistic update: immediately add to UI
+    onMutate: async (newClient) => {
+      // Cancel any outgoing refetches
+      await utils.clients.list.cancel();
+      
+      // Snapshot the previous value
+      const previousClients = utils.clients.list.getData();
+      
+      // Optimistically add the new client with a temporary ID
+      const optimisticClient = {
+        id: -Date.now(), // Temporary negative ID
+        name: newClient.name,
+        email: newClient.email || null,
+        phone: newClient.phone || null,
+        address: newClient.address || null,
+        companyName: null,
+        notes: null,
+        vatNumber: newClient.vatNumber || null,
+        taxExempt: newClient.taxExempt ?? false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: 0, // Temporary userId, will be replaced on server response
+      };
+      
+      utils.clients.list.setData(undefined, (old) => 
+        old ? [optimisticClient, ...old] : [optimisticClient]
+      );
+      
+      // Close dialog immediately for instant feedback
       onOpenChange(false);
       resetForm();
+      
+      return { previousClients };
+    },
+    onSuccess: (data) => {
+      toast.success("Client created successfully");
       onSuccess?.(data.id);
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      // Rollback on error
+      if (context?.previousClients) {
+        utils.clients.list.setData(undefined, context.previousClients);
+      }
       toast.error(error.message || "Failed to create client");
+    },
+    onSettled: () => {
+      // Always refetch to sync with server
+      utils.clients.list.invalidate();
     },
   });
 
   const updateClient = trpc.clients.update.useMutation({
-    onSuccess: () => {
-      toast.success("Client updated successfully");
-      utils.clients.list.invalidate();
+    // Optimistic update: immediately update in UI
+    onMutate: async (updatedClient) => {
+      await utils.clients.list.cancel();
+      
+      const previousClients = utils.clients.list.getData();
+      
+      // Optimistically update the client in the list
+      utils.clients.list.setData(undefined, (old) => 
+        old?.map((c) => 
+          c.id === updatedClient.id 
+            ? { 
+                ...c, 
+                name: updatedClient.name || c.name,
+                email: updatedClient.email || null,
+                phone: updatedClient.phone || null,
+                address: updatedClient.address || null,
+                vatNumber: updatedClient.vatNumber || null,
+                taxExempt: updatedClient.taxExempt ?? c.taxExempt,
+                updatedAt: new Date(),
+              } 
+            : c
+        )
+      );
+      
       onOpenChange(false);
       resetForm();
+      
+      return { previousClients };
+    },
+    onSuccess: () => {
+      toast.success("Client updated successfully");
       onSuccess?.();
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousClients) {
+        utils.clients.list.setData(undefined, context.previousClients);
+      }
       toast.error(error.message || "Failed to update client");
+    },
+    onSettled: () => {
+      utils.clients.list.invalidate();
     },
   });
 

@@ -54,14 +54,39 @@ export default function Clients() {
 
   const utils = trpc.useUtils();
   const deleteClient = trpc.clients.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Client deleted successfully");
-      utils.clients.list.invalidate();
+    // Optimistic update: immediately remove from UI
+    onMutate: async ({ id }) => {
+      // Cancel any outgoing refetches to prevent overwriting optimistic update
+      await utils.clients.list.cancel();
+      
+      // Snapshot the previous value
+      const previousClients = utils.clients.list.getData();
+      
+      // Optimistically update the cache by removing the client
+      utils.clients.list.setData(undefined, (old) => 
+        old?.filter((client) => client.id !== id)
+      );
+      
+      // Close dialog immediately for instant feedback
       setDeleteDialogOpen(false);
       setClientToDelete(null);
+      
+      // Return context with the snapshot for rollback
+      return { previousClients };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.success("Client deleted successfully");
+    },
+    onError: (error, _variables, context) => {
+      // Rollback to the previous value on error
+      if (context?.previousClients) {
+        utils.clients.list.setData(undefined, context.previousClients);
+      }
       toast.error(error.message || "Failed to delete client");
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure cache is in sync
+      utils.clients.list.invalidate();
     },
   });
 

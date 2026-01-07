@@ -127,15 +127,36 @@ export default function Products() {
     },
   });
 
+  const utils = trpc.useUtils();
+  
   const deleteMutation = trpc.products.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Product archived successfully");
+    // Optimistic update: immediately remove/archive from UI
+    onMutate: async ({ id }) => {
+      await utils.products.list.cancel({ includeInactive: showInactive });
+      const previousProducts = utils.products.list.getData({ includeInactive: showInactive });
+      
+      // Optimistically remove the product from the list
+      utils.products.list.setData({ includeInactive: showInactive }, (old) => 
+        old?.filter((product) => product.id !== id)
+      );
+      
+      // Close dialog immediately
       setIsDeleteDialogOpen(false);
       setSelectedProduct(null);
-      refetch();
+      
+      return { previousProducts };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.success("Product archived successfully");
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousProducts) {
+        utils.products.list.setData({ includeInactive: showInactive }, context.previousProducts);
+      }
       toast.error(error.message || "Failed to archive product");
+    },
+    onSettled: () => {
+      refetch();
     },
   });
 

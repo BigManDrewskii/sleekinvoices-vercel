@@ -54,20 +54,67 @@ export function PartialPaymentDialog({
   );
 
   const recordPayment = trpc.payments.recordPartial.useMutation({
+    // Optimistic update: immediately update payment summary
+    onMutate: async (newPayment) => {
+      await utils.payments.getSummary.cancel({ invoiceId });
+      const previousSummary = utils.payments.getSummary.getData({ invoiceId });
+      
+      // Optimistically update the summary
+      if (previousSummary) {
+        const paymentAmount = parseFloat(newPayment.amount);
+        const newTotalPaid = previousSummary.totalPaid + paymentAmount;
+        const newRemaining = previousSummary.total - newTotalPaid;
+        
+        utils.payments.getSummary.setData({ invoiceId }, {
+          ...previousSummary,
+          totalPaid: newTotalPaid,
+          remaining: newRemaining,
+          isFullyPaid: newRemaining <= 0,
+          payments: [
+            {
+              id: -Date.now(),
+              invoiceId,
+              userId: 0,
+              amount: newPayment.amount,
+              currency,
+              paymentMethod: newPayment.paymentMethod,
+              stripePaymentIntentId: null,
+              cryptoCurrency: newPayment.cryptoCurrency || null,
+              cryptoTxHash: newPayment.cryptoTxHash || null,
+              paymentDate: newPayment.paymentDate,
+              notes: newPayment.notes || null,
+              status: 'completed' as const,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            } as typeof previousSummary.payments[0],
+            ...previousSummary.payments,
+          ],
+        });
+      }
+      
+      // Close dialog immediately for instant feedback
+      handleClose();
+      
+      return { previousSummary };
+    },
     onSuccess: (result) => {
       toast.success(`Payment of ${currency} ${amount} recorded successfully`);
       if (result.remaining <= 0) {
         toast.success("Invoice is now fully paid!");
       }
+      onSuccess();
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousSummary) {
+        utils.payments.getSummary.setData({ invoiceId }, context.previousSummary);
+      }
+      toast.error(error.message || "Failed to record payment");
+    },
+    onSettled: () => {
       utils.payments.getSummary.invalidate({ invoiceId });
       utils.payments.getByInvoice.invalidate({ invoiceId });
       utils.invoices.list.invalidate();
       utils.invoices.get.invalidate({ id: invoiceId });
-      onSuccess();
-      handleClose();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to record payment");
     },
   });
 

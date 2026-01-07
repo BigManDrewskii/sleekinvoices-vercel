@@ -103,26 +103,65 @@ export default function Invoices() {
   const utils = trpc.useUtils();
   
   const deleteInvoice = trpc.invoices.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Invoice deleted successfully");
-      utils.invoices.list.invalidate();
+    // Optimistic update: immediately remove from UI
+    onMutate: async ({ id }) => {
+      await utils.invoices.list.cancel();
+      const previousInvoices = utils.invoices.list.getData();
+      
+      // Optimistically remove the invoice
+      utils.invoices.list.setData(undefined, (old) => 
+        old?.filter((invoice) => invoice.id !== id)
+      );
+      
+      // Close dialog immediately
       setDeleteDialogOpen(false);
       setInvoiceToDelete(null);
+      
+      return { previousInvoices };
     },
-    onError: (error) => {
+    onSuccess: () => {
+      toast.success("Invoice deleted successfully");
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousInvoices) {
+        utils.invoices.list.setData(undefined, context.previousInvoices);
+      }
       toast.error(error.message || "Failed to delete invoice");
+    },
+    onSettled: () => {
+      utils.invoices.list.invalidate();
     },
   });
 
   const bulkDeleteInvoices = trpc.invoices.bulkDelete.useMutation({
-    onSuccess: (data) => {
-      toast.success(`${data.deletedCount} invoice(s) deleted successfully`);
-      utils.invoices.list.invalidate();
+    // Optimistic update: immediately remove selected invoices
+    onMutate: async ({ ids }) => {
+      await utils.invoices.list.cancel();
+      const previousInvoices = utils.invoices.list.getData();
+      const idsSet = new Set(ids);
+      
+      // Optimistically remove selected invoices
+      utils.invoices.list.setData(undefined, (old) => 
+        old?.filter((invoice) => !idsSet.has(invoice.id))
+      );
+      
+      // Close dialog and clear selection immediately
       setBulkDeleteDialogOpen(false);
       setSelectedIds(new Set());
+      
+      return { previousInvoices, deletedCount: ids.length };
     },
-    onError: (error) => {
+    onSuccess: (data) => {
+      toast.success(`${data.deletedCount} invoice(s) deleted successfully`);
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previousInvoices) {
+        utils.invoices.list.setData(undefined, context.previousInvoices);
+      }
       toast.error(error.message || "Failed to delete invoices");
+    },
+    onSettled: () => {
+      utils.invoices.list.invalidate();
     },
   });
 
@@ -138,12 +177,31 @@ export default function Invoices() {
   });
 
   const sendEmail = trpc.invoices.sendEmail.useMutation({
+    // Optimistic update: immediately update status to Sent
+    onMutate: async ({ id }) => {
+      await utils.invoices.list.cancel();
+      const previousInvoices = utils.invoices.list.getData();
+      
+      // Optimistically update status to Sent
+      utils.invoices.list.setData(undefined, (old) => 
+        old?.map((invoice) => 
+          invoice.id === id ? { ...invoice, status: 'sent' } : invoice
+        )
+      );
+      
+      return { previousInvoices };
+    },
     onSuccess: () => {
       toast.success("Invoice sent successfully");
-      utils.invoices.list.invalidate();
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousInvoices) {
+        utils.invoices.list.setData(undefined, context.previousInvoices);
+      }
       toast.error(error.message || "Failed to send invoice");
+    },
+    onSettled: () => {
+      utils.invoices.list.invalidate();
     },
   });
 

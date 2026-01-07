@@ -220,13 +220,24 @@ export default function Expenses() {
   const handleDeleteExpense = async (id: number) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
+    // Optimistic update: immediately remove from UI
+    const previousExpenses = utils.expenses.list.getData();
+    utils.expenses.list.setData(undefined, (old) => 
+      old?.filter((expense: any) => expense.id !== id)
+    );
+
     try {
       await deleteExpenseMutation.mutateAsync({ id });
-      utils.expenses.list.invalidate();
-      utils.expenses.stats.invalidate();
       toast.success("Expense deleted");
     } catch (error) {
+      // Rollback on error
+      if (previousExpenses) {
+        utils.expenses.list.setData(undefined, previousExpenses);
+      }
       toast.error("Failed to delete expense");
+    } finally {
+      utils.expenses.list.invalidate();
+      utils.expenses.stats.invalidate();
     }
   };
 

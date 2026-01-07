@@ -17,24 +17,48 @@ export default function RecurringInvoices() {
   const utils = trpc.useUtils();
 
   const handleToggle = async (id: number, currentStatus: boolean) => {
+    // Optimistic update: immediately toggle status in UI
+    const previousData = utils.recurringInvoices.list.getData();
+    utils.recurringInvoices.list.setData(undefined, (old) => 
+      old?.map((item: any) => 
+        item.id === id ? { ...item, isActive: !currentStatus } : item
+      )
+    );
+    
     try {
       await toggleMutation.mutateAsync({ id, isActive: !currentStatus });
-      utils.recurringInvoices.list.invalidate();
       toast.success(currentStatus ? "Recurring invoice paused" : "Recurring invoice activated");
     } catch (error) {
+      // Rollback on error
+      if (previousData) {
+        utils.recurringInvoices.list.setData(undefined, previousData);
+      }
       toast.error("Failed to toggle recurring invoice");
+    } finally {
+      utils.recurringInvoices.list.invalidate();
     }
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this recurring invoice?")) return;
     
+    // Optimistic update: immediately remove from UI
+    const previousData = utils.recurringInvoices.list.getData();
+    utils.recurringInvoices.list.setData(undefined, (old) => 
+      old?.filter((item: any) => item.id !== id)
+    );
+    
     try {
       await deleteMutation.mutateAsync({ id });
-      utils.recurringInvoices.list.invalidate();
       toast.success("Recurring invoice deleted");
     } catch (error) {
+      // Rollback on error
+      if (previousData) {
+        utils.recurringInvoices.list.setData(undefined, previousData);
+      }
       toast.error("Failed to delete recurring invoice");
+    } finally {
+      utils.recurringInvoices.list.invalidate();
     }
   };
 
