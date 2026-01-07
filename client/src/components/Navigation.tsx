@@ -556,20 +556,22 @@ export function Navigation() {
           {/* Logo - Dynamic sizing based on breakpoint */}
           <Link 
             href="/dashboard" 
-            className="navbar-logo group"
+            className="navbar-logo group relative"
             aria-label="SleekInvoices - Go to Dashboard"
           >
+            {/* Full logo for desktop */}
             <img
-              src="/logos/wide/SleekInvoices-Logo-Wide.svg"
+              src="/logo-full.svg"
               alt="SleekInvoices"
-              className="navbar-logo-wide transition-transform duration-200 group-hover:scale-[1.02]"
-              style={{ height: '32px', width: 'auto', maxWidth: '200px' }}
+              className="navbar-logo-wide transition-all duration-150 ease-out group-hover:scale-[1.03] group-hover:brightness-110 group-active:scale-[0.98]"
+              style={{ height: '28px', width: 'auto', maxWidth: '180px' }}
             />
+            {/* Icon logo for mobile/tablet */}
             <img
-              src="/logos/monogram/SleekInvoices-Monogram-White.svg"
+              src="/logo-icon.svg"
               alt="SleekInvoices"
-              className="navbar-logo-compact transition-transform duration-200 group-hover:scale-105"
-              style={{ height: '36px', width: '36px', maxWidth: '36px' }}
+              className="navbar-logo-compact transition-all duration-150 ease-out group-hover:scale-110 group-hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] group-active:scale-95"
+              style={{ height: '32px', width: '32px', maxWidth: '32px' }}
             />
           </Link>
 

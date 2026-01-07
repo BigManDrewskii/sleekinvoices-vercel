@@ -5,59 +5,47 @@
  */
 
 export const LOGO_ASSETS = {
-  // Wide Logo - Full horizontal logo with text
+  // Wide Logo - Full horizontal logo with text (new compact version)
   wide: {
-    svg: "/logos/wide/SleekInvoices-Logo-Wide.svg",
+    svg: "/logo-full.svg",
     png: {
-      "1x": "/logos/wide/SleekInvoices-Logo-Wide.png",
-      "2x": "/logos/wide/SleekInvoices-Logo-Wide@2x.png",
-      "3x": "/logos/wide/SleekInvoices-Logo-Wide@3x.png",
+      "1x": "/logo-full.svg",
+      "2x": "/logo-full.svg",
+      "3x": "/logo-full.svg",
     },
-    srcset: `
-      /logos/wide/SleekInvoices-Logo-Wide.png 1x,
-      /logos/wide/SleekInvoices-Logo-Wide@2x.png 2x,
-      /logos/wide/SleekInvoices-Logo-Wide@3x.png 3x
-    `.trim(),
-    width: 240,
-    height: 60,
-    aspectRatio: 4,
+    srcset: `/logo-full.svg 1x`.trim(),
+    width: 180,
+    height: 28,
+    aspectRatio: 6.4,
     description: "Full logo with text - use on desktop navigation",
   },
 
-  // Compact Logo - Medium size logo
+  // Compact Logo - Same as wide for now
   compact: {
-    svg: "/logos/compact/SleekInvoices-Logo-Compact.svg",
+    svg: "/logo-full.svg",
     png: {
-      "1x": "/logos/compact/SleekInvoices-Logo-Compact.png",
-      "2x": "/logos/compact/SleekInvoices-Logo-Compact@2x.png",
-      "3x": "/logos/compact/SleekInvoices-Logo-Compact@3x.png",
+      "1x": "/logo-full.svg",
+      "2x": "/logo-full.svg",
+      "3x": "/logo-full.svg",
     },
-    srcset: `
-      /logos/compact/SleekInvoices-Logo-Compact.png 1x,
-      /logos/compact/SleekInvoices-Logo-Compact@2x.png 2x,
-      /logos/compact/SleekInvoices-Logo-Compact@3x.png 3x
-    `.trim(),
-    width: 120,
-    height: 60,
-    aspectRatio: 2,
+    srcset: `/logo-full.svg 1x`.trim(),
+    width: 180,
+    height: 28,
+    aspectRatio: 6.4,
     description: "Compact logo - use on tablet and smaller screens",
   },
 
-  // Monogram - Square icon only
+  // Monogram - Square icon only (new $ monogram)
   monogram: {
-    svg: "/logos/monogram/SleekInvoices-Monogram-White.svg",
+    svg: "/logo-icon.svg",
     png: {
-      "1x": "/logos/monogram/SleekInvoices-Monogram-White.png",
-      "2x": "/logos/monogram/SleekInvoices-Monogram-White@2x.png",
-      "3x": "/logos/monogram/SleekInvoices-Monogram-White@3x.png",
+      "1x": "/logo-icon.svg",
+      "2x": "/logo-icon.svg",
+      "3x": "/logo-icon.svg",
     },
-    srcset: `
-      /logos/monogram/SleekInvoices-Monogram-White.png 1x,
-      /logos/monogram/SleekInvoices-Monogram-White@2x.png 2x,
-      /logos/monogram/SleekInvoices-Monogram-White@3x.png 3x
-    `.trim(),
-    width: 40,
-    height: 40,
+    srcset: `/logo-icon.svg 1x`.trim(),
+    width: 32,
+    height: 32,
     aspectRatio: 1,
     description: "Square monogram - use on mobile and as favicon",
   },
@@ -69,7 +57,7 @@ export const LOGO_ASSETS = {
  */
 export const FAVICON_CONFIG = {
   ico: "/favicon.ico",
-  svg: "/logos/monogram/SleekInvoices-Monogram-White.svg",
+  svg: "/logo-icon.svg",
   png16: "/favicon-16x16.png",
   png32: "/favicon-32x32.png",
   appleTouchIcon: "/apple-touch-icon.png",
