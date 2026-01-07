@@ -1023,6 +1023,8 @@ export async function getExpensesByUserId(userId: number, filters?: {
   categoryId?: number;
   startDate?: Date;
   endDate?: Date;
+  isBillable?: boolean;
+  clientId?: number;
 }) {
   const db = await getDb();
   if (!db) return [];
@@ -1034,13 +1036,26 @@ export async function getExpensesByUserId(userId: number, filters?: {
       categoryName: expenseCategories.name,
       categoryColor: expenseCategories.color,
       amount: expenses.amount,
+      currency: expenses.currency,
       date: expenses.date,
       description: expenses.description,
+      vendor: expenses.vendor,
+      notes: expenses.notes,
       receiptUrl: expenses.receiptUrl,
+      receiptKey: expenses.receiptKey,
+      paymentMethod: expenses.paymentMethod,
+      taxAmount: expenses.taxAmount,
+      isBillable: expenses.isBillable,
+      clientId: expenses.clientId,
+      clientName: clients.name,
+      invoiceId: expenses.invoiceId,
+      billedAt: expenses.billedAt,
+      isTaxDeductible: expenses.isTaxDeductible,
       createdAt: expenses.createdAt,
     })
     .from(expenses)
     .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
+    .leftJoin(clients, eq(expenses.clientId, clients.id))
     .where(eq(expenses.userId, userId))
     .$dynamic();
 
@@ -1052,6 +1067,12 @@ export async function getExpensesByUserId(userId: number, filters?: {
   }
   if (filters?.endDate) {
     query = query.where(lte(expenses.date, filters.endDate));
+  }
+  if (filters?.isBillable !== undefined) {
+    query = query.where(eq(expenses.isBillable, filters.isBillable));
+  }
+  if (filters?.clientId) {
+    query = query.where(eq(expenses.clientId, filters.clientId));
   }
 
   const results = await query.orderBy(desc(expenses.date));
@@ -1077,9 +1098,20 @@ export async function updateExpense(
   updates: Partial<{
     categoryId: number;
     amount: string;
+    currency: string;
     date: Date;
     description: string;
+    vendor: string;
+    notes: string;
     receiptUrl: string;
+    receiptKey: string;
+    paymentMethod: 'cash' | 'credit_card' | 'debit_card' | 'bank_transfer' | 'check' | 'other';
+    taxAmount: string;
+    isBillable: boolean;
+    clientId: number | null;
+    invoiceId: number | null;
+    billedAt: Date | null;
+    isTaxDeductible: boolean;
   }>
 ) {
   const db = await getDb();

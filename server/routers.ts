@@ -1081,6 +1081,8 @@ export const appRouter = router({
         categoryId: z.number().optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
+        isBillable: z.boolean().optional(),
+        clientId: z.number().optional(),
       }).optional())
       .query(async ({ ctx, input }) => {
         return await db.getExpensesByUserId(ctx.user.id, input);

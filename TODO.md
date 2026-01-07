@@ -2128,3 +2128,35 @@ Before marking a phase complete, verify:
 - [done] 8.2.2 Standardize CardContent padding across pages - pt-5 pb-4 and py-4 changed to p-4
 - [done] 8.2.3 Fix any pt-6 inconsistencies - Products filter card fixed
 - [done] 8.2.4 Ensure mobile card views have consistent spacing - All use p-4 in mobile cards
+
+
+---
+
+## Phase 9: Expenses Tracking Feature
+
+### 9.1 Database Schema
+- [done] 9.1.1 Create expenses table with all required fields - Already exists with comprehensive fields
+- [done] 9.1.2 Add category enum for expense types - Using expenseCategories table
+- [done] 9.1.3 Add billable flag and client reference - isBillable, clientId, invoiceId fields exist
+- [done] 9.1.4 Add receipt URL field for S3 storage - receiptUrl and receiptKey fields exist
+- [done] 9.1.5 Run database migration - Added billedAt and isTaxDe### 9.2 Backend Operations
+- [done] 9.2.1 Create expense CRUD functions in db.ts - Already exists, enhanced with all fields
+- [done] 9.2.2 Add expenses router with list/create/update/delete procedures - Already exists
+- [done] 9.2.3 Add receipt upload procedure with S3 integration - uploadReceipt procedure exists
+- [done] 9.2.4 Add billable expense linking to invoices - linkExpenseToInvoice fu### 9.3 Receipt Upload
+- [done] 9.3.1 Implement S3 upload for receipts - uploadReceipt procedure in router
+- [done] 9.3.2 Add file type validation (images, PDFs) - contentType passed to S3
+- [done] 9.3.3 Generate presigned URLs for viewing - Direct S3 URLs returned
+### 9.4 Expenses List Page
+- [done] 9.4.1 Build expenses list with table/card views - Expandable list with details
+- [done] 9.4.2 Add filtering by category, date range, billable status - Full filter UI exists
+- [done] 9.4.3 Add expense summary cards (total, by category) - 4 stat cards at top
+- [ ] 9.4.4 Implement pagination
+
+### 9.5 Expense Form
+- [done] 9.5.1 Create expense dialog/form component - Dialog with full form exists
+- [done] 9.5.2 Add billable checkbox with client selector - isBillable + clientId fields
+- [done] 9.5.3 Add receipt upload component - ReceiptUpload component integrated
+- [done] 9.5.4 Add tax amount field - taxAmount input exists
+- [done] 9.5.5 Add payment method selector - Full dropdown with all methodss for expense operations
+- [ ] 9.6.2 Verify all functionality works

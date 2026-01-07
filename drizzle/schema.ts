@@ -328,7 +328,7 @@ export type ExpenseCategory = typeof expenseCategories.$inferSelect;
 export type InsertExpenseCategory = typeof expenseCategories.$inferInsert;
 
 /**
- * Expenses for profit/loss tracking
+ * Expenses for profit/loss tracking with billable expense support
  */
 export const expenses = mysqlTable("expenses", {
   id: int("id").autoincrement().primaryKey(),
@@ -362,9 +362,13 @@ export const expenses = mysqlTable("expenses", {
   isBillable: boolean("isBillable").default(false).notNull(),
   clientId: int("clientId"), // If billable, which client
   invoiceId: int("invoiceId"), // If billed, which invoice
+  billedAt: timestamp("billedAt"), // When expense was added to invoice
   
   // Recurring flag
   isRecurring: boolean("isRecurring").default(false).notNull(),
+  
+  // Tax deduction tracking
+  isTaxDeductible: boolean("isTaxDeductible").default(true).notNull(),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
