@@ -136,7 +136,8 @@ export function Navigation() {
       <DropdownMenuTrigger asChild>
         <Button 
           size="sm" 
-          className="h-10 min-w-[44px] gap-1.5 px-3 group relative overflow-hidden bg-purple-600 hover:bg-purple-700 border-2 border-purple-400/50 hover:border-purple-400 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-200"
+          variant="outline"
+          className="h-10 min-w-[44px] gap-1.5 px-3 group relative overflow-hidden border-primary/50 hover:border-primary hover:bg-primary/10 text-primary transition-all duration-200"
         >
           <Plus className="h-4 w-4 transition-transform duration-200 group-hover:rotate-90" />
           <span className="hidden sm:inline">New</span>

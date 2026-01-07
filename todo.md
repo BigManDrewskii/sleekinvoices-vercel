@@ -1137,3 +1137,8 @@
 - [x] Create overlay/dialog with two choices: Smart Invoice Builder and Classic Form
 - [x] Add explanations for each invoice creation method
 - [x] Style Navigation "New" button with purple outline and darker fill for differentiation
+
+
+## New Invoice Dialog & Button Refinement
+- [x] Add AI option (Magic Invoice) to the New Invoice dialog with emerald accent
+- [x] Restyle Navigation "New" button to follow design system (outline variant with primary color)

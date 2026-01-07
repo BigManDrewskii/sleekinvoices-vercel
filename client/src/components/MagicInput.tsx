@@ -70,6 +70,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
   if (!isExpanded) {
     return (
       <Button
+        data-magic-invoice
         variant="outline"
         onClick={() => setIsExpanded(true)}
         className={cn(
@@ -90,10 +91,13 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
   }
 
   return (
-    <div className={cn(
-      "relative rounded-lg border border-primary/30 bg-card p-4 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200",
-      className
-    )}>
+    <div 
+      data-magic-invoice
+      className={cn(
+        "relative rounded-lg border border-primary/30 bg-card p-4 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200",
+        className
+      )}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

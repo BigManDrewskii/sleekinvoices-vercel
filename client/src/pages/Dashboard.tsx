@@ -82,7 +82,42 @@ export default function Dashboard() {
                       Choose how you'd like to create your invoice
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
+                  <div className="grid gap-3 py-4">
+                    {/* AI Magic Invoice - Top option */}
+                    <div 
+                      className="group relative rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 p-4 cursor-pointer transition-all duration-200 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/10"
+                      onClick={() => {
+                        // Scroll to Magic Invoice section and focus the input
+                        const magicSection = document.querySelector('[data-magic-invoice]');
+                        if (magicSection) {
+                          magicSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          const input = magicSection.querySelector('input, textarea');
+                          if (input) setTimeout(() => (input as HTMLElement).focus(), 500);
+                        }
+                        // Close the dialog
+                        const closeBtn = document.querySelector('[data-dialog-close]') as HTMLElement;
+                        if (closeBtn) closeBtn.click();
+                      }}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500 group-hover:bg-emerald-500/20 transition-colors">
+                          <Sparkles className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-foreground mb-1">AI Magic Invoice</h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            Describe what you need in plain English and let AI create your invoice instantly.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="absolute top-3 right-3">
+                        <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
+                          Fastest
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Smart Invoice Builder */}
                     <Link href="/invoices/guided">
                       <div className="group relative rounded-xl border border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-purple-500/10 p-4 cursor-pointer transition-all duration-200 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10">
                         <div className="flex items-start gap-4">
@@ -92,17 +127,19 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <h3 className="font-semibold text-foreground mb-1">Smart Invoice Builder</h3>
                             <p className="text-sm text-muted-foreground leading-relaxed">
-                              Answer simple questions step-by-step. Perfect for beginners or when you want guidance through the process.
+                              Answer simple questions step-by-step. Perfect for beginners or when you want guidance.
                             </p>
                           </div>
                         </div>
                         <div className="absolute top-3 right-3">
                           <span className="inline-flex items-center rounded-full bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-500">
-                            Recommended
+                            Guided
                           </span>
                         </div>
                       </div>
                     </Link>
+
+                    {/* Classic Form */}
                     <Link href="/invoices/create">
                       <div className="group rounded-xl border border-border/50 bg-card/50 p-4 cursor-pointer transition-all duration-200 hover:border-border hover:bg-card hover:shadow-md">
                         <div className="flex items-start gap-4">
@@ -112,7 +149,7 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <h3 className="font-semibold text-foreground mb-1">Classic Form</h3>
                             <p className="text-sm text-muted-foreground leading-relaxed">
-                              Traditional invoice form with all fields visible. Best for experienced users who prefer full control.
+                              Traditional invoice form with all fields visible. Best for experienced users.
                             </p>
                           </div>
                         </div>
