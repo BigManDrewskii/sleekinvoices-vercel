@@ -873,3 +873,137 @@ select:focus {
 .sparkle-delay-1 { animation-delay: 0.2s; }
 .sparkle-delay-2 { animation-delay: 0.4s; }
 .sparkle-delay-3 { animation-delay: 0.6s; }
+
+
+/* ========================================
+   Gear Loader - Elegant Loading Animation
+   Inspired by UIverse (fresh-panther-41)
+   ======================================== */
+
+/* Gear rotation animations */
+@keyframes gear-clockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes gear-counter-clockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* Animation utility classes */
+.animate-gear-cw {
+  animation: gear-clockwise 3s infinite linear;
+}
+
+.animate-gear-ccw {
+  animation: gear-counter-clockwise 3s infinite linear;
+}
+
+.animate-gear-ccw-slow {
+  animation: gear-counter-clockwise 6s infinite linear;
+}
+
+/* Rotation utility classes */
+.rotate-30 { transform: rotate(30deg); }
+.rotate-60 { transform: rotate(60deg); }
+.rotate-90 { transform: rotate(90deg); }
+.rotate-120 { transform: rotate(120deg); }
+.rotate-150 { transform: rotate(150deg); }
+
+/* Gear loader base styles */
+.gear-loader {
+  --gear-color: hsl(var(--muted-foreground) / 0.6);
+  --gear-shadow-light: hsl(var(--foreground) / 0.3);
+  --gear-shadow-dark: hsl(var(--background) / 0.8);
+  --gear-center: hsl(var(--card));
+}
+
+/* Individual gear styling */
+.gear-loader .gear {
+  position: absolute;
+  height: 30%;
+  width: 22.5%;
+  box-shadow: 0px -1px 0px 0px var(--gear-shadow-light), 
+              0px 1px 0px 0px var(--gear-shadow-dark);
+  border-radius: 50%;
+}
+
+.gear-loader .gear.large {
+  height: 60%;
+  width: 45%;
+}
+
+/* Gear inner circle (the rotating part) */
+.gear-loader .gear-inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: var(--gear-color);
+  border-radius: 50%;
+  border: 1px solid hsl(var(--border) / 0.3);
+}
+
+/* Center hole of the gear */
+.gear-loader .gear::after {
+  content: "";
+  position: absolute;
+  height: 60%;
+  width: 60%;
+  border-radius: 50%;
+  background: var(--gear-center);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  box-shadow: 0px 0px 10px hsl(var(--foreground) / 0.1),
+              inset 0px 0px 10px hsl(var(--background) / 0.3),
+              inset 0px 2px 0px 0px hsl(var(--background) / 0.5),
+              inset 0px -1px 0px 0px var(--gear-shadow-light);
+}
+
+.gear-loader .gear.large::after {
+  height: 80%;
+  width: 80%;
+}
+
+/* Gear teeth (bars) */
+.gear-loader .bar {
+  background: var(--gear-color);
+  height: 26%;
+  width: 126%;
+  position: absolute;
+  left: 50%;
+  margin-left: -63%;
+  top: 50%;
+  margin-top: -13%;
+  border-radius: 2px;
+  border-left: 1px solid hsl(var(--border) / 0.2);
+  border-right: 1px solid hsl(var(--border) / 0.2);
+}
+
+.gear-loader .gear.large .bar {
+  width: 113%;
+  margin-left: -56.5%;
+}
+
+/* Gear positions */
+.gear-loader .gear-one {
+  top: 8%;
+  left: 5%;
+}
+
+.gear-loader .gear-two {
+  top: 40%;
+  left: 30%;
+}
+
+.gear-loader .gear-three {
+  top: 73%;
+  left: 5%;
+}
+
+.gear-loader .gear-four {
+  top: 8%;
+  left: 64%;
+}

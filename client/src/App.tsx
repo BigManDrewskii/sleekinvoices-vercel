@@ -42,13 +42,15 @@ const ViewEstimate = lazy(() => import("./pages/ViewEstimate"));
 const EditEstimate = lazy(() => import("./pages/EditEstimate"));
 const GuidedInvoiceCreator = lazy(() => import("./pages/GuidedInvoiceCreator"));
 
-// Loading fallback component
+import { GearLoader } from "@/components/ui/gear-loader";
+
+// Loading fallback component with elegant gear animation
 function LoadingFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="flex flex-col items-center gap-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-sm text-muted-foreground">Loading...</p>
+      <div className="flex flex-col items-center gap-6">
+        <GearLoader size="lg" />
+        <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
       </div>
     </div>
   );
