@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 export type OrbState = "idle" | "listening" | "thinking" | "talking";
 
@@ -23,72 +22,102 @@ export function Orb({
   className,
   onClick,
 }: OrbProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const sizeClasses = {
-    sm: "h-10 w-10",
-    md: "h-14 w-14",
-    lg: "h-20 w-20",
+  const sizeMap = {
+    sm: 40,
+    md: 56,
+    lg: 80,
   };
+
+  const orbSize = sizeMap[size];
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "orb-container relative rounded-full cursor-pointer transition-transform hover:scale-105 active:scale-95",
-        sizeClasses[size],
+        "orb-button relative rounded-full cursor-pointer transition-all duration-300",
+        "hover:scale-110 active:scale-95",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
         className
       )}
       style={{
-        "--orb-color-1": colors[0],
-        "--orb-color-2": colors[1],
-      } as React.CSSProperties}
+        width: orbSize,
+        height: orbSize,
+      }}
+      aria-label="AI Assistant"
     >
-      {/* Outer glow */}
+      {/* Glow effect */}
       <div
-        className="absolute inset-0 rounded-full opacity-60 blur-lg"
+        className="absolute inset-[-8px] rounded-full opacity-50 blur-xl animate-pulse"
         style={{
-          background: `radial-gradient(circle, ${colors[0]}80 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${colors[0]} 0%, transparent 70%)`,
         }}
       />
 
-      {/* Main orb body */}
+      {/* Main orb */}
       <div
-        className={cn(
-          "orb-body absolute inset-1 rounded-full overflow-hidden",
-          "shadow-[inset_0_2px_20px_rgba(255,255,255,0.3),inset_0_-2px_20px_rgba(0,0,0,0.2)]",
-          mounted && "animate-orb-rotate"
-        )}
+        className="absolute inset-0 rounded-full overflow-hidden"
         style={{
-          background: `
-            radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4) 0%, transparent 40%),
-            radial-gradient(circle at 70% 70%, rgba(0,0,0,0.2) 0%, transparent 40%),
-            linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 50%, ${colors[0]} 100%)
+          background: `linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 100%)`,
+          boxShadow: `
+            inset 0 -4px 12px rgba(0,0,0,0.3),
+            inset 0 4px 12px rgba(255,255,255,0.2),
+            0 4px 20px ${colors[0]}60
           `,
-          backgroundSize: "100% 100%, 100% 100%, 200% 200%",
         }}
       >
-        {/* Inner shimmer */}
+        {/* Animated gradient overlay */}
         <div
-          className={cn("absolute inset-0 rounded-full", mounted && "animate-orb-shimmer")}
+          className="absolute inset-0 rounded-full animate-orb-spin"
           style={{
-            background: "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%)",
-            backgroundSize: "200% 200%",
+            background: `
+              conic-gradient(
+                from 0deg,
+                transparent 0deg,
+                ${colors[0]}40 90deg,
+                transparent 180deg,
+                ${colors[1]}40 270deg,
+                transparent 360deg
+              )
+            `,
           }}
         />
+
+        {/* Glass reflection */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `
+              radial-gradient(
+                ellipse 60% 40% at 30% 20%,
+                rgba(255,255,255,0.4) 0%,
+                transparent 100%
+              )
+            `,
+          }}
+        />
+
+        {/* Inner glow for active states */}
+        {state !== "idle" && (
+          <div
+            className="absolute inset-2 rounded-full animate-pulse"
+            style={{
+              background: `radial-gradient(circle, ${colors[0]}60 0%, transparent 70%)`,
+              animationDuration: state === "talking" ? "0.3s" : state === "thinking" ? "0.8s" : "1.5s",
+            }}
+          />
+        )}
       </div>
 
-      {/* Highlight */}
-      <div
-        className="absolute top-1.5 left-1.5 w-1/3 h-1/4 rounded-full opacity-60"
-        style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.8) 0%, transparent 100%)",
-        }}
-      />
+      {/* Sparkle icon in center */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <svg
+          className="w-1/2 h-1/2 text-white/90 drop-shadow-sm"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+        </svg>
+      </div>
     </button>
   );
 }

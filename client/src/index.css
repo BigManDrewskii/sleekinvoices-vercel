@@ -1013,26 +1013,19 @@ select:focus {
    Orb Component - ElevenLabs Inspired
    ======================================== */
 
-@keyframes orb-rotate {
-  0% { background-position: 0% 0%, 0% 0%, 0% 50%; }
-  50% { background-position: 100% 100%, 100% 100%, 100% 50%; }
-  100% { background-position: 0% 0%, 0% 0%, 200% 50%; }
+@keyframes orb-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.animate-orb-rotate {
-  animation: orb-rotate 8s ease-in-out infinite;
+.animate-orb-spin {
+  animation: orb-spin 8s linear infinite;
 }
 
-@keyframes orb-shimmer {
-  0% { background-position: -100% -100%; }
-  50% { background-position: 200% 200%; }
-  100% { background-position: -100% -100%; }
+.orb-button:hover {
+  filter: brightness(1.15);
 }
 
-.animate-orb-shimmer {
-  animation: orb-shimmer 6s ease-in-out infinite;
-}
-
-.orb-container:hover .orb-body {
-  filter: brightness(1.1);
+.orb-button:hover .animate-orb-spin {
+  animation-duration: 4s;
 }
