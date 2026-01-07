@@ -58,6 +58,7 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { CurrencyBadge } from "@/components/CurrencySelector";
+import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 
 interface Invoice {
   id: number;
@@ -101,6 +102,7 @@ export default function Invoices() {
   });
 
   const utils = trpc.useUtils();
+  const { pushUndoAction } = useKeyboardShortcuts();
   
   const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; invoiceId: number } | null>(null);
   
@@ -133,28 +135,40 @@ export default function Invoices() {
     setDeleteDialogOpen(false);
     setInvoiceToDelete(null);
 
+    // Create undo function
+    const undoDelete = () => {
+      // Cancel the pending delete
+      if (pendingDeleteRef.current) {
+        clearTimeout(pendingDeleteRef.current.timeoutId);
+        pendingDeleteRef.current = null;
+      }
+      
+      // Restore the invoice to UI
+      if (previousInvoices) {
+        utils.invoices.list.setData(undefined, previousInvoices);
+      } else {
+        utils.invoices.list.invalidate();
+      }
+    };
+
+    // Register with keyboard shortcuts context for Cmd+Z
+    pushUndoAction({
+      type: 'delete',
+      entityType: 'invoice',
+      description: `Delete invoice ${invoice.invoiceNumber}`,
+      undo: undoDelete,
+    });
+
     // Show undo toast
     toast(
-      `Invoice "${invoice.invoiceNumber}" deleted`,
+      `Invoice ${invoice.invoiceNumber} deleted`,
       {
-        description: 'Click undo to restore',
+        description: 'Click undo to restore or press ⌘Z',
         duration: 5000,
         action: {
           label: 'Undo',
           onClick: () => {
-            // Cancel the pending delete
-            if (pendingDeleteRef.current) {
-              clearTimeout(pendingDeleteRef.current.timeoutId);
-              pendingDeleteRef.current = null;
-            }
-            
-            // Restore the invoice to UI
-            if (previousInvoices) {
-              utils.invoices.list.setData(undefined, previousInvoices);
-            } else {
-              utils.invoices.list.invalidate();
-            }
-            
+            undoDelete();
             toast.success('Invoice restored');
           },
         },

@@ -17,12 +17,13 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { CSVImportDialog } from "@/components/clients/CSVImportDialog";
 import { ClientsTableSkeleton } from "@/components/skeletons";
+import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 
 interface Client {
   id: number;
@@ -48,11 +49,22 @@ export default function Clients() {
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
+  // Listen for keyboard shortcut to open new client dialog
+  useEffect(() => {
+    const handleOpenDialog = () => {
+      setSelectedClient(null);
+      setClientDialogOpen(true);
+    };
+    window.addEventListener('open-new-client-dialog', handleOpenDialog);
+    return () => window.removeEventListener('open-new-client-dialog', handleOpenDialog);
+  }, []);
+
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery(undefined, {
     enabled: isAuthenticated,
   });
 
   const utils = trpc.useUtils();
+  const { pushUndoAction } = useKeyboardShortcuts();
   const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; clientId: number } | null>(null);
   
   const deleteClient = trpc.clients.delete.useMutation({
@@ -85,28 +97,40 @@ export default function Clients() {
     setDeleteDialogOpen(false);
     setClientToDelete(null);
 
+    // Create undo function
+    const undoDelete = () => {
+      // Cancel the pending delete
+      if (pendingDeleteRef.current) {
+        clearTimeout(pendingDeleteRef.current.timeoutId);
+        pendingDeleteRef.current = null;
+      }
+      
+      // Restore the client to UI
+      if (previousClients) {
+        utils.clients.list.setData(undefined, previousClients);
+      } else {
+        utils.clients.list.invalidate();
+      }
+    };
+
+    // Register with keyboard shortcuts context for Cmd+Z
+    pushUndoAction({
+      type: 'delete',
+      entityType: 'client',
+      description: `Delete client "${client.name}"`,
+      undo: undoDelete,
+    });
+
     // Show undo toast
-    const toastId = toast(
+    toast(
       `Client "${client.name}" deleted`,
       {
-        description: 'Click undo to restore',
+        description: 'Click undo to restore or press ⌘Z',
         duration: 5000,
         action: {
           label: 'Undo',
           onClick: () => {
-            // Cancel the pending delete
-            if (pendingDeleteRef.current) {
-              clearTimeout(pendingDeleteRef.current.timeoutId);
-              pendingDeleteRef.current = null;
-            }
-            
-            // Restore the client to UI
-            if (previousClients) {
-              utils.clients.list.setData(undefined, previousClients);
-            } else {
-              utils.clients.list.invalidate();
-            }
-            
+            undoDelete();
             toast.success('Client restored');
           },
         },

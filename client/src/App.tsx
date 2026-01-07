@@ -4,6 +4,8 @@ import { Route, Switch } from "wouter";
 import { lazy, Suspense } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { KeyboardShortcutsHelp } from "./components/KeyboardShortcutsHelp";
+import { GlobalShortcuts } from "./components/GlobalShortcuts";
 
 // Eager load: Public pages (landing, home, client portal)
 // These are needed immediately for anonymous visitors
@@ -94,6 +96,8 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
+          <KeyboardShortcutsHelp />
+          <GlobalShortcuts />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

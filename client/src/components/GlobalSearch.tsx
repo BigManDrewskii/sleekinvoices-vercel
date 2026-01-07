@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/popover";
 import { Search, FileText, Users } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 
 export function GlobalSearch() {
   const [, setLocation] = useLocation();
-  const [open, setOpen] = useState(false);
+  const { isSearchOpen, setSearchOpen } = useKeyboardShortcuts();
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<{
     invoices: any[];
@@ -30,21 +31,9 @@ export function GlobalSearch() {
   const { data: invoices } = trpc.invoices.list.useQuery();
   const { data: clients } = trpc.clients.list.useQuery();
 
-  // Handle Cmd/Ctrl + K shortcut
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setOpen(true);
-      }
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  // Sync local state with context (keyboard shortcut opens search)
+  const open = isSearchOpen;
+  const setOpen = setSearchOpen;
 
   // Search logic
   useEffect(() => {
@@ -81,13 +70,13 @@ export function GlobalSearch() {
 
   const handleSelectInvoice = (invoiceId: number) => {
     setLocation(`/invoices/${invoiceId}`);
-    setOpen(false);
+    setSearchOpen(false);
     setSearchQuery("");
   };
 
   const handleSelectClient = (clientId: number) => {
     setLocation(`/clients/${clientId}`);
-    setOpen(false);
+    setSearchOpen(false);
     setSearchQuery("");
   };
 

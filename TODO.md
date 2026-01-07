@@ -2459,3 +2459,33 @@ Before marking a phase complete, verify:
 - [x] Test undo functionality in browser
 - [x] Verify timer cancellation on undo click
 - [x] Verify permanent deletion after timeout
+
+
+## ⌨️ FEATURE: Global Keyboard Shortcuts (Completed)
+
+### Core Implementation
+- [x] Create useKeyboardShortcuts hook for global shortcut handling
+- [x] Create keyboard shortcut context for app-wide state
+- [x] Create undo action history stack for Cmd+Z
+
+### Search Shortcut (Cmd+K)
+- [x] Integrate Cmd+K with existing search dialog
+- [x] Ensure search dialog opens and focuses input
+
+### Undo Shortcut (Cmd+Z)
+- [x] Create action history context to track undoable actions
+- [x] Implement Cmd+Z to undo last delete action
+- [x] Show toast confirmation when undo is triggered
+- [x] Integrate with Clients, Invoices, Expenses pages
+
+### Additional Shortcuts
+- [x] Cmd+N / Ctrl+N - New invoice
+- [x] Cmd+Shift+N - New client
+- [x] Cmd+Shift+E - New expense
+- [x] Escape - Close modals/dialogs
+- [x] Shift+? - Show keyboard shortcuts help dialog
+
+### Testing
+- [x] Test all shortcuts in browser
+- [x] Verify shortcuts work on both Mac and Windows
+- [x] Ensure shortcuts don't conflict with browser defaults

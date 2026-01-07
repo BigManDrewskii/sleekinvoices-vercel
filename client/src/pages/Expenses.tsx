@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { ExpensesPageSkeleton } from "@/components/skeletons/ExpensesPageSkeleton";
+import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 
 // Payment method display names
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -34,9 +35,19 @@ export default function Expenses() {
   const createCategoryMutation = trpc.expenses.categories.create.useMutation();
   const deleteCategoryMutation = trpc.expenses.categories.delete.useMutation();
   const utils = trpc.useUtils();
+  const { pushUndoAction } = useKeyboardShortcuts();
 
   const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+
+  // Listen for keyboard shortcut to open new expense dialog
+  useEffect(() => {
+    const handleOpenDialog = () => {
+      setIsExpenseDialogOpen(true);
+    };
+    window.addEventListener('open-new-expense-dialog', handleOpenDialog);
+    return () => window.removeEventListener('open-new-expense-dialog', handleOpenDialog);
+  }, []);
   const [expandedExpenses, setExpandedExpenses] = useState<Set<number>>(new Set());
   
   // Filter state
@@ -236,28 +247,40 @@ export default function Expenses() {
       old?.filter((expense: any) => expense.id !== id)
     );
 
+    // Create undo function
+    const undoDelete = () => {
+      // Cancel the pending delete
+      if (pendingExpenseDeleteRef.current) {
+        clearTimeout(pendingExpenseDeleteRef.current.timeoutId);
+        pendingExpenseDeleteRef.current = null;
+      }
+      
+      // Restore the expense to UI
+      if (previousExpenses) {
+        utils.expenses.list.setData(undefined, previousExpenses);
+      } else {
+        utils.expenses.list.invalidate();
+      }
+    };
+
+    // Register with keyboard shortcuts context for Cmd+Z
+    pushUndoAction({
+      type: 'delete',
+      entityType: 'expense',
+      description: `Delete expense`,
+      undo: undoDelete,
+    });
+
     // Show undo toast
     toast(
       `Expense deleted`,
       {
-        description: 'Click undo to restore',
+        description: 'Click undo to restore or press ⌘Z',
         duration: 5000,
         action: {
           label: 'Undo',
           onClick: () => {
-            // Cancel the pending delete
-            if (pendingExpenseDeleteRef.current) {
-              clearTimeout(pendingExpenseDeleteRef.current.timeoutId);
-              pendingExpenseDeleteRef.current = null;
-            }
-            
-            // Restore the expense to UI
-            if (previousExpenses) {
-              utils.expenses.list.setData(undefined, previousExpenses);
-            } else {
-              utils.expenses.list.invalidate();
-            }
-            
+            undoDelete();
             toast.success('Expense restored');
           },
         },
