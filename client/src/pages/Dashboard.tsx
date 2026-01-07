@@ -83,7 +83,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Revenue */}
             <Card className="border-border">
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Total Revenue</p>
                   <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
@@ -103,7 +103,7 @@ export default function Dashboard() {
 
             {/* Outstanding */}
             <Card className="border-border">
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Outstanding</p>
                   {(stats?.outstandingBalance || 0) > 0 && (
@@ -124,7 +124,7 @@ export default function Dashboard() {
 
             {/* Total Invoices */}
             <Card className="border-border">
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Total Invoices</p>
                 </div>
@@ -139,7 +139,7 @@ export default function Dashboard() {
 
             {/* Paid Invoices */}
             <Card className="border-border">
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-muted-foreground">Paid Invoices</p>
                   <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
