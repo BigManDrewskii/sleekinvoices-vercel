@@ -1007,3 +1007,32 @@ select:focus {
   top: 8%;
   left: 64%;
 }
+
+
+/* ========================================
+   Orb Component - ElevenLabs Inspired
+   ======================================== */
+
+@keyframes orb-rotate {
+  0% { background-position: 0% 0%, 0% 0%, 0% 50%; }
+  50% { background-position: 100% 100%, 100% 100%, 100% 50%; }
+  100% { background-position: 0% 0%, 0% 0%, 200% 50%; }
+}
+
+.animate-orb-rotate {
+  animation: orb-rotate 8s ease-in-out infinite;
+}
+
+@keyframes orb-shimmer {
+  0% { background-position: -100% -100%; }
+  50% { background-position: 200% 200%; }
+  100% { background-position: -100% -100%; }
+}
+
+.animate-orb-shimmer {
+  animation: orb-shimmer 6s ease-in-out infinite;
+}
+
+.orb-container:hover .orb-body {
+  filter: brightness(1.1);
+}

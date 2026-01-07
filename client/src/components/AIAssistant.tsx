@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Orb } from "@/components/ui/orb";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -409,28 +410,25 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 }
 
 /**
- * Floating AI Assistant trigger button
+ * Floating AI Assistant trigger button with animated orb
  */
 export function AIAssistantTrigger({ onClick, className }: { onClick: () => void; className?: string }) {
   const { data: credits } = trpc.ai.getCredits.useQuery();
   
   return (
-    <Button
-      onClick={onClick}
-      size="lg"
-      className={cn(
-        "fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-40",
-        "bg-primary hover:bg-primary/90",
-        className
-      )}
-      title="Open AI Assistant"
-    >
-      <Sparkles className="h-6 w-6" />
+    <div className={cn("fixed bottom-6 right-6 z-40", className)}>
+      <Orb
+        onClick={onClick}
+        size="md"
+        state="idle"
+        colors={["#818cf8", "#6366f1"]}
+        className="shadow-lg hover:shadow-xl"
+      />
       {credits && credits.remaining > 0 && (
-        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-green-500 text-[10px] font-bold flex items-center justify-center text-white">
+        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md z-10">
           {credits.remaining > 9 ? "9+" : credits.remaining}
         </span>
       )}
-    </Button>
+    </div>
   );
 }
