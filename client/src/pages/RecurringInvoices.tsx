@@ -7,6 +7,7 @@ import { Plus, Calendar, RefreshCw, Pause, Play, Trash2, Edit } from "lucide-rea
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { RecurringInvoicesPageSkeleton } from "@/components/skeletons";
 
 export default function RecurringInvoices() {
   const [, setLocation] = useLocation();
@@ -47,13 +48,7 @@ export default function RecurringInvoices() {
   };
 
   if (isLoading) {
-    return (
-      <PageLayout title="Recurring Invoices" subtitle="Loading...">
-        <div className="flex items-center justify-center h-64">
-          <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
-        </div>
-      </PageLayout>
-    );
+    return <RecurringInvoicesPageSkeleton />;
   }
 
   return (

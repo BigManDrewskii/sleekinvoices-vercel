@@ -32,6 +32,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, DollarSign, CreditCard, Banknote, FileCheck, Bitcoin } from "lucide-react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { PaymentsPageSkeleton } from "@/components/skeletons";
 
 export default function Payments() {
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
@@ -204,7 +205,7 @@ export default function Payments() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading payments...</div>
+            <PaymentsPageSkeleton />
           ) : !payments || payments.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               No payments recorded yet

@@ -51,6 +51,7 @@ import { Navigation } from "@/components/Navigation";
 import { CryptoPaymentDialog } from "@/components/payments/CryptoPaymentDialog";
 import { PartialPaymentDialog } from "@/components/payments/PartialPaymentDialog";
 import { DollarSign } from "lucide-react";
+import { ViewInvoicePageSkeleton } from "@/components/skeletons";
 
 export default function ViewInvoice() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -133,11 +134,7 @@ export default function ViewInvoice() {
   });
 
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <ViewInvoicePageSkeleton />;
   }
 
   if (!isAuthenticated) {

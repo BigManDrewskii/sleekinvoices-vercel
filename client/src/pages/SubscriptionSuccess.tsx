@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { trpc } from "@/lib/trpc";
 import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { SubscriptionPageSkeleton } from "@/components/skeletons";
 
 export default function SubscriptionSuccess() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -22,11 +23,7 @@ export default function SubscriptionSuccess() {
 
   // Show loading while auth or subscription data is loading
   if (authLoading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <SubscriptionPageSkeleton />;
   }
 
   const isActive = subscriptionStatus?.status === "active";

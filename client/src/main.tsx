@@ -19,7 +19,26 @@ const resizeObserverErrHandler = (e: ErrorEvent) => {
 };
 window.addEventListener('error', resizeObserverErrHandler);
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Keep data fresh for 30 seconds before refetching
+      staleTime: 30 * 1000,
+      // Cache data for 5 minutes
+      gcTime: 5 * 60 * 1000,
+      // Don't refetch on window focus for better UX
+      refetchOnWindowFocus: false,
+      // Retry failed queries once
+      retry: 1,
+      // Show stale data while revalidating
+      placeholderData: (previousData: unknown) => previousData,
+    },
+    mutations: {
+      // Retry mutations once on failure
+      retry: 1,
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;

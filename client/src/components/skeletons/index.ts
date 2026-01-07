@@ -52,6 +52,20 @@ export {
   MainTemplateShowcaseSkeleton,
 } from "./TemplatesPageSkeleton";
 
+// Page-level skeletons
+export {
+  AnalyticsPageSkeleton,
+  ViewInvoicePageSkeleton,
+  InvoiceFormSkeleton,
+  SettingsPageSkeleton,
+  SubscriptionPageSkeleton,
+  PaymentsPageSkeleton,
+  RecurringInvoicesPageSkeleton,
+  ProductsPageSkeleton,
+  EstimatesPageSkeleton,
+  ClientPortalPageSkeleton,
+} from "./PageSkeletons";
+
 // Re-export base skeleton components for custom usage
 export {
   Skeleton,

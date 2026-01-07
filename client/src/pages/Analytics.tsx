@@ -32,6 +32,7 @@ import {
   Cell,
 } from "recharts";
 import { Navigation } from "@/components/Navigation";
+import { AnalyticsPageSkeleton } from "@/components/skeletons";
 
 // Status colors matching the design system
 const STATUS_COLORS: Record<string, { bg: string; text: string; fill: string }> = {
@@ -164,11 +165,7 @@ export default function Analytics() {
   };
 
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <AnalyticsPageSkeleton />;
   }
 
   if (!isAuthenticated) {

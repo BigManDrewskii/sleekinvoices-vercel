@@ -34,6 +34,50 @@
 
 See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 
+## 🎨 UI ENHANCEMENT: Advanced Loading Optimization (Completed)
+
+### Page Audit
+- [x] Identify all pages with plain loading states
+- [x] Document current loading patterns
+- [x] Prioritize pages by traffic/importance
+
+### Skeleton Components
+- [x] Create AnalyticsPageSkeleton
+- [x] Create ViewInvoicePageSkeleton
+- [x] Create InvoiceFormSkeleton
+- [x] Create SettingsPageSkeleton
+- [x] Create SubscriptionPageSkeleton
+- [x] Create PaymentsPageSkeleton
+- [x] Create RecurringInvoicesPageSkeleton
+- [x] Create ProductsPageSkeleton
+- [x] Create EstimatesPageSkeleton
+- [x] Create ClientPortalPageSkeleton
+
+### Data Fetching Optimization
+- [x] Configure QueryClient with staleTime and gcTime
+- [x] Disable refetchOnWindowFocus for better UX
+- [x] Add placeholderData for stale-while-revalidate
+- [x] Create usePrefetch hook for hover prefetching
+
+### Animation Enhancements
+- [x] Add stagger-fade-in animation for lists
+- [x] Add content-reveal animation
+- [x] Add skeleton-shimmer with improved timing
+- [x] Add scale-in for modals
+- [x] Add slide-in-bottom for mobile
+- [x] Add blur-in effect
+
+### Page Integration
+- [x] Update Analytics page with skeleton
+- [x] Update ViewInvoice page with skeleton
+- [x] Update EditInvoice page with skeleton
+- [x] Update Payments page with skeleton
+- [x] Update RecurringInvoices page with skeleton
+- [x] Update Products page with skeleton
+- [x] Update Estimates page with skeleton
+- [x] Update ViewEstimate page with skeleton
+- [x] Update SubscriptionSuccess page with skeleton
+
 ## 🎨 UI ENHANCEMENT: Loading Skeletons (Completed)
 
 ### Skeleton Components Created
@@ -2298,3 +2342,39 @@ Before marking a phase complete, verify:
 - [ ] Verify skeletons display during loading
 - [ ] Test skeleton-to-content transitions
 - [ ] Ensure consistent skeleton styling across pages
+
+
+## 🎨 UI ENHANCEMENT: Advanced Loading Optimization
+
+### Audit & Analysis
+- [ ] Identify all pages with plain loading states
+- [ ] Map data fetching patterns across the app
+- [ ] Document route transition behaviors
+
+### Page-Level Skeleton Wrappers
+- [ ] Create PageTransitionWrapper component
+- [ ] Implement route-level loading states
+- [ ] Add fade-in animations for content
+
+### Data Fetching Optimization
+- [ ] Implement tRPC query prefetching on hover
+- [ ] Add staleTime/cacheTime optimization
+- [ ] Implement optimistic updates for common actions
+
+### Additional Skeleton Implementations
+- [ ] CreateInvoice page skeleton
+- [ ] ViewInvoice page skeleton
+- [ ] EditInvoice page skeleton
+- [ ] Settings page skeleton
+- [ ] Subscription page skeleton
+- [ ] Analytics page skeleton
+
+### Loading Animations & Polish
+- [ ] Add content fade-in transitions
+- [ ] Implement staggered skeleton animations
+- [ ] Add subtle pulse effects to action buttons during loading
+
+### Testing
+- [ ] Test all loading states across pages
+- [ ] Verify skeleton-to-content transitions
+- [ ] Test on slow network conditions

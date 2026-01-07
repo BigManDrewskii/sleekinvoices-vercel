@@ -37,7 +37,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { toast } from "sonner";
 import { 
   Plus, 
@@ -51,6 +51,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { PageLayout } from "@/components/layout/PageLayout";
+import { ProductsPageSkeleton, Skeleton } from "@/components/skeletons";
 
 type Product = {
   id: number;
@@ -221,17 +222,7 @@ export default function Products() {
   const totalUsage = products?.reduce((sum, p) => sum + p.usageCount, 0) || 0;
 
   if (loading) {
-    return (
-      <PageLayout title="Products & Services" subtitle="Loading...">
-        <Skeleton className="h-8 w-48 mb-8" />
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-24" />
-          ))}
-        </div>
-        <Skeleton className="h-96" />
-      </PageLayout>
-    );
+    return <ProductsPageSkeleton />;
   }
 
   return (

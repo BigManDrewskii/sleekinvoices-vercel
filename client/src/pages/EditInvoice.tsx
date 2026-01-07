@@ -16,6 +16,7 @@ import { Link, useLocation, useParams } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { Navigation } from "@/components/Navigation";
+import { InvoiceFormSkeleton } from "@/components/skeletons";
 
 export default function EditInvoice() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -205,11 +206,7 @@ export default function EditInvoice() {
   };
 
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <InvoiceFormSkeleton />;
   }
 
   if (!isAuthenticated) {

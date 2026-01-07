@@ -30,6 +30,7 @@ import { useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
+import { ViewInvoicePageSkeleton } from "@/components/skeletons";
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: any }> = {
   draft: { label: "Draft", variant: "secondary", icon: FileText },
@@ -98,11 +99,7 @@ export default function ViewEstimate() {
   });
 
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <ViewInvoicePageSkeleton />;
   }
 
   if (!isAuthenticated) {
