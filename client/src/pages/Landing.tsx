@@ -3,20 +3,21 @@ import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
 import {
   FileText,
-  Send,
-  DollarSign,
   BarChart3,
-  CheckCircle,
-  Clock,
-  Shield,
   Zap,
   CreditCard,
   Bell,
   Users,
   Mail,
-  Sparkles,
   ArrowRight,
   Check,
+  X,
+  Bitcoin,
+  RefreshCw,
+  FileCheck,
+  Receipt,
+  Globe,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "wouter";
 import { LandingNavigation } from "@/components/LandingNavigation";
@@ -28,8 +29,23 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <LandingNavigation />
 
+      {/* AND.CO Migration Banner */}
+      <div className="bg-amber-500/10 border-b border-amber-500/20">
+        <div className="container max-w-5xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-center gap-2 text-sm">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <span className="text-amber-200">
+              <strong>AND.CO shutting down March 2026?</strong>{" "}
+              <a href={getLoginUrl()} className="underline hover:text-amber-100">
+                Migrate to SleekInvoices free →
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section with Sleeky mascot */}
-      <section className="pt-32 pb-20 md:pt-40 md:pb-32">
+      <section className="pt-24 pb-20 md:pt-32 md:pb-32">
         <div className="container max-w-5xl mx-auto px-4 text-center">
           {/* Sleeky Mascot */}
           <div className="mb-8">
@@ -40,19 +56,36 @@ export default function Landing() {
             />
           </div>
 
+          {/* Competitive Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
+            <Zap className="h-4 w-4" />
+            FreshBooks features at 80% less
+          </div>
+
           {/* Main headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6">
-            Get paid faster with
+            Professional invoicing
             <br />
-            <span className="text-primary">beautiful invoices</span>
+            <span className="text-primary">for just $12/month</span>
           </h1>
 
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Create professional invoices in seconds. Built-in Stripe payments,
-            automated reminders, and real-time analytics for freelancers and
-            small businesses.
+          {/* Subheadline with competitive positioning */}
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 leading-relaxed">
+            Why pay $65/month for FreshBooks or $75/month for QuickBooks? Get unlimited invoices, 
+            Stripe payments, auto reminders, and crypto support—all in one simple tool.
           </p>
+
+          {/* Price Comparison Callout */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mb-10 text-sm">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400">
+              <Check className="h-4 w-4" />
+              <span>Unlimited clients (FreshBooks caps at 5)</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400">
+              <Check className="h-4 w-4" />
+              <span>No hidden fees</span>
+            </div>
+          </div>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -68,7 +101,7 @@ export default function Landing() {
               asChild
               className="text-base px-8 h-12 rounded-full bg-transparent"
             >
-              <a href="#features">See Features</a>
+              <a href="#compare">Compare Plans</a>
             </Button>
           </div>
 
@@ -86,6 +119,50 @@ export default function Landing() {
               <Check className="h-4 w-4 text-green-500" />
               Cancel anytime
             </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Crypto Payments Highlight */}
+      <section className="py-16 bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-blue-500/10 border-y border-border">
+        <div className="container max-w-5xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/20 text-orange-400 text-sm font-medium mb-4">
+                <Bitcoin className="h-4 w-4" />
+                Exclusive Feature
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                Accept crypto payments
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                The only invoicing tool with native crypto support. Accept Bitcoin, Ethereum, USDT, 
+                and 300+ cryptocurrencies. No major competitor offers this.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 rounded-full bg-card border border-border text-sm">BTC</span>
+                <span className="px-3 py-1 rounded-full bg-card border border-border text-sm">ETH</span>
+                <span className="px-3 py-1 rounded-full bg-card border border-border text-sm">USDT</span>
+                <span className="px-3 py-1 rounded-full bg-card border border-border text-sm">USDC</span>
+                <span className="px-3 py-1 rounded-full bg-card border border-border text-sm">+300 more</span>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-4 rounded-xl bg-card border border-border text-center">
+                  <div className="text-2xl font-bold text-foreground">35%</div>
+                  <div className="text-xs text-muted-foreground">SMBs accept crypto</div>
+                </div>
+                <div className="p-4 rounded-xl bg-card border border-border text-center">
+                  <div className="text-2xl font-bold text-foreground">0</div>
+                  <div className="text-xs text-muted-foreground">Chargebacks</div>
+                </div>
+                <div className="p-4 rounded-xl bg-card border border-border text-center">
+                  <div className="text-2xl font-bold text-foreground">24/7</div>
+                  <div className="text-xs text-muted-foreground">Settlement</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -110,13 +187,28 @@ export default function Landing() {
             />
             <FeatureCard
               icon={<CreditCard className="h-6 w-6" />}
-              title="Stripe Payments"
-              description="Add secure payment links. Customers pay with one click, funds arrive in 1-2 days."
+              title="Stripe + Crypto Payments"
+              description="Accept cards via Stripe or crypto via NOWPayments. Your clients choose how to pay."
             />
             <FeatureCard
               icon={<Bell className="h-6 w-6" />}
               title="Auto Reminders"
               description="Never chase payments again. Automatic email reminders keep you top-of-mind."
+            />
+            <FeatureCard
+              icon={<RefreshCw className="h-6 w-6" />}
+              title="Recurring Invoices"
+              description="Set up automated billing for retainer clients. Invoice once, get paid forever."
+            />
+            <FeatureCard
+              icon={<FileCheck className="h-6 w-6" />}
+              title="Estimates & Quotes"
+              description="Send professional quotes. Convert to invoices with one click when approved."
+            />
+            <FeatureCard
+              icon={<Receipt className="h-6 w-6" />}
+              title="Expense Tracking"
+              description="Track business expenses, attach receipts, and add billable expenses to invoices."
             />
             <FeatureCard
               icon={<BarChart3 className="h-6 w-6" />}
@@ -130,15 +222,144 @@ export default function Landing() {
             />
             <FeatureCard
               icon={<Users className="h-6 w-6" />}
-              title="Client Management"
-              description="Store client details, track payment history, and manage relationships."
+              title="Client Portal"
+              description="Clients view invoices, download PDFs, and pay—all in one branded portal."
             />
           </div>
         </div>
       </section>
 
+      {/* Competitor Comparison Section */}
+      <section id="compare" className="py-20 md:py-28 bg-secondary/30">
+        <div className="container max-w-5xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
+              See how we compare
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              All the features you need at a fraction of the price
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left py-4 px-4 font-medium text-muted-foreground">Feature</th>
+                  <th className="text-center py-4 px-4">
+                    <div className="font-bold text-primary">SleekInvoices</div>
+                    <div className="text-sm text-muted-foreground">$12/mo</div>
+                  </th>
+                  <th className="text-center py-4 px-4">
+                    <div className="font-medium text-foreground">FreshBooks</div>
+                    <div className="text-sm text-muted-foreground">$21-65/mo</div>
+                  </th>
+                  <th className="text-center py-4 px-4">
+                    <div className="font-medium text-foreground">QuickBooks</div>
+                    <div className="text-sm text-muted-foreground">$38-75/mo</div>
+                  </th>
+                  <th className="text-center py-4 px-4">
+                    <div className="font-medium text-foreground">Wave</div>
+                    <div className="text-sm text-muted-foreground">Free-$16/mo</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <ComparisonRow
+                  feature="Unlimited Invoices"
+                  sleek={true}
+                  freshbooks="Premium only"
+                  quickbooks={true}
+                  wave={true}
+                />
+                <ComparisonRow
+                  feature="Unlimited Clients"
+                  sleek={true}
+                  freshbooks="5 on Lite"
+                  quickbooks={true}
+                  wave={true}
+                />
+                <ComparisonRow
+                  feature="Crypto Payments"
+                  sleek={true}
+                  freshbooks={false}
+                  quickbooks={false}
+                  wave={false}
+                  highlight
+                />
+                <ComparisonRow
+                  feature="Auto Reminders"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave={false}
+                />
+                <ComparisonRow
+                  feature="Recurring Invoices"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks="$20+ tier"
+                  wave={true}
+                />
+                <ComparisonRow
+                  feature="Estimates/Quotes"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave={true}
+                />
+                <ComparisonRow
+                  feature="Expense Tracking"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave={true}
+                />
+                <ComparisonRow
+                  feature="Client Portal"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave={false}
+                />
+                <ComparisonRow
+                  feature="Multi-Currency"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks="$75/mo tier"
+                  wave="Removed"
+                />
+                <ComparisonRow
+                  feature="No Branding"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave="Paid only"
+                />
+                <ComparisonRow
+                  feature="Human Support"
+                  sleek={true}
+                  freshbooks={true}
+                  quickbooks={true}
+                  wave="1.1★ rating"
+                />
+              </tbody>
+            </table>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button size="lg" asChild className="text-base px-8 h-12 rounded-full">
+              <a href={getLoginUrl()}>
+                Start Saving Today
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section className="py-20 md:py-28 bg-secondary/30">
+      <section className="py-20 md:py-28">
         <div className="container max-w-5xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -176,7 +397,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 md:py-28">
+      <section id="pricing" className="py-20 md:py-28 bg-secondary/30">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -207,15 +428,17 @@ export default function Landing() {
               name="Pro"
               price="$12"
               period="per month"
-              description="Unlimited everything"
-              badge="Popular"
+              description="Save 80% vs FreshBooks Premium"
+              badge="Best Value"
               features={[
                 "Unlimited invoices",
                 "Unlimited clients",
-                "Stripe payment links",
+                "Stripe + Crypto payments",
                 "Auto payment reminders",
-                "Advanced analytics",
-                "Custom email domain",
+                "Recurring invoices",
+                "Estimates & quotes",
+                "Expense tracking",
+                "Client portal",
                 "Priority support",
               ]}
               cta="Start Free Trial"
@@ -231,7 +454,7 @@ export default function Landing() {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 md:py-28 bg-secondary/30">
+      <section id="faq" className="py-20 md:py-28">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
@@ -245,38 +468,38 @@ export default function Landing() {
               answer="Start with 3 free invoices per month. No credit card required. Upgrade to Pro anytime for unlimited invoices."
             />
             <FAQItem
-              question="Can I use my own domain?"
-              answer="Yes! Pro users can send invoices from their custom domain for a professional touch."
+              question="Why is SleekInvoices so much cheaper?"
+              answer="We focus on what freelancers actually need—invoicing. No bloated accounting features you'll never use. Just powerful invoicing at a fair price."
             />
             <FAQItem
-              question="How do I get paid?"
-              answer="Connect your Stripe account. Customers pay directly from the invoice. Funds arrive in 1-2 days."
+              question="How do crypto payments work?"
+              answer="Enable crypto payments and your clients can pay with Bitcoin, Ethereum, USDT, and 300+ cryptocurrencies. Funds convert automatically or stay in crypto—your choice."
+            />
+            <FAQItem
+              question="Can I migrate from FreshBooks or Wave?"
+              answer="Yes! Export your client list and import it directly into SleekInvoices. We're also building direct migration tools."
+            />
+            <FAQItem
+              question="Is my data secure?"
+              answer="Yes. We use bank-level encryption and never store payment information on our servers. Payments are processed by Stripe and NOWPayments."
             />
             <FAQItem
               question="Can I cancel anytime?"
               answer="Absolutely. No contracts, no cancellation fees. Your data is always yours to export."
-            />
-            <FAQItem
-              question="Is my data secure?"
-              answer="Yes. We use bank-level encryption and never store payment information on our servers."
-            />
-            <FAQItem
-              question="Do you offer support?"
-              answer="Email support for all users, with priority support for Pro subscribers."
             />
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 bg-secondary/30">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="bg-gradient-to-br from-primary/20 via-primary/10 to-transparent border border-primary/20 rounded-3xl p-8 md:p-12 lg:p-16 text-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Ready to get paid faster?
+              Stop overpaying for invoicing
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-              Join thousands of freelancers and small businesses creating professional invoices with SleekInvoices.
+              Join freelancers and small businesses saving hundreds per year with SleekInvoices.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild className="text-base px-8 h-12 rounded-full">
@@ -325,7 +548,7 @@ export default function Landing() {
                   <span className="font-semibold text-foreground">SleekInvoices</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Professional invoicing for freelancers and small businesses.
+                  Professional invoicing for freelancers and small businesses. 80% cheaper than the competition.
                 </p>
               </div>
 
@@ -350,6 +573,16 @@ export default function Landing() {
                     className="hover:text-foreground transition-colors"
                   >
                     Pricing
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() =>
+                      document.getElementById("compare")?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Compare
                   </button>
                 </li>
                 <li>
@@ -392,22 +625,27 @@ export default function Landing() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-foreground mb-4 text-sm">Resources</h4>
+              <h4 className="font-semibold text-foreground mb-4 text-sm">Migrate From</h4>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/landing" className="hover:text-foreground transition-colors">
-                    Help Center
-                  </Link>
+                  <a href={getLoginUrl()} className="hover:text-foreground transition-colors">
+                    FreshBooks
+                  </a>
                 </li>
                 <li>
-                  <Link href="/landing" className="hover:text-foreground transition-colors">
-                    API Docs
-                  </Link>
+                  <a href={getLoginUrl()} className="hover:text-foreground transition-colors">
+                    Wave
+                  </a>
                 </li>
                 <li>
-                  <Link href="/landing" className="hover:text-foreground transition-colors">
-                    Blog
-                  </Link>
+                  <a href={getLoginUrl()} className="hover:text-foreground transition-colors">
+                    AND.CO
+                  </a>
+                </li>
+                <li>
+                  <a href={getLoginUrl()} className="hover:text-foreground transition-colors">
+                    HoneyBook
+                  </a>
                 </li>
               </ul>
             </div>
@@ -473,6 +711,43 @@ function StepCard({
       <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
     </div>
+  );
+}
+
+// Comparison Row Component
+function ComparisonRow({
+  feature,
+  sleek,
+  freshbooks,
+  quickbooks,
+  wave,
+  highlight = false,
+}: {
+  feature: string;
+  sleek: boolean | string;
+  freshbooks: boolean | string;
+  quickbooks: boolean | string;
+  wave: boolean | string;
+  highlight?: boolean;
+}) {
+  const renderValue = (value: boolean | string) => {
+    if (value === true) {
+      return <Check className="h-5 w-5 text-green-500 mx-auto" />;
+    }
+    if (value === false) {
+      return <X className="h-5 w-5 text-red-500/50 mx-auto" />;
+    }
+    return <span className="text-sm text-muted-foreground">{value}</span>;
+  };
+
+  return (
+    <tr className={`border-b border-border ${highlight ? "bg-primary/5" : ""}`}>
+      <td className="py-4 px-4 text-sm text-foreground">{feature}</td>
+      <td className="py-4 px-4 text-center bg-primary/5">{renderValue(sleek)}</td>
+      <td className="py-4 px-4 text-center">{renderValue(freshbooks)}</td>
+      <td className="py-4 px-4 text-center">{renderValue(quickbooks)}</td>
+      <td className="py-4 px-4 text-center">{renderValue(wave)}</td>
+    </tr>
   );
 }
 
