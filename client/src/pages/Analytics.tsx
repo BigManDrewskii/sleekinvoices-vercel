@@ -293,7 +293,7 @@ export default function Analytics() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Revenue */}
             <Card className="border-border bg-card">
-              <CardContent className="pt-5 pb-4">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-primary/10">
@@ -321,7 +321,7 @@ export default function Analytics() {
 
             {/* Outstanding */}
             <Card className="border-border bg-card">
-              <CardContent className="pt-5 pb-4">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-yellow-500/10">
@@ -344,7 +344,7 @@ export default function Analytics() {
 
             {/* DSO (Days Sales Outstanding) */}
             <Card className="border-border bg-card">
-              <CardContent className="pt-5 pb-4">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-blue-500/10">
@@ -369,7 +369,7 @@ export default function Analytics() {
 
             {/* Collection Rate */}
             <Card className="border-border bg-card">
-              <CardContent className="pt-5 pb-4">
+              <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className="p-1.5 rounded-md bg-green-500/10">
@@ -397,7 +397,7 @@ export default function Analytics() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Total Invoices */}
             <Card className="border-border bg-card">
-              <CardContent className="py-4">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-secondary">
                     <Receipt className="h-5 w-5 text-muted-foreground" />
@@ -412,7 +412,7 @@ export default function Analytics() {
 
             {/* Average Invoice Value */}
             <Card className="border-border bg-card">
-              <CardContent className="py-4">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-secondary">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
@@ -427,7 +427,7 @@ export default function Analytics() {
 
             {/* Net Profit */}
             <Card className="border-border bg-card">
-              <CardContent className="py-4">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${netProfit >= 0 ? "bg-green-500/10" : "bg-red-500/10"}`}>
                     {netProfit >= 0 ? (

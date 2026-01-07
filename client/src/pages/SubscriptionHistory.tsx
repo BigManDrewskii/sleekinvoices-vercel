@@ -130,7 +130,7 @@ export default function SubscriptionHistory() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <Receipt className="h-5 w-5 text-primary" />
@@ -144,7 +144,7 @@ export default function SubscriptionHistory() {
             </Card>
             
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-500/10 rounded-lg">
                     <TrendingUp className="h-5 w-5 text-green-500" />
@@ -158,7 +158,7 @@ export default function SubscriptionHistory() {
             </Card>
             
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-amber-500/10 rounded-lg">
                     <Calendar className="h-5 w-5 text-amber-500" />
@@ -278,7 +278,7 @@ export default function SubscriptionHistory() {
 
           {/* Info Card */}
           <Card className="mt-6 bg-muted/50">
-            <CardContent className="pt-6">
+            <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-muted-foreground">
