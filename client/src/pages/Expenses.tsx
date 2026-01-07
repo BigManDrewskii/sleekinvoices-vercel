@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -217,28 +217,74 @@ export default function Expenses() {
     }
   };
 
-  const handleDeleteExpense = async (id: number) => {
+  const pendingExpenseDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; expenseId: number } | null>(null);
+
+  const handleDeleteExpense = async (id: number, description?: string) => {
     if (!confirm("Are you sure you want to delete this expense?")) return;
 
-    // Optimistic update: immediately remove from UI
+    // Cancel any existing pending delete
+    if (pendingExpenseDeleteRef.current) {
+      clearTimeout(pendingExpenseDeleteRef.current.timeoutId);
+      pendingExpenseDeleteRef.current = null;
+    }
+
+    // Snapshot the previous value for potential restore
     const previousExpenses = utils.expenses.list.getData();
+    
+    // Optimistically remove from UI immediately
     utils.expenses.list.setData(undefined, (old) => 
       old?.filter((expense: any) => expense.id !== id)
     );
 
-    try {
-      await deleteExpenseMutation.mutateAsync({ id });
-      toast.success("Expense deleted");
-    } catch (error) {
-      // Rollback on error
-      if (previousExpenses) {
-        utils.expenses.list.setData(undefined, previousExpenses);
+    // Show undo toast
+    toast(
+      `Expense deleted`,
+      {
+        description: 'Click undo to restore',
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Cancel the pending delete
+            if (pendingExpenseDeleteRef.current) {
+              clearTimeout(pendingExpenseDeleteRef.current.timeoutId);
+              pendingExpenseDeleteRef.current = null;
+            }
+            
+            // Restore the expense to UI
+            if (previousExpenses) {
+              utils.expenses.list.setData(undefined, previousExpenses);
+            } else {
+              utils.expenses.list.invalidate();
+            }
+            
+            toast.success('Expense restored');
+          },
+        },
       }
-      toast.error("Failed to delete expense");
-    } finally {
-      utils.expenses.list.invalidate();
-      utils.expenses.stats.invalidate();
-    }
+    );
+
+    // Set timeout to permanently delete after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      pendingExpenseDeleteRef.current = null;
+      
+      try {
+        await deleteExpenseMutation.mutateAsync({ id });
+      } catch (error) {
+        // Restore the expense on error
+        if (previousExpenses) {
+          utils.expenses.list.setData(undefined, previousExpenses);
+        } else {
+          utils.expenses.list.invalidate();
+        }
+        toast.error("Failed to delete expense. Item has been restored.");
+      } finally {
+        utils.expenses.list.invalidate();
+        utils.expenses.stats.invalidate();
+      }
+    }, 5000);
+
+    pendingExpenseDeleteRef.current = { timeoutId, expenseId: id };
   };
 
   const toggleExpenseRow = (id: number) => {

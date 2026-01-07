@@ -51,7 +51,7 @@ import {
   XSquare,
   FileSpreadsheet,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useTableSort } from "@/hooks/useTableSort";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { Link, useLocation } from "wouter";
@@ -102,36 +102,83 @@ export default function Invoices() {
 
   const utils = trpc.useUtils();
   
+  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; invoiceId: number } | null>(null);
+  
   const deleteInvoice = trpc.invoices.delete.useMutation({
-    // Optimistic update: immediately remove from UI
-    onMutate: async ({ id }) => {
-      await utils.invoices.list.cancel();
-      const previousInvoices = utils.invoices.list.getData();
-      
-      // Optimistically remove the invoice
-      utils.invoices.list.setData(undefined, (old) => 
-        old?.filter((invoice) => invoice.id !== id)
-      );
-      
-      // Close dialog immediately
-      setDeleteDialogOpen(false);
-      setInvoiceToDelete(null);
-      
-      return { previousInvoices };
-    },
     onSuccess: () => {
-      toast.success("Invoice deleted successfully");
+      // Success is silent since the item is already removed from UI
     },
-    onError: (error, _variables, context) => {
-      if (context?.previousInvoices) {
-        utils.invoices.list.setData(undefined, context.previousInvoices);
-      }
-      toast.error(error.message || "Failed to delete invoice");
-    },
-    onSettled: () => {
+    onError: (error) => {
       utils.invoices.list.invalidate();
+      toast.error(error.message || "Failed to delete invoice. Item has been restored.");
     },
   });
+
+  const handleUndoableDelete = (invoice: Invoice) => {
+    // Cancel any existing pending delete
+    if (pendingDeleteRef.current) {
+      clearTimeout(pendingDeleteRef.current.timeoutId);
+      pendingDeleteRef.current = null;
+    }
+
+    // Snapshot the previous value for potential restore
+    const previousInvoices = utils.invoices.list.getData();
+    
+    // Optimistically remove from UI immediately
+    utils.invoices.list.setData(undefined, (old) => 
+      old?.filter((inv) => inv.id !== invoice.id)
+    );
+    
+    // Close dialog
+    setDeleteDialogOpen(false);
+    setInvoiceToDelete(null);
+
+    // Show undo toast
+    toast(
+      `Invoice "${invoice.invoiceNumber}" deleted`,
+      {
+        description: 'Click undo to restore',
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Cancel the pending delete
+            if (pendingDeleteRef.current) {
+              clearTimeout(pendingDeleteRef.current.timeoutId);
+              pendingDeleteRef.current = null;
+            }
+            
+            // Restore the invoice to UI
+            if (previousInvoices) {
+              utils.invoices.list.setData(undefined, previousInvoices);
+            } else {
+              utils.invoices.list.invalidate();
+            }
+            
+            toast.success('Invoice restored');
+          },
+        },
+      }
+    );
+
+    // Set timeout to permanently delete after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      pendingDeleteRef.current = null;
+      
+      try {
+        await deleteInvoice.mutateAsync({ id: invoice.id });
+      } catch (error) {
+        // Restore the invoice on error
+        if (previousInvoices) {
+          utils.invoices.list.setData(undefined, previousInvoices);
+        } else {
+          utils.invoices.list.invalidate();
+        }
+      }
+    }, 5000);
+
+    pendingDeleteRef.current = { timeoutId, invoiceId: invoice.id };
+  };
 
   const bulkDeleteInvoices = trpc.invoices.bulkDelete.useMutation({
     // Optimistic update: immediately remove selected invoices
@@ -303,7 +350,7 @@ export default function Invoices() {
 
   const confirmDelete = () => {
     if (invoiceToDelete) {
-      deleteInvoice.mutate({ id: invoiceToDelete.id });
+      handleUndoableDelete(invoiceToDelete);
     }
   };
 

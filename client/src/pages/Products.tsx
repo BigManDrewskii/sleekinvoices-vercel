@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -129,36 +129,83 @@ export default function Products() {
 
   const utils = trpc.useUtils();
   
+  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; productId: number } | null>(null);
+  
   const deleteMutation = trpc.products.delete.useMutation({
-    // Optimistic update: immediately remove/archive from UI
-    onMutate: async ({ id }) => {
-      await utils.products.list.cancel({ includeInactive: showInactive });
-      const previousProducts = utils.products.list.getData({ includeInactive: showInactive });
-      
-      // Optimistically remove the product from the list
-      utils.products.list.setData({ includeInactive: showInactive }, (old) => 
-        old?.filter((product) => product.id !== id)
-      );
-      
-      // Close dialog immediately
-      setIsDeleteDialogOpen(false);
-      setSelectedProduct(null);
-      
-      return { previousProducts };
-    },
     onSuccess: () => {
-      toast.success("Product archived successfully");
+      // Success is silent since the item is already removed from UI
     },
-    onError: (error, _variables, context) => {
-      if (context?.previousProducts) {
-        utils.products.list.setData({ includeInactive: showInactive }, context.previousProducts);
-      }
-      toast.error(error.message || "Failed to archive product");
-    },
-    onSettled: () => {
+    onError: (error) => {
       refetch();
+      toast.error(error.message || "Failed to archive product. Item has been restored.");
     },
   });
+
+  const handleUndoableDelete = (product: Product) => {
+    // Cancel any existing pending delete
+    if (pendingDeleteRef.current) {
+      clearTimeout(pendingDeleteRef.current.timeoutId);
+      pendingDeleteRef.current = null;
+    }
+
+    // Snapshot the previous value for potential restore
+    const previousProducts = utils.products.list.getData({ includeInactive: showInactive });
+    
+    // Optimistically remove from UI immediately
+    utils.products.list.setData({ includeInactive: showInactive }, (old) => 
+      old?.filter((p) => p.id !== product.id)
+    );
+    
+    // Close dialog
+    setIsDeleteDialogOpen(false);
+    setSelectedProduct(null);
+
+    // Show undo toast
+    toast(
+      `Product "${product.name}" archived`,
+      {
+        description: 'Click undo to restore',
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Cancel the pending delete
+            if (pendingDeleteRef.current) {
+              clearTimeout(pendingDeleteRef.current.timeoutId);
+              pendingDeleteRef.current = null;
+            }
+            
+            // Restore the product to UI
+            if (previousProducts) {
+              utils.products.list.setData({ includeInactive: showInactive }, previousProducts);
+            } else {
+              refetch();
+            }
+            
+            toast.success('Product restored');
+          },
+        },
+      }
+    );
+
+    // Set timeout to permanently delete after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      pendingDeleteRef.current = null;
+      
+      try {
+        await deleteMutation.mutateAsync({ id: product.id });
+      } catch (error) {
+        // Restore the product on error
+        if (previousProducts) {
+          utils.products.list.setData({ includeInactive: showInactive }, previousProducts);
+        } else {
+          refetch();
+        }
+      }
+    }, 5000);
+
+    pendingDeleteRef.current = { timeoutId, productId: product.id };
+  };
 
   const resetForm = () => {
     setFormData({
@@ -204,7 +251,7 @@ export default function Products() {
 
   const handleDelete = () => {
     if (!selectedProduct) return;
-    deleteMutation.mutate({ id: selectedProduct.id });
+    handleUndoableDelete(selectedProduct);
   };
 
   const openEditDialog = (product: Product) => {

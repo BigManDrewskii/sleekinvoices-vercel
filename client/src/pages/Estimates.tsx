@@ -28,7 +28,7 @@ import {
   XCircle,
   Send,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
@@ -65,34 +65,83 @@ export default function Estimates() {
 
   const utils = trpc.useUtils();
 
+  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; estimateId: number } | null>(null);
+  
   const deleteEstimate = trpc.estimates.delete.useMutation({
-    // Optimistic update: immediately remove from UI
-    onMutate: async ({ id }) => {
-      await utils.estimates.list.cancel();
-      const previousEstimates = utils.estimates.list.getData();
-      
-      utils.estimates.list.setData(undefined, (old) => 
-        old?.filter((estimate) => estimate.id !== id)
-      );
-      
-      setDeleteDialogOpen(false);
-      setEstimateToDelete(null);
-      
-      return { previousEstimates };
-    },
     onSuccess: () => {
-      toast.success("Estimate deleted successfully");
+      // Success is silent since the item is already removed from UI
     },
-    onError: (error, _variables, context) => {
-      if (context?.previousEstimates) {
-        utils.estimates.list.setData(undefined, context.previousEstimates);
-      }
-      toast.error(error.message || "Failed to delete estimate");
-    },
-    onSettled: () => {
+    onError: (error) => {
       utils.estimates.list.invalidate();
+      toast.error(error.message || "Failed to delete estimate. Item has been restored.");
     },
   });
+
+  const handleUndoableDelete = (estimate: any) => {
+    // Cancel any existing pending delete
+    if (pendingDeleteRef.current) {
+      clearTimeout(pendingDeleteRef.current.timeoutId);
+      pendingDeleteRef.current = null;
+    }
+
+    // Snapshot the previous value for potential restore
+    const previousEstimates = utils.estimates.list.getData();
+    
+    // Optimistically remove from UI immediately
+    utils.estimates.list.setData(undefined, (old) => 
+      old?.filter((e) => e.id !== estimate.id)
+    );
+    
+    // Close dialog
+    setDeleteDialogOpen(false);
+    setEstimateToDelete(null);
+
+    // Show undo toast
+    toast(
+      `Estimate "${estimate.estimateNumber}" deleted`,
+      {
+        description: 'Click undo to restore',
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Cancel the pending delete
+            if (pendingDeleteRef.current) {
+              clearTimeout(pendingDeleteRef.current.timeoutId);
+              pendingDeleteRef.current = null;
+            }
+            
+            // Restore the estimate to UI
+            if (previousEstimates) {
+              utils.estimates.list.setData(undefined, previousEstimates);
+            } else {
+              utils.estimates.list.invalidate();
+            }
+            
+            toast.success('Estimate restored');
+          },
+        },
+      }
+    );
+
+    // Set timeout to permanently delete after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      pendingDeleteRef.current = null;
+      
+      try {
+        await deleteEstimate.mutateAsync({ id: estimate.id });
+      } catch (error) {
+        // Restore the estimate on error
+        if (previousEstimates) {
+          utils.estimates.list.setData(undefined, previousEstimates);
+        } else {
+          utils.estimates.list.invalidate();
+        }
+      }
+    }, 5000);
+
+    pendingDeleteRef.current = { timeoutId, estimateId: estimate.id };
+  };
 
   const convertToInvoice = trpc.estimates.convertToInvoice.useMutation({
     onSuccess: (result) => {
@@ -215,7 +264,7 @@ export default function Estimates() {
 
   const confirmDelete = () => {
     if (estimateToDelete) {
-      deleteEstimate.mutate({ id: estimateToDelete.id });
+      handleUndoableDelete(estimateToDelete);
     }
   };
 

@@ -2438,3 +2438,24 @@ Before marking a phase complete, verify:
 - [x] Write vitest tests for optimistic update behavior
 - [x] Test rollback scenarios
 - [x] Verify UI consistency during optimistic updates
+
+
+## 🔄 FEATURE: Undo Toast for Delete Actions (Completed)
+
+### Core Implementation
+- [x] Create useUndoableDelete hook with timer management
+- [x] Implement undo toast component with action button
+- [x] Add 5-second countdown before permanent deletion
+
+### Integration
+- [x] Integrate undo into client delete
+- [x] Integrate undo into invoice delete
+- [x] Integrate undo into expense delete
+- [x] Integrate undo into product delete
+- [x] Integrate undo into estimate delete
+- [x] Integrate undo into recurring invoice delete
+
+### Testing
+- [x] Test undo functionality in browser
+- [x] Verify timer cancellation on undo click
+- [x] Verify permanent deletion after timeout

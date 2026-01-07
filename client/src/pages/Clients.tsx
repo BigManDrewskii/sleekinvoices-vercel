@@ -17,7 +17,7 @@ import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
@@ -53,42 +53,85 @@ export default function Clients() {
   });
 
   const utils = trpc.useUtils();
+  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; clientId: number } | null>(null);
+  
   const deleteClient = trpc.clients.delete.useMutation({
-    // Optimistic update: immediately remove from UI
-    onMutate: async ({ id }) => {
-      // Cancel any outgoing refetches to prevent overwriting optimistic update
-      await utils.clients.list.cancel();
-      
-      // Snapshot the previous value
-      const previousClients = utils.clients.list.getData();
-      
-      // Optimistically update the cache by removing the client
-      utils.clients.list.setData(undefined, (old) => 
-        old?.filter((client) => client.id !== id)
-      );
-      
-      // Close dialog immediately for instant feedback
-      setDeleteDialogOpen(false);
-      setClientToDelete(null);
-      
-      // Return context with the snapshot for rollback
-      return { previousClients };
-    },
     onSuccess: () => {
-      toast.success("Client deleted successfully");
+      // Success is silent since the item is already removed from UI
     },
-    onError: (error, _variables, context) => {
-      // Rollback to the previous value on error
-      if (context?.previousClients) {
-        utils.clients.list.setData(undefined, context.previousClients);
-      }
-      toast.error(error.message || "Failed to delete client");
-    },
-    onSettled: () => {
-      // Always refetch after error or success to ensure cache is in sync
+    onError: (error, variables) => {
+      // Rollback: restore the deleted client to the cache
       utils.clients.list.invalidate();
+      toast.error(error.message || "Failed to delete client. Item has been restored.");
     },
   });
+
+  const handleUndoableDelete = (client: Client) => {
+    // Cancel any existing pending delete
+    if (pendingDeleteRef.current) {
+      clearTimeout(pendingDeleteRef.current.timeoutId);
+      pendingDeleteRef.current = null;
+    }
+
+    // Snapshot the previous value for potential restore
+    const previousClients = utils.clients.list.getData();
+    
+    // Optimistically remove from UI immediately
+    utils.clients.list.setData(undefined, (old) => 
+      old?.filter((c) => c.id !== client.id)
+    );
+    
+    // Close dialog
+    setDeleteDialogOpen(false);
+    setClientToDelete(null);
+
+    // Show undo toast
+    const toastId = toast(
+      `Client "${client.name}" deleted`,
+      {
+        description: 'Click undo to restore',
+        duration: 5000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            // Cancel the pending delete
+            if (pendingDeleteRef.current) {
+              clearTimeout(pendingDeleteRef.current.timeoutId);
+              pendingDeleteRef.current = null;
+            }
+            
+            // Restore the client to UI
+            if (previousClients) {
+              utils.clients.list.setData(undefined, previousClients);
+            } else {
+              utils.clients.list.invalidate();
+            }
+            
+            toast.success('Client restored');
+          },
+        },
+      }
+    );
+
+    // Set timeout to permanently delete after 5 seconds
+    const timeoutId = setTimeout(async () => {
+      pendingDeleteRef.current = null;
+      
+      try {
+        await deleteClient.mutateAsync({ id: client.id });
+      } catch (error) {
+        // Error handling is done in mutation onError
+        // Restore the client on error
+        if (previousClients) {
+          utils.clients.list.setData(undefined, previousClients);
+        } else {
+          utils.clients.list.invalidate();
+        }
+      }
+    }, 5000);
+
+    pendingDeleteRef.current = { timeoutId, clientId: client.id };
+  };
 
   if (loading) {
     return (
@@ -135,7 +178,7 @@ export default function Clients() {
 
   const confirmDelete = () => {
     if (clientToDelete) {
-      deleteClient.mutate({ id: clientToDelete.id });
+      handleUndoableDelete(clientToDelete);
     }
   };
 
