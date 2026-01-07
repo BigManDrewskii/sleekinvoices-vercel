@@ -1142,3 +1142,7 @@
 ## New Invoice Dialog & Button Refinement
 - [x] Add AI option (Magic Invoice) to the New Invoice dialog with emerald accent
 - [x] Restyle Navigation "New" button to follow design system (outline variant with primary color)
+
+
+## Dashboard UI Refinement
+- [x] Refine MagicInvoiceSection container with Manus.im inspired aesthetic (subtle glow on hover, refined gradients)

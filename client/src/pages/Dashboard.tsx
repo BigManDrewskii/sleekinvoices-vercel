@@ -348,8 +348,10 @@ function MagicInvoiceSection() {
   };
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-primary/5 via-card to-card/80 border border-primary/20 backdrop-blur-sm overflow-hidden">
-      <div className="p-5">
+    <div className="group relative rounded-2xl bg-gradient-to-br from-card via-card/95 to-card/90 border border-border/40 backdrop-blur-sm overflow-hidden shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300">
+      {/* Subtle glow effect on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative p-5">
         <MagicInput onExtract={handleExtract} className="w-full" />
       </div>
     </div>
