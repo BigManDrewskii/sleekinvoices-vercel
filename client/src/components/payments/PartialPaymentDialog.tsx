@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { DollarSign, Calendar, CreditCard, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { DollarSign, Calendar, CreditCard, Loader2, CheckCircle2, FileText, Check } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -110,20 +110,25 @@ export function PartialPaymentDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Record Payment</DialogTitle>
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-green-500/10">
+              <CreditCard className="size-4 text-green-500" />
+            </div>
+            Record Payment
+          </DialogTitle>
           <DialogDescription>
             Record a payment for invoice {invoiceNumber}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-5 py-2">
           {/* Payment Summary */}
           {summaryLoading ? (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : summary ? (
-            <div className="space-y-3 p-4 bg-secondary/50 rounded-lg">
+            <div className="space-y-3 p-4 bg-secondary/50 rounded-lg border border-border">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Invoice Total</span>
                 <span className="font-medium">{currency} {summary.total.toFixed(2)}</span>
@@ -139,9 +144,11 @@ export function PartialPaymentDialog({
               </div>
               
               {summary.isFullyPaid && (
-                <Alert className="mt-2">
+                <Alert className="mt-2 bg-green-500/10 border-green-500/20">
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <AlertDescription>This invoice is fully paid</AlertDescription>
+                  <AlertDescription className="text-green-600 dark:text-green-400">
+                    This invoice is fully paid
+                  </AlertDescription>
                 </Alert>
               )}
             </div>
@@ -152,7 +159,7 @@ export function PartialPaymentDialog({
             <div className="space-y-4">
               {/* Amount */}
               <div className="space-y-2">
-                <Label htmlFor="amount">Payment Amount</Label>
+                <Label htmlFor="amount" className="text-sm font-medium">Payment Amount</Label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -164,13 +171,13 @@ export function PartialPaymentDialog({
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="pl-10"
+                    className="pl-9"
                   />
                 </div>
                 <div className="flex gap-2">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="soft"
                     size="sm"
                     onClick={() => setAmount((summary.remaining / 2).toFixed(2))}
                   >
@@ -178,7 +185,7 @@ export function PartialPaymentDialog({
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="soft"
                     size="sm"
                     onClick={() => setAmount(summary.remaining.toFixed(2))}
                   >
@@ -189,10 +196,13 @@ export function PartialPaymentDialog({
 
               {/* Payment Method */}
               <div className="space-y-2">
-                <Label htmlFor="paymentMethod">Payment Method</Label>
+                <Label htmlFor="paymentMethod" className="text-sm font-medium">Payment Method</Label>
                 <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select payment method" />
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="size-4 text-muted-foreground" />
+                      <SelectValue placeholder="Select payment method" />
+                    </div>
                   </SelectTrigger>
                   <SelectContent>
                     {PAYMENT_METHODS.map((method) => (
@@ -206,9 +216,9 @@ export function PartialPaymentDialog({
 
               {/* Crypto Fields */}
               {paymentMethod === "crypto" && (
-                <div className="space-y-4 p-3 border rounded-lg">
+                <div className="space-y-4 p-3 border border-[#f7931a]/30 bg-[#f7931a]/5 rounded-lg">
                   <div className="space-y-2">
-                    <Label htmlFor="cryptoCurrency">Cryptocurrency</Label>
+                    <Label htmlFor="cryptoCurrency" className="text-sm font-medium">Cryptocurrency</Label>
                     <Input
                       id="cryptoCurrency"
                       placeholder="e.g., BTC, ETH, USDT"
@@ -217,7 +227,9 @@ export function PartialPaymentDialog({
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="cryptoTxHash">Transaction Hash (optional)</Label>
+                    <Label htmlFor="cryptoTxHash" className="text-sm font-medium">
+                      Transaction Hash <span className="text-muted-foreground font-normal">(optional)</span>
+                    </Label>
                     <Input
                       id="cryptoTxHash"
                       placeholder="0x..."
@@ -230,7 +242,7 @@ export function PartialPaymentDialog({
 
               {/* Payment Date */}
               <div className="space-y-2">
-                <Label htmlFor="paymentDate">Payment Date</Label>
+                <Label htmlFor="paymentDate" className="text-sm font-medium">Payment Date</Label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -238,21 +250,27 @@ export function PartialPaymentDialog({
                     type="date"
                     value={paymentDate}
                     onChange={(e) => setPaymentDate(e.target.value)}
-                    className="pl-10"
+                    className="pl-9"
                   />
                 </div>
               </div>
 
               {/* Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes (optional)</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Add any notes about this payment..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                />
+                <Label htmlFor="notes" className="text-sm font-medium">
+                  Notes <span className="text-muted-foreground font-normal">(optional)</span>
+                </Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Textarea
+                    id="notes"
+                    placeholder="Add any notes about this payment..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={2}
+                    className="pl-9 resize-none"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -260,12 +278,13 @@ export function PartialPaymentDialog({
           {/* Payment History */}
           {summary && summary.payments.length > 0 && (
             <div className="space-y-2">
-              <Label>Payment History</Label>
+              <div className="h-px bg-border" />
+              <Label className="text-sm font-medium">Payment History</Label>
               <div className="max-h-32 overflow-y-auto space-y-2">
                 {summary.payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between p-2 bg-secondary/30 rounded text-sm"
+                    className="flex items-center justify-between p-2 bg-secondary/30 rounded-lg text-sm"
                   >
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-3 w-3 text-muted-foreground" />
@@ -284,22 +303,26 @@ export function PartialPaymentDialog({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <Button variant="ghost" onClick={handleClose}>
             Cancel
           </Button>
           {summary && !summary.isFullyPaid && (
             <Button
+              variant="success"
               onClick={handleSubmit}
               disabled={recordPayment.isPending || !amount || parseFloat(amount) <= 0}
             >
               {recordPayment.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   Recording...
                 </>
               ) : (
-                "Record Payment"
+                <>
+                  <Check className="size-4" />
+                  Record Payment
+                </>
               )}
             </Button>
           )}

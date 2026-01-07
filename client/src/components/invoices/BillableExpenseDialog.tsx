@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Receipt, Loader2, Plus, Check } from "lucide-react";
 
 interface BillableExpense {
   id: number;
@@ -84,23 +85,33 @@ export function BillableExpenseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Billable Expenses</DialogTitle>
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+              <Receipt className="size-4 text-primary" />
+            </div>
+            Add Billable Expenses
+          </DialogTitle>
           <DialogDescription>
             Select expenses to add as line items to this invoice
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-2">
           {isLoading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           )}
 
           {!isLoading && (!expenses || expenses.length === 0) && (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>No unbilled expenses found for this client.</p>
-              <p className="text-sm mt-2">
+            <div className="text-center py-8 rounded-lg border border-dashed border-border bg-secondary/30">
+              <div className="flex justify-center mb-3">
+                <div className="rounded-full bg-muted p-3">
+                  <Receipt className="h-6 w-6 text-muted-foreground" />
+                </div>
+              </div>
+              <p className="text-muted-foreground">No unbilled expenses found for this client.</p>
+              <p className="text-sm text-muted-foreground mt-2">
                 Create billable expenses and assign them to this client to see them here.
               </p>
             </div>
@@ -108,22 +119,27 @@ export function BillableExpenseDialog({
 
           {!isLoading && expenses && expenses.length > 0 && (
             <>
-              <div className="text-sm text-muted-foreground mb-2">
+              <div className="text-sm text-muted-foreground mb-2 px-1">
                 {selectedExpenseIds.size} of {expenses.length} expense(s) selected
               </div>
               
               <div className="space-y-2">
                 {expenses.map((expense) => {
                   const totalAmount = Number(expense.amount) + (Number(expense.taxAmount) || 0);
+                  const isSelected = selectedExpenseIds.has(expense.id);
                   
                   return (
                     <div
                       key={expense.id}
-                      className="flex items-start gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
+                      className={`flex items-start gap-3 p-3 border rounded-lg transition-colors cursor-pointer ${
+                        isSelected 
+                          ? "border-primary/50 bg-primary/5" 
+                          : "border-border hover:bg-secondary/50"
+                      }`}
                       onClick={() => toggleExpense(expense.id)}
                     >
                       <Checkbox
-                        checked={selectedExpenseIds.has(expense.id)}
+                        checked={isSelected}
                         onCheckedChange={() => toggleExpense(expense.id)}
                         className="mt-1"
                       />
@@ -164,15 +180,25 @@ export function BillableExpenseDialog({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
           <Button 
             onClick={handleAdd}
             disabled={selectedExpenseIds.size === 0}
           >
-            Add {selectedExpenseIds.size > 0 ? `${selectedExpenseIds.size} ` : ''}Expense(s)
+            {selectedExpenseIds.size > 0 ? (
+              <>
+                <Plus className="size-4" />
+                Add {selectedExpenseIds.size} Expense(s)
+              </>
+            ) : (
+              <>
+                <Plus className="size-4" />
+                Add Expense(s)
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

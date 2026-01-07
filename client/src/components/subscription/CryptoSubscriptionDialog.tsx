@@ -156,18 +156,20 @@ export function CryptoSubscriptionDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2.5">
             {step === "crypto" && (
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 mr-1"
+                size="icon-sm"
+                className="mr-1"
                 onClick={handleBack}
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="size-4" />
               </Button>
             )}
-            <Bitcoin className="h-5 w-5 text-amber-500" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-[#f7931a]/10">
+              <Bitcoin className="size-4 text-[#f7931a]" />
+            </div>
             {isExtension ? "Extend Subscription" : "Pay with Cryptocurrency"}
           </DialogTitle>
           <DialogDescription>
@@ -295,18 +297,20 @@ export function CryptoSubscriptionDialog({
 
             {/* Create payment button */}
             <Button
+              variant="crypto"
+              size="lg"
               onClick={handleCreatePayment}
               disabled={isPending}
               className="w-full"
             >
               {isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   Creating Payment...
                 </>
               ) : (
                 <>
-                  <Bitcoin className="h-4 w-4 mr-2" />
+                  <Bitcoin className="size-4" />
                   Pay ${selectedTier?.totalPrice.toFixed(2)} with {selectedCryptoInfo?.name}
                 </>
               )}
@@ -375,8 +379,8 @@ export function CryptoSubscriptionDialog({
             </div>
 
             {/* Open payment page button */}
-            <Button onClick={handleOpenPaymentPage} className="w-full">
-              <ExternalLink className="h-4 w-4 mr-2" />
+            <Button variant="crypto" size="lg" onClick={handleOpenPaymentPage} className="w-full">
+              <ExternalLink className="size-4" />
               Open Payment Page
             </Button>
 

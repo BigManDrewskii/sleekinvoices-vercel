@@ -5,28 +5,96 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  [
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium",
+    "transition-all duration-150 ease-out",
+    "transform-gpu will-change-transform",
+    "active:scale-[0.98] active:transition-none",
+    "disabled:pointer-events-none disabled:opacity-40 disabled:scale-100",
+    "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0",
+    "[&_svg]:transition-transform [&_svg]:duration-150",
+    "outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+    "select-none cursor-pointer",
+  ].join(" "),
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-transparent shadow-xs hover:bg-accent dark:bg-transparent dark:border-input dark:hover:bg-input/50",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost:
-          "hover:bg-accent dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+        // Primary - subtle border accent on hover
+        default: [
+          "bg-primary text-primary-foreground",
+          "border border-primary",
+          "hover:bg-primary/90 hover:border-primary/70",
+          "active:bg-primary/80",
+        ].join(" "),
+        // Secondary - muted fill with border reveal
+        secondary: [
+          "bg-secondary text-secondary-foreground",
+          "border border-transparent",
+          "hover:bg-secondary/80 hover:border-border/50",
+          "active:bg-secondary/70",
+        ].join(" "),
+        // Outline - border emphasis on hover
+        outline: [
+          "border border-border bg-transparent text-foreground",
+          "hover:border-muted-foreground/50 hover:bg-secondary/30",
+          "active:bg-secondary/50",
+        ].join(" "),
+        // Ghost - minimal with subtle background
+        ghost: [
+          "bg-transparent text-muted-foreground",
+          "border border-transparent",
+          "hover:text-foreground hover:bg-secondary/50",
+          "active:bg-secondary/70",
+        ].join(" "),
+        // Destructive - subtle red outline accent
+        destructive: [
+          "bg-destructive text-destructive-foreground",
+          "border border-destructive",
+          "hover:bg-destructive/90 hover:border-destructive/70",
+          "active:bg-destructive/80",
+        ].join(" "),
+        // Soft - very muted background
+        soft: [
+          "bg-muted/50 text-muted-foreground",
+          "border border-transparent",
+          "hover:text-foreground hover:bg-muted/80 hover:border-border/30",
+          "active:bg-muted",
+        ].join(" "),
+        // Link - underline animation
+        link: [
+          "bg-transparent text-primary p-0 h-auto border-none",
+          "underline-offset-4 decoration-primary/0 hover:decoration-primary hover:underline",
+          "active:text-primary/80",
+        ].join(" "),
+        // Success - green with outline accent
+        success: [
+          "bg-green-600 text-white",
+          "border border-green-600",
+          "hover:bg-green-600/90 hover:border-green-500",
+          "active:bg-green-600/80",
+        ].join(" "),
+        // Crypto - distinctive amber/orange for crypto payments
+        crypto: [
+          "bg-[#f7931a]/10 text-[#f7931a]",
+          "border border-[#f7931a]/40",
+          "hover:bg-[#f7931a]/20 hover:border-[#f7931a]/70",
+          "active:bg-[#f7931a]/30",
+        ].join(" "),
+        // Premium outline - subtle primary border variant
+        "outline-primary": [
+          "border border-primary/40 bg-transparent text-primary",
+          "hover:border-primary/70 hover:bg-primary/5",
+          "active:bg-primary/10",
+        ].join(" "),
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
-        "icon-sm": "size-8",
-        "icon-lg": "size-10",
+        default: "h-9 px-4 py-2 rounded-lg",
+        sm: "h-8 px-3 py-1.5 text-xs rounded-md",
+        lg: "h-11 px-6 py-2.5 text-base rounded-lg",
+        xl: "h-12 px-8 py-3 text-base rounded-xl",
+        icon: "size-9 rounded-lg",
+        "icon-sm": "size-8 rounded-md",
+        "icon-lg": "size-11 rounded-lg",
       },
     },
     defaultVariants: {
@@ -36,25 +104,25 @@ const buttonVariants = cva(
   }
 );
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
-  const Comp = asChild ? Slot : "button";
-
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  );
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
 }
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    );
+  }
+);
+Button.displayName = "Button";
 
 export { Button, buttonVariants };

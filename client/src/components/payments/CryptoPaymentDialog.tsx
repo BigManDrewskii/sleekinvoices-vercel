@@ -5,6 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/utils";
-import { Loader2, ExternalLink, Bitcoin, Copy, Check, RefreshCw } from "lucide-react";
+import { Loader2, ExternalLink, Bitcoin, Copy, Check, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 interface CryptoPaymentDialogProps {
@@ -121,8 +122,10 @@ export function CryptoPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Bitcoin className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-[#f7931a]/10">
+              <Bitcoin className="size-4 text-[#f7931a]" />
+            </div>
             Pay with Cryptocurrency
           </DialogTitle>
           <DialogDescription>
@@ -130,15 +133,18 @@ export function CryptoPaymentDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-5 py-2">
           {!paymentUrl ? (
             <>
               {/* Currency Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Select Cryptocurrency</label>
                 <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a cryptocurrency..." />
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="size-4 text-muted-foreground" />
+                      <SelectValue placeholder="Choose a cryptocurrency..." />
+                    </div>
                   </SelectTrigger>
                   <SelectContent>
                     {currenciesLoading ? (
@@ -163,7 +169,7 @@ export function CryptoPaymentDialog({
 
               {/* Price Estimate */}
               {selectedCrypto && (
-                <div className="rounded-lg bg-muted p-4 space-y-2">
+                <div className="rounded-lg bg-[#f7931a]/5 border border-[#f7931a]/20 p-4 space-y-2">
                   <div className="text-sm text-muted-foreground">Estimated Amount</div>
                   {estimateLoading ? (
                     <div className="flex items-center gap-2">
@@ -171,7 +177,7 @@ export function CryptoPaymentDialog({
                       <span>Calculating...</span>
                     </div>
                   ) : estimate ? (
-                    <div className="text-2xl font-bold">
+                    <div className="text-2xl font-bold text-[#f7931a]">
                       {parseFloat(estimate.cryptoAmount).toFixed(8)}{" "}
                       {selectedCrypto.toUpperCase()}
                     </div>
@@ -184,18 +190,20 @@ export function CryptoPaymentDialog({
 
               {/* Create Payment Button */}
               <Button
+                variant="crypto"
+                size="lg"
                 className="w-full"
                 onClick={handleCreatePayment}
                 disabled={!selectedCrypto || createPayment.isPending}
               >
                 {createPayment.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                     Creating Payment...
                   </>
                 ) : (
                   <>
-                    <Bitcoin className="h-4 w-4 mr-2" />
+                    <Bitcoin className="size-4" />
                     Create Crypto Payment
                   </>
                 )}
@@ -204,8 +212,8 @@ export function CryptoPaymentDialog({
           ) : (
             <>
               {/* Payment Created - Show Link */}
-              <div className="rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 p-4 space-y-3">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+              <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-4 space-y-3">
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
                   <Check className="h-5 w-5" />
                   <span className="font-medium">Payment Created!</span>
                 </div>
@@ -216,19 +224,19 @@ export function CryptoPaymentDialog({
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2">
-                <Button onClick={handleOpenPayment} className="w-full">
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                <Button variant="crypto" size="lg" onClick={handleOpenPayment} className="w-full">
+                  <ExternalLink className="size-4" />
                   Open Payment Page
                 </Button>
                 <Button variant="outline" onClick={handleCopyLink} className="w-full">
                   {copied ? (
                     <>
-                      <Check className="h-4 w-4 mr-2" />
+                      <Check className="size-4" />
                       Copied!
                     </>
                   ) : (
                     <>
-                      <Copy className="h-4 w-4 mr-2" />
+                      <Copy className="size-4" />
                       Copy Payment Link
                     </>
                   )}
@@ -236,13 +244,19 @@ export function CryptoPaymentDialog({
               </div>
 
               {/* Payment Info */}
-              <div className="text-xs text-muted-foreground text-center">
+              <div className="text-xs text-muted-foreground text-center space-y-1">
                 <p>Payment is processed by NOWPayments</p>
                 <p>You'll be redirected back after payment</p>
               </div>
             </>
           )}
         </div>
+        
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            {paymentUrl ? "Close" : "Cancel"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

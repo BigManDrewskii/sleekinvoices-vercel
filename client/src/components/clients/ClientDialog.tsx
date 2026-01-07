@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Check, X, Loader2, Shield } from "lucide-react";
+import { Check, X, Loader2, Shield, UserPlus, User, Mail, Phone, MapPin, Building2, FileText } from "lucide-react";
 
 interface Client {
   id: number;
@@ -207,140 +207,192 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
       <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{client ? "Edit Client" : "Add New Client"}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                <UserPlus className="size-4 text-primary" />
+              </div>
+              {client ? "Edit Client" : "Add New Client"}
+            </DialogTitle>
             <DialogDescription>
               {client ? "Update client information" : "Add a new client to your database"}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">
-                Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe or Company Name"
-                disabled={isLoading}
-              />
-              {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john@example.com"
-                disabled={isLoading}
-              />
-              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 (555) 123-4567"
-                disabled={isLoading}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="123 Main St, City, State, ZIP"
-                rows={3}
-                disabled={isLoading}
-              />
-            </div>
-            
-            {/* VAT / Tax ID Section */}
-            <div className="border-t pt-4 mt-2">
-              <div className="flex items-center gap-2 mb-3">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Tax Information</span>
+          
+          <div className="space-y-5 py-4">
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-sm font-medium text-foreground">Contact Information</h3>
               </div>
               
-              <div className="grid gap-2">
-                <Label htmlFor="vatNumber">VAT / Tax ID</Label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Name <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
-                      id="vatNumber"
-                      value={vatNumber}
-                      onChange={(e) => handleVatNumberChange(e.target.value.toUpperCase())}
-                      placeholder="e.g., DE123456789"
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="John Doe or Company Name"
                       disabled={isLoading}
-                      className="pr-8"
+                      className="pl-9"
                     />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                      {getVatStatusIcon()}
+                  </div>
+                  {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="john@example.com"
+                        disabled={isLoading}
+                        className="pl-9"
+                      />
+                    </div>
+                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+1 (555) 123-4567"
+                        disabled={isLoading}
+                        className="pl-9"
+                      />
                     </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleValidateVAT}
-                    disabled={isLoading || validateVAT.isPending || !vatNumber.trim()}
-                    className="whitespace-nowrap"
-                  >
-                    {validateVAT.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                        Validating
-                      </>
-                    ) : (
-                      "Validate VAT"
-                    )}
-                  </Button>
                 </div>
-                {vatValidationMessage && (
-                  <p className={`text-sm ${vatValidationStatus === 'valid' ? 'text-green-600' : 'text-red-500'}`}>
-                    {vatValidationMessage}
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  For EU clients, enter the full VAT number including country code (e.g., DE123456789)
-                </p>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="address" className="text-sm font-medium">Address</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 size-4 text-muted-foreground" />
+                    <Textarea
+                      id="address"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="123 Main St, City, State, ZIP"
+                      rows={2}
+                      disabled={isLoading}
+                      className="pl-9 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="h-px bg-border" />
+            
+            {/* Tax Information Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Tax Information</span>
               </div>
               
-              <div className="flex items-center space-x-2 mt-4">
-                <Checkbox
-                  id="taxExempt"
-                  checked={taxExempt}
-                  onCheckedChange={(checked) => setTaxExempt(checked === true)}
-                  disabled={isLoading}
-                />
-                <Label 
-                  htmlFor="taxExempt" 
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Tax Exempt
-                </Label>
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="vatNumber" className="text-sm font-medium">VAT / Tax ID</Label>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <FileText className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                      <Input
+                        id="vatNumber"
+                        value={vatNumber}
+                        onChange={(e) => handleVatNumberChange(e.target.value.toUpperCase())}
+                        placeholder="e.g., DE123456789"
+                        disabled={isLoading}
+                        className="pl-9 pr-8"
+                      />
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        {getVatStatusIcon()}
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleValidateVAT}
+                      disabled={isLoading || validateVAT.isPending || !vatNumber.trim()}
+                      className="whitespace-nowrap"
+                    >
+                      {validateVAT.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Validating
+                        </>
+                      ) : (
+                        "Validate VAT"
+                      )}
+                    </Button>
+                  </div>
+                  {vatValidationMessage && (
+                    <p className={`text-sm ${vatValidationStatus === 'valid' ? 'text-green-600' : 'text-destructive'}`}>
+                      {vatValidationMessage}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    For EU clients, enter the full VAT number including country code
+                  </p>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="taxExempt"
+                    checked={taxExempt}
+                    onCheckedChange={(checked) => setTaxExempt(checked === true)}
+                    disabled={isLoading}
+                  />
+                  <Label 
+                    htmlFor="taxExempt" 
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    Tax Exempt
+                  </Label>
+                </div>
+                <p className="text-xs text-muted-foreground -mt-2 ml-6">
+                  Check this if the client is exempt from tax (e.g., reverse charge for B2B EU transactions)
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground mt-1 ml-6">
-                Check this if the client is exempt from tax (e.g., reverse charge for B2B EU transactions)
-              </p>
             </div>
           </div>
-          <DialogFooter>
+          
+          <DialogFooter className="gap-2 sm:gap-2 pt-2">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : client ? "Update Client" : "Create Client"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Check className="size-4" />
+                  {client ? "Update Client" : "Create Client"}
+                </>
+              )}
             </Button>
           </DialogFooter>
         </form>

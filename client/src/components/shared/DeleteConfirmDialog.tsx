@@ -8,6 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Trash2, Loader2 } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -28,12 +29,17 @@ export function DeleteConfirmDialog({
 }: DeleteConfirmDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-[420px]">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-destructive/10">
+              <Trash2 className="size-4 text-destructive" />
+            </div>
+            {title}
+          </AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="gap-2 sm:gap-2 pt-2">
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
@@ -41,9 +47,19 @@ export function DeleteConfirmDialog({
               onConfirm();
             }}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-destructive text-destructive-foreground border border-destructive hover:bg-destructive/90 hover:border-destructive/70"
           >
-            {isLoading ? "Deleting..." : "Delete"}
+            {isLoading ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <Trash2 className="size-4" />
+                Delete
+              </>
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

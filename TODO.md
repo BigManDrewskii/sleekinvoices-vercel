@@ -34,6 +34,39 @@
 
 See TODO_PHASE6A_FRONTEND.md for detailed implementation plan
 
+## 🎨 UI ENHANCEMENT: Button System & Modal Redesign (Completed)
+
+### Button System Upgrade
+- [x] Update button.tsx with new variants from reference repo
+- [x] Add subtle outline effects and minimal animations
+- [x] Implement new button sizes (icon-sm, lg)
+- [x] Add crypto button variant for payment buttons
+- [x] Ensure consistent gap spacing for button icons
+
+### Modal Components Enhancement
+- [x] Update dialog.tsx with improved overlay and animations
+- [x] Add icon badge pattern to modal headers
+- [x] Improve close button styling in modals
+- [x] Update ClientDialog with new modal patterns
+- [x] Update DeleteConfirmDialog with enhanced styling
+- [x] Update CSVImportDialog with icon badge
+- [x] Update CryptoPaymentDialog with crypto button variant
+- [x] Update PartialPaymentDialog with new patterns
+- [x] Update PortalAccessDialog with new patterns
+- [x] Update BillableExpenseDialog with new patterns
+- [x] Update CryptoSubscriptionDialog with new patterns
+
+### Form Components Refinement
+- [x] Update input.tsx with improved focus states
+- [x] Update select.tsx with consistent rounded corners
+- [x] Update alert-dialog.tsx with enhanced styling
+
+### Visual Coherence
+- [x] Ensure visual coherence across all pages
+- [x] Test all button variants in browser
+- [x] Test modal components for proper rendering
+- [x] Verify responsive behavior
+
 ## 🐛 BUG FIXES (Completed)
 
 - [x] Fix nested `<a>` tag error on Dashboard page
@@ -2160,3 +2193,57 @@ Before marking a phase complete, verify:
 - [done] 9.5.4 Add tax amount field - taxAmount input exists
 - [done] 9.5.5 Add payment method selector - Full dropdown with all methodss for expense operations
 - [ ] 9.6.2 Verify all functionality works
+
+
+## 🎨 UI ENHANCEMENT: Button System & Modal Redesign
+
+### Button System Overhaul
+- [ ] Update button.tsx with new variant system
+  - [ ] Add subtle border accent on hover for primary buttons
+  - [ ] Add new variants: soft, success, crypto, outline-primary
+  - [ ] Add transform-gpu and will-change-transform for smooth animations
+  - [ ] Add active:scale-[0.98] for press feedback
+  - [ ] Update size variants with rounded-lg/xl options
+  - [ ] Add icon-sm and icon-lg size variants
+- [ ] Update button hover states with border color transitions
+- [ ] Add SVG transition animations for icons
+
+### Dialog/Modal Component Enhancement
+- [ ] Update dialog.tsx with improved overlay
+  - [ ] Add backdrop-blur-[2px] effect
+  - [ ] Update bg-black/60 for better contrast
+  - [ ] Add zoom and slide animations
+  - [ ] Update close button styling with hover states
+- [ ] Update DialogContent with rounded-xl and shadow-2xl
+- [ ] Add showCloseButton prop support
+
+### Form Input Enhancements
+- [ ] Update input.tsx with improved focus states
+- [ ] Update select.tsx with better trigger styling
+- [ ] Add switch.tsx component if missing
+- [ ] Add label.tsx enhancements
+
+### Modal Pattern Updates
+- [ ] Update ClientDialog with new modal patterns
+  - [ ] Add icon badge in DialogTitle
+  - [ ] Add section dividers
+  - [ ] Add icon prefixes for inputs
+- [ ] Update DeleteConfirmDialog styling
+- [ ] Update CSVImportDialog styling
+- [ ] Update PortalAccessDialog styling
+- [ ] Update BillableExpenseDialog styling
+- [ ] Update CryptoPaymentDialog styling
+- [ ] Update PartialPaymentDialog styling
+- [ ] Update CryptoSubscriptionDialog styling
+- [ ] Update InvoicePreviewModal styling
+
+### CSS/Design System Updates
+- [ ] Add status-success color variable
+- [ ] Update index.css with any new utility classes
+- [ ] Ensure dark mode compatibility for all new styles
+
+### Testing & Verification
+- [ ] Test all button variants in UI
+- [ ] Test all modal components
+- [ ] Verify responsive behavior
+- [ ] Check dark mode styling

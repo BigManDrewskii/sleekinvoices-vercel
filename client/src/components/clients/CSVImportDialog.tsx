@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, AlertCircle, CheckCircle2, Download, X, Loader2 } from "lucide-react";
+import { Upload, FileText, AlertCircle, CheckCircle2, Download, X, Loader2, FileUp } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { parseCSV, generateSampleCSV, type ParseResult, type ParsedClient } from "../../../../shared/csv-parser";
 import { toast } from "sonner";
@@ -321,7 +321,10 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+              <FileUp className="size-4 text-primary" />
+            </div>
             {step === "upload" && "Import Clients from CSV"}
             {step === "preview" && "Preview Import"}
             {step === "importing" && "Importing..."}
@@ -342,27 +345,29 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
           {step === "complete" && renderCompleteStep()}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
           {step === "upload" && (
-            <Button variant="outline" onClick={handleClose}>
+            <Button variant="ghost" onClick={handleClose}>
               Cancel
             </Button>
           )}
           {step === "preview" && (
             <>
-              <Button variant="outline" onClick={() => setStep("upload")}>
+              <Button variant="ghost" onClick={() => setStep("upload")}>
                 Back
               </Button>
               <Button
                 onClick={handleImport}
                 disabled={!parseResult || parseResult.clients.length === 0}
               >
+                <Upload className="size-4" />
                 Import {parseResult?.clients.length || 0} Clients
               </Button>
             </>
           )}
           {step === "complete" && (
-            <Button onClick={handleClose}>
+            <Button variant="success" onClick={handleClose}>
+              <CheckCircle2 className="size-4" />
               Done
             </Button>
           )}

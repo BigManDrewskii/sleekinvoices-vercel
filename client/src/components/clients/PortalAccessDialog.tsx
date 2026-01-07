@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Copy, ExternalLink, Key, Loader2, Mail, RefreshCw, Shield, ShieldOff } from "lucide-react";
+import { Copy, ExternalLink, Key, Loader2, Mail, RefreshCw, Shield, ShieldOff, Check } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface PortalAccessDialogProps {
@@ -90,8 +90,10 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+              <Key className="size-4 text-primary" />
+            </div>
             Client Portal Access
           </DialogTitle>
           <DialogDescription>
@@ -99,7 +101,7 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-5 py-2">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -107,7 +109,7 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
           ) : activeAccess && !isExpired ? (
             <>
               {/* Active Access Info */}
-              <div className="rounded-lg border bg-primary/5 p-4 space-y-3">
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-primary">
                   <Shield className="h-4 w-4" />
                   Active Portal Access
@@ -133,21 +135,28 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
               
               {/* Portal Link */}
               <div className="space-y-2">
-                <Label htmlFor="portal-url">Portal Link</Label>
+                <Label htmlFor="portal-url" className="text-sm font-medium">Portal Link</Label>
                 <div className="flex gap-2">
-                  <Input
-                    id="portal-url"
-                    value={portalUrl}
-                    readOnly
-                    className="font-mono text-sm"
-                  />
+                  <div className="relative flex-1">
+                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                    <Input
+                      id="portal-url"
+                      value={portalUrl}
+                      readOnly
+                      className="font-mono text-sm pl-9"
+                    />
+                  </div>
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={handleCopy}
                     title="Copy to clipboard"
                   >
-                    <Copy className={`h-4 w-4 ${copied ? "text-green-600" : ""}`} />
+                    {copied ? (
+                      <Check className="size-4 text-green-500" />
+                    ) : (
+                      <Copy className="size-4" />
+                    )}
                   </Button>
                   <Button
                     variant="outline"
@@ -155,7 +164,7 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
                     onClick={handleOpenPortal}
                     title="Open in new tab"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="size-4" />
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -171,9 +180,9 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
                   className="flex-1"
                 >
                   {sendInvitation.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Mail className="h-4 w-4 mr-2" />
+                    <Mail className="size-4" />
                   )}
                   Send Invite
                 </Button>
@@ -184,24 +193,25 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
                   className="flex-1"
                 >
                   {revokeAccess.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <ShieldOff className="h-4 w-4 mr-2" />
+                    <ShieldOff className="size-4" />
                   )}
                   Revoke Access
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => refetch()}
                   disabled={isLoading}
                   title="Refresh"
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <RefreshCw className="size-4" />
                 </Button>
               </div>
               
               {!client.email && (
-                <p className="text-xs text-yellow-600 bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded">
+                <p className="text-xs text-yellow-600 bg-yellow-500/10 border border-yellow-500/20 p-2 rounded-lg">
                   ⚠️ Client email is required to send invitations. Please add an email address to this client.
                 </p>
               )}
@@ -209,7 +219,7 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
           ) : (
             <>
               {/* No Active Access */}
-              <div className="rounded-lg border border-dashed bg-muted/20 p-8 text-center space-y-4">
+              <div className="rounded-lg border border-dashed border-border bg-secondary/30 p-8 text-center space-y-4">
                 <div className="flex justify-center">
                   <div className="rounded-full bg-primary/10 p-3">
                     <Key className="h-8 w-8 text-primary" />
@@ -227,19 +237,19 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
                   className="mt-2"
                 >
                   {generateAccess.isPending ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Key className="h-4 w-4 mr-2" />
+                    <Key className="size-4" />
                   )}
                   Generate Portal Link
                 </Button>
               </div>
               
-              <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4">
-                <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+              <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
+                <h4 className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-2">
                   About Client Portal Access
                 </h4>
-                <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                <ul className="text-xs text-blue-600 dark:text-blue-400 space-y-1">
                   <li>• Clients can view all their invoices</li>
                   <li>• Secure payment links included for unpaid invoices</li>
                   <li>• Access tokens expire after 90 days</li>
@@ -249,6 +259,12 @@ export function PortalAccessDialog({ open, onOpenChange, client }: PortalAccessD
             </>
           )}
         </div>
+        
+        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

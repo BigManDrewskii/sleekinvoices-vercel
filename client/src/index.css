@@ -271,14 +271,7 @@ button, a, input, select, textarea {
   transition: all 0.15s ease-in-out;
 }
 
-/* Enhanced button hover states */
-button:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-button:not(:disabled):active {
-  transform: translateY(0);
-}
+/* Button hover states are now handled in the button component */
 
 /* Improved focus states for accessibility */
 *:focus-visible {
