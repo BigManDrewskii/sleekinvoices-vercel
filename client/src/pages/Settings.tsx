@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { QuickBooksSettings } from "@/components/QuickBooksSettings";
+import { PlaceholderTextarea } from "@/components/PlaceholderTextarea";
 
 export default function Settings() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -477,21 +478,24 @@ export default function Settings() {
                 </div>
                 
                 {/* Email Template */}
-                <div className="space-y-2">
-                  <Label htmlFor="reminderTemplate">Email Template (Optional)</Label>
-                  <Textarea
-                    id="reminderTemplate"
-                    placeholder="Leave blank to use the default template"
-                    value={reminderTemplate}
-                    onChange={(e) => setReminderTemplate(e.target.value)}
-                    disabled={!reminderEnabled}
-                    rows={10}
-                    className="font-mono text-sm"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    Available placeholders: {'{{'}clientName{'}}'}, {'{{'}invoiceNumber{'}}'}, {'{{'}invoiceAmount{'}}'}, {'{{'}dueDate{'}}'}, {'{{'}daysOverdue{'}}'}, {'{{'}invoiceUrl{'}}'}, {'{{'}companyName{'}}'}  
-                  </p>
-                </div>
+                <PlaceholderTextarea
+                  label="Email Template (Optional)"
+                  value={reminderTemplate}
+                  onChange={setReminderTemplate}
+                  placeholder="Leave blank to use the default template. Click 'Insert Placeholder' or type {{placeholderName}} to add dynamic content."
+                  disabled={!reminderEnabled}
+                  rows={10}
+                  description="Customize the reminder email sent to clients. Use the placeholders above to insert dynamic content."
+                  placeholders={[
+                    { key: "clientName", label: "Client's full name", sampleValue: "John Smith" },
+                    { key: "invoiceNumber", label: "Invoice number", sampleValue: "INV-2026-001" },
+                    { key: "invoiceAmount", label: "Total invoice amount", sampleValue: "$1,250.00" },
+                    { key: "dueDate", label: "Invoice due date", sampleValue: "January 15, 2026" },
+                    { key: "daysOverdue", label: "Days past due", sampleValue: "7" },
+                    { key: "invoiceUrl", label: "Link to view invoice", sampleValue: "https://sleekinvoices.com/view/abc123" },
+                    { key: "companyName", label: "Your company name", sampleValue: "Acme Inc." },
+                  ]}
+                />
                 
                 {/* Save Button */}
                 <div className="flex justify-end pt-4">

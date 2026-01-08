@@ -1454,3 +1454,27 @@
 - [ ] Verify touch targets are 44x44 pixels minimum
 - [ ] Test invoice creation form on mobile
 - [ ] Verify modals don't overflow on small screens
+
+
+## Client Management Enhancements
+
+### Client Sorting
+- [x] Add sort dropdown/buttons for Name, Email, Date Added
+- [x] Implement ascending/descending toggle
+- [x] Persist sort preference in state
+- [x] Update table headers to show sort indicators (clickable with icons)
+
+### Bulk Delete
+- [x] Add checkbox column to clients table
+- [x] Add "Select All" checkbox in header
+- [x] Add "Delete Selected" button (shows when items selected)
+- [x] Implement bulk delete API endpoint
+- [x] Add confirmation dialog before deletion
+- [x] Show count of selected items
+
+### Visual Email Template Editor
+- [x] Create placeholder-aware textarea component (PlaceholderTextarea.tsx)
+- [x] Highlight {{placeholders}} with distinct styling (green for valid, red for invalid)
+- [x] Add placeholder insertion buttons/dropdown
+- [x] Show live preview of template with sample data
+- [x] Validate placeholder syntax (highlights invalid placeholders in red)

@@ -3,6 +3,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -11,13 +12,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ClientDialog } from "@/components/clients/ClientDialog";
 import { PortalAccessDialog } from "@/components/clients/PortalAccessDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Pagination } from "@/components/shared/Pagination";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload } from "lucide-react";
+import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "wouter";
@@ -42,15 +50,26 @@ interface Client {
   updatedAt: Date;
 }
 
+type SortField = 'name' | 'email' | 'createdAt';
+type SortDirection = 'asc' | 'desc';
+
 export default function Clients() {
   const { user, loading, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
   const [portalAccessDialogOpen, setPortalAccessDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  
+  // Sorting state
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  
+  // Selection state for bulk delete
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -85,26 +104,74 @@ export default function Clients() {
     },
   });
 
-  // Filter clients based on search query
-  const filteredClients = useMemo(() => {
+  const bulkDeleteClients = trpc.clients.bulkDelete.useMutation({
+    onSuccess: (result) => {
+      utils.clients.list.invalidate();
+      setSelectedIds(new Set());
+      toast.success(`Successfully deleted ${result.deletedCount} client(s)`);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete clients");
+    },
+  });
+
+  // Filter and sort clients
+  const filteredAndSortedClients = useMemo(() => {
     if (!clients) return [];
     const query = searchQuery.toLowerCase();
-    return clients.filter((client) => 
+    
+    // Filter
+    let filtered = clients.filter((client) => 
       client.name.toLowerCase().includes(query) ||
       client.email?.toLowerCase().includes(query) ||
       client.phone?.toLowerCase().includes(query) ||
       client.companyName?.toLowerCase().includes(query)
     );
-  }, [clients, searchQuery]);
+    
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue: string | Date | null;
+      let bValue: string | Date | null;
+      
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'email':
+          aValue = a.email?.toLowerCase() || '';
+          bValue = b.email?.toLowerCase() || '';
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+      
+      if (sortField === 'createdAt') {
+        const aTime = (aValue as Date).getTime();
+        const bTime = (bValue as Date).getTime();
+        return sortDirection === 'asc' ? aTime - bTime : bTime - aTime;
+      }
+      
+      const comparison = (aValue as string).localeCompare(bValue as string);
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+    
+    return filtered;
+  }, [clients, searchQuery, sortField, sortDirection]);
 
   // Calculate pagination
-  const totalItems = filteredClients.length;
+  const totalItems = filteredAndSortedClients.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   
-  // Reset to page 1 when search changes
+  // Reset to page 1 when search or sort changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, sortField, sortDirection]);
 
   // Ensure current page is valid
   useEffect(() => {
@@ -116,48 +183,94 @@ export default function Clients() {
   // Get paginated clients
   const paginatedClients = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
-    return filteredClients.slice(startIndex, startIndex + pageSize);
-  }, [filteredClients, currentPage, pageSize]);
+    return filteredAndSortedClients.slice(startIndex, startIndex + pageSize);
+  }, [filteredAndSortedClients, currentPage, pageSize]);
+
+  // Clear selection when page changes
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [currentPage, pageSize, searchQuery]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll to top of table
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
+    }
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="h-4 w-4 ml-1" />
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
+
+  // Selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(paginatedClients.map(c => c.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: number, checked: boolean) => {
+    const newSelected = new Set(selectedIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const isAllSelected = paginatedClients.length > 0 && paginatedClients.every(c => selectedIds.has(c.id));
+  const isSomeSelected = selectedIds.size > 0;
+
+  const handleBulkDelete = () => {
+    setBulkDeleteDialogOpen(true);
+  };
+
+  const confirmBulkDelete = () => {
+    bulkDeleteClients.mutate({ ids: Array.from(selectedIds) });
+    setBulkDeleteDialogOpen(false);
   };
 
   const handleUndoableDelete = (client: Client) => {
-    // Cancel any existing pending delete
     if (pendingDeleteRef.current) {
       clearTimeout(pendingDeleteRef.current.timeoutId);
       pendingDeleteRef.current = null;
     }
 
-    // Snapshot the previous value for potential restore
     const previousClients = utils.clients.list.getData();
     
-    // Optimistically remove from UI immediately
     utils.clients.list.setData(undefined, (old) => 
       old?.filter((c) => c.id !== client.id)
     );
     
-    // Close dialog
     setDeleteDialogOpen(false);
     setClientToDelete(null);
 
-    // Create undo function
     const undoDelete = () => {
-      // Cancel the pending delete
       if (pendingDeleteRef.current) {
         clearTimeout(pendingDeleteRef.current.timeoutId);
         pendingDeleteRef.current = null;
       }
       
-      // Restore the client to UI
       if (previousClients) {
         utils.clients.list.setData(undefined, previousClients);
       } else {
@@ -165,7 +278,6 @@ export default function Clients() {
       }
     };
 
-    // Register with keyboard shortcuts context for Cmd+Z
     pushUndoAction({
       type: 'delete',
       entityType: 'client',
@@ -173,7 +285,6 @@ export default function Clients() {
       undo: undoDelete,
     });
 
-    // Show undo toast
     toast(
       `Client "${client.name}" deleted`,
       {
@@ -189,15 +300,12 @@ export default function Clients() {
       }
     );
 
-    // Set timeout to permanently delete after 5 seconds
     const timeoutId = setTimeout(async () => {
       pendingDeleteRef.current = null;
       
       try {
         await deleteClient.mutateAsync({ id: client.id });
       } catch (error) {
-        // Error handling is done in mutation onError
-        // Restore the client on error
         if (previousClients) {
           utils.clients.list.setData(undefined, previousClients);
         } else {
@@ -276,9 +384,9 @@ export default function Clients() {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
+        {/* Search and Sort Bar */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search clients by name, email, phone, or company..."
@@ -287,7 +395,43 @@ export default function Clients() {
               className="pl-10"
             />
           </div>
+          <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Sort by Name</SelectItem>
+              <SelectItem value="email">Sort by Email</SelectItem>
+              <SelectItem value="createdAt">Sort by Date Added</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={() => setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')}
+            title={sortDirection === 'asc' ? 'Ascending' : 'Descending'}
+          >
+            {sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+          </Button>
         </div>
+
+        {/* Bulk Actions Bar */}
+        {isSomeSelected && (
+          <div className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-between">
+            <span className="text-sm font-medium">
+              {selectedIds.size} client{selectedIds.size !== 1 ? 's' : ''} selected
+            </span>
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+                Clear Selection
+              </Button>
+              <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Selected
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Clients Table */}
         <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm overflow-hidden">
@@ -310,7 +454,7 @@ export default function Clients() {
                   icon: Plus,
                 }}
               />
-            ) : filteredClients.length === 0 ? (
+            ) : filteredAndSortedClients.length === 0 ? (
               <EmptyState
                 icon={Search}
                 {...EmptyStatePresets.search}
@@ -323,8 +467,29 @@ export default function Clients() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Contact</TableHead>
+                      <TableHead className="w-[40px]">
+                        <Checkbox 
+                          checked={isAllSelected}
+                          onCheckedChange={handleSelectAll}
+                          aria-label="Select all"
+                        />
+                      </TableHead>
+                      <TableHead>
+                        <button 
+                          className="flex items-center hover:text-foreground transition-colors"
+                          onClick={() => handleSort('name')}
+                        >
+                          Name {getSortIcon('name')}
+                        </button>
+                      </TableHead>
+                      <TableHead>
+                        <button 
+                          className="flex items-center hover:text-foreground transition-colors"
+                          onClick={() => handleSort('email')}
+                        >
+                          Contact {getSortIcon('email')}
+                        </button>
+                      </TableHead>
                       <TableHead>Company</TableHead>
                       <TableHead>VAT</TableHead>
                       <TableHead>Address</TableHead>
@@ -333,7 +498,14 @@ export default function Clients() {
                   </TableHeader>
                   <TableBody>
                     {paginatedClients.map((client) => (
-                      <TableRow key={client.id}>
+                      <TableRow key={client.id} className={selectedIds.has(client.id) ? 'bg-primary/5' : ''}>
+                        <TableCell>
+                          <Checkbox 
+                            checked={selectedIds.has(client.id)}
+                            onCheckedChange={(checked) => handleSelectOne(client.id, !!checked)}
+                            aria-label={`Select ${client.name}`}
+                          />
+                        </TableCell>
                         <TableCell className="font-medium">{client.name}</TableCell>
                         <TableCell>
                           <div className="space-y-1">
@@ -406,7 +578,7 @@ export default function Clients() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDelete(client)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              className="text-destructive hover:text-destructive"
                               title="Delete"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -418,100 +590,91 @@ export default function Clients() {
                   </TableBody>
                 </Table>
               </div>
-              
+
               {/* Mobile Card View */}
               <div className="md:hidden space-y-3">
                 {paginatedClients.map((client) => (
-                  <div key={client.id} className="rounded-xl border border-border/50 bg-card/50 p-4 space-y-3 hover:border-border transition-colors">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="font-semibold text-foreground">{client.name}</p>
-                        {client.companyName && (
-                          <p className="text-sm text-muted-foreground">{client.companyName}</p>
-                        )}
+                  <div
+                    key={client.id}
+                    className={`p-4 rounded-lg border border-border/50 bg-card/50 ${selectedIds.has(client.id) ? 'ring-2 ring-primary/50' : ''}`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <Checkbox 
+                          checked={selectedIds.has(client.id)}
+                          onCheckedChange={(checked) => handleSelectOne(client.id, !!checked)}
+                          aria-label={`Select ${client.name}`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-foreground truncate">{client.name}</h4>
+                          {client.companyName && (
+                            <p className="text-sm text-muted-foreground truncate">{client.companyName}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePortalAccess(client)}
+                          title="Portal Access"
+                        >
+                          <Key className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(client)}
+                          title="Edit"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(client)}
+                          className="text-destructive hover:text-destructive"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    
-                    <div className="space-y-2 text-sm">
+                    <div className="mt-3 space-y-1.5 text-sm">
                       {client.email && (
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <span>{client.email}</span>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="h-3 w-3" />
+                          <span className="truncate">{client.email}</span>
                         </div>
                       )}
                       {client.phone && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Phone className="h-3 w-3" />
                           <span>{client.phone}</span>
                         </div>
                       )}
                       {client.address && (
-                        <div className="flex items-start gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                          <span className="line-clamp-2">{client.address}</span>
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <MapPin className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{client.address}</span>
                         </div>
                       )}
-                      {client.vatNumber && (
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">VAT:</span>
-                          <span className="font-mono">{client.vatNumber}</span>
-                        </div>
-                      )}
-                      {client.taxExempt && (
-                        <Badge variant="secondary" className="text-xs flex items-center gap-1 w-fit">
-                          <ShieldCheck className="h-3 w-3" />
-                          Tax Exempt
-                        </Badge>
-                      )}
-                      {!client.email && !client.phone && !client.address && (
-                        <p className="text-muted-foreground">No contact information</p>
-                      )}
-                    </div>
-                    
-                    <div className="flex gap-2 pt-3 border-t">
-                      <Button
-                        variant="outline"
-                        size="default"
-                        onClick={() => handlePortalAccess(client)}
-                        className="flex-1 h-11"
-                      >
-                        <Key className="h-4 w-4 mr-2" />
-                        Portal
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="default"
-                        onClick={() => handleEdit(client)}
-                        className="flex-1 h-11"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="default"
-                        onClick={() => handleDelete(client)}
-                        className="text-red-600 hover:text-red-700 h-11 px-3"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Pagination */}
-              {totalItems > 10 && (
+              <div className="mt-6">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  pageSize={pageSize}
                   totalItems={totalItems}
+                  pageSize={pageSize}
                   onPageChange={handlePageChange}
                   onPageSizeChange={handlePageSizeChange}
-                  pageSizeOptions={[10, 25, 50, 100]}
                 />
-              )}
+              </div>
               </>
             )}
           </div>
@@ -523,22 +686,30 @@ export default function Clients() {
         open={clientDialogOpen}
         onOpenChange={setClientDialogOpen}
         client={selectedClient}
-        onSuccess={() => setSelectedClient(null)}
       />
 
-      <PortalAccessDialog
-        open={portalAccessDialogOpen}
-        onOpenChange={setPortalAccessDialogOpen}
-        client={selectedClient || { id: 0, name: "", email: null }}
-      />
+      {selectedClient && (
+        <PortalAccessDialog
+          open={portalAccessDialogOpen}
+          onOpenChange={setPortalAccessDialogOpen}
+          client={selectedClient}
+        />
+      )}
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={confirmDelete}
         title="Delete Client"
-        description={`Are you sure you want to delete ${clientToDelete?.name}? This action cannot be undone.`}
-        isLoading={deleteClient.isPending}
+        description={`Are you sure you want to delete "${clientToDelete?.name}"? This action cannot be undone.`}
+      />
+
+      <DeleteConfirmDialog
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={confirmBulkDelete}
+        title="Delete Selected Clients"
+        description={`Are you sure you want to delete ${selectedIds.size} client${selectedIds.size !== 1 ? 's' : ''}? This action cannot be undone.`}
       />
 
       <CSVImportDialog

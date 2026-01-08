@@ -113,6 +113,23 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    // Bulk delete clients
+    bulkDelete: protectedProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        let deletedCount = 0;
+        for (const id of input.ids) {
+          try {
+            await db.deleteClient(id, ctx.user.id);
+            deletedCount++;
+          } catch (error) {
+            // Continue with other deletions if one fails
+            console.error(`Failed to delete client ${id}:`, error);
+          }
+        }
+        return { success: true, deletedCount };
+      }),
+    
     // Bulk import clients from CSV
     import: protectedProcedure
       .input(z.object({
