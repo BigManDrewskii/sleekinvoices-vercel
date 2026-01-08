@@ -7,13 +7,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Eye, EyeOff, Code } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Code, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Placeholder {
   key: string;
   label: string;
   sampleValue: string;
+}
+
+interface TemplatePreset {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
 }
 
 interface PlaceholderTextareaProps {
@@ -25,6 +32,7 @@ interface PlaceholderTextareaProps {
   label?: string;
   description?: string;
   placeholders: Placeholder[];
+  presets?: TemplatePreset[];
   className?: string;
 }
 
@@ -37,6 +45,7 @@ export function PlaceholderTextarea({
   label,
   description,
   placeholders,
+  presets,
   className,
 }: PlaceholderTextareaProps) {
   const [showPreview, setShowPreview] = useState(false);
@@ -125,7 +134,33 @@ export function PlaceholderTextarea({
       {label && <Label>{label}</Label>}
       
       {/* Toolbar */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
+        {/* Presets Dropdown */}
+        {presets && presets.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={disabled}>
+                <FileText className="h-4 w-4 mr-2" />
+                Use Template
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-72">
+              {presets.map((preset) => (
+                <DropdownMenuItem
+                  key={preset.id}
+                  onClick={() => onChange(preset.content)}
+                  className="flex flex-col items-start py-3"
+                >
+                  <span className="font-medium">{preset.name}</span>
+                  <span className="text-xs text-muted-foreground">{preset.description}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        
+        {/* Placeholder Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" disabled={disabled}>

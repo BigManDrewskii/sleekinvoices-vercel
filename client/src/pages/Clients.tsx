@@ -25,7 +25,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Pagination } from "@/components/shared/Pagination";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload, ArrowUpDown, ArrowUp, ArrowDown, Filter, Download, X, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "wouter";
@@ -67,6 +67,12 @@ export default function Clients() {
   // Sorting state
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  
+  // Filter state
+  const [companyFilter, setCompanyFilter] = useState<string>('all');
+  const [taxExemptFilter, setTaxExemptFilter] = useState<string>('all');
+  const [dateRangeFilter, setDateRangeFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
   
   // Selection state for bulk delete
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -115,18 +121,75 @@ export default function Clients() {
     },
   });
 
+  // Get unique companies for filter dropdown
+  const uniqueCompanies = useMemo(() => {
+    if (!clients) return [];
+    const companies = clients
+      .map(c => c.companyName)
+      .filter((c): c is string => !!c)
+      .filter((c, i, arr) => arr.indexOf(c) === i)
+      .sort();
+    return companies;
+  }, [clients]);
+
   // Filter and sort clients
   const filteredAndSortedClients = useMemo(() => {
     if (!clients) return [];
     const query = searchQuery.toLowerCase();
     
-    // Filter
+    // Text search filter
     let filtered = clients.filter((client) => 
       client.name.toLowerCase().includes(query) ||
       client.email?.toLowerCase().includes(query) ||
       client.phone?.toLowerCase().includes(query) ||
       client.companyName?.toLowerCase().includes(query)
     );
+    
+    // Company filter
+    if (companyFilter !== 'all') {
+      if (companyFilter === 'no-company') {
+        filtered = filtered.filter(c => !c.companyName);
+      } else {
+        filtered = filtered.filter(c => c.companyName === companyFilter);
+      }
+    }
+    
+    // Tax exempt filter
+    if (taxExemptFilter !== 'all') {
+      if (taxExemptFilter === 'exempt') {
+        filtered = filtered.filter(c => c.taxExempt === true);
+      } else if (taxExemptFilter === 'not-exempt') {
+        filtered = filtered.filter(c => c.taxExempt !== true);
+      }
+    }
+    
+    // Date range filter
+    if (dateRangeFilter !== 'all') {
+      const now = new Date();
+      let cutoffDate: Date;
+      
+      switch (dateRangeFilter) {
+        case 'today':
+          cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          break;
+        case 'week':
+          cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case 'month':
+          cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          break;
+        case 'quarter':
+          cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          break;
+        case 'year':
+          cutoffDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          break;
+        default:
+          cutoffDate = new Date(0);
+      }
+      
+      filtered = filtered.filter(c => new Date(c.createdAt) >= cutoffDate);
+    }
     
     // Sort
     filtered.sort((a, b) => {
@@ -162,16 +225,16 @@ export default function Clients() {
     });
     
     return filtered;
-  }, [clients, searchQuery, sortField, sortDirection]);
+  }, [clients, searchQuery, sortField, sortDirection, companyFilter, taxExemptFilter, dateRangeFilter]);
 
   // Calculate pagination
   const totalItems = filteredAndSortedClients.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   
-  // Reset to page 1 when search or sort changes
+  // Reset to page 1 when search, sort, or filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortField, sortDirection]);
+  }, [searchQuery, sortField, sortDirection, companyFilter, taxExemptFilter, dateRangeFilter]);
 
   // Ensure current page is valid
   useEffect(() => {
@@ -356,6 +419,75 @@ export default function Clients() {
     }
   };
 
+  // Export clients to CSV
+  const handleExportCSV = () => {
+    if (!clients || clients.length === 0) {
+      toast.error("No clients to export");
+      return;
+    }
+
+    // Use filtered clients if filters are active, otherwise all clients
+    const clientsToExport = filteredAndSortedClients.length > 0 ? filteredAndSortedClients : clients;
+
+    // CSV headers
+    const headers = [
+      "Name",
+      "Email",
+      "Phone",
+      "Company",
+      "Address",
+      "VAT Number",
+      "Tax Exempt",
+      "Notes",
+      "Created At"
+    ];
+
+    // Helper function to escape CSV values
+    const escapeCSV = (value: string | null | undefined | boolean | Date): string => {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "boolean") return value ? "Yes" : "No";
+      if (value instanceof Date) return value.toISOString().split("T")[0];
+      const str = String(value);
+      // Escape quotes and wrap in quotes if contains comma, quote, or newline
+      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    // Build CSV rows
+    const rows = clientsToExport.map(client => [
+      escapeCSV(client.name),
+      escapeCSV(client.email),
+      escapeCSV(client.phone),
+      escapeCSV(client.companyName),
+      escapeCSV(client.address),
+      escapeCSV(client.vatNumber),
+      escapeCSV(client.taxExempt),
+      escapeCSV(client.notes),
+      escapeCSV(new Date(client.createdAt))
+    ]);
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `clients-export-${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success(`Exported ${clientsToExport.length} client(s) to CSV`);
+  };
+
   return (
     <div className="page-wrapper">
       <Navigation />
@@ -370,6 +502,11 @@ export default function Clients() {
               <p className="page-header-subtitle">Manage your client database</p>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" onClick={handleExportCSV} className="flex-1 sm:flex-initial touch-target">
+                <Download className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Export CSV</span>
+                <span className="sm:hidden">Export</span>
+              </Button>
               <Button variant="outline" onClick={() => setImportDialogOpen(true)} className="flex-1 sm:flex-initial touch-target">
                 <Upload className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Import CSV</span>
@@ -385,7 +522,7 @@ export default function Clients() {
         </div>
 
         {/* Search and Sort Bar */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <div className="mb-4 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -395,6 +532,19 @@ export default function Clients() {
               className="pl-10"
             />
           </div>
+          <Button
+            variant={showFilters ? "secondary" : "outline"}
+            onClick={() => setShowFilters(!showFilters)}
+            className="gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {(companyFilter !== 'all' || taxExemptFilter !== 'all' || dateRangeFilter !== 'all') && (
+              <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                {[companyFilter !== 'all', taxExemptFilter !== 'all', dateRangeFilter !== 'all'].filter(Boolean).length}
+              </Badge>
+            )}
+          </Button>
           <Select value={sortField} onValueChange={(value: SortField) => setSortField(value)}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Sort by" />
@@ -414,6 +564,81 @@ export default function Clients() {
             {sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
           </Button>
         </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="mb-6 p-4 rounded-lg border border-border bg-card/50">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium">Filter Clients</h3>
+              {(companyFilter !== 'all' || taxExemptFilter !== 'all' || dateRangeFilter !== 'all') && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setCompanyFilter('all');
+                    setTaxExemptFilter('all');
+                    setDateRangeFilter('all');
+                  }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear All
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Company Filter */}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Company</label>
+                <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Companies" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Companies</SelectItem>
+                    <SelectItem value="no-company">No Company</SelectItem>
+                    {uniqueCompanies.map(company => (
+                      <SelectItem key={company} value={company}>{company}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Tax Exempt Filter */}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Tax Status</label>
+                <Select value={taxExemptFilter} onValueChange={setTaxExemptFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="exempt">Tax Exempt</SelectItem>
+                    <SelectItem value="not-exempt">Not Exempt</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Date Range Filter */}
+              <div className="space-y-2">
+                <label className="text-sm text-muted-foreground">Added</label>
+                <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Any Time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Time</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="week">Last 7 Days</SelectItem>
+                    <SelectItem value="month">Last 30 Days</SelectItem>
+                    <SelectItem value="quarter">Last 90 Days</SelectItem>
+                    <SelectItem value="year">Last Year</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Bulk Actions Bar */}
         {isSomeSelected && (

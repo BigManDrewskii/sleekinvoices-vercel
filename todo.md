@@ -1478,3 +1478,25 @@
 - [x] Add placeholder insertion buttons/dropdown
 - [x] Show live preview of template with sample data
 - [x] Validate placeholder syntax (highlights invalid placeholders in red)
+
+
+## Client Management Enhancements (Round 2)
+
+### Client Search Filters
+- [x] Add company filter dropdown (list unique companies)
+- [x] Add tax exempt status filter (All/Tax Exempt/Not Exempt)
+- [x] Add date range filter (created date)
+- [x] Combine filters with existing search and sort
+
+### Email Template Presets
+- [x] Create friendly reminder template preset
+- [x] Create formal reminder template preset
+- [x] Create urgent reminder template preset
+- [x] Add preset selector dropdown in Settings ("Use Template" button)
+- [x] Allow customization after selecting preset
+
+### Export Clients to CSV
+- [x] Add "Export CSV" button to clients page
+- [x] Generate CSV with all client fields (name, email, phone, company, address, VAT, tax exempt, notes, created)
+- [x] Handle large datasets efficiently (client-side generation)
+- [x] Include proper CSV escaping for special characters (quotes, commas, newlines)
