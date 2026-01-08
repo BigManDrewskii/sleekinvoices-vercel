@@ -1638,7 +1638,11 @@
 
 ### Phase 1: Enhance Collaborative Mode
 - [ ] Expand quick actions library (add 10+ new actions)
-- [ ] Add inline action buttons in AI responses
+- [x] Add inline action buttons in AI responses
+  - [x] Create ActionButton component for rendering clickable actions
+  - [x] Implement response parser to detect action markers
+  - [x] Update AI system prompt to generate action buttons
+  - [x] Support actions: create invoice, view client, send reminder, navigate
 - [ ] Improve AI panel visual design (larger input, category chips)
 - [ ] Add follow-up suggestions after each response
 - [ ] Support embedded data tables in AI responses

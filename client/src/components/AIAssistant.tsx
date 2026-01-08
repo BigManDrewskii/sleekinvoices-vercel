@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Streamdown } from "streamdown";
+import { parseAIResponse, AIActionButtonGroup } from "./AIActionButton";
 
 interface Message {
   id: string;
@@ -351,9 +352,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                         <span className="text-sm text-muted-foreground">Thinking...</span>
                       </div>
                     ) : (
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <Streamdown>{message.content}</Streamdown>
-                      </div>
+                      (() => {
+                        const { text, actions } = parseAIResponse(message.content);
+                        return (
+                          <div>
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <Streamdown>{text}</Streamdown>
+                            </div>
+                            {!message.isStreaming && actions.length > 0 && (
+                              <AIActionButtonGroup actions={actions} />
+                            )}
+                          </div>
+                        );
+                      })()
                     )
                   ) : (
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
