@@ -929,3 +929,58 @@ export const clientTagAssignments = mysqlTable("clientTagAssignments", {
 
 export type ClientTagAssignment = typeof clientTagAssignments.$inferSelect;
 export type InsertClientTagAssignment = typeof clientTagAssignments.$inferInsert;
+
+
+/**
+ * Batch Invoice Templates - saved configurations for creating invoices for multiple clients
+ * Users can save frequently used batch configurations with line items, due date settings, and notes
+ */
+export const batchInvoiceTemplates = mysqlTable("batchInvoiceTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  
+  // Template identification
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  
+  // Invoice settings
+  dueInDays: int("dueInDays").default(30).notNull(), // Days until due date
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+  taxRate: decimal("taxRate", { precision: 5, scale: 2 }).default("0").notNull(),
+  
+  // Invoice template reference (optional)
+  invoiceTemplateId: int("invoiceTemplateId"),
+  
+  // Notes and terms
+  notes: text("notes"),
+  paymentTerms: text("paymentTerms"),
+  
+  // Frequency hint for recurring use
+  frequency: mysqlEnum("frequency", ["one-time", "weekly", "monthly", "quarterly", "yearly"]).default("monthly").notNull(),
+  
+  // Usage tracking
+  usageCount: int("usageCount").default(0).notNull(),
+  lastUsedAt: timestamp("lastUsedAt"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BatchInvoiceTemplate = typeof batchInvoiceTemplates.$inferSelect;
+export type InsertBatchInvoiceTemplate = typeof batchInvoiceTemplates.$inferInsert;
+
+/**
+ * Batch Invoice Template Line Items - line items for batch invoice templates
+ */
+export const batchInvoiceTemplateLineItems = mysqlTable("batchInvoiceTemplateLineItems", {
+  id: int("id").autoincrement().primaryKey(),
+  templateId: int("templateId").notNull(),
+  description: text("description").notNull(),
+  quantity: decimal("quantity", { precision: 24, scale: 8 }).notNull(),
+  rate: decimal("rate", { precision: 24, scale: 8 }).notNull(),
+  sortOrder: int("sortOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type BatchInvoiceTemplateLineItem = typeof batchInvoiceTemplateLineItems.$inferSelect;
+export type InsertBatchInvoiceTemplateLineItem = typeof batchInvoiceTemplateLineItems.$inferInsert;

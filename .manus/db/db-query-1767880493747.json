@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `batchInvoiceTemplates` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(255) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `description` text,\n  `dueInDays` int NOT NULL DEFAULT 30,\n  `currency` varchar(10) DEFAULT 'USD',\n  `taxRate` decimal(5,2) DEFAULT '0.00',\n  `invoiceTemplateId` int,\n  `notes` text,\n  `paymentTerms` text,\n  `frequency` varchar(50) NOT NULL DEFAULT 'monthly',\n  `usageCount` int NOT NULL DEFAULT 0,\n  `lastUsedAt` datetime,\n  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute CREATE TABLE IF NOT EXISTS `batchInvoiceTemplates` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `userId` varchar(255) NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `description` text,\n  `dueInDays` int NOT NULL DEFAULT 30,\n  `currency` varchar(10) DEFAULT 'USD',\n  `taxRate` decimal(5,2) DEFAULT '0.00',\n  `invoiceTemplateId` int,\n  `notes` text,\n  `paymentTerms` text,\n  `frequency` varchar(50) NOT NULL DEFAULT 'monthly',\n  `usageCount` int NOT NULL DEFAULT 0,\n  `lastUsedAt` datetime,\n  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 564
+}

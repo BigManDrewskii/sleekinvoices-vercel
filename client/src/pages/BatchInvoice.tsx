@@ -13,15 +13,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Plus, Trash2, ArrowLeft, Users, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { FileText, Plus, Trash2, ArrowLeft, Users, CheckCircle, XCircle, Loader2, Save, FolderOpen, Tag, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { formatCurrency } from "@/lib/utils";
+import { SaveBatchTemplateDialog, LoadBatchTemplateDialog } from "@/components/BatchTemplateDialog";
 
 interface LineItem {
   id: string;
@@ -45,10 +45,18 @@ export default function BatchInvoice() {
   const clientIdsParam = searchParams.get('clients');
   
   // Parse client IDs from URL
-  const selectedClientIds = useMemo(() => {
+  const initialClientIds = useMemo(() => {
     if (!clientIdsParam) return [];
     return clientIdsParam.split(',').map(id => parseInt(id)).filter(id => !isNaN(id));
   }, [clientIdsParam]);
+
+  // Selected client IDs state (can be modified by tag selection)
+  const [selectedClientIds, setSelectedClientIds] = useState<number[]>(initialClientIds);
+  
+  // Update selected IDs when URL changes
+  useEffect(() => {
+    setSelectedClientIds(initialClientIds);
+  }, [initialClientIds]);
 
   // Form state
   const [lineItems, setLineItems] = useState<LineItem[]>([
@@ -64,6 +72,15 @@ export default function BatchInvoice() {
   const [isCreating, setIsCreating] = useState(false);
   const [batchResults, setBatchResults] = useState<BatchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  
+  // Template dialog state
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showLoadDialog, setShowLoadDialog] = useState(false);
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const [deletingTemplateId, setDeletingTemplateId] = useState<number | null>(null);
+  
+  // Tag selection state
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
 
   // Queries
   const { data: clients } = trpc.clients.list.useQuery(undefined, {
@@ -73,11 +90,29 @@ export default function BatchInvoice() {
   const { data: templates } = trpc.templates.list.useQuery(undefined, {
     enabled: isAuthenticated,
   });
+  
+  const { data: clientTags } = trpc.clients.listTags.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  
+  const { data: batchTemplates, refetch: refetchBatchTemplates } = trpc.batchTemplates.list.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
+  
+  const { data: clientsByTag, isLoading: isLoadingClientsByTag } = trpc.clients.getClientsByTag.useQuery(
+    { tagId: selectedTagId! },
+    { enabled: isAuthenticated && selectedTagId !== null }
+  );
+
+  // Mutations
+  const createInvoice = trpc.invoices.create.useMutation();
+  const createBatchTemplate = trpc.batchTemplates.create.useMutation();
+  const deleteBatchTemplate = trpc.batchTemplates.delete.useMutation();
+  const incrementTemplateUsage = trpc.batchTemplates.incrementUsage.useMutation();
+  const utils = trpc.useUtils();
 
   // Use default settings for batch creation
   const settings = { currency: 'USD', taxRate: 0 };
-
-  const createInvoice = trpc.invoices.create.useMutation();
 
   // Get selected clients
   const selectedClients = useMemo(() => {
@@ -128,6 +163,125 @@ export default function BatchInvoice() {
     const timestamp = Date.now().toString().slice(-4);
     return `INV-${year}-BATCH-${timestamp}-${(index + 1).toString().padStart(3, '0')}`;
   };
+  
+  // Handle tag selection to add clients
+  const handleTagSelect = (tagId: string) => {
+    if (tagId === 'none') {
+      setSelectedTagId(null);
+      return;
+    }
+    setSelectedTagId(parseInt(tagId));
+  };
+  
+  // Add clients from selected tag
+  const handleAddClientsFromTag = () => {
+    if (!clientsByTag || clientsByTag.length === 0) return;
+    
+    const newClientIds = clientsByTag.map(c => c.id);
+    const uniqueIds = Array.from(new Set([...selectedClientIds, ...newClientIds]));
+    setSelectedClientIds(uniqueIds);
+    
+    const addedCount = uniqueIds.length - selectedClientIds.length;
+    if (addedCount > 0) {
+      toast.success(`Added ${addedCount} client${addedCount !== 1 ? 's' : ''} from tag`);
+    } else {
+      toast.info('All clients with this tag are already selected');
+    }
+    setSelectedTagId(null);
+  };
+  
+  // Remove a client from selection
+  const handleRemoveClient = (clientId: number) => {
+    setSelectedClientIds(selectedClientIds.filter(id => id !== clientId));
+  };
+  
+  // Save batch template
+  const handleSaveTemplate = async (data: {
+    name: string;
+    description: string;
+    frequency: 'one-time' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  }) => {
+    setIsSavingTemplate(true);
+    try {
+      await createBatchTemplate.mutateAsync({
+        name: data.name,
+        description: data.description || undefined,
+        frequency: data.frequency,
+        dueInDays,
+        notes: notes || undefined,
+        invoiceTemplateId: templateId || undefined,
+        lineItems: lineItems
+          .filter(item => item.description && item.rate > 0)
+          .map(item => ({
+            description: item.description,
+            quantity: item.quantity.toString(),
+            rate: item.rate.toString(),
+          })),
+      });
+      
+      await refetchBatchTemplates();
+      setShowSaveDialog(false);
+      toast.success('Template saved successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to save template');
+    } finally {
+      setIsSavingTemplate(false);
+    }
+  };
+  
+  // Load batch template
+  const handleLoadTemplate = async (batchTemplateId: number) => {
+    try {
+      // Fetch the template with line items
+      const result = await utils.batchTemplates.get.fetch({ id: batchTemplateId });
+      
+      if (!result) {
+        toast.error('Template not found');
+        return;
+      }
+      
+      const { template, lineItems: templateLineItems } = result;
+      
+      // Apply template settings
+      setDueInDays(template.dueInDays);
+      setNotes(template.notes || '');
+      if (template.invoiceTemplateId) {
+        setTemplateId(template.invoiceTemplateId);
+      }
+      
+      // Apply line items
+      if (templateLineItems.length > 0) {
+        setLineItems(templateLineItems.map((item: { description: string; quantity: string; rate: string }, index: number) => ({
+          id: `loaded-${index}-${Date.now()}`,
+          description: item.description,
+          quantity: parseFloat(item.quantity),
+          rate: parseFloat(item.rate),
+        })));
+      }
+      
+      // Increment usage count
+      await incrementTemplateUsage.mutateAsync({ id: batchTemplateId });
+      await refetchBatchTemplates();
+      
+      toast.success(`Loaded template: ${template.name}`);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to load template');
+    }
+  };
+  
+  // Delete batch template
+  const handleDeleteTemplate = async (batchTemplateId: number) => {
+    setDeletingTemplateId(batchTemplateId);
+    try {
+      await deleteBatchTemplate.mutateAsync({ id: batchTemplateId });
+      await refetchBatchTemplates();
+      toast.success('Template deleted');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete template');
+    } finally {
+      setDeletingTemplateId(null);
+    }
+  };
 
   // Create batch invoices
   const handleCreateBatch = async () => {
@@ -153,6 +307,7 @@ export default function BatchInvoice() {
     setBatchResults(initialResults);
 
     // Create invoices sequentially
+    const results: BatchResult[] = [...initialResults];
     for (let i = 0; i < selectedClients.length; i++) {
       const client = selectedClients[i];
       const invoiceNumber = generateInvoiceNumber(i);
@@ -181,24 +336,18 @@ export default function BatchInvoice() {
         });
 
         // Update result to success
-        setBatchResults(prev => prev.map(r => 
-          r.clientId === client.id 
-            ? { ...r, status: 'success', invoiceNumber }
-            : r
-        ));
+        results[i] = { ...results[i], status: 'success', invoiceNumber };
+        setBatchResults([...results]);
       } catch (error: any) {
         // Update result to error
-        setBatchResults(prev => prev.map(r => 
-          r.clientId === client.id 
-            ? { ...r, status: 'error', error: error.message || 'Failed to create invoice' }
-            : r
-        ));
+        results[i] = { ...results[i], status: 'error', error: error.message || 'Failed to create invoice' };
+        setBatchResults([...results]);
       }
     }
 
     setIsCreating(false);
     
-    const successCount = batchResults.filter(r => r.status === 'success').length;
+    const successCount = results.filter(r => r.status === 'success').length;
     if (successCount === selectedClients.length) {
       toast.success(`Successfully created ${successCount} invoices`);
     } else {
@@ -219,7 +368,8 @@ export default function BatchInvoice() {
     return null;
   }
 
-  if (selectedClientIds.length === 0) {
+  // Show empty state if no clients selected and no URL params
+  if (selectedClientIds.length === 0 && !clientIdsParam) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -229,14 +379,16 @@ export default function BatchInvoice() {
               <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h2 className="text-xl font-semibold mb-2">No Clients Selected</h2>
               <p className="text-muted-foreground mb-4">
-                Select clients from the Clients page to create batch invoices.
+                Select clients from the Clients page to create batch invoices, or use tags to quickly select groups of clients.
               </p>
-              <Link href="/clients">
-                <Button>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Go to Clients
-                </Button>
-              </Link>
+              <div className="flex gap-3 justify-center">
+                <Link href="/clients">
+                  <Button>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Go to Clients
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </main>
@@ -249,17 +401,31 @@ export default function BatchInvoice() {
       <Navigation />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link href="/clients">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link href="/clients">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-2xl font-bold">Create Batch Invoices</h1>
+              <p className="text-muted-foreground">
+                Create invoices for {selectedClients.length} selected client{selectedClients.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+          
+          {/* Template Actions */}
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setShowLoadDialog(true)}>
+              <FolderOpen className="h-4 w-4 mr-2" />
+              Load Template
             </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Create Batch Invoices</h1>
-            <p className="text-muted-foreground">
-              Create invoices for {selectedClients.length} selected client{selectedClients.length !== 1 ? 's' : ''}
-            </p>
+            <Button variant="outline" size="sm" onClick={() => setShowSaveDialog(true)}>
+              <Save className="h-4 w-4 mr-2" />
+              Save Template
+            </Button>
           </div>
         </div>
 
@@ -328,19 +494,76 @@ export default function BatchInvoice() {
         ) : (
           /* Form View */
           <div className="space-y-6">
-            {/* Selected Clients */}
+            {/* Selected Clients with Tag Filter */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Selected Clients</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Selected Clients</CardTitle>
+                  
+                  {/* Tag Filter */}
+                  {clientTags && clientTags.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedTagId?.toString() || 'none'} onValueChange={handleTagSelect}>
+                        <SelectTrigger className="w-[180px]">
+                          <Tag className="h-4 w-4 mr-2" />
+                          <SelectValue placeholder="Add by tag" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Select a tag...</SelectItem>
+                          {clientTags.map(tag => (
+                            <SelectItem key={tag.id} value={tag.id.toString()}>
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-3 h-3 rounded-full" 
+                                  style={{ backgroundColor: tag.color }}
+                                />
+                                {tag.name}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {selectedTagId && (
+                        <Button 
+                          size="sm" 
+                          onClick={handleAddClientsFromTag}
+                          disabled={isLoadingClientsByTag || !clientsByTag?.length}
+                        >
+                          {isLoadingClientsByTag ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>Add {clientsByTag?.length || 0} Client{(clientsByTag?.length || 0) !== 1 ? 's' : ''}</>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {selectedClients.map(client => (
-                    <Badge key={client.id} variant="secondary" className="text-sm">
+                    <Badge 
+                      key={client.id} 
+                      variant="secondary" 
+                      className="text-sm pr-1 flex items-center gap-1"
+                    >
                       {client.name}
+                      <button
+                        onClick={() => handleRemoveClient(client.id)}
+                        className="ml-1 hover:bg-muted rounded-full p-0.5"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     </Badge>
                   ))}
                 </div>
+                {selectedClients.length === 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    No clients selected. Use the tag filter above to add clients.
+                  </p>
+                )}
               </CardContent>
             </Card>
 
@@ -500,7 +723,10 @@ export default function BatchInvoice() {
               <Link href="/clients">
                 <Button variant="outline">Cancel</Button>
               </Link>
-              <Button onClick={handleCreateBatch} disabled={isCreating}>
+              <Button 
+                onClick={handleCreateBatch} 
+                disabled={isCreating || selectedClients.length === 0}
+              >
                 {isCreating ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -517,6 +743,34 @@ export default function BatchInvoice() {
           </div>
         )}
       </main>
+      
+      {/* Template Dialogs */}
+      <SaveBatchTemplateDialog
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
+        onSave={handleSaveTemplate}
+        lineItems={lineItems}
+        dueInDays={dueInDays}
+        notes={notes}
+        isLoading={isSavingTemplate}
+      />
+      
+      <LoadBatchTemplateDialog
+        open={showLoadDialog}
+        onOpenChange={setShowLoadDialog}
+        templates={(batchTemplates || []).map(t => ({
+          id: t.id,
+          name: t.name,
+          description: t.description,
+          frequency: t.frequency as 'one-time' | 'weekly' | 'monthly' | 'quarterly' | 'yearly',
+          dueInDays: t.dueInDays,
+          usageCount: t.usageCount,
+          lastUsedAt: t.lastUsedAt,
+        }))}
+        onLoad={handleLoadTemplate}
+        onDelete={handleDeleteTemplate}
+        deletingId={deletingTemplateId}
+      />
     </div>
   );
 }

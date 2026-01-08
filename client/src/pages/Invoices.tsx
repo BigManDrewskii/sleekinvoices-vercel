@@ -67,6 +67,7 @@ import { Navigation } from "@/components/Navigation";
 import { CurrencyBadge } from "@/components/CurrencySelector";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
+import { InvoiceExportDialog } from "@/components/InvoiceExportDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -121,6 +122,9 @@ export default function Invoices() {
   
   // Bulk selection state
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  
+  // Export dialog state
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const { data: invoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -565,11 +569,11 @@ export default function Invoices() {
             <div className="flex gap-2 w-full sm:w-auto">
               <Button
                 variant="outline"
-                onClick={() => exportInvoicesCSV()}
+                onClick={() => setShowExportDialog(true)}
                 className="gap-2 touch-target"
               >
-                <FileSpreadsheet className="h-4 w-4" />
-                <span className="hidden sm:inline">Export CSV</span>
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
                 <span className="sm:hidden">Export</span>
               </Button>
               <Button
@@ -1102,6 +1106,13 @@ export default function Invoices() {
         title="Delete Selected Invoices"
         description={`Are you sure you want to delete ${selectedIds.size} invoice${selectedIds.size !== 1 ? 's' : ''}? This action cannot be undone.`}
         isLoading={bulkDeleteInvoices.isPending}
+      />
+      
+      {/* Export Dialog */}
+      <InvoiceExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        invoices={sortedInvoices}
       />
     </div>
   );

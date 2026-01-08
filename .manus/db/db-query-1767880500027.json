@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `batchInvoiceTemplateLineItems` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `batchTemplateId` int NOT NULL,\n  `description` varchar(500) NOT NULL,\n  `quantity` decimal(10,2) NOT NULL DEFAULT '1.00',\n  `rate` decimal(10,2) NOT NULL DEFAULT '0.00',\n  `sortOrder` int NOT NULL DEFAULT 0,\n  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (`batchTemplateId`) REFERENCES `batchInvoiceTemplates`(`id`) ON DELETE CASCADE\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute CREATE TABLE IF NOT EXISTS `batchInvoiceTemplateLineItems` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `batchTemplateId` int NOT NULL,\n  `description` varchar(500) NOT NULL,\n  `quantity` decimal(10,2) NOT NULL DEFAULT '1.00',\n  `rate` decimal(10,2) NOT NULL DEFAULT '0.00',\n  `sortOrder` int NOT NULL DEFAULT 0,\n  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (`batchTemplateId`) REFERENCES `batchInvoiceTemplates`(`id`) ON DELETE CASCADE\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 596
+}

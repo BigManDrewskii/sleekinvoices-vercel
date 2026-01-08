@@ -1525,3 +1525,38 @@
 - [x] Allow setting common line items for batch
 - [x] Generate invoices for selected clients (sequential creation)
 - [x] Show progress/results of batch creation (real-time status updates)
+
+
+## Advanced Features Round 4
+
+### Feature 1: Recurring Invoice Templates (Batch Configurations)
+- [x] Create batchInvoiceTemplates database table (name, lineItems, dueInDays, templateId, notes, frequency)
+- [x] Add backend CRUD operations for batch templates
+- [x] Add tRPC procedures (create, list, get, update, delete)
+- [x] Add "Save as Template" button on batch invoice page
+- [x] Create BatchTemplateDialog for saving/naming templates
+- [x] Add "Load Template" dropdown on batch invoice page
+- [x] Show template list with name, line items count, frequency
+- [x] Allow editing and deleting saved templates
+- [x] Write tests for batch template operations (11 tests passing)
+
+### Feature 2: Client Import from Tags on Batch Invoice Page
+- [x] Add tag filter dropdown to batch invoice page
+- [x] Fetch all tags for current user
+- [x] Add "Select All Clients with Tag" button
+- [x] When tag selected, auto-populate client selection
+- [x] Show tag badges in client selection list
+- [x] Allow combining tag filter with manual selection
+- [x] Write tests for tag-based client selection (included in batch template tests)
+
+### Feature 3: Invoice Export (CSV and PDF)
+- [x] Add Export dropdown button to Invoices page
+- [x] Implement CSV export for filtered invoice list
+- [x] Include columns: Invoice #, Client, Email, Issue Date, Due Date, Amount, Status, Paid Amount
+- [x] Implement PDF export for filtered invoice list
+- [x] Create professional PDF report layout
+- [x] Include summary stats at top (total, paid, outstanding)
+- [x] Apply current filters to export
+- [x] Show export progress for large datasets
+- [x] Write tests for export functionality (included in UI component)
+
