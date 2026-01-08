@@ -5,13 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { FileText, Save, Upload, User, Building2, LogOut, Mail } from "lucide-react";
+import { Save, Upload, User, Building2, LogOut, Mail, Bell, Link2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { QuickBooksSettings } from "@/components/QuickBooksSettings";
@@ -176,19 +176,38 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="page-wrapper">
       <Navigation />
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground">Manage your profile and company information</p>
-          </div>
+      <div className="page-content page-transition">
+        <div className="page-header">
+          <h1 className="page-header-title">Settings</h1>
+          <p className="page-header-subtitle">Manage your account, company, and integrations</p>
+        </div>
 
-          <div className="space-y-6">
-            {/* Personal Information */}
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-auto lg:inline-flex">
+            <TabsTrigger value="profile" className="gap-2">
+              <User className="h-4 w-4 hidden sm:block" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="company" className="gap-2">
+              <Building2 className="h-4 w-4 hidden sm:block" />
+              Company
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="gap-2">
+              <Bell className="h-4 w-4 hidden sm:block" />
+              Reminders
+            </TabsTrigger>
+            <TabsTrigger value="integrations" className="gap-2">
+              <Link2 className="h-4 w-4 hidden sm:block" />
+              Integrations
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Profile Tab */}
+          <TabsContent value="profile" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Personal Information</CardTitle>
@@ -217,10 +236,45 @@ export default function Settings() {
                     Email cannot be changed
                   </p>
                 </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button
+                    onClick={handleSaveProfile}
+                    disabled={updateProfile.isPending}
+                  >
+                    {updateProfile.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Company Information */}
+            {/* Account Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Actions</CardTitle>
+                <CardDescription>Manage your account</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log Out
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Company Tab */}
+          <TabsContent value="company" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Company Information</CardTitle>
@@ -350,8 +404,10 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Email Reminder Settings */}
+          {/* Reminders Tab */}
+          <TabsContent value="reminders" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Email Reminder Settings</CardTitle>
@@ -458,25 +514,13 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* QuickBooks Integration */}
+          {/* Integrations Tab */}
+          <TabsContent value="integrations" className="space-y-6">
             <QuickBooksSettings />
-
-            {/* Account Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Actions</CardTitle>
-                <CardDescription>Manage your account</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Log Out
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

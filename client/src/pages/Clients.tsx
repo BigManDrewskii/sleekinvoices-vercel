@@ -14,11 +14,12 @@ import {
 import { ClientDialog } from "@/components/clients/ClientDialog";
 import { PortalAccessDialog } from "@/components/clients/PortalAccessDialog";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { Pagination } from "@/components/shared/Pagination";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { FileText, Plus, Search, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
@@ -50,6 +51,10 @@ export default function Clients() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   // Listen for keyboard shortcut to open new client dialog
   useEffect(() => {
@@ -79,6 +84,51 @@ export default function Clients() {
       toast.error(error.message || "Failed to delete client. Item has been restored.");
     },
   });
+
+  // Filter clients based on search query
+  const filteredClients = useMemo(() => {
+    if (!clients) return [];
+    const query = searchQuery.toLowerCase();
+    return clients.filter((client) => 
+      client.name.toLowerCase().includes(query) ||
+      client.email?.toLowerCase().includes(query) ||
+      client.phone?.toLowerCase().includes(query) ||
+      client.companyName?.toLowerCase().includes(query)
+    );
+  }, [clients, searchQuery]);
+
+  // Calculate pagination
+  const totalItems = filteredClients.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // Ensure current page is valid
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  // Get paginated clients
+  const paginatedClients = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredClients.slice(startIndex, startIndex + pageSize);
+  }, [filteredClients, currentPage, pageSize]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top of table
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   const handleUndoableDelete = (client: Client) => {
     // Cancel any existing pending delete
@@ -172,16 +222,6 @@ export default function Clients() {
     return null;
   }
 
-  const filteredClients = clients?.filter((client) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      client.name.toLowerCase().includes(query) ||
-      client.email?.toLowerCase().includes(query) ||
-      client.phone?.toLowerCase().includes(query) ||
-      client.companyName?.toLowerCase().includes(query)
-    );
-  });
-
   const handleEdit = (client: Client) => {
     setSelectedClient(client);
     setClientDialogOpen(true);
@@ -254,7 +294,7 @@ export default function Clients() {
           <div className="p-5 pb-4">
             <h3 className="text-lg font-semibold text-foreground">All Clients</h3>
             <p className="text-sm text-muted-foreground">
-              {filteredClients?.length || 0} client{filteredClients?.length !== 1 ? "s" : ""} found
+              {totalItems} client{totalItems !== 1 ? "s" : ""} found
             </p>
           </div>
           <div className="px-5 pb-5">
@@ -270,7 +310,7 @@ export default function Clients() {
                   icon: Plus,
                 }}
               />
-            ) : filteredClients && filteredClients.length === 0 ? (
+            ) : filteredClients.length === 0 ? (
               <EmptyState
                 icon={Search}
                 {...EmptyStatePresets.search}
@@ -292,7 +332,7 @@ export default function Clients() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredClients?.map((client) => (
+                    {paginatedClients.map((client) => (
                       <TableRow key={client.id}>
                         <TableCell className="font-medium">{client.name}</TableCell>
                         <TableCell>
@@ -381,7 +421,7 @@ export default function Clients() {
               
               {/* Mobile Card View */}
               <div className="md:hidden space-y-3">
-                {filteredClients?.map((client) => (
+                {paginatedClients.map((client) => (
                   <div key={client.id} className="rounded-xl border border-border/50 bg-card/50 p-4 space-y-3 hover:border-border transition-colors">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -459,6 +499,19 @@ export default function Clients() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination */}
+              {totalItems > 10 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  pageSize={pageSize}
+                  totalItems={totalItems}
+                  onPageChange={handlePageChange}
+                  onPageSizeChange={handlePageSizeChange}
+                  pageSizeOptions={[10, 25, 50, 100]}
+                />
+              )}
               </>
             )}
           </div>

@@ -74,7 +74,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
         variant="outline"
         onClick={() => setIsExpanded(true)}
         className={cn(
-          "gap-2 border-dashed border-primary/50 hover:border-primary hover:bg-primary/5 transition-all",
+          "gap-2 border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10 transition-all",
           className
         )}
         disabled={!hasCredits}

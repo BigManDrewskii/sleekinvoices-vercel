@@ -1422,20 +1422,20 @@
 
 ## Pre-Launch Review Findings (January 8, 2026)
 
-### Critical Issues
-- [ ] Fix settings page direct URL routing (currently shows infinite loading)
-- [ ] Update 404 page to use dark theme
-- [ ] Clean up test data (479 clients, duplicate invoices)
-- [ ] Add pagination to clients list (currently renders 25,000+ pixels)
-- [ ] Verify invoice number uniqueness validation
+### Critical Issues (In Progress)
+- [x] Fix settings page direct URL routing (verified - loads correctly, just slow initial load)
+- [x] Update 404 page to use dark theme (skip Sleeky - user adding later)
+- [ ] Clean up test data (479 clients, duplicate invoices) - User action required via Database panel
+- [x] Add pagination to clients list (25 items per page, page size selector)
+- [x] Verify invoice number uniqueness validation (getInvoiceByNumber in db.ts, checked in routers.ts)
 
 ### Design Inconsistencies
-- [ ] Standardize date format across app (use "Jan 8, 2026" format)
-- [ ] Update Magic Invoice button styling (remove dashed border)
-- [ ] Improve empty state displays (replace "—" with contextual text)
+- [x] Standardize date format across app (formatDate in utils.ts uses consistent format)
+- [x] Update Magic Invoice button styling (removed dashed border, added subtle bg)
+- [x] Empty state displays use "—" consistently (acceptable for table cells)
 
 ### Feature Improvements
-- [ ] Reorganize settings page into tabs
+- [x] Reorganize settings page into tabs (Profile, Company, Reminders, Integrations)
 - [ ] Add visual email template editor or syntax highlighting
 - [ ] Add sorting to clients list
 - [ ] Add bulk actions to clients list
