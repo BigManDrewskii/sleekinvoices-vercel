@@ -6,20 +6,15 @@ import {
   Loader2, 
   FileText, 
   Users, 
-  Calculator,
-  Lightbulb,
-  RotateCcw,
-  ChevronRight,
-  Wand2,
-  MessageSquare,
   TrendingUp,
   Clock,
-  Zap
+  Lightbulb,
+  RotateCcw,
+  ArrowRight,
+  MessageCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Orb } from "@/components/ui/orb";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
@@ -228,197 +223,275 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] bg-card border-l border-border shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Sparkles className="h-5 w-5 text-primary" />
+    <>
+      {/* Backdrop overlay */}
+      <div 
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-200"
+        onClick={onClose}
+      />
+      
+      {/* Sidebar Panel */}
+      <div className="fixed inset-y-0 right-0 w-full sm:w-[440px] bg-gradient-to-b from-background via-background to-background/95 border-l border-border/50 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
+        
+        {/* Header - Manus-inspired minimal design */}
+        <div className="relative flex items-center justify-between px-5 py-4 border-b border-border/40">
+          {/* Subtle gradient accent */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent flex items-center justify-center ring-1 ring-primary/20">
+                <Sparkles className="h-5 w-5 text-primary" />
+              </div>
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 rounded-xl bg-primary/10 blur-md -z-10" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-[15px] tracking-tight">AI Assistant</h2>
+              <p className="text-xs text-muted-foreground/80">
+                {credits ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className={cn(
+                      "inline-block h-1.5 w-1.5 rounded-full",
+                      credits.remaining > 10 ? "bg-emerald-500" : credits.remaining > 0 ? "bg-amber-500" : "bg-red-500"
+                    )} />
+                    {credits.remaining} credits
+                  </span>
+                ) : (
+                  "Loading..."
+                )}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-semibold text-sm">AI Assistant</h2>
-            <p className="text-xs text-muted-foreground">
-              {credits ? `${credits.remaining} credits remaining` : "Loading..."}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {messages.length > 0 && (
+          
+          <div className="flex items-center gap-1">
+            {messages.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+                onClick={handleClearChat}
+                title="Clear conversation"
+              >
+                <RotateCcw className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
-              onClick={handleClearChat}
-              title="Clear conversation"
+              className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+              onClick={onClose}
             >
-              <RotateCcw className="h-4 w-4" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Messages Area */}
-      <ScrollArea ref={scrollRef} className="flex-1">
-        {messages.length === 0 ? (
-          <div className="p-4 space-y-6">
-            {/* Welcome */}
-            <div className="text-center py-6">
-              <div className="inline-flex p-3 rounded-full bg-primary/10 mb-4">
-                <Sparkles className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold text-lg mb-2">How can I help?</h3>
-              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                I can help you create invoices, analyze your business, and more.
-              </p>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground px-1">Quick Actions</p>
-              <div className="grid grid-cols-2 gap-2">
-                {QUICK_ACTIONS.map((action) => (
-                  <button
-                    key={action.id}
-                    onClick={() => handleQuickAction(action)}
-                    disabled={!hasCredits || isTyping}
-                    className="flex flex-col items-start p-3 rounded-lg border border-border bg-background hover:bg-accent hover:border-primary/30 transition-all text-left group disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <action.icon className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">{action.label}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground line-clamp-1">
-                      {action.description}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Contextual Suggestions */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground px-1">Suggestions</p>
-              <div className="space-y-1">
-                {contextualSuggestions.map((suggestion, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleSend(suggestion)}
-                    disabled={!hasCredits || isTyping}
-                    className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-accent text-left text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />
-                    <span>{suggestion}</span>
-                    <ChevronRight className="h-3.5 w-3.5 ml-auto opacity-0 group-hover:opacity-100" />
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
-        ) : (
-          <div className="p-4 space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex gap-3",
-                  message.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
-                {message.role === "assistant" && (
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="h-4 w-4 text-primary" />
+        </div>
+
+        {/* Messages Area */}
+        <ScrollArea ref={scrollRef} className="flex-1 overflow-hidden">
+          {messages.length === 0 ? (
+            <div className="p-5 space-y-8">
+              {/* Welcome Section - Manus-inspired */}
+              <div className="text-center pt-8 pb-4">
+                <div className="relative inline-flex mb-5">
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent flex items-center justify-center ring-1 ring-primary/20">
+                    <Sparkles className="h-8 w-8 text-primary" />
                   </div>
-                )}
+                  {/* Animated glow */}
+                  <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl animate-pulse" />
+                </div>
+                <h3 className="text-xl font-semibold tracking-tight mb-2">What can I help with?</h3>
+                <p className="text-sm text-muted-foreground/80 max-w-[280px] mx-auto leading-relaxed">
+                  Create invoices, analyze your business, draft emails, and more.
+                </p>
+              </div>
+
+              {/* Quick Actions - Pill-style buttons like Manus */}
+              <div className="space-y-3">
+                <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">Quick Actions</p>
+                <div className="flex flex-wrap gap-2">
+                  {QUICK_ACTIONS.map((action) => (
+                    <button
+                      key={action.id}
+                      onClick={() => handleQuickAction(action)}
+                      disabled={!hasCredits || isTyping}
+                      className={cn(
+                        "inline-flex items-center gap-2 px-4 py-2.5 rounded-full",
+                        "bg-muted/50 hover:bg-muted border border-border/50 hover:border-border",
+                        "text-sm font-medium text-foreground/90 hover:text-foreground",
+                        "transition-all duration-200 ease-out",
+                        "hover:shadow-sm hover:-translate-y-0.5",
+                        "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                      )}
+                    >
+                      <action.icon className="h-4 w-4 text-primary/80" />
+                      <span>{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Contextual Suggestions - Clean list */}
+              <div className="space-y-3">
+                <p className="text-xs font-medium text-muted-foreground/70 uppercase tracking-wider px-1">Suggestions</p>
+                <div className="space-y-1.5">
+                  {contextualSuggestions.map((suggestion, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(suggestion)}
+                      disabled={!hasCredits || isTyping}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 rounded-xl",
+                        "bg-transparent hover:bg-muted/60",
+                        "text-left text-sm text-muted-foreground hover:text-foreground",
+                        "transition-all duration-200 group",
+                        "disabled:opacity-50 disabled:cursor-not-allowed"
+                      )}
+                    >
+                      <Lightbulb className="h-4 w-4 text-amber-500/80 shrink-0" />
+                      <span className="flex-1">{suggestion}</span>
+                      <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-60 group-hover:translate-x-0 transition-all duration-200" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-5 space-y-5">
+              {messages.map((message) => (
                 <div
+                  key={message.id}
                   className={cn(
-                    "max-w-[85%] rounded-lg px-4 py-2.5",
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                    "flex gap-3 animate-in fade-in slide-in-from-bottom-2 duration-300",
+                    message.role === "user" ? "justify-end" : "justify-start"
                   )}
                 >
-                  {message.role === "assistant" ? (
-                    message.isStreaming && !message.content ? (
-                      <div className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span className="text-sm text-muted-foreground">Thinking...</span>
-                      </div>
-                    ) : (
-                      (() => {
-                        const { text, actions } = parseAIResponse(message.content);
-                        return (
-                          <div>
-<MarkdownRenderer 
-                                              content={text} 
-                                              isStreaming={message.isStreaming}
-                                              className="prose prose-sm dark:prose-invert max-w-none"
-                                            />
-                            {!message.isStreaming && actions.length > 0 && (
-                              <AIActionButtonGroup actions={actions} />
-                            )}
+                  {message.role === "assistant" && (
+                    <div className="shrink-0 h-8 w-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl px-4 py-3",
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted/60 border border-border/30 rounded-bl-md"
+                    )}
+                  >
+                    {message.role === "assistant" ? (
+                      message.isStreaming && !message.content ? (
+                        <div className="flex items-center gap-2.5 py-1">
+                          <div className="flex gap-1">
+                            <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce [animation-delay:-0.3s]" />
+                            <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce [animation-delay:-0.15s]" />
+                            <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce" />
                           </div>
-                        );
-                      })()
-                    )
-                  ) : (
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                          <span className="text-sm text-muted-foreground">Thinking...</span>
+                        </div>
+                      ) : (
+                        (() => {
+                          const { text, actions } = parseAIResponse(message.content);
+                          return (
+                            <div>
+                              <MarkdownRenderer 
+                                content={text} 
+                                isStreaming={message.isStreaming}
+                                className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:my-1.5"
+                              />
+                              {!message.isStreaming && actions.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-border/30">
+                                  <AIActionButtonGroup actions={actions} />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()
+                      )
+                    ) : (
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                    )}
+                  </div>
+                  {message.role === "user" && (
+                    <div className="shrink-0 h-8 w-8 rounded-xl bg-secondary/80 flex items-center justify-center ring-1 ring-border/30">
+                      <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                    </div>
                   )}
                 </div>
-                {message.role === "user" && (
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                    <MessageSquare className="h-4 w-4" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </ScrollArea>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-border bg-background/50">
-        {!hasCredits && (
-          <div className="mb-3 p-2 rounded-lg bg-destructive/10 text-destructive text-xs text-center">
-            No AI credits remaining. Upgrade to Pro for more credits.
+        {/* Input Area - Manus-inspired clean design */}
+        <div className="relative p-4 border-t border-border/40 bg-gradient-to-t from-muted/30 to-transparent">
+          {/* Top accent line */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/50 to-transparent" />
+          
+          {!hasCredits && (
+            <div className="mb-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center">
+              <span className="font-medium">No credits remaining.</span>
+              <span className="text-destructive/80"> Upgrade to Pro for more.</span>
+            </div>
+          )}
+          
+          <div className="relative flex items-end gap-2">
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Auto-resize
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder={hasCredits ? "Ask me anything..." : "No credits remaining"}
+                className={cn(
+                  "w-full min-h-[48px] max-h-[120px] px-4 py-3 pr-12",
+                  "bg-background border border-border/60 rounded-2xl",
+                  "text-sm placeholder:text-muted-foreground/60",
+                  "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40",
+                  "resize-none transition-all duration-200",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+                disabled={!hasCredits || isTyping}
+                rows={1}
+              />
+              {/* Character hint when typing */}
+              {input.length > 0 && (
+                <span className="absolute right-3 bottom-3 text-[10px] text-muted-foreground/50">
+                  ⏎
+                </span>
+              )}
+            </div>
+            <Button
+              size="icon"
+              onClick={() => handleSend(input)}
+              disabled={!input.trim() || !hasCredits || isTyping}
+              className={cn(
+                "shrink-0 h-12 w-12 rounded-xl",
+                "bg-primary hover:bg-primary/90",
+                "shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30",
+                "transition-all duration-200",
+                "disabled:opacity-50 disabled:shadow-none"
+              )}
+            >
+              {isTyping ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
           </div>
-        )}
-        <div className="flex gap-2">
-          <Textarea
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={hasCredits ? "Ask me anything..." : "No credits remaining"}
-            className="flex-1 min-h-[44px] max-h-32 resize-none"
-            disabled={!hasCredits || isTyping}
-            rows={1}
-          />
-          <Button
-            size="icon"
-            onClick={() => handleSend(input)}
-            disabled={!input.trim() || !hasCredits || isTyping}
-            className="shrink-0 h-[44px] w-[44px]"
-          >
-            {isTyping ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
+          
+          <p className="text-[11px] text-muted-foreground/60 mt-2.5 text-center">
+            Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">Enter</kbd> to send · <kbd className="px-1.5 py-0.5 rounded bg-muted text-[10px] font-mono">Shift+Enter</kbd> for new line
+          </p>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-2 text-center">
-          Press Enter to send • Shift+Enter for new line
-        </p>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -435,10 +508,10 @@ export function AIAssistantTrigger({ onClick, className }: { onClick: () => void
         size="md"
         state="idle"
         colors={["#818cf8", "#6366f1"]}
-        className="shadow-lg hover:shadow-xl"
+        className="shadow-lg hover:shadow-xl transition-shadow duration-300"
       />
       {credits && credits.remaining > 0 && (
-        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md z-10">
+        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md ring-2 ring-background z-10">
           {credits.remaining > 9 ? "9+" : credits.remaining}
         </span>
       )}
