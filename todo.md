@@ -1665,3 +1665,10 @@
 - [ ] Voice input support
 - [ ] Visual selection mode (select element → ask AI to improve)
 - [ ] Multi-step workflow engine
+
+
+## Dashboard UI Improvements (Manus-Inspired)
+- [x] Redesign MonthlyUsageCard - elegant/compact for Pro, prominent for Free users
+- [x] Improve MagicInput with Manus-inspired design language
+- [x] Add subtle gradients and refined spacing
+- [x] Improve card hierarchy and visual flow
