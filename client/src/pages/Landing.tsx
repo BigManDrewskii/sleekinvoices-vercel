@@ -660,12 +660,12 @@ export default function Landing() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/landing" className="hover:text-foreground transition-colors">
+                  <Link href="/privacy" className="hover:text-foreground transition-colors">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/landing" className="hover:text-foreground transition-colors">
+                  <Link href="/terms" className="hover:text-foreground transition-colors">
                     Terms
                   </Link>
                 </li>

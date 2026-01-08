@@ -1251,5 +1251,54 @@
 - [x] All 9 tests passing
 
 ### Phase 9: Delivery
-- [ ] Save checkpoint with QuickBooks integration
-- [ ] Request QuickBooks API credentials from user
+- [x] Save checkpoint with QuickBooks integration
+- [x] Request QuickBooks API credentials from user
+- [x] Pass Intuit compliance questionnaire
+- [x] Configure production credentials
+- [x] Validate credentials with tests (5 tests passing)
+
+
+## Legal Pages & QuickBooks Configuration
+
+### Phase 1: Terms of Service Page
+- [x] Create Terms of Service page component
+- [x] Add route for /terms
+- [x] Include standard SaaS terms content
+- [x] Style consistently with landing page
+
+### Phase 2: Privacy Policy Page
+- [x] Create Privacy Policy page component
+- [x] Add route for /privacy
+- [x] Include GDPR-compliant privacy content
+- [x] Cover QuickBooks data handling
+- [x] Style consistently with landing page
+
+### Phase 3: QuickBooks API Configuration
+- [x] Configure QUICKBOOKS_CLIENT_ID secret
+- [x] Configure QUICKBOOKS_CLIENT_SECRET secret
+- [x] Configure QUICKBOOKS_REDIRECT_URI secret
+- [x] Configure QUICKBOOKS_ENVIRONMENT secret (production)
+- [x] Test OAuth flow with credentials validation
+
+### Phase 4: Delivery
+- [x] Save checkpoint with legal pages
+- [x] Provide URLs for Intuit compliance form
+- [x] Pass Intuit compliance review
+
+
+## Legal Pages Design Refinement
+
+### Phase 1: Design System Review
+- [x] Review landing page header/footer design
+- [x] Identify logo component and usage
+- [x] Document color scheme and typography
+
+### Phase 2: Page Refinement
+- [x] Update Terms page to match landing page design
+- [x] Update Privacy page to match landing page design
+- [x] Use correct SleekInvoices logo component
+- [x] Match header/footer styling with landing page
+
+### Phase 3: Landing Page Integration
+- [x] Add Terms link to landing page footer
+- [x] Add Privacy link to landing page footer

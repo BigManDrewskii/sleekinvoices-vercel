@@ -16,6 +16,8 @@ import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import ClientPortal from "./pages/ClientPortal";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 
 // Lazy load: Authenticated pages
 // These are only loaded when user navigates to them after login
@@ -65,6 +67,8 @@ function Router() {
         <Route path={"/"} component={Home} />
         <Route path={"/landing"} component={Landing} />
         <Route path="/portal/:accessToken" component={ClientPortal} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/privacy" component={Privacy} />
         
         {/* Authenticated routes - lazy loaded */}
         <Route path={"/dashboard"} component={Dashboard} />
