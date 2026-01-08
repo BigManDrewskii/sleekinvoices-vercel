@@ -1672,3 +1672,23 @@
 - [x] Improve MagicInput with Manus-inspired design language
 - [x] Add subtle gradients and refined spacing
 - [x] Improve card hierarchy and visual flow
+
+
+## Performance Optimization
+- [x] Audit current bundle size and identify heavy dependencies
+- [x] Analyze code splitting and lazy loading opportunities
+
+### Phase 1: Quick Wins
+- [x] Lazy load AIAssistant component (removes streamdown/mermaid from main bundle)
+- [x] Add manual chunks configuration to vite.config.ts
+- [x] Lazy load AIAssistantProvider context
+- [x] Main bundle reduced from 1.87MB to 317KB (83% reduction!)
+
+### Phase 2: Streamdown Replacement
+- [ ] Replace streamdown with react-markdown for lighter markdown rendering
+- [ ] Lazy load syntax highlighting only when code blocks detected
+
+### Phase 3: Advanced Optimizations
+- [ ] Add preload hints for critical chunks
+- [ ] Implement compression (gzip/brotli)
+- [ ] Add performance monitoring

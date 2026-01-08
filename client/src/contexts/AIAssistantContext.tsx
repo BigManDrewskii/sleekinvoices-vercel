@@ -1,5 +1,8 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { AIAssistant, AIAssistantTrigger } from "@/components/AIAssistant";
+import { createContext, useContext, useState, useCallback, ReactNode, lazy, Suspense } from "react";
+
+// Lazy load the heavy AIAssistant component (contains streamdown/mermaid)
+const AIAssistant = lazy(() => import("@/components/AIAssistant").then(m => ({ default: m.AIAssistant })));
+const AIAssistantTrigger = lazy(() => import("@/components/AIAssistant").then(m => ({ default: m.AIAssistantTrigger })));
 
 interface AIAssistantContextType {
   isOpen: boolean;
@@ -22,18 +25,54 @@ interface AIAssistantProviderProps {
   children: ReactNode;
 }
 
+// Lightweight trigger button that doesn't require Suspense
+function TriggerFallback({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+      aria-label="Open AI Assistant"
+    >
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    </button>
+  );
+}
+
 export function AIAssistantProvider({ children }: AIAssistantProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = useState(false);
 
-  const open = useCallback(() => setIsOpen(true), []);
+  const open = useCallback(() => {
+    setIsOpen(true);
+    setHasBeenOpened(true);
+  }, []);
   const close = useCallback(() => setIsOpen(false), []);
-  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
+  const toggle = useCallback(() => {
+    setIsOpen((prev) => {
+      if (!prev) setHasBeenOpened(true);
+      return !prev;
+    });
+  }, []);
 
   return (
     <AIAssistantContext.Provider value={{ isOpen, open, close, toggle }}>
       {children}
-      <AIAssistant isOpen={isOpen} onClose={close} />
-      {!isOpen && <AIAssistantTrigger onClick={open} />}
+      
+      {/* Only load the heavy AIAssistant component when it's been opened at least once */}
+      {hasBeenOpened && (
+        <Suspense fallback={null}>
+          <AIAssistant isOpen={isOpen} onClose={close} />
+        </Suspense>
+      )}
+      
+      {/* Show trigger button when assistant is closed */}
+      {!isOpen && (
+        <Suspense fallback={<TriggerFallback onClick={open} />}>
+          <AIAssistantTrigger onClick={open} />
+        </Suspense>
+      )}
     </AIAssistantContext.Provider>
   );
 }
