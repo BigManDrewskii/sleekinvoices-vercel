@@ -317,8 +317,9 @@ export function Navigation() {
       <NavigationMenuList className="gap-1">
         {/* Dashboard - Direct Link */}
         <NavigationMenuItem>
-          <Link href="/dashboard">
-            <NavigationMenuLink
+          <NavigationMenuLink asChild>
+            <Link
+              href="/dashboard"
               className={cn(
                 "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
                 "hover:bg-accent/80 hover:text-accent-foreground",
@@ -334,8 +335,8 @@ export function Navigation() {
               {isActive("/dashboard") && (
                 <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
               )}
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
         {/* Billing - Dropdown */}
@@ -392,8 +393,9 @@ export function Navigation() {
 
         {/* Clients - Direct Link */}
         <NavigationMenuItem>
-          <Link href="/clients">
-            <NavigationMenuLink
+          <NavigationMenuLink asChild>
+            <Link
+              href="/clients"
               className={cn(
                 "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
                 "hover:bg-accent/80 hover:text-accent-foreground",
@@ -409,8 +411,8 @@ export function Navigation() {
               {isActive("/clients") && (
                 <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
               )}
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
 
         {/* Finances - Dropdown */}
@@ -467,8 +469,9 @@ export function Navigation() {
 
         {/* Templates - Direct Link */}
         <NavigationMenuItem>
-          <Link href="/templates">
-            <NavigationMenuLink
+          <NavigationMenuLink asChild>
+            <Link
+              href="/templates"
               className={cn(
                 "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
                 "hover:bg-accent/80 hover:text-accent-foreground",
@@ -484,8 +487,8 @@ export function Navigation() {
               {isActive("/templates") && (
                 <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
               )}
-            </NavigationMenuLink>
-          </Link>
+            </Link>
+          </NavigationMenuLink>
         </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>

@@ -1628,3 +1628,7 @@
 - [x] Add subject line preview with variable replacement in preview mode
 - [x] Update Settings page to pass subject line value to editor
 - [x] Test subject line preview with all variable types
+
+
+## Bug Fix: Nested Anchor Tag Error
+- [x] Fix nested <a> tag error on Settings page (React DOM validation error)
