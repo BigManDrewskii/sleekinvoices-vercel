@@ -1685,8 +1685,12 @@
 - [x] Main bundle reduced from 1.87MB to 317KB (83% reduction!)
 
 ### Phase 2: Streamdown Replacement
-- [ ] Replace streamdown with react-markdown for lighter markdown rendering
-- [ ] Lazy load syntax highlighting only when code blocks detected
+- [x] Install react-markdown and remark-gfm packages
+- [x] Create lightweight MarkdownRenderer component
+- [x] Update AIAssistant to use new renderer
+- [x] Update AIChatBox to use new renderer
+- [x] Remove streamdown dependency
+- [x] Verify bundle size reduction (12.3MB → 219KB = 98% reduction!)
 
 ### Phase 3: Advanced Optimizations
 - [ ] Add preload hints for critical chunks

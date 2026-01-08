@@ -24,7 +24,7 @@ import { Orb } from "@/components/ui/orb";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { Streamdown } from "streamdown";
+import { MarkdownRenderer } from "./MarkdownRenderer";
 import { parseAIResponse, AIActionButtonGroup } from "./AIActionButton";
 
 interface Message {
@@ -356,9 +356,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                         const { text, actions } = parseAIResponse(message.content);
                         return (
                           <div>
-                            <div className="prose prose-sm dark:prose-invert max-w-none">
-                              <Streamdown>{text}</Streamdown>
-                            </div>
+<MarkdownRenderer 
+                                              content={text} 
+                                              isStreaming={message.isStreaming}
+                                              className="prose prose-sm dark:prose-invert max-w-none"
+                                            />
                             {!message.isStreaming && actions.length > 0 && (
                               <AIActionButtonGroup actions={actions} />
                             )}
