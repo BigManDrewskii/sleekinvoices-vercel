@@ -36,7 +36,8 @@ import {
   aiCredits,
   AiCredits,
   aiUsageLogs,
-  InsertAiUsageLog
+  InsertAiUsageLog,
+  quickbooksInvoiceMapping
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { DEFAULT_REMINDER_TEMPLATE } from './email';
@@ -228,14 +229,14 @@ export async function createInvoice(invoice: InsertInvoice): Promise<Invoice> {
 }
 
 /**
- * Get all invoices for a user with payment information
- * Includes payment status, total paid, and amount due
+ * Get all invoices for a user with payment information and QuickBooks sync status
+ * Includes payment status, total paid, amount due, and QB sync info
  */
 export async function getInvoicesByUserId(userId: number) {
   const db = await getDb();
   if (!db) return [];
   
-  // Optimized query: Join with payments and calculate totals in a single query
+  // Optimized query: Join with payments and QuickBooks mapping to calculate totals in a single query
   const results = await db.select({
     id: invoices.id,
     invoiceNumber: invoices.invoiceNumber,
@@ -250,12 +251,19 @@ export async function getInvoicesByUserId(userId: number) {
     clientName: clients.name,
     clientEmail: clients.email,
     totalPaid: sql<string>`COALESCE(SUM(CASE WHEN ${payments.status} = 'completed' THEN ${payments.amount} ELSE 0 END), 0)`,
+    // QuickBooks sync status
+    qbInvoiceId: quickbooksInvoiceMapping.qbInvoiceId,
+    qbLastSyncedAt: quickbooksInvoiceMapping.lastSyncedAt,
   })
   .from(invoices)
   .leftJoin(clients, eq(invoices.clientId, clients.id))
   .leftJoin(payments, eq(payments.invoiceId, invoices.id))
+  .leftJoin(quickbooksInvoiceMapping, and(
+    eq(quickbooksInvoiceMapping.invoiceId, invoices.id),
+    eq(quickbooksInvoiceMapping.userId, userId)
+  ))
   .where(eq(invoices.userId, userId))
-  .groupBy(invoices.id, clients.id)
+  .groupBy(invoices.id, clients.id, quickbooksInvoiceMapping.qbInvoiceId, quickbooksInvoiceMapping.lastSyncedAt)
   .orderBy(desc(invoices.createdAt));
   
   // Calculate payment status from aggregated data
@@ -291,6 +299,12 @@ export async function getInvoicesByUserId(userId: number) {
         id: r.clientId,
         name: r.clientName || 'Unknown',
         email: r.clientEmail,
+      },
+      // QuickBooks sync status
+      quickbooks: {
+        synced: !!r.qbInvoiceId,
+        qbInvoiceId: r.qbInvoiceId || null,
+        lastSyncedAt: r.qbLastSyncedAt || null,
       },
     };
   });

@@ -845,3 +845,50 @@ export const quickbooksSyncLog = mysqlTable("quickbooksSyncLog", {
 });
 export type QuickBooksSyncLog = typeof quickbooksSyncLog.$inferSelect;
 export type InsertQuickBooksSyncLog = typeof quickbooksSyncLog.$inferInsert;
+
+
+/**
+ * QuickBooks Payment Mapping - tracks payments synced from QuickBooks
+ */
+export const quickbooksPaymentMapping = mysqlTable("quickbooksPaymentMapping", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  paymentId: int("paymentId").notNull(),
+  qbPaymentId: varchar("qbPaymentId", { length: 50 }).notNull(),
+  qbInvoiceId: varchar("qbInvoiceId", { length: 50 }), // The QB invoice this payment is linked to
+  syncDirection: mysqlEnum("syncDirection", ["to_qb", "from_qb"]).notNull(), // Direction of sync
+  syncVersion: int("syncVersion").default(1).notNull(),
+  lastSyncedAt: timestamp("lastSyncedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  paymentIdx: uniqueIndex("qb_payment_idx").on(table.userId, table.paymentId),
+  qbPaymentIdx: uniqueIndex("qb_payment_qb_idx").on(table.userId, table.qbPaymentId),
+}));
+export type QuickBooksPaymentMapping = typeof quickbooksPaymentMapping.$inferSelect;
+export type InsertQuickBooksPaymentMapping = typeof quickbooksPaymentMapping.$inferInsert;
+
+/**
+ * QuickBooks Sync Settings - user preferences for auto-sync behavior
+ */
+export const quickbooksSyncSettings = mysqlTable("quickbooksSyncSettings", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  
+  // Auto-sync toggles
+  autoSyncInvoices: boolean("autoSyncInvoices").default(true).notNull(), // Sync invoices when sent
+  autoSyncPayments: boolean("autoSyncPayments").default(true).notNull(), // Sync payments when recorded
+  syncPaymentsFromQB: boolean("syncPaymentsFromQB").default(true).notNull(), // Pull payments from QB
+  
+  // Sync filters
+  minInvoiceAmount: decimal("minInvoiceAmount", { precision: 24, scale: 8 }), // Only sync invoices above this amount
+  syncDraftInvoices: boolean("syncDraftInvoices").default(false).notNull(), // Sync draft invoices (not recommended)
+  
+  // Polling settings for two-way sync
+  lastPaymentPollAt: timestamp("lastPaymentPollAt"), // Last time we polled QB for payments
+  pollIntervalMinutes: int("pollIntervalMinutes").default(60).notNull(), // How often to poll (default 1 hour)
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type QuickBooksSyncSettings = typeof quickbooksSyncSettings.$inferSelect;
+export type InsertQuickBooksSyncSettings = typeof quickbooksSyncSettings.$inferInsert;

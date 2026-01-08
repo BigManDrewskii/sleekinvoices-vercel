@@ -5,3 +5,4 @@ export { createOAuthClient, getAuthorizationUrl, exchangeCodeForTokens, refreshA
 export { makeQBApiCall, queryQB, getQBEntity, createQBEntity, updateQBEntity, deleteQBEntity } from "./client";
 export { syncClientToQB, syncAllClientsToQB, getClientSyncStatus, getCustomerMapping, findQBCustomer } from "./customerSync";
 export { syncInvoiceToQB, syncAllInvoicesToQB, getInvoiceSyncStatus, getInvoiceMapping, getSyncHistory } from "./invoiceSync";
+export { syncPaymentToQB, pollPaymentsFromQB, getSyncSettings, updateSyncSettings, shouldAutoSync, getPaymentMapping, getPaymentMappingByQBId } from "./paymentSync";

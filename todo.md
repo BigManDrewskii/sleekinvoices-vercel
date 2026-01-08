@@ -1350,3 +1350,35 @@
 - [x] Test error handling (2 tests)
 - [x] Test InvoiceActionsMenu integration (3 tests)
 - [x] All 12 tests passing
+
+
+## QuickBooks Advanced Enhancements
+
+### Sync Status Indicators on Invoice List
+- [x] Create QuickBooks sync status badge component (inline in Invoices.tsx)
+- [x] Fetch sync status for invoices in list query (joined quickbooksInvoiceMapping)
+- [x] Display sync indicator (icon/badge) on invoice rows (desktop and mobile)
+- [x] Show last synced timestamp on hover/tooltip
+- [x] Handle loading state for sync status (QB column only shows when connected)
+
+### Two-Way Payment Sync
+- [x] Research QuickBooks payment webhooks/polling options (using CDC polling)
+- [x] Create endpoint to receive QuickBooks payment updates (pollPayments mutation)
+- [x] Implement payment sync from QuickBooks to SleekInvoices (pollPaymentsFromQB)
+- [x] Add periodic sync check for payment status (manual "Pull Payments" button)
+- [x] Handle payment reconciliation conflicts (via quickbooksPaymentMapping table)
+
+### QuickBooks Sync Settings
+- [x] Create quickbooksSyncSettings database table
+- [x] Add sync preferences UI in Settings page (collapsible panel)
+- [x] Implement auto-sync toggle (enable/disable) for invoices and payments
+- [x] Add minimum invoice amount filter for sync
+- [x] Add sync frequency settings (pollIntervalMinutes)
+- [x] Save and apply user preferences
+
+### Testing
+- [x] Test sync status indicator display (2 tests)
+- [x] Test two-way payment sync (3 tests)
+- [x] Test sync settings persistence (5 tests)
+- [x] Test settings application to sync behavior (4 tests)
+- [x] All 14 tests passing

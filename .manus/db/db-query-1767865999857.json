@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `quickbooksSyncSettings` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`autoSyncInvoices` boolean NOT NULL DEFAULT true,\n\t`autoSyncPayments` boolean NOT NULL DEFAULT true,\n\t`syncPaymentsFromQB` boolean NOT NULL DEFAULT true,\n\t`minInvoiceAmount` decimal(24,8),\n\t`syncDraftInvoices` boolean NOT NULL DEFAULT false,\n\t`lastPaymentPollAt` timestamp NULL,\n\t`pollIntervalMinutes` int NOT NULL DEFAULT 60,\n\t`createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `quickbooksSyncSettings_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `quickbooksSyncSettings_userId_unique` UNIQUE(`userId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute CREATE TABLE IF NOT EXISTS `quickbooksSyncSettings` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`autoSyncInvoices` boolean NOT NULL DEFAULT true,\n\t`autoSyncPayments` boolean NOT NULL DEFAULT true,\n\t`syncPaymentsFromQB` boolean NOT NULL DEFAULT true,\n\t`minInvoiceAmount` decimal(24,8),\n\t`syncDraftInvoices` boolean NOT NULL DEFAULT false,\n\t`lastPaymentPollAt` timestamp NULL,\n\t`pollIntervalMinutes` int NOT NULL DEFAULT 60,\n\t`createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `quickbooksSyncSettings_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `quickbooksSyncSettings_userId_unique` UNIQUE(`userId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 509
+}

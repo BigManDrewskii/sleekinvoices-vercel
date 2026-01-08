@@ -2405,6 +2405,47 @@ export const appRouter = router({
         const { getSyncHistory } = await import('./quickbooks');
         return await getSyncHistory(ctx.user.id, input.limit || 50);
       }),
+
+    // Sync Settings
+    getSyncSettings: protectedProcedure.query(async ({ ctx }) => {
+      const { getSyncSettings } = await import('./quickbooks');
+      return await getSyncSettings(ctx.user.id);
+    }),
+
+    updateSyncSettings: protectedProcedure
+      .input(z.object({
+        autoSyncInvoices: z.boolean().optional(),
+        autoSyncPayments: z.boolean().optional(),
+        syncPaymentsFromQB: z.boolean().optional(),
+        minInvoiceAmount: z.string().nullable().optional(),
+        syncDraftInvoices: z.boolean().optional(),
+        pollIntervalMinutes: z.number().min(15).max(1440).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateSyncSettings } = await import('./quickbooks');
+        const result = await updateSyncSettings(ctx.user.id, input);
+        if (!result.success) throw new Error(result.error || 'Failed to update settings');
+        return { success: true };
+      }),
+
+    // Payment Sync
+    syncPayment: protectedProcedure
+      .input(z.object({ paymentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { syncPaymentToQB, getConnectionStatus } = await import('./quickbooks');
+        const status = await getConnectionStatus(ctx.user.id);
+        if (!status.connected) throw new Error('Not connected to QuickBooks');
+        const result = await syncPaymentToQB(ctx.user.id, input.paymentId);
+        if (!result.success) throw new Error(result.error || 'Failed to sync payment');
+        return { success: true, qbPaymentId: result.qbPaymentId };
+      }),
+
+    pollPayments: protectedProcedure.mutation(async ({ ctx }) => {
+      const { pollPaymentsFromQB, getConnectionStatus } = await import('./quickbooks');
+      const status = await getConnectionStatus(ctx.user.id);
+      if (!status.connected) throw new Error('Not connected to QuickBooks');
+      return await pollPaymentsFromQB(ctx.user.id);
+    }),
   }),
 });
 

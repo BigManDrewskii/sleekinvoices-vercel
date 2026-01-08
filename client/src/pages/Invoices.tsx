@@ -62,6 +62,12 @@ import { Navigation } from "@/components/Navigation";
 import { CurrencyBadge } from "@/components/CurrencySelector";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Invoice {
   id: number;
@@ -82,6 +88,12 @@ interface Invoice {
   paymentStatus?: 'unpaid' | 'partial' | 'paid';
   paymentProgress?: number;
   currency?: string;
+  // QuickBooks sync status
+  quickbooks?: {
+    synced: boolean;
+    qbInvoiceId: string | null;
+    lastSyncedAt: Date | null;
+  };
 }
 
 export default function Invoices() {
@@ -663,6 +675,9 @@ export default function Invoices() {
                           currentSort={sort}
                           onSort={handleSort}
                         />
+                        {qbStatus?.connected && (
+                          <TableHead className="w-[60px] text-center">QB</TableHead>
+                        )}
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -710,6 +725,43 @@ export default function Invoices() {
                           <TableCell>
                             <StatusBadge status={invoice.status} />
                           </TableCell>
+                          {qbStatus?.connected && (
+                            <TableCell className="text-center">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="flex justify-center">
+                                      {invoice.quickbooks?.synced ? (
+                                        <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                          <svg className="w-4 h-4 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                          </svg>
+                                        </div>
+                                      ) : (
+                                        <div className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center">
+                                          <div className="w-2 h-2 rounded-full bg-muted-foreground/30"></div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">
+                                    {invoice.quickbooks?.synced ? (
+                                      <div className="text-xs">
+                                        <div className="font-medium">Synced to QuickBooks</div>
+                                        {invoice.quickbooks.lastSyncedAt && (
+                                          <div className="text-muted-foreground">
+                                            {new Date(invoice.quickbooks.lastSyncedAt).toLocaleString()}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <span>Not synced to QuickBooks</span>
+                                    )}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </TableCell>
+                          )}
                           <TableCell className="text-right">
                             <InvoiceActionsMenu
                               invoiceId={invoice.id}
@@ -781,6 +833,22 @@ export default function Invoices() {
                         <div className="flex items-center gap-2">
                           <StatusBadge status={invoice.status} />
                           <PaymentStatusBadge status={invoice.paymentStatus || 'unpaid'} />
+                          {qbStatus?.connected && invoice.quickbooks?.synced && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                                    <svg className="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <span className="text-xs">Synced to QuickBooks</span>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </div>
                         <div className="text-right">
                           <p className="font-semibold flex items-center gap-1 justify-end">

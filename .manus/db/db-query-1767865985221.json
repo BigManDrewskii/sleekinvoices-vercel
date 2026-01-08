@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `quickbooksPaymentMapping` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`paymentId` int NOT NULL,\n\t`qbPaymentId` varchar(50) NOT NULL,\n\t`qbInvoiceId` varchar(50),\n\t`syncDirection` enum('to_qb','from_qb') NOT NULL,\n\t`syncVersion` int NOT NULL DEFAULT 1,\n\t`lastSyncedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\tCONSTRAINT `quickbooksPaymentMapping_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `qb_payment_idx` UNIQUE(`userId`,`paymentId`),\n\tCONSTRAINT `qb_payment_qb_idx` UNIQUE(`userId`,`qbPaymentId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute CREATE TABLE IF NOT EXISTS `quickbooksPaymentMapping` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`userId` int NOT NULL,\n\t`paymentId` int NOT NULL,\n\t`qbPaymentId` varchar(50) NOT NULL,\n\t`qbInvoiceId` varchar(50),\n\t`syncDirection` enum('to_qb','from_qb') NOT NULL,\n\t`syncVersion` int NOT NULL DEFAULT 1,\n\t`lastSyncedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\t`createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n\tCONSTRAINT `quickbooksPaymentMapping_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `qb_payment_idx` UNIQUE(`userId`,`paymentId`),\n\tCONSTRAINT `qb_payment_qb_idx` UNIQUE(`userId`,`qbPaymentId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 559
+}
