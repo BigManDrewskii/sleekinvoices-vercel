@@ -1418,3 +1418,39 @@
 - [x] Match background color to dashboard (using theme bg-background variable)
 - [x] Unify max-width across all sections (max-w-4xl, px-6 padding)
 - [x] Improve overall UI for cleaner look (theme variables throughout)
+
+
+## Pre-Launch Review Findings (January 8, 2026)
+
+### Critical Issues
+- [ ] Fix settings page direct URL routing (currently shows infinite loading)
+- [ ] Update 404 page to use dark theme
+- [ ] Clean up test data (479 clients, duplicate invoices)
+- [ ] Add pagination to clients list (currently renders 25,000+ pixels)
+- [ ] Verify invoice number uniqueness validation
+
+### Design Inconsistencies
+- [ ] Standardize date format across app (use "Jan 8, 2026" format)
+- [ ] Update Magic Invoice button styling (remove dashed border)
+- [ ] Improve empty state displays (replace "—" with contextual text)
+
+### Feature Improvements
+- [ ] Reorganize settings page into tabs
+- [ ] Add visual email template editor or syntax highlighting
+- [ ] Add sorting to clients list
+- [ ] Add bulk actions to clients list
+- [ ] Add client revenue display
+- [ ] Add template preview to invoice creation
+
+### Landing Page
+- [ ] Add testimonials section
+- [ ] Add product demo video/GIF
+- [ ] Create contact page
+- [ ] Create privacy and terms pages
+- [ ] Add Sleeky mascot to empty states and 404 page
+
+### Mobile
+- [ ] Test hamburger menu on mobile
+- [ ] Verify touch targets are 44x44 pixels minimum
+- [ ] Test invoice creation form on mobile
+- [ ] Verify modals don't overflow on small screens
