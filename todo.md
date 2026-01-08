@@ -1632,3 +1632,32 @@
 
 ## Bug Fix: Nested Anchor Tag Error
 - [x] Fix nested <a> tag error on Settings page (React DOM validation error)
+
+
+## AI Integration Improvements (Manus-Inspired)
+
+### Phase 1: Enhance Collaborative Mode
+- [ ] Expand quick actions library (add 10+ new actions)
+- [ ] Add inline action buttons in AI responses
+- [ ] Improve AI panel visual design (larger input, category chips)
+- [ ] Add follow-up suggestions after each response
+- [ ] Support embedded data tables in AI responses
+- [ ] Add clickable client/invoice references in responses
+
+### Phase 2: Add Embedded AI Features
+- [ ] Dashboard AI Insight card (daily actionable recommendation)
+- [ ] Smart suggestions during invoice creation (line items, payment terms)
+- [ ] Client health score feature
+- [ ] Contextual AI tooltips throughout app
+- [ ] Smart defaults (auto-fill based on patterns)
+
+### Phase 3: Add Asynchronous AI Features
+- [ ] Background report generation
+- [ ] Batch reminder sending with AI personalization
+- [ ] Scheduled AI tasks (weekly summaries, auto-reminders)
+- [ ] Bulk expense categorization
+
+### Phase 4: Advanced AI Interactions
+- [ ] Voice input support
+- [ ] Visual selection mode (select element → ask AI to improve)
+- [ ] Multi-step workflow engine
