@@ -11,7 +11,8 @@ import {
   Lightbulb,
   RotateCcw,
   ArrowRight,
-  MessageCircle
+  MessageCircle,
+  Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -216,6 +217,38 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     setMessages([]);
   };
 
+  const handleExportConversation = () => {
+    if (messages.length === 0) return;
+
+    // Format the conversation as text
+    const header = `SleekInvoices AI Assistant - Conversation Export\n`;
+    const divider = `${'='.repeat(50)}\n`;
+    const exportDate = `Exported on: ${new Date().toLocaleString()}\n\n`;
+    
+    const conversationText = messages.map((msg) => {
+      const role = msg.role === 'user' ? 'You' : 'AI Assistant';
+      const timestamp = msg.timestamp.toLocaleTimeString();
+      // Strip any action buttons from assistant messages
+      const content = msg.role === 'assistant' 
+        ? msg.content.replace(/\[ACTION:.*?\]/g, '').trim()
+        : msg.content;
+      return `[${timestamp}] ${role}:\n${content}\n`;
+    }).join('\n' + '-'.repeat(40) + '\n\n');
+
+    const fullText = header + divider + exportDate + conversationText;
+
+    // Create and download the file
+    const blob = new Blob([fullText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sleek-ai-chat-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const contextualSuggestions = CONTEXTUAL_SUGGESTIONS[location] || CONTEXTUAL_SUGGESTIONS["/dashboard"];
 
   const hasCredits = credits && credits.remaining > 0;
@@ -266,15 +299,26 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           
           <div className="flex items-center gap-1">
             {messages.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
-                onClick={handleClearChat}
-                title="Clear conversation"
-              >
-                <RotateCcw className="h-4 w-4 text-muted-foreground" />
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+                  onClick={handleExportConversation}
+                  title="Export conversation"
+                >
+                  <Download className="h-4 w-4 text-muted-foreground" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+                  onClick={handleClearChat}
+                  title="Clear conversation"
+                >
+                  <RotateCcw className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </>
             )}
             <Button
               variant="ghost"
