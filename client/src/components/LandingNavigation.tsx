@@ -34,7 +34,7 @@ export function LandingNavigation() {
     <nav
       className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-5xl transition-all duration-300 ${
         scrolled
-          ? "bg-card/80 backdrop-blur-xl border border-border/50 shadow-lg shadow-black/10"
+          ? "bg-[#0a0a0f]/90 backdrop-blur-xl border border-white/10 shadow-lg shadow-black/20"
           : "bg-transparent"
       } rounded-full`}
     >
@@ -56,19 +56,19 @@ export function LandingNavigation() {
           <div className="hidden md:flex items-center gap-1">
             <button
               onClick={() => scrollToSection("features")}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all"
+              className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
               Features
             </button>
             <button
               onClick={() => scrollToSection("pricing")}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all"
+              className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
               Pricing
             </button>
             <button
               onClick={() => scrollToSection("faq")}
-              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all"
+              className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
             >
               FAQ
             </button>
@@ -99,29 +99,29 @@ export function LandingNavigation() {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 bg-card/95 backdrop-blur-xl">
+            <SheetContent side="right" className="w-72 bg-[#0a0a0f]/95 backdrop-blur-xl border-l border-white/10">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="flex flex-col gap-2 mt-8">
                 <button
                   onClick={() => scrollToSection("features")}
-                  className="px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl transition-all text-left"
+                  className="px-4 py-3 text-base font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-left"
                 >
                   Features
                 </button>
                 <button
                   onClick={() => scrollToSection("pricing")}
-                  className="px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl transition-all text-left"
+                  className="px-4 py-3 text-base font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-left"
                 >
                   Pricing
                 </button>
                 <button
                   onClick={() => scrollToSection("faq")}
-                  className="px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl transition-all text-left"
+                  className="px-4 py-3 text-base font-medium text-zinc-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-left"
                 >
                   FAQ
                 </button>
 
-                <div className="border-t border-border/50 pt-4 mt-4 space-y-3">
+                <div className="border-t border-white/10 pt-4 mt-4 space-y-3">
                   <Button variant="outline" className="w-full rounded-xl" asChild>
                     <a href={getLoginUrl()}>Sign In</a>
                   </Button>

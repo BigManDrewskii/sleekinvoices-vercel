@@ -1382,3 +1382,31 @@
 - [x] Test sync settings persistence (5 tests)
 - [x] Test settings application to sync behavior (4 tests)
 - [x] All 14 tests passing
+
+
+## Landing Page Improvements
+
+### Banner Refinement
+- [x] Review and remove/refine obstructing banner at line 34
+- [x] Ensure banner doesn't obstruct UI elements (made smaller, less intrusive)
+
+### AND.CO Research
+- [x] Research AND.CO competitor (features, positioning, pricing)
+- [x] Identify key differentiators for SleekInvoices (templates, QB sync, crypto)
+- [x] Apply competitive insights to landing page messaging (added AND.CO to comparison)
+
+### Hero Section Improvements
+- [x] Reduce copy - make it more concise and targeted
+- [x] Apply landing page best practices (single clear CTA, social proof)
+- [x] Improve visual hierarchy and clarity
+
+### Aesthetic Improvements
+- [x] Unify background - use one solid dark background (#0a0a0f)
+- [x] Remove alternating background tones between sections
+- [x] Improve features section aesthetic (cleaner cards with icons)
+- [x] Ensure consistent visual design across all sections
+
+### Testing
+- [x] Verify all changes render correctly
+- [x] Test responsive design on mobile
+- [x] Ensure no UI obstructions
