@@ -777,3 +777,71 @@ export const aiUsageLogs = mysqlTable("aiUsageLogs", {
 
 export type AiUsageLog = typeof aiUsageLogs.$inferSelect;
 export type InsertAiUsageLog = typeof aiUsageLogs.$inferInsert;
+
+
+/**
+ * QuickBooks Integration Tables
+ */
+export const quickbooksConnections = mysqlTable("quickbooksConnections", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  realmId: varchar("realmId", { length: 50 }).notNull(),
+  companyName: varchar("companyName", { length: 255 }),
+  accessToken: text("accessToken").notNull(),
+  refreshToken: text("refreshToken").notNull(),
+  tokenExpiresAt: timestamp("tokenExpiresAt").notNull(),
+  refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  environment: mysqlEnum("environment", ["sandbox", "production"]).default("sandbox").notNull(),
+  lastSyncAt: timestamp("lastSyncAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type QuickBooksConnection = typeof quickbooksConnections.$inferSelect;
+export type InsertQuickBooksConnection = typeof quickbooksConnections.$inferInsert;
+
+export const quickbooksCustomerMapping = mysqlTable("quickbooksCustomerMapping", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  clientId: int("clientId").notNull(),
+  qbCustomerId: varchar("qbCustomerId", { length: 50 }).notNull(),
+  qbDisplayName: varchar("qbDisplayName", { length: 255 }),
+  syncVersion: int("syncVersion").default(1).notNull(),
+  lastSyncedAt: timestamp("lastSyncedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  clientIdx: uniqueIndex("qb_customer_client_idx").on(table.userId, table.clientId),
+}));
+export type QuickBooksCustomerMapping = typeof quickbooksCustomerMapping.$inferSelect;
+export type InsertQuickBooksCustomerMapping = typeof quickbooksCustomerMapping.$inferInsert;
+
+export const quickbooksInvoiceMapping = mysqlTable("quickbooksInvoiceMapping", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  invoiceId: int("invoiceId").notNull(),
+  qbInvoiceId: varchar("qbInvoiceId", { length: 50 }).notNull(),
+  qbDocNumber: varchar("qbDocNumber", { length: 50 }),
+  syncVersion: int("syncVersion").default(1).notNull(),
+  lastSyncedAt: timestamp("lastSyncedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  invoiceIdx: uniqueIndex("qb_invoice_idx").on(table.userId, table.invoiceId),
+}));
+export type QuickBooksInvoiceMapping = typeof quickbooksInvoiceMapping.$inferSelect;
+export type InsertQuickBooksInvoiceMapping = typeof quickbooksInvoiceMapping.$inferInsert;
+
+export const quickbooksSyncLog = mysqlTable("quickbooksSyncLog", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  entityType: mysqlEnum("entityType", ["customer", "invoice", "payment"]).notNull(),
+  entityId: int("entityId").notNull(),
+  qbEntityId: varchar("qbEntityId", { length: 50 }),
+  action: mysqlEnum("action", ["create", "update", "delete"]).notNull(),
+  status: mysqlEnum("status", ["success", "failed", "pending"]).notNull(),
+  errorMessage: text("errorMessage"),
+  requestPayload: text("requestPayload"),
+  responsePayload: text("responsePayload"),
+  syncedAt: timestamp("syncedAt").defaultNow().notNull(),
+});
+export type QuickBooksSyncLog = typeof quickbooksSyncLog.$inferSelect;
+export type InsertQuickBooksSyncLog = typeof quickbooksSyncLog.$inferInsert;

@@ -41,6 +41,7 @@ const CreateEstimate = lazy(() => import("./pages/CreateEstimate"));
 const ViewEstimate = lazy(() => import("./pages/ViewEstimate"));
 const EditEstimate = lazy(() => import("./pages/EditEstimate"));
 const GuidedInvoiceCreator = lazy(() => import("./pages/GuidedInvoiceCreator"));
+const QuickBooksCallback = lazy(() => import("./pages/QuickBooksCallback"));
 
 import { GearLoader } from "@/components/ui/gear-loader";
 
@@ -88,6 +89,7 @@ function Router() {
         <Route path={"/estimates/create"} component={CreateEstimate} />
         <Route path={"/estimates/:id/edit"} component={EditEstimate} />
         <Route path={"/estimates/:id"} component={ViewEstimate} />
+        <Route path={"/quickbooks/callback"} component={QuickBooksCallback} />
         
         {/* 404 - eager loaded */}
         <Route path={"/404"} component={NotFound} />

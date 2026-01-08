@@ -1174,3 +1174,82 @@
 - [x] Research AI automation and e-signature integrations
 - [x] Identify strategic integrations aligned with market preferences
 - [x] Compile comprehensive recommendations report (see research/integration-recommendations.md)
+
+
+## QuickBooks Integration
+
+### Phase 1: Research & Architecture
+- [x] Research QuickBooks Online API documentation
+- [x] Study OAuth 2.0 authentication flow
+- [x] Review Invoice and Customer entity structures
+- [x] Design integration architecture (one-way sync: SleekInvoices → QuickBooks)
+
+### Phase 2: Database Schema
+- [x] Create quickbooksConnections table for OAuth tokens
+- [x] Create quickbooksCustomerMapping table for client-customer mapping
+- [x] Create quickbooksInvoiceMapping table for invoice mapping
+- [x] Create quickbooksSyncLog table for audit trail
+- [x] Run database migrations
+
+### Phase 3: OAuth 2.0 Implementation
+- [x] Install intuit-oauth package
+- [x] Create type declarations for intuit-oauth
+- [x] Implement OAuth client creation
+- [x] Implement authorization URL generation
+- [x] Implement token exchange
+- [x] Implement token refresh
+- [x] Implement connection status checking
+
+### Phase 4: Customer Sync
+- [x] Implement customer mapping lookup
+- [x] Implement customer creation in QuickBooks
+- [x] Implement customer update in QuickBooks
+- [x] Implement sync all clients functionality
+- [x] Implement client sync status checking
+
+### Phase 5: Invoice Sync
+- [x] Implement invoice mapping lookup
+- [x] Implement invoice creation in QuickBooks
+- [x] Implement invoice update in QuickBooks
+- [x] Implement sync all invoices functionality
+- [x] Implement invoice sync status checking
+- [x] Implement sync history retrieval
+
+### Phase 6: tRPC Router
+- [x] Add getStatus procedure
+- [x] Add getAuthUrl procedure
+- [x] Add handleCallback procedure
+- [x] Add disconnect procedure
+- [x] Add syncClient procedure
+- [x] Add syncAllClients procedure
+- [x] Add syncInvoice procedure
+- [x] Add syncAllInvoices procedure
+- [x] Add getClientSyncStatus procedure
+- [x] Add getInvoiceSyncStatus procedure
+- [x] Add getSyncHistory procedure
+
+### Phase 7: Frontend UI
+- [x] Create QuickBooksSettings component
+- [x] Add connection status display
+- [x] Add connect/disconnect buttons
+- [x] Add sync all clients button
+- [x] Add sync all invoices button
+- [x] Add sync history dialog
+- [x] Create QuickBooksCallback page
+- [x] Add route for OAuth callback
+- [x] Integrate into Settings page
+
+### Phase 8: Testing
+- [x] Create comprehensive vitest tests
+- [x] Test OAuth configuration check
+- [x] Test OAuth client creation
+- [x] Test authorization URL generation
+- [x] Test API call error handling
+- [x] Test customer mapping functions
+- [x] Test invoice mapping functions
+- [x] Test sync history retrieval
+- [x] All 9 tests passing
+
+### Phase 9: Delivery
+- [ ] Save checkpoint with QuickBooks integration
+- [ ] Request QuickBooks API credentials from user

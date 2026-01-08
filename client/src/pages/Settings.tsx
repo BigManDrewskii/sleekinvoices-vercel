@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
+import { QuickBooksSettings } from "@/components/QuickBooksSettings";
 
 export default function Settings() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -456,6 +457,9 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* QuickBooks Integration */}
+            <QuickBooksSettings />
 
             {/* Account Actions */}
             <Card>
