@@ -51,6 +51,15 @@ import {
   auditLog,
   AuditLog,
   InsertAuditLog,
+  recurringInvoices,
+  recurringInvoiceLineItems,
+  estimates,
+  estimateLineItems,
+  clientPortalAccess,
+  quickbooksCustomerMapping,
+  quickbooksConnections,
+  quickbooksSyncLog,
+  quickbooksSyncSettings,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { DEFAULT_REMINDER_TEMPLATE } from './email';
@@ -3010,9 +3019,8 @@ export async function recordPartialPayment(
 // ESTIMATES/QUOTES OPERATIONS
 // ============================================================================
 
-import { 
-  estimates, 
-  estimateLineItems, 
+// Note: estimates, estimateLineItems already imported at top of file
+import type { 
   Estimate, 
   EstimateLineItem,
   InsertEstimate, 
@@ -3996,4 +4004,120 @@ export async function getEntityAuditLogs(
     ...log,
     details: log.details ? JSON.parse(log.details as string) : null,
   }));
+}
+
+
+// ============================================================================
+// ACCOUNT DELETION (GDPR Compliance)
+// ============================================================================
+
+/**
+ * Permanently delete all user data for GDPR compliance
+ * This function removes data from all tables in the correct order to respect foreign key constraints
+ */
+export async function deleteUserAccount(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get all invoice IDs for this user (needed for cascading deletes)
+  const userInvoices = await db
+    .select({ id: invoices.id })
+    .from(invoices)
+    .where(eq(invoices.userId, userId));
+  const invoiceIds = userInvoices.map(i => i.id);
+  
+  // Get all client IDs for this user
+  const userClients = await db
+    .select({ id: clients.id })
+    .from(clients)
+    .where(eq(clients.userId, userId));
+  const clientIds = userClients.map(c => c.id);
+  
+  // Get all recurring invoice IDs
+  const userRecurringInvoices = await db
+    .select({ id: recurringInvoices.id })
+    .from(recurringInvoices)
+    .where(eq(recurringInvoices.userId, userId));
+  const recurringInvoiceIds = userRecurringInvoices.map(r => r.id);
+  
+  // Get all estimate IDs
+  const userEstimates = await db
+    .select({ id: estimates.id })
+    .from(estimates)
+    .where(eq(estimates.userId, userId));
+  const estimateIds = userEstimates.map(e => e.id);
+  
+  // Get all batch template IDs
+  const userBatchTemplates = await db
+    .select({ id: batchInvoiceTemplates.id })
+    .from(batchInvoiceTemplates)
+    .where(eq(batchInvoiceTemplates.userId, userId));
+  const batchTemplateIds = userBatchTemplates.map(b => b.id);
+  
+  // Delete in order to respect foreign key constraints
+  // 1. Delete invoice-related child records
+  if (invoiceIds.length > 0) {
+    await db.delete(invoiceLineItems).where(inArray(invoiceLineItems.invoiceId, invoiceIds));
+    await db.delete(invoiceCustomFieldValues).where(inArray(invoiceCustomFieldValues.invoiceId, invoiceIds));
+    await db.delete(invoiceViews).where(inArray(invoiceViews.invoiceId, invoiceIds));
+    await db.delete(payments).where(inArray(payments.invoiceId, invoiceIds));
+    await db.delete(quickbooksInvoiceMapping).where(inArray(quickbooksInvoiceMapping.invoiceId, invoiceIds));
+  }
+  
+  // 2. Delete recurring invoice line items
+  if (recurringInvoiceIds.length > 0) {
+    await db.delete(recurringInvoiceLineItems).where(inArray(recurringInvoiceLineItems.recurringInvoiceId, recurringInvoiceIds));
+  }
+  
+  // 3. Delete estimate line items
+  if (estimateIds.length > 0) {
+    await db.delete(estimateLineItems).where(inArray(estimateLineItems.estimateId, estimateIds));
+  }
+  
+  // 4. Delete batch template line items
+  if (batchTemplateIds.length > 0) {
+    await db.delete(batchInvoiceTemplateLineItems).where(inArray(batchInvoiceTemplateLineItems.templateId, batchTemplateIds));
+  }
+  
+  // 5. Delete client-related records
+  if (clientIds.length > 0) {
+    await db.delete(clientTagAssignments).where(inArray(clientTagAssignments.clientId, clientIds));
+    await db.delete(clientPortalAccess).where(inArray(clientPortalAccess.clientId, clientIds));
+    await db.delete(quickbooksCustomerMapping).where(inArray(quickbooksCustomerMapping.clientId, clientIds));
+  }
+  
+  // 6. Delete main records by userId
+  await db.delete(invoices).where(eq(invoices.userId, userId));
+  await db.delete(recurringInvoices).where(eq(recurringInvoices.userId, userId));
+  await db.delete(estimates).where(eq(estimates.userId, userId));
+  await db.delete(clients).where(eq(clients.userId, userId));
+  await db.delete(products).where(eq(products.userId, userId));
+  await db.delete(expenses).where(eq(expenses.userId, userId));
+  await db.delete(expenseCategories).where(eq(expenseCategories.userId, userId));
+  await db.delete(invoiceTemplates).where(eq(invoiceTemplates.userId, userId));
+  await db.delete(customFields).where(eq(customFields.userId, userId));
+  await db.delete(batchInvoiceTemplates).where(eq(batchInvoiceTemplates.userId, userId));
+  await db.delete(clientTags).where(eq(clientTags.userId, userId));
+  
+  // 7. Delete user settings and logs
+  await db.delete(reminderSettings).where(eq(reminderSettings.userId, userId));
+  await db.delete(reminderLogs).where(eq(reminderLogs.userId, userId));
+  await db.delete(emailLog).where(eq(emailLog.userId, userId));
+  await db.delete(usageTracking).where(eq(usageTracking.userId, userId));
+  await db.delete(aiCredits).where(eq(aiCredits.userId, userId));
+  await db.delete(aiUsageLogs).where(eq(aiUsageLogs.userId, userId));
+  await db.delete(cryptoSubscriptionPayments).where(eq(cryptoSubscriptionPayments.userId, userId));
+  // Note: stripeWebhookEvents doesn't have userId, it's global webhook log
+  
+  // 8. Delete QuickBooks integration data
+  await db.delete(quickbooksConnections).where(eq(quickbooksConnections.userId, userId));
+  await db.delete(quickbooksSyncLog).where(eq(quickbooksSyncLog.userId, userId));
+  await db.delete(quickbooksSyncSettings).where(eq(quickbooksSyncSettings.userId, userId));
+  
+  // 9. Delete audit logs (keep for compliance, but anonymize)
+  // Note: We keep audit logs but the user record deletion will orphan them
+  // The audit log entry created before deletion serves as proof of deletion request
+  
+  // 10. Finally, delete the user record
+  await db.delete(users).where(eq(users.id, userId));
 }

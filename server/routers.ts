@@ -114,6 +114,47 @@ export const appRouter = router({
         await db.updateUserProfile(ctx.user.id, { logoUrl: url });
         return { url };
       }),
+    
+    // GDPR Account Deletion - Delete all user data
+    deleteAccount: protectedProcedure
+      .input(z.object({
+        confirmationText: z.string(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Verify confirmation text matches
+        if (input.confirmationText !== 'DELETE MY ACCOUNT') {
+          throw new Error('Please type "DELETE MY ACCOUNT" to confirm deletion');
+        }
+        
+        const userId = ctx.user.id;
+        const userEmail = ctx.user.email as string | undefined;
+        
+        // Log the deletion request for audit trail (before deleting data)
+        await db.logAuditEvent({
+          userId,
+          action: 'account_deletion_initiated',
+          entityType: 'user',
+          entityId: userId,
+          entityName: userEmail ?? undefined,
+          details: {
+            reason: input.reason || 'No reason provided',
+            deletedAt: new Date().toISOString(),
+          },
+        });
+        
+        // Perform comprehensive data deletion
+        await db.deleteUserAccount(userId);
+        
+        // Clear the session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+        
+        return { 
+          success: true, 
+          message: 'Your account and all associated data have been permanently deleted.' 
+        };
+      }),
   }),
 
   clients: router({

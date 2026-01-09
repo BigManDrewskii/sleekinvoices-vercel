@@ -17,6 +17,7 @@ import { Navigation } from "@/components/Navigation";
 import { QuickBooksSettings } from "@/components/QuickBooksSettings";
 import { OnboardingRestartButton } from "@/components/OnboardingRestartButton";
 import { EmailTemplateEditor } from "@/components/EmailTemplateEditor";
+import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
 
 export default function Settings() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -275,6 +276,19 @@ export default function Settings() {
                   <LogOut className="h-4 w-4 mr-2" />
                   Log Out
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Danger Zone */}
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>
+                  Permanently delete your account and all associated data. This action cannot be undone.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DeleteAccountDialog />
               </CardContent>
             </Card>
           </TabsContent>
