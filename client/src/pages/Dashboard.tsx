@@ -22,6 +22,7 @@ import { useLocation } from "wouter";
 import { MonthlyUsageCard } from "@/components/dashboard/MonthlyUsageCard";
 import { StatsGridSkeleton, RecentInvoicesSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { formatCurrency } from "@/lib/utils";
+import { Currency, DateDisplay, Numeric } from "@/components/ui/typography";
 
 export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -84,7 +85,7 @@ export default function Dashboard() {
                       Choose how you'd like to create your invoice
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-3 py-4">
+                  <div className="grid gap-4 px-6 py-4">
                     {/* AI Magic Invoice - Top option */}
                     <div 
                       className="group relative rounded-xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-emerald-500/10 p-4 cursor-pointer transition-all duration-200 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/10"
@@ -190,7 +191,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <p className="text-2xl font-bold tracking-tight text-foreground">
-                {formatCurrency(stats?.totalRevenue || 0)}
+                <Currency amount={stats?.totalRevenue || 0} />
               </p>
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
                 <TrendingUp className="h-3 w-3 text-emerald-500" />
@@ -210,7 +211,7 @@ export default function Dashboard() {
                 )}
               </div>
               <p className="text-2xl font-bold tracking-tight text-foreground">
-                {formatCurrency(stats?.outstandingBalance || 0)}
+                <Currency amount={stats?.outstandingBalance || 0} />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Awaiting payment
@@ -223,7 +224,7 @@ export default function Dashboard() {
                 <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
               </div>
               <p className="text-2xl font-bold tracking-tight text-foreground">
-                {stats?.totalInvoices || 0}
+                <Numeric value={stats?.totalInvoices || 0} />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 All time invoices created
@@ -240,7 +241,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <p className="text-2xl font-bold tracking-tight text-foreground">
-                {stats?.paidInvoices || 0}
+                <Numeric value={stats?.paidInvoices || 0} />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Successfully collected
@@ -310,7 +311,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-4">
                         <StatusBadge status={invoice.status} />
                         <span className="font-semibold text-foreground min-w-[80px] text-right tabular-nums">
-                          {formatCurrency(Number(invoice.total))}
+                          <Currency amount={Number(invoice.total)} />
                         </span>
                       </div>
                     </Link>

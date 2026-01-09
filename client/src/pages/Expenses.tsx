@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
+import { Currency } from "@/components/ui/typography";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { ExpensesPageSkeleton } from "@/components/skeletons/ExpensesPageSkeleton";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
@@ -604,7 +605,7 @@ export default function Expenses() {
                   />
                   {expenseForm.taxAmount && (
                     <p className="text-sm text-muted-foreground mt-1">
-                      Total: {formatCurrency(parseFloat(expenseForm.amount || "0") + parseFloat(expenseForm.taxAmount || "0"))}
+                      Total: <Currency amount={parseFloat(expenseForm.amount || "0") + parseFloat(expenseForm.taxAmount || "0")} />
                     </p>
                   )}
                 </div>
@@ -684,10 +685,10 @@ export default function Expenses() {
             <DollarSign className="w-8 h-8 text-muted-foreground" />
             <div>
               <p className="text-sm text-muted-foreground">Total Expenses</p>
-              <p className="text-2xl font-bold">{formatCurrency(stats.totalWithTax)}</p>
+              <p className="text-2xl font-bold"><Currency amount={stats.totalWithTax} /></p>
               {stats.totalTax > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  (incl. {formatCurrency(stats.totalTax)} tax)
+                  (incl. <Currency amount={stats.totalTax} /> tax)
                 </p>
               )}
             </div>
@@ -714,7 +715,7 @@ export default function Expenses() {
             <Receipt className="w-8 h-8 text-green-600" />
             <div>
               <p className="text-sm text-muted-foreground">Billable</p>
-              <p className="text-2xl font-bold">{formatCurrency(stats.billableAmount)}</p>
+              <p className="text-2xl font-bold"><Currency amount={stats.billableAmount} /></p>
               <p className="text-xs text-muted-foreground">
                 {stats.billableCount} expense{stats.billableCount !== 1 ? 's' : ''}
               </p>
@@ -727,7 +728,7 @@ export default function Expenses() {
             <Tag className="w-8 h-8 text-muted-foreground" />
             <div>
               <p className="text-sm text-muted-foreground">Non-Billable</p>
-              <p className="text-2xl font-bold">{formatCurrency(stats.totalWithTax - stats.billableAmount)}</p>
+              <p className="text-2xl font-bold"><Currency amount={stats.totalWithTax - stats.billableAmount} /></p>
               <p className="text-xs text-muted-foreground">
                 {stats.nonBillableCount} expense{stats.nonBillableCount !== 1 ? 's' : ''}
               </p>
@@ -942,7 +943,7 @@ export default function Expenses() {
                           )}
                         </p>
                       </div>
-                      <p className="text-lg font-semibold">{formatCurrency(parseFloat(expense.amount))}</p>
+                      <p className="text-lg font-semibold"><Currency amount={parseFloat(expense.amount)} /></p>
                     </div>
                     <Button
                       variant="ghost"
@@ -972,13 +973,13 @@ export default function Expenses() {
                         {expense.taxAmount && parseFloat(expense.taxAmount) > 0 && (
                           <div>
                             <p className="text-muted-foreground mb-1">Tax Amount</p>
-                            <p className="font-medium">{formatCurrency(parseFloat(expense.taxAmount))}</p>
+                            <p className="font-medium"><Currency amount={parseFloat(expense.taxAmount)} /></p>
                           </div>
                         )}
                         {(expense.taxAmount && parseFloat(expense.taxAmount) > 0) && (
                           <div>
                             <p className="text-muted-foreground mb-1">Total (incl. tax)</p>
-                            <p className="font-medium">{formatCurrency(parseFloat(expense.amount) + parseFloat(expense.taxAmount))}</p>
+                            <p className="font-medium"><Currency amount={parseFloat(expense.amount) + parseFloat(expense.taxAmount)} /></p>
                           </div>
                         )}
                         {expense.receiptUrl && (

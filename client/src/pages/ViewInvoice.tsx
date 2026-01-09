@@ -14,6 +14,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Currency, DateDisplay } from "@/components/ui/typography";
 import {
   FileText,
   Edit,
@@ -324,16 +325,16 @@ export default function ViewInvoice() {
                   <div className="space-y-3">
                     <div>
                       <span className="text-sm text-muted-foreground">Issue Date: </span>
-                      <span className="font-medium">{formatDate(invoice.issueDate)}</span>
+                      <span className="font-medium"><DateDisplay date={invoice.issueDate} format="long" /></span>
                     </div>
                     <div>
                       <span className="text-sm text-muted-foreground">Due Date: </span>
-                      <span className="font-medium">{formatDate(invoice.dueDate)}</span>
+                      <span className="font-medium"><DateDisplay date={invoice.dueDate} format="long" /></span>
                     </div>
                     {invoice.paidAt && (
                       <div>
                         <span className="text-sm text-muted-foreground">Paid At: </span>
-                        <span className="font-medium">{formatDate(invoice.paidAt)}</span>
+                        <span className="font-medium"><DateDisplay date={invoice.paidAt!} format="long" /></span>
                       </div>
                     )}
                     {viewCount !== undefined && viewCount > 0 && (
@@ -342,7 +343,7 @@ export default function ViewInvoice() {
                         <span className="text-sm text-muted-foreground">Viewed {viewCount} time{viewCount !== 1 ? 's' : ''}</span>
                         {(invoice as any).firstViewedAt && (
                           <span className="text-xs text-muted-foreground">
-                            (first: {formatDate((invoice as any).firstViewedAt)})
+                            (first: <DateDisplay date={(invoice as any).firstViewedAt} format="long" />)
                           </span>
                         )}
                       </div>
@@ -372,9 +373,9 @@ export default function ViewInvoice() {
                       <TableRow key={item.id}>
                         <TableCell>{item.description}</TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.rate)}</TableCell>
+                        <TableCell className="text-right"><Currency amount={item.rate} /></TableCell>
                         <TableCell className="text-right font-medium">
-                          {formatCurrency(item.amount)}
+                          <Currency amount={item.amount} />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -392,7 +393,7 @@ export default function ViewInvoice() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-medium">{formatCurrency(invoice.subtotal)}</span>
+                    <span className="font-medium"><Currency amount={invoice.subtotal} /></span>
                   </div>
                   {parseFloat(invoice.discountAmount) > 0 && (
                     <div className="flex items-center justify-between text-sm">
@@ -402,33 +403,33 @@ export default function ViewInvoice() {
                           ? ` (${invoice.discountValue}%)`
                           : ""}
                       </span>
-                      <span className="text-red-600">-{formatCurrency(invoice.discountAmount)}</span>
+                      <span className="text-red-600">-<Currency amount={invoice.discountAmount} /></span>
                     </div>
                   )}
                   {parseFloat(invoice.taxAmount) > 0 && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Tax ({invoice.taxRate}%)</span>
-                      <span>+{formatCurrency(invoice.taxAmount)}</span>
+                      <span>+<Currency amount={invoice.taxAmount} /></span>
                     </div>
                   )}
                   <div className="flex items-center justify-between pt-3 border-t-2 border-primary/20">
                     <span className="text-lg font-bold">Total</span>
                     <span className="text-2xl font-bold text-primary">
-                      {formatCurrency(invoice.total)}
+                      <Currency amount={invoice.total} />
                     </span>
                   </div>
                   {parseFloat(invoice.amountPaid) > 0 && (
                     <>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Amount Paid</span>
-                        <span className="text-green-600">-{formatCurrency(invoice.amountPaid)}</span>
+                        <span className="text-green-600">-<Currency amount={invoice.amountPaid} /></span>
                       </div>
                       <div className="flex items-center justify-between pt-2 border-t">
                         <span className="font-semibold">Balance Due</span>
                         <span className="font-bold">
-                          {formatCurrency(
-                            parseFloat(invoice.total) - parseFloat(invoice.amountPaid)
-                          )}
+                          <Currency
+                            amount={parseFloat(invoice.total) - parseFloat(invoice.amountPaid)}
+                          />
                         </span>
                       </div>
                     </>
@@ -616,15 +617,15 @@ function PaymentHistoryCard({ invoiceId, invoiceTotal }: { invoiceId: number; in
           <div className="mb-4 p-4 bg-muted rounded-lg space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Invoice Total:</span>
-              <span className="font-semibold">{formatCurrency(invoiceTotal)}</span>
+              <span className="font-semibold"><Currency amount={invoiceTotal} /></span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total Paid:</span>
-              <span className="font-semibold text-green-600">{formatCurrency(totalPaid)}</span>
+              <span className="font-semibold text-green-600"><Currency amount={totalPaid} /></span>
             </div>
             <div className="flex justify-between text-sm pt-2 border-t">
               <span className="font-medium">Balance Due:</span>
-              <span className="font-bold">{formatCurrency(balance)}</span>
+              <span className="font-bold"><Currency amount={balance} /></span>
             </div>
           </div>
 

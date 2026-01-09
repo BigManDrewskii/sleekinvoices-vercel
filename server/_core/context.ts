@@ -13,6 +13,31 @@ export async function createContext(
 ): Promise<TrpcContext> {
   let user: User | null = null;
 
+  // Development mode: Auto-authenticate with dev user if SKIP_AUTH is enabled
+  if (process.env.NODE_ENV === "development" && process.env.SKIP_AUTH === "true") {
+    const { getUserByOpenId, upsertUser } = await import("../db");
+
+    let devUser = await getUserByOpenId("dev-user-local");
+
+    if (!devUser) {
+      await upsertUser({
+        openId: "dev-user-local",
+        name: "Local Dev User",
+        email: "dev@localhost.test",
+        loginMethod: "dev",
+        lastSignedIn: new Date(),
+      });
+      devUser = await getUserByOpenId("dev-user-local");
+    }
+
+    return {
+      req: opts.req,
+      res: opts.res,
+      user: devUser || null,
+    };
+  }
+
+  // Regular authentication flow
   try {
     user = await sdk.authenticateRequest(opts.req);
   } catch (error) {

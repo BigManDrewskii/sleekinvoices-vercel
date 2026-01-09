@@ -9,7 +9,13 @@ export default function Home() {
 
   useEffect(() => {
     if (loading) return;
-    
+
+    // In development with SKIP_AUTH, always go to dashboard
+    if (import.meta.env.DEV) {
+      setLocation("/dashboard");
+      return;
+    }
+
     if (isAuthenticated) {
       setLocation("/dashboard");
     } else {

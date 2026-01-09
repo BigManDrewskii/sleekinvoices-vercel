@@ -11,6 +11,10 @@ export const users = mysqlTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   
+  // Profile
+  avatarUrl: text("avatarUrl"), // Custom uploaded avatar URL
+  avatarType: mysqlEnum("avatarType", ["initials", "boring", "upload"]).default("initials"), // Avatar display type
+
   // Company/branding info
   companyName: text("companyName"),
   baseCurrency: varchar("baseCurrency", { length: 3 }).default("USD").notNull(),

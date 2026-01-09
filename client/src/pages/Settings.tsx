@@ -18,6 +18,7 @@ import { QuickBooksSettings } from "@/components/QuickBooksSettings";
 import { OnboardingRestartButton } from "@/components/OnboardingRestartButton";
 import { EmailTemplateEditor } from "@/components/EmailTemplateEditor";
 import { DeleteAccountDialog } from "@/components/DeleteAccountDialog";
+import { AvatarSelector } from "@/components/AvatarSelector";
 
 export default function Settings() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -214,6 +215,51 @@ export default function Settings() {
 
           {/* Profile Tab */}
           <TabsContent value="profile" className="space-y-6">
+            {/* Avatar Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Avatar</CardTitle>
+                <CardDescription>Choose how you want to be represented in the app</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AvatarSelector
+                  currentAvatarUrl={user?.avatarUrl}
+                  currentAvatarType={user?.avatarType || 'initials'}
+                  userName={user?.name || ''}
+                  userEmail={user?.email || ''}
+                  onSelect={async (avatarUrl, avatarType) => {
+                    await updateProfile.mutateAsync({ avatarUrl, avatarType });
+                  }}
+                  onUpload={async (file) => {
+                    const reader = new FileReader();
+                    return new Promise((resolve, reject) => {
+                      reader.onloadend = async () => {
+                        try {
+                          const base64Data = (reader.result as string).split(",")[1];
+                          const response = await fetch('/api/upload/avatar', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              file: base64Data,
+                              userId: user?.id,
+                              filename: file.name,
+                            }),
+                          });
+                          const data = await response.json();
+                          if (!response.ok) throw new Error(data.error);
+                          resolve(data.url);
+                        } catch (error) {
+                          reject(error);
+                        }
+                      };
+                      reader.onerror = reject;
+                      reader.readAsDataURL(file);
+                    });
+                  }}
+                />
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Personal Information</CardTitle>

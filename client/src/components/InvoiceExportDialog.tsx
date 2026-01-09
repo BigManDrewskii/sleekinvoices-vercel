@@ -3,10 +3,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -160,9 +160,8 @@ export function InvoiceExportDialog({
             Export {invoices.length} invoice{invoices.length !== 1 ? 's' : ''} with current filters applied.
           </DialogDescription>
         </DialogHeader>
-        
-        {/* Dialog Body - consistent padding */}
-        <div className="px-6 py-4 space-y-6">
+
+        <DialogBody spacing="relaxed">
           {/* Summary Stats */}
           <div className="rounded-lg border p-4 bg-muted/50">
             <p className="text-sm font-medium mb-3">Export Summary</p>
@@ -216,26 +215,16 @@ export function InvoiceExportDialog({
               </div>
             </RadioGroup>
           </div>
-        </div>
-        
-        <DialogFooter className="gap-3">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
-            Cancel
-          </Button>
-          <Button onClick={handleExport} disabled={isExporting || invoices.length === 0}>
-            {isExporting ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Exporting...
-              </>
-            ) : (
-              <>
-                <Download weight="bold" className="h-4 w-4 mr-2" />
-                Export {exportFormat.toUpperCase()}
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+        </DialogBody>
+
+        <DialogActions
+          onClose={() => onOpenChange(false)}
+          onSubmit={handleExport}
+          submitText={`Export ${exportFormat.toUpperCase()}`}
+          cancelText="Cancel"
+          isLoading={isExporting}
+          disabled={invoices.length === 0}
+        />
       </DialogContent>
     </Dialog>
   );

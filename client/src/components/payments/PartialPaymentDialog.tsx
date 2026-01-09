@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogIconHeader, DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -158,19 +159,15 @@ export function PartialPaymentDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-green-500/10">
-              <CreditCard className="size-4 text-green-500" />
-            </div>
-            Record Payment
+          <DialogTitle>
+            <DialogIconHeader icon={CreditCard} title="Record Payment" variant="success" size="sm" />
           </DialogTitle>
           <DialogDescription>
             Record a payment for invoice {invoiceNumber}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Dialog Body - consistent padding */}
-        <div className="px-6 py-4 space-y-5">
+        <DialogBody spacing="relaxed">
           {/* Payment Summary */}
           {summaryLoading ? (
             <div className="flex items-center justify-center py-4">
@@ -350,32 +347,18 @@ export function PartialPaymentDialog({
               </div>
             </div>
           )}
-        </div>
+        </DialogBody>
 
-        <DialogFooter className="gap-3">
-          <Button variant="ghost" onClick={handleClose}>
-            Cancel
-          </Button>
-          {summary && !summary.isFullyPaid && (
-            <Button
-              variant="success"
-              onClick={handleSubmit}
-              disabled={recordPayment.isPending || !amount || parseFloat(amount) <= 0}
-            >
-              {recordPayment.isPending ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Recording...
-                </>
-              ) : (
-                <>
-                  <Check weight="bold" className="size-4" />
-                  Record Payment
-                </>
-              )}
-            </Button>
-          )}
-        </DialogFooter>
+        {summary && !summary.isFullyPaid && (
+          <DialogActions
+            onClose={handleClose}
+            onSubmit={handleSubmit}
+            submitText="Record Payment"
+            cancelText="Cancel"
+            isLoading={recordPayment.isPending}
+            disabled={!amount || parseFloat(amount) <= 0}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

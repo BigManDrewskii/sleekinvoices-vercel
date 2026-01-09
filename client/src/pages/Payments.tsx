@@ -53,6 +53,7 @@ import {
 import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PaymentsPageSkeleton } from "@/components/skeletons";
+import { Currency, DateDisplay } from "@/components/ui/typography";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -327,7 +328,7 @@ export default function Payments() {
             <CardHeader className="pb-2">
               <CardDescription>Total Received</CardDescription>
               <CardTitle className="text-2xl">
-                {formatCurrency(stats.totalAmount)}
+                <Currency amount={stats.totalAmount} />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -345,7 +346,7 @@ export default function Payments() {
                   {methodStat.method.replace("_", " ").toUpperCase()}
                 </CardDescription>
                 <CardTitle className="text-2xl">
-                  {formatCurrency(methodStat.total)}
+                  <Currency amount={methodStat.total} />
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -511,7 +512,7 @@ export default function Payments() {
                         onClick={() => setSelectedPayment(payment as Payment)}
                       >
                         <TableCell className="font-medium">
-                          {formatDate(payment.paymentDate)}
+                          <DateDisplay date={payment.paymentDate} format="long" />
                         </TableCell>
                         <TableCell>
                           <span className="font-mono text-sm bg-muted/50 px-2 py-1 rounded">
@@ -519,7 +520,7 @@ export default function Payments() {
                           </span>
                         </TableCell>
                         <TableCell className="font-semibold text-primary">
-                          {formatCurrency(payment.amount, payment.currency)}
+                          <Currency amount={payment.amount} currency={payment.currency} />
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -625,7 +626,7 @@ export default function Payments() {
                 <div>
                   <p className="text-sm text-muted-foreground">Amount</p>
                   <p className="text-2xl font-bold text-primary">
-                    {formatCurrency(selectedPayment.amount, selectedPayment.currency)}
+                    <Currency amount={selectedPayment.amount} currency={selectedPayment.currency} />
                   </p>
                 </div>
                 <div className="text-right">
@@ -655,14 +656,14 @@ export default function Payments() {
                     <Calendar className="h-3.5 w-3.5" />
                     Payment Date
                   </div>
-                  <p className="font-medium">{formatDate(selectedPayment.paymentDate)}</p>
+                  <p className="font-medium"><DateDisplay date={selectedPayment.paymentDate} format="long" /></p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" />
                     Recorded At
                   </div>
-                  <p className="font-medium">{formatDateTime(selectedPayment.createdAt)}</p>
+                  <p className="font-medium"><DateDisplay date={selectedPayment.createdAt} format="long" /></p>
                 </div>
               </div>
 

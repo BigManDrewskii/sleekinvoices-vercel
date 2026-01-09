@@ -38,6 +38,8 @@ export const appRouter = router({
         companyAddress: z.string().optional(),
         companyPhone: z.string().optional(),
         taxId: z.string().max(50).optional(), // VAT/Tax ID for invoices
+        avatarUrl: z.string().nullable().optional(),
+        avatarType: z.enum(["initials", "boring", "upload"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.updateUserProfile(ctx.user.id, input);

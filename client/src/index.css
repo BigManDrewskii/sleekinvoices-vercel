@@ -6,10 +6,18 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Typography System */
+  --font-sans: "Google Sans Flex", system-ui, -apple-system, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+
+  /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -42,6 +50,40 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Animation System */
+  --duration-instant: 0.1s;
+  --duration-fast: 0.15s;
+  --duration-normal: 0.2s;
+  --duration-moderate: 0.3s;
+  --duration-slow: 0.5s;
+  --duration-slower: 0.6s;
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Shadow Scale */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* Z-Index Hierarchy */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-modal: 1200;
+  --z-popover: 1300;
+  --z-tooltip: 1400;
+  --z-notification: 1500;
+
+  /* Special Colors */
+  --color-crypto: #f7931a;
+  --color-manus-bg: #f8f8f7;
+  --color-manus-text: #34322d;
+  --color-manus-muted: #858481;
 }
 
 :root {
@@ -287,10 +329,50 @@ html {
 
 /* Better text rendering */
 body {
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* Typography hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans); /* Google Sans Flex */
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+/* Form labels use body font (DM Sans) */
+label {
+  font-family: var(--font-body); /* DM Sans */
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Numeric values - amounts, dates, invoice numbers */
+.font-numeric {
+  font-family: var(--font-mono); /* Atkinson Hyperlegible Mono - ONLY for numbers */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Utility classes for explicit font control */
+.font-heading {
+  font-family: var(--font-sans); /* Google Sans Flex - Primary font */
+}
+
+.font-paragraph {
+  font-family: var(--font-body); /* DM Sans - Body/secondary font */
+}
+
+/*
+  Typography System Summary:
+  - Primary (Headings): Google Sans Flex
+  - Secondary (Body, Labels): DM Sans
+  - Numbers Only: Atkinson Hyperlegible Mono
+*/
 
 /* Animated gradient backgrounds */
 @keyframes gradient-shift {

@@ -13,15 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { UserAvatar } from "@/components/UserAvatar";
 import { 
   Menu, 
   User, 
@@ -214,9 +206,9 @@ export function Navigation() {
     </DropdownMenu>
   );
 
-  // Tablet Navigation - simplified horizontal nav for medium screens
-  const TabletNav = () => (
-    <div className="hidden md:flex lg:hidden navbar-tablet-nav">
+  // Desktop & Tablet Navigation - unified snappy UX with DropdownMenu
+  const DesktopTabletNav = () => (
+    <div className="hidden md:flex navbar-desktop-tablet-nav">
       <Link
         href="/dashboard"
         className={cn(
@@ -312,188 +304,6 @@ export function Navigation() {
     </div>
   );
 
-  // Desktop Navigation with enhanced hover effects
-  const DesktopNav = () => (
-    <NavigationMenu className="hidden lg:flex" data-onboarding="main-nav">
-      <NavigationMenuList className="gap-1">
-        {/* Dashboard - Direct Link */}
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Link
-              href="/dashboard"
-              className={cn(
-                "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
-                "hover:bg-accent/80 hover:text-accent-foreground",
-                "focus:bg-accent focus:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                "disabled:pointer-events-none disabled:opacity-50",
-                "relative overflow-hidden",
-                isActive("/dashboard") 
-                  ? "bg-accent text-foreground" 
-                  : "text-muted-foreground"
-              )}
-            >
-              <span className="relative z-10">Dashboard</span>
-              {isActive("/dashboard") && (
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
-              )}
-            </Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-
-        {/* Billing - Dropdown */}
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className={cn(
-              "h-10 px-4 text-sm font-medium rounded-lg transition-all duration-200",
-              "hover:bg-accent/80",
-              "data-[state=open]:bg-accent",
-              isGroupActive(navigationConfig.billing.items) 
-                ? "bg-accent/50 text-foreground" 
-                : "text-muted-foreground"
-            )}
-          >
-            Billing
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[420px] gap-2 p-4 md:w-[520px] md:grid-cols-2">
-              {navigationConfig.billing.items.map((item) => (
-                <li key={item.href}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "group block select-none rounded-lg p-3 leading-none no-underline outline-none transition-all duration-200",
-                        "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-                        "focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring",
-                        isActive(item.href) && "bg-accent/60 shadow-sm"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-md transition-colors duration-200",
-                          isActive(item.href) 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                        )}>
-                          <NavigationIcon icon={item.icon} isActive={isActive(item.href)} className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium leading-none mb-1">{item.label}</div>
-                          <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </NavigationMenuLink>
-                </li>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        {/* Clients - Direct Link */}
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Link
-              href="/clients"
-              className={cn(
-                "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
-                "hover:bg-accent/80 hover:text-accent-foreground",
-                "focus:bg-accent focus:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                "disabled:pointer-events-none disabled:opacity-50",
-                "relative overflow-hidden",
-                isActive("/clients") 
-                  ? "bg-accent text-foreground" 
-                  : "text-muted-foreground"
-              )}
-            >
-              <span className="relative z-10">Clients</span>
-              {isActive("/clients") && (
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
-              )}
-            </Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-
-        {/* Finances - Dropdown */}
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className={cn(
-              "h-10 px-4 text-sm font-medium rounded-lg transition-all duration-200",
-              "hover:bg-accent/80",
-              "data-[state=open]:bg-accent",
-              isGroupActive(navigationConfig.finances.items) 
-                ? "bg-accent/50 text-foreground" 
-                : "text-muted-foreground"
-            )}
-          >
-            Finances
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[380px] gap-2 p-4 md:w-[460px] md:grid-cols-2">
-              {navigationConfig.finances.items.map((item) => (
-                <li key={item.href}>
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "group block select-none rounded-lg p-3 leading-none no-underline outline-none transition-all duration-200",
-                        "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-                        "focus:bg-accent focus:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring",
-                        isActive(item.href) && "bg-accent/60 shadow-sm"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "flex h-9 w-9 items-center justify-center rounded-md transition-colors duration-200",
-                          isActive(item.href) 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                        )}>
-                          <NavigationIcon icon={item.icon} isActive={isActive(item.href)} className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium leading-none mb-1">{item.label}</div>
-                          <p className="line-clamp-1 text-xs leading-snug text-muted-foreground">
-                            {item.description}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  </NavigationMenuLink>
-                </li>
-              ))}
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
-        {/* Templates - Direct Link */}
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild>
-            <Link
-              href="/templates"
-              className={cn(
-                "group inline-flex h-10 w-max items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200",
-                "hover:bg-accent/80 hover:text-accent-foreground",
-                "focus:bg-accent focus:text-accent-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                "disabled:pointer-events-none disabled:opacity-50",
-                "relative overflow-hidden",
-                isActive("/templates") 
-                  ? "bg-accent text-foreground" 
-                  : "text-muted-foreground"
-              )}
-            >
-              <span className="relative z-10">Templates</span>
-              {isActive("/templates") && (
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
-              )}
-            </Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
-  );
 
   // Mobile Navigation with improved animations
   const MobileNav = () => {
@@ -689,11 +499,8 @@ export function Navigation() {
             />
           </Link>
 
-          {/* Tablet Navigation - Only at md to lg (768px - 1023px) */}
-          <TabletNav />
-
-          {/* Desktop Navigation - Only at lg (1024px+) */}
-          <DesktopNav />
+          {/* Desktop & Tablet Navigation - Unified UX (768px+) */}
+          <DesktopTabletNav />
 
           {/* Global Search - Only at xl (1280px+) */}
           <div className="hidden xl:block flex-1 max-w-xs ml-4" data-onboarding="search-bar">
@@ -708,31 +515,21 @@ export function Navigation() {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="navbar-avatar rounded-full h-10 w-10 min-w-[44px] transition-all duration-200" 
+                <button
+                  className="flex items-center justify-center rounded-full h-10 w-10 min-w-[40px] hover:ring-2 hover:ring-primary/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="User menu"
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-sm bg-primary/10 text-primary font-medium">
-                      {user?.name?.charAt(0).toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
+                  {user && <UserAvatar user={user} size={40} />}
+                </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-60 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
+              <DropdownMenuContent
+                align="end"
+                className="w-60"
                 sideOffset={8}
               >
                 <div className="px-3 py-3 border-b border-border/50">
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {user?.name?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
+                    {user && <UserAvatar user={user} size={48} />}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{user?.name}</p>
                       <p className="text-xs text-muted-foreground truncate">{user?.email}</p>

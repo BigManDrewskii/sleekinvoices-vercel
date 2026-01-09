@@ -74,12 +74,7 @@ const buttonVariants = cva(
           "active:bg-green-600/80",
         ].join(" "),
         // Crypto - distinctive amber/orange for crypto payments
-        crypto: [
-          "bg-[#f7931a]/10 text-[#f7931a]",
-          "border border-[#f7931a]/40",
-          "hover:bg-[#f7931a]/20 hover:border-[#f7931a]/70",
-          "active:bg-[#f7931a]/30",
-        ].join(" "),
+        crypto: "bg-[var(--color-crypto)]/10 text-[var(--color-crypto)] border border-[var(--color-crypto)]/40 hover:bg-[var(--color-crypto)]/20 hover:border-[var(--color-crypto)]/70 active:bg-[var(--color-crypto)]/30",
         // Premium outline - subtle primary border variant
         "outline-primary": [
           "border border-primary/40 bg-transparent text-primary",

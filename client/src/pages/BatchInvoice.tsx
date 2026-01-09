@@ -21,6 +21,7 @@ import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
 import { formatCurrency } from "@/lib/utils";
+import { Currency } from "@/components/ui/typography";
 import { SaveBatchTemplateDialog, LoadBatchTemplateDialog } from "@/components/BatchTemplateDialog";
 
 interface LineItem {
@@ -608,7 +609,7 @@ export default function BatchInvoice() {
                     </div>
                     <div className="col-span-2 flex items-center justify-between">
                       <span className="text-sm font-medium">
-                        {formatCurrency(item.quantity * item.rate, settings?.currency || 'USD')}
+                        <Currency amount={item.quantity * item.rate} currency={settings?.currency || 'USD'} />
                       </span>
                       {lineItems.length > 1 && (
                         <Button
@@ -633,12 +634,12 @@ export default function BatchInvoice() {
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Per Invoice Total</p>
                     <p className="text-xl font-bold">
-                      {formatCurrency(lineItemsTotal, settings?.currency || 'USD')}
+                      <Currency amount={lineItemsTotal} currency={settings?.currency || 'USD'} />
                     </p>
                     <p className="text-sm text-muted-foreground mt-2">
                       Total for {selectedClients.length} invoices: {' '}
                       <span className="font-semibold text-foreground">
-                        {formatCurrency(totalForAllClients, settings?.currency || 'USD')}
+                        <Currency amount={totalForAllClients} currency={settings?.currency || 'USD'} />
                       </span>
                     </p>
                   </div>

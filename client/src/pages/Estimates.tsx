@@ -16,6 +16,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Currency, DateDisplay } from "@/components/ui/typography";
 import {
   FileText,
   Plus,

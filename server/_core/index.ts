@@ -185,6 +185,50 @@ async function startServer() {
     }
   });
 
+  // Avatar upload endpoint with image optimization
+  app.post("/api/upload/avatar", async (req, res) => {
+    try {
+      const { file, userId, filename } = req.body;
+      if (!file || !userId) {
+        return res.status(400).json({ error: "Missing file or userId" });
+      }
+
+      const buffer = Buffer.from(file, 'base64');
+      const { storagePut } = await import("../storage");
+      const { optimizeImage, getFileExtension } = await import("../image-optimization");
+
+      const optimization = await optimizeImage(buffer, filename || 'avatar.png');
+
+      const timestamp = Date.now();
+      const ext = getFileExtension(optimization.format);
+      const storageFilename = `avatars/${userId}/avatar-${timestamp}.${ext}`;
+
+      const mimeTypeMap: Record<string, string> = {
+        'png': 'image/png',
+        'jpeg': 'image/jpeg',
+        'jpg': 'image/jpeg',
+        'webp': 'image/webp',
+      };
+      const mimeType = mimeTypeMap[optimization.format] || 'image/png';
+
+      const { url } = await storagePut(storageFilename, optimization.buffer, mimeType);
+
+      res.json({
+        url,
+        optimization: {
+          originalSize: optimization.originalSize,
+          optimizedSize: optimization.optimizedSize,
+          compressionRatio: optimization.compressionRatio,
+          format: optimization.format,
+        }
+      });
+    } catch (error: unknown) {
+      console.error("Avatar upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ error: errorMessage });
+    }
+  });
+
   // Rate limiting for API endpoints
   app.use("/api/trpc", standardRateLimit);
   app.use("/api/stripe/webhook", strictRateLimit);

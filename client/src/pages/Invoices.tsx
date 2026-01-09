@@ -36,6 +36,7 @@ import { Pagination } from "@/components/shared/Pagination";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
+import { Currency, DateDisplay } from "@/components/ui/typography";
 import {
   FileText,
   Plus,
@@ -1004,19 +1005,19 @@ export default function Invoices() {
                             <InvoiceNumberCell invoiceNumber={invoice.invoiceNumber} />
                           </TableCell>
                           <TableCell>{invoice.client.name}</TableCell>
-                          <TableCell>{formatDateShort(invoice.issueDate)}</TableCell>
-                          <TableCell>{formatDateShort(invoice.dueDate)}</TableCell>
+                          <TableCell><DateDisplay date={invoice.issueDate} format="short" /></TableCell>
+                          <TableCell><DateDisplay date={invoice.dueDate} format="short" /></TableCell>
                           <TableCell className="font-semibold">
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                {formatCurrency(invoice.total, invoice.currency)}
+                                <Currency amount={invoice.total} currency={invoice.currency} />
                                 {invoice.currency && invoice.currency !== 'USD' && (
                                   <CurrencyBadge code={invoice.currency} />
                                 )}
                               </div>
                               {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
                                 <div className="text-xs text-muted-foreground">
-                                  Paid: {formatCurrency(invoice.totalPaid || '0')}
+                                  Paid: <Currency amount={invoice.totalPaid || '0'} />
                                 </div>
                               )}
                             </div>
@@ -1162,21 +1163,21 @@ export default function Invoices() {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold flex items-center gap-1 justify-end">
-                            {formatCurrency(invoice.total, invoice.currency)}
+                            <Currency amount={invoice.total} currency={invoice.currency} />
                             {invoice.currency && invoice.currency !== 'USD' && (
                               <CurrencyBadge code={invoice.currency} />
                             )}
                           </p>
                           {invoice.paymentStatus && invoice.paymentStatus !== 'unpaid' && (
                             <p className="text-xs text-muted-foreground">
-                              Paid: {formatCurrency(invoice.totalPaid || '0')}
+                              Paid: <Currency amount={invoice.totalPaid || '0'} />
                             </p>
                           )}
                         </div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
-                        <span>Issued: {formatDateShort(invoice.issueDate)}</span>
-                        <span>Due: {formatDateShort(invoice.dueDate)}</span>
+                        <span>Issued: <DateDisplay date={invoice.issueDate} format="short" /></span>
+                        <span>Due: <DateDisplay date={invoice.dueDate} format="short" /></span>
                       </div>
                     </div>
                   ))}

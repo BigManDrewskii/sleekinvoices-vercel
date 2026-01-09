@@ -8,6 +8,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/utils";
+import { Currency } from "../ui/typography";
+import { PercentageInput, CurrencyInput } from "../ui/specialized-inputs";
+import { FormField } from "../ui/form-field";
 
 interface InvoiceFormCalculationsProps {
   subtotal: number;
@@ -38,7 +41,7 @@ export function InvoiceFormCalculations({
     <div className="space-y-4">
       <div className="flex items-center justify-between py-2 border-t">
         <span className="text-sm font-medium">Subtotal</span>
-        <span className="text-sm font-semibold">{formatCurrency(subtotal)}</span>
+        <span className="text-sm font-semibold"><Currency amount={subtotal} /></span>
       </div>
 
       {/* Discount */}
@@ -68,35 +71,30 @@ export function InvoiceFormCalculations({
         {discountAmount > 0 && (
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>Discount amount</span>
-            <span>-{formatCurrency(discountAmount)}</span>
+            <span>-<Currency amount={discountAmount} /></span>
           </div>
         )}
       </div>
 
       {/* Tax */}
-      <div className="space-y-2">
-        <Label>Tax Rate (%)</Label>
-        <Input
-          type="number"
-          placeholder="0%"
-          min="0"
-          max="100"
-          step="0.01"
+      <FormField label="Tax Rate (%)">
+        <PercentageInput
+          placeholder="0"
           value={taxRate || ''}
-          onChange={(e) => onTaxRateChange(parseFloat(e.target.value) || 0)}
+          onValueChange={(value) => onTaxRateChange(parseFloat(value) || 0)}
         />
         {taxAmount > 0 && (
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
             <span>Tax amount</span>
-            <span>+{formatCurrency(taxAmount)}</span>
+            <span>+<Currency amount={taxAmount} /></span>
           </div>
         )}
-      </div>
+      </FormField>
 
       {/* Total */}
       <div className="flex items-center justify-between py-3 border-t-2 border-primary/20">
         <span className="text-lg font-bold">Total</span>
-        <span className="text-2xl font-bold text-primary">{formatCurrency(total)}</span>
+        <span className="text-2xl font-bold text-primary"><Currency amount={total} /></span>
       </div>
     </div>
   );

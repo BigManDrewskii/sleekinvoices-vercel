@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/utils";
+import { Currency, Numeric } from "@/components/ui/typography";
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -153,7 +154,7 @@ export default function Analytics() {
         <div className="bg-card border border-border rounded-lg px-4 py-3 shadow-xl">
           <p className="text-xs text-muted-foreground mb-1">{label}</p>
           <p className="text-lg font-bold text-primary">
-            {formatCurrency(payload[0].value)}
+            <Currency amount={payload[0].value} />
           </p>
         </div>
       );
@@ -213,7 +214,7 @@ export default function Analytics() {
                 <span className="text-sm font-medium text-muted-foreground">Total Revenue</span>
               </div>
               <div className="text-3xl font-bold text-foreground mb-2">
-                {formatCurrency(revenueNum)}
+                <Currency amount={revenueNum} />
               </div>
               <div className="flex items-center gap-1.5">
                 {revenueChangePercent >= 0 ? (
@@ -239,7 +240,7 @@ export default function Analytics() {
                 <span className="text-sm font-medium text-muted-foreground">Outstanding</span>
               </div>
               <div className="text-3xl font-bold text-foreground mb-2">
-                {formatCurrency(outstandingNum)}
+                <Currency amount={outstandingNum} />
               </div>
               <div className="text-sm text-muted-foreground">
                 {totalInvoices - paidInvoices} unpaid invoices
@@ -257,7 +258,7 @@ export default function Analytics() {
                 <span className="text-sm font-medium text-muted-foreground">Overdue</span>
               </div>
               <div className="text-3xl font-bold text-foreground mb-2">
-                {formatCurrency(overdueAmount)}
+                <Currency amount={overdueAmount} />
               </div>
               <div className="text-sm text-muted-foreground">
                 {overdueCount > 0 ? `${overdueCount} invoices need attention` : "All invoices on track"}
@@ -281,7 +282,7 @@ export default function Analytics() {
               </div>
               {chartData.length > 0 && (
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(revenueNum)}</p>
+                  <p className="text-2xl font-bold text-primary"><Currency amount={revenueNum} /></p>
                   <p className="text-xs text-muted-foreground">Total for period</p>
                 </div>
               )}
@@ -433,7 +434,7 @@ export default function Analytics() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-foreground">{bucket.label}</span>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-foreground">{formatCurrency(amount)}</span>
+                        <span className="text-sm font-semibold text-foreground"><Currency amount={amount} /></span>
                         <span className="text-xs text-muted-foreground w-16 text-right">{bucket.count} inv</span>
                       </div>
                     </div>

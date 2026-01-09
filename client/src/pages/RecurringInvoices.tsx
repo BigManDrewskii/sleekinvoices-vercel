@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { RecurringInvoicesPageSkeleton } from "@/components/skeletons";
+import { DateDisplay } from "@/components/ui/typography";
 
 export default function RecurringInvoices() {
   const [, setLocation] = useLocation();
@@ -173,15 +174,15 @@ export default function RecurringInvoices() {
                       <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">Start Date</p>
-                          <p className="font-medium">{formatDate(recurring.startDate)}</p>
+                          <p className="font-medium"><DateDisplay date={recurring.startDate} format="long" /></p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Next Invoice</p>
-                          <p className="font-medium">{formatDate(recurring.nextInvoiceDate)}</p>
+                          <p className="font-medium"><DateDisplay date={recurring.nextInvoiceDate} format="long" /></p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">End Date</p>
-                          <p className="font-medium">{formatDate(recurring.endDate)}</p>
+                          <p className="font-medium"><DateDisplay date={recurring.endDate} format="long" /></p>
                         </div>
                       </div>
 
@@ -253,7 +254,7 @@ export default function RecurringInvoices() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Next Invoice</p>
-                      <p className="font-medium">{formatDate(recurring.nextInvoiceDate)}</p>
+                      <p className="font-medium"><DateDisplay date={recurring.nextInvoiceDate} format="long" /></p>
                     </div>
                   </div>
 

@@ -3,10 +3,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogIconHeader, DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -279,19 +279,20 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
       <DialogContent className="sm:max-w-[500px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
-                <UserPlus className="size-4 text-primary" />
-              </div>
-              {client ? "Edit Client" : "Add New Client"}
+            <DialogTitle>
+              <DialogIconHeader
+                icon={UserPlus}
+                title={client ? "Edit Client" : "Add New Client"}
+                variant="primary"
+                size="sm"
+              />
             </DialogTitle>
             <DialogDescription>
               {client ? "Update client information" : "Add a new client to your database"}
             </DialogDescription>
           </DialogHeader>
-          
-          {/* Dialog Body - consistent padding applied via px-6 py-4 */}
-          <div className="px-6 py-4 space-y-6">
+
+          <DialogBody spacing="relaxed">
             {/* Contact Information Section */}
             <div className="space-y-4">
               <div className="space-y-1">
@@ -443,31 +444,15 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
                 </p>
               </div>
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="size-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Check weight="bold" className="size-4" />
-                  {client ? "Update Client" : "Create Client"}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
+          </DialogBody>
+
+          <DialogActions
+            onClose={() => onOpenChange(false)}
+            onSubmit={() => {}} // Form handles submit via form onSubmit
+            submitText={client ? "Update Client" : "Create Client"}
+            cancelText="Cancel"
+            isLoading={isLoading}
+          />
         </form>
       </DialogContent>
     </Dialog>
