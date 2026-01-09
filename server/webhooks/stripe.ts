@@ -143,18 +143,35 @@ async function handlePaymentSucceeded(event: any) {
   
   // Send payment confirmation email
   try {
-    const { clients } = await import("../../drizzle/schema");
-    
+    const { clients, users } = await import("../../drizzle/schema");
+    const { sendPaymentConfirmationEmail } = await import("../email");
+
     const clientResult = await db
       .select()
       .from(clients)
       .where(eq(clients.id, invoice.clientId))
       .limit(1);
-    
-    if (clientResult[0]?.email) {
-      // TODO: Send payment confirmation email
-      // Would need to implement a generic sendEmail function or use sendInvoiceEmail
-      console.log(`[Stripe Webhook] Would send payment confirmation to ${clientResult[0].email}`);
+
+    const userResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, invoice.userId))
+      .limit(1);
+
+    if (clientResult[0] && userResult[0]) {
+      const emailResult = await sendPaymentConfirmationEmail({
+        invoice,
+        client: clientResult[0],
+        user: userResult[0],
+        amountPaid: paymentIntent.amount / 100, // Convert from cents
+        paymentMethod: 'Stripe',
+      });
+
+      if (emailResult.success) {
+        console.log(`[Stripe Webhook] Payment confirmation email sent to ${clientResult[0].email}`);
+      } else {
+        console.error(`[Stripe Webhook] Failed to send confirmation email: ${emailResult.error}`);
+      }
     }
   } catch (emailError) {
     console.error("[Stripe Webhook] Failed to send payment confirmation email:", emailError);

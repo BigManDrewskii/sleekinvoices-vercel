@@ -125,7 +125,66 @@ async function startServer() {
       });
     }
   });
-  
+
+  // Client portal PDF download endpoint (public with access token validation)
+  app.get("/api/invoices/:id/pdf", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const accessToken = req.query.token as string;
+
+      if (!accessToken) {
+        return res.status(401).json({ error: "Access token required" });
+      }
+
+      if (isNaN(invoiceId)) {
+        return res.status(400).json({ error: "Invalid invoice ID" });
+      }
+
+      // Import required functions
+      const { getClientByAccessToken, getInvoiceById, getLineItemsByInvoiceId, getUserById, getDefaultTemplate } = await import("../db");
+      const { generateInvoicePDF } = await import("../pdf");
+
+      // Validate access token
+      const client = await getClientByAccessToken(accessToken);
+      if (!client) {
+        return res.status(401).json({ error: "Invalid or expired access token" });
+      }
+
+      // Get invoice and verify it belongs to this client
+      const invoice = await getInvoiceById(invoiceId, client.userId);
+      if (!invoice || invoice.clientId !== client.id) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+
+      // Get invoice data
+      const lineItems = await getLineItemsByInvoiceId(invoiceId);
+      const user = await getUserById(client.userId);
+      const template = await getDefaultTemplate(client.userId);
+
+      if (!user) {
+        return res.status(500).json({ error: "User not found" });
+      }
+
+      // Generate PDF
+      const pdfBuffer = await generateInvoicePDF({
+        invoice,
+        client,
+        lineItems,
+        user,
+        template,
+      });
+
+      // Send PDF as response
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice-${invoice.invoiceNumber}.pdf"`);
+      res.send(pdfBuffer);
+    } catch (error: unknown) {
+      console.error("PDF generation error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ error: "Failed to generate PDF", details: errorMessage });
+    }
+  });
+
   // Rate limiting for API endpoints
   app.use("/api/trpc", standardRateLimit);
   app.use("/api/stripe/webhook", strictRateLimit);

@@ -618,3 +618,117 @@ export async function sendReminderEmail(params: SendReminderEmailParams): Promis
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * Send payment confirmation email
+ */
+interface SendPaymentConfirmationParams {
+  invoice: Invoice;
+  client: Client;
+  user: User;
+  amountPaid: number | string;
+  paymentMethod?: string;
+}
+
+export async function sendPaymentConfirmationEmail(params: SendPaymentConfirmationParams): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  const { invoice, client, user, amountPaid, paymentMethod = 'Stripe' } = params;
+
+  if (!client.email) {
+    return { success: false, error: 'Client email is not set' };
+  }
+
+  if (!user.email) {
+    return { success: false, error: 'User email is not set' };
+  }
+
+  try {
+    const resendClient = getResend();
+
+    // Generate invoice URL (client portal)
+    const portalUrl = `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/portal/${invoice.id}`;
+
+    const paidAmount = formatCurrency(amountPaid);
+    const invoiceTotal = formatCurrency(invoice.total);
+
+    // Create payment confirmation email
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Payment Confirmation</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">Payment Received!</h1>
+          </div>
+
+          <div style="background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+            <p style="font-size: 16px; margin-bottom: 20px;">Hi ${client.name || 'there'},</p>
+
+            <p style="font-size: 16px; margin-bottom: 20px;">Great news! We've received your payment for <strong>Invoice ${invoice.invoiceNumber}</strong>.</p>
+
+            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 25px 0;">
+              <h2 style="margin: 0 0 15px 0; font-size: 18px; color: #374151;">Payment Details</h2>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px 0; color: #6b7280;">Invoice Number</td>
+                  <td style="padding: 12px 0; text-align: right; font-weight: 600;">${invoice.invoiceNumber}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px 0; color: #6b7280;">Amount Paid</td>
+                  <td style="padding: 12px 0; text-align: right; font-weight: 600; color: #10b981;">${paidAmount}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px 0; color: #6b7280;">Invoice Total</td>
+                  <td style="padding: 12px 0; text-align: right; font-weight: 600;">${invoiceTotal}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px 0; color: #6b7280;">Payment Method</td>
+                  <td style="padding: 12px 0; text-align: right;">${paymentMethod}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; color: #6b7280;">Payment Date</td>
+                  <td style="padding: 12px 0; text-align: right;">${formatDate(new Date())}</td>
+                </tr>
+              </table>
+            </div>
+
+            <p style="font-size: 16px; margin: 25px 0;">Thank you for your prompt payment. If you have any questions or concerns, please don't hesitate to reach out.</p>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${portalUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600;">View Invoice</a>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+            <p style="font-size: 14px; color: #6b7280; margin: 0;">
+              Best regards,<br>
+              <strong>${user.companyName || user.name}</strong>
+            </p>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; padding: 20px; color: #6b7280; font-size: 12px;">
+            <p>This is an automated payment confirmation email.</p>
+            <p>If you have any questions, please contact ${user.email}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const result = await resendClient.emails.send({
+      from: `${user.companyName || user.name || 'SleekInvoices'} <payments@sleekinvoices.com>`,
+      replyTo: user.email || 'support@sleekinvoices.com',
+      to: client.email,
+      subject: `Payment Received for Invoice ${invoice.invoiceNumber}`,
+      html: emailHtml,
+    });
+
+    return { success: true, messageId: result.data?.id };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Failed to send payment confirmation email:', errorMessage);
+    return { success: false, error: errorMessage };
+  }
+}

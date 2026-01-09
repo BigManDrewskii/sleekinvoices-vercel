@@ -2,7 +2,8 @@ import { getDb } from "../db";
 import * as db from "../db";
 import { sendInvoiceEmail } from "../email";
 import { generateInvoicePDF } from "../pdf";
-import { invoiceGenerationLogs } from "../../drizzle/schema";
+import { invoiceGenerationLogs, invoices, invoiceLineItems, recurringInvoices } from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * Generate invoices from recurring templates that are due
@@ -61,39 +62,7 @@ export async function generateRecurringInvoices() {
         const amountAfterDiscount = subtotal - discountAmount;
         const taxAmount = (amountAfterDiscount * taxRate) / 100;
         const total = amountAfterDiscount + taxAmount;
-        
-        // Create the invoice
-        const newInvoice = await db.createInvoice({
-          userId: recurring.userId,
-          clientId: recurring.clientId,
-          invoiceNumber,
-          status: "sent", // Auto-send generated invoices
-          subtotal: subtotal.toString(),
-          taxRate: recurring.taxRate,
-          taxAmount: taxAmount.toString(),
-          discountType: recurring.discountType,
-          discountValue: recurring.discountValue,
-          discountAmount: discountAmount.toString(),
-          total: total.toString(),
-          amountPaid: "0",
-          notes: recurring.notes,
-          paymentTerms: recurring.paymentTerms,
-          issueDate,
-          dueDate,
-          sentAt: new Date(),
-        });
-        
-        // Create line items
-        for (const item of lineItems) {
-          await db.createLineItem({
-            invoiceId: newInvoice.id,
-            description: item.description,
-            quantity: item.quantity,
-            rate: item.rate,
-            amount: (parseFloat(item.quantity) * parseFloat(item.rate)).toString(),
-          });
-        }
-        
+
         // Calculate next invoice date
         const nextDate = new Date(recurring.nextInvoiceDate);
         if (recurring.frequency === "weekly") {
@@ -103,10 +72,86 @@ export async function generateRecurringInvoices() {
         } else if (recurring.frequency === "yearly") {
           nextDate.setFullYear(nextDate.getFullYear() + 1);
         }
-        
-        // Update recurring invoice with next date
-        await db.updateRecurringInvoice(recurring.id, recurring.userId, {
-          nextInvoiceDate: nextDate,
+
+        // Use transaction to ensure atomicity of invoice creation, line items, and recurring invoice update
+        const newInvoice = await database.transaction(async (tx) => {
+          // Create the invoice
+          const [createdInvoice] = await tx.insert(invoices).values({
+            userId: recurring.userId,
+            clientId: recurring.clientId,
+            invoiceNumber,
+            status: "sent", // Auto-send generated invoices
+            subtotal: subtotal.toString(),
+            taxRate: recurring.taxRate,
+            taxAmount: taxAmount.toString(),
+            discountType: recurring.discountType,
+            discountValue: recurring.discountValue,
+            discountAmount: discountAmount.toString(),
+            total: total.toString(),
+            amountPaid: "0",
+            notes: recurring.notes,
+            paymentTerms: recurring.paymentTerms,
+            issueDate,
+            dueDate,
+            sentAt: new Date(),
+            createdAt: new Date(),
+          });
+
+          const insertedInvoiceId = createdInvoice.insertId;
+
+          // Create line items
+          for (const item of lineItems) {
+            await tx.insert(invoiceLineItems).values({
+              invoiceId: insertedInvoiceId,
+              description: item.description,
+              quantity: item.quantity,
+              rate: item.rate,
+              amount: (parseFloat(item.quantity) * parseFloat(item.rate)).toString(),
+              sortOrder: 0,
+              createdAt: new Date(),
+            });
+          }
+
+          // Update recurring invoice with next date
+          await tx
+            .update(recurringInvoices)
+            .set({ nextInvoiceDate: nextDate })
+            .where(eq(recurringInvoices.id, recurring.id));
+
+          // Return the created invoice with proper typing (matching Invoice schema)
+          return {
+            id: insertedInvoiceId,
+            userId: recurring.userId,
+            clientId: recurring.clientId,
+            invoiceNumber,
+            status: "sent" as const,
+            currency: "USD",
+            subtotal: subtotal.toString(),
+            taxRate: recurring.taxRate,
+            taxAmount: taxAmount.toString(),
+            discountType: recurring.discountType,
+            discountValue: recurring.discountValue,
+            discountAmount: discountAmount.toString(),
+            total: total.toString(),
+            amountPaid: "0",
+            cryptoAmount: null,
+            cryptoCurrency: null,
+            cryptoPaymentId: null,
+            cryptoPaymentUrl: null,
+            stripePaymentLinkId: null,
+            stripePaymentLinkUrl: null,
+            stripeSessionId: null,
+            notes: recurring.notes,
+            paymentTerms: recurring.paymentTerms,
+            templateId: null,
+            issueDate,
+            dueDate,
+            sentAt: new Date(),
+            paidAt: null,
+            firstViewedAt: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
         });
         
         // Log successful generation

@@ -876,27 +876,33 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const invoice = await db.getInvoiceById(input.id, ctx.user.id);
         if (!invoice) throw new Error('Invoice not found');
-        
+
         const lineItems = await db.getLineItemsByInvoiceId(input.id);
         const client = await db.getClientById(invoice.clientId, ctx.user.id);
         if (!client) throw new Error('Client not found');
-        
+
         // Get user's default template
         const template = await db.getDefaultTemplate(ctx.user.id);
-        
-        const pdfBuffer = await generateInvoicePDF({
-          invoice,
-          client,
-          lineItems,
-          user: ctx.user,
-          template,
-        });
-        
-        // Upload to S3
-        const fileKey = `invoices/${ctx.user.id}/${invoice.invoiceNumber}-${nanoid()}.pdf`;
-        const { url } = await storagePut(fileKey, pdfBuffer, 'application/pdf');
-        
-        return { url };
+
+        try {
+          const pdfBuffer = await generateInvoicePDF({
+            invoice,
+            client,
+            lineItems,
+            user: ctx.user,
+            template,
+          });
+
+          // Upload to S3
+          const fileKey = `invoices/${ctx.user.id}/${invoice.invoiceNumber}-${nanoid()}.pdf`;
+          const { url } = await storagePut(fileKey, pdfBuffer, 'application/pdf');
+
+          return { url };
+        } catch (error: unknown) {
+          console.error(`Failed to generate PDF for invoice ${invoice.invoiceNumber}:`, error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          throw new Error(`PDF generation failed: ${errorMessage}`);
+        }
       }),
     
     createPaymentLink: protectedProcedure
@@ -927,74 +933,80 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const invoice = await db.getInvoiceById(input.id, ctx.user.id);
         if (!invoice) throw new Error('Invoice not found');
-        
+
         const lineItems = await db.getLineItemsByInvoiceId(input.id);
         const client = await db.getClientById(invoice.clientId, ctx.user.id);
         if (!client) throw new Error('Client not found');
-        
+
         // Get user's default template
         const template = await db.getDefaultTemplate(ctx.user.id);
-        
-        // Generate PDF
-        const pdfBuffer = await generateInvoicePDF({
-          invoice,
-          client,
-          lineItems,
-          user: ctx.user,
-          template,
-        });
-        
-        // Send email
-        const result = await sendInvoiceEmail({
-          invoice,
-          client,
-          user: ctx.user,
-          pdfBuffer,
-          paymentLinkUrl: invoice.stripePaymentLinkUrl || undefined,
-        });
-        
-        // Always update invoice status to 'sent' when user clicks send
-        // This ensures status updates even if email delivery fails
-        if (invoice.status === 'draft') {
-          await db.updateInvoice(input.id, ctx.user.id, {
-            status: 'sent',
-            sentAt: new Date(),
+
+        try {
+          // Generate PDF
+          const pdfBuffer = await generateInvoicePDF({
+            invoice,
+            client,
+            lineItems,
+            user: ctx.user,
+            template,
           });
-          
-          // ============================================================================
-          // AUTOMATIC QUICKBOOKS SYNC ON SEND
-          // Sync invoice to QuickBooks when first sent (status changes from draft)
-          // ============================================================================
-          try {
-            const { getConnectionStatus, syncInvoiceToQB } = await import('./quickbooks');
-            const qbStatus = await getConnectionStatus(ctx.user.id);
-            if (qbStatus.connected) {
-              // Fire and forget - don't block email sending on QB sync
-              syncInvoiceToQB(ctx.user.id, input.id).catch((err) => {
-                console.error('[QuickBooks] Auto-sync on send failed for invoice', input.id, err);
-              });
+
+          // Send email
+          const result = await sendInvoiceEmail({
+            invoice,
+            client,
+            user: ctx.user,
+            pdfBuffer,
+            paymentLinkUrl: invoice.stripePaymentLinkUrl || undefined,
+          });
+
+          // Always update invoice status to 'sent' when user clicks send
+          // This ensures status updates even if email delivery fails
+          if (invoice.status === 'draft') {
+            await db.updateInvoice(input.id, ctx.user.id, {
+              status: 'sent',
+              sentAt: new Date(),
+            });
+
+            // ============================================================================
+            // AUTOMATIC QUICKBOOKS SYNC ON SEND
+            // Sync invoice to QuickBooks when first sent (status changes from draft)
+            // ============================================================================
+            try {
+              const { getConnectionStatus, syncInvoiceToQB } = await import('./quickbooks');
+              const qbStatus = await getConnectionStatus(ctx.user.id);
+              if (qbStatus.connected) {
+                // Fire and forget - don't block email sending on QB sync
+                syncInvoiceToQB(ctx.user.id, input.id).catch((err) => {
+                  console.error('[QuickBooks] Auto-sync on send failed for invoice', input.id, err);
+                });
+              }
+            } catch (err) {
+              console.error('[QuickBooks] Auto-sync on send error:', err);
             }
-          } catch (err) {
-            console.error('[QuickBooks] Auto-sync on send error:', err);
           }
+
+          // Log email result
+          await db.logEmail({
+            userId: ctx.user.id,
+            invoiceId: invoice.id,
+            recipientEmail: client.email!,
+            subject: `Invoice ${invoice.invoiceNumber}`,
+            emailType: 'invoice',
+            success: result.success,
+            errorMessage: result.error,
+          });
+
+          return {
+            success: true, // Status updated successfully
+            emailSent: result.success, // Separate flag for email delivery
+            error: result.error,
+          };
+        } catch (error: unknown) {
+          console.error(`Failed to generate PDF or send email for invoice ${invoice.invoiceNumber}:`, error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          throw new Error(`Failed to send invoice: ${errorMessage}`);
         }
-        
-        // Log email result
-        await db.logEmail({
-          userId: ctx.user.id,
-          invoiceId: invoice.id,
-          recipientEmail: client.email!,
-          subject: `Invoice ${invoice.invoiceNumber}`,
-          emailType: 'invoice',
-          success: result.success,
-          errorMessage: result.error,
-        });
-        
-        return {
-          success: true, // Status updated successfully
-          emailSent: result.success, // Separate flag for email delivery
-          error: result.error,
-        };
       }),
     
     sendReminder: protectedProcedure

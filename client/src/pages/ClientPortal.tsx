@@ -144,7 +144,7 @@ export default function ClientPortal() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => window.open(`/api/invoices/${invoice.id}/pdf`, "_blank")}
+                          onClick={() => window.open(`/api/invoices/${invoice.id}/pdf?token=${accessToken}`, "_blank")}
                         >
                           Download PDF
                         </Button>

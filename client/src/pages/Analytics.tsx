@@ -119,10 +119,25 @@ export default function Analytics() {
     : 0;
 
   // Format chart data - use bar chart for better visibility
-  const chartData = monthlyRevenue.map((item: { month: string; revenue: string | number }) => ({
-    date: new Date(item.month).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    revenue: parseFloat(item.revenue?.toString() || "0"),
-  }));
+  const chartData = monthlyRevenue.map((item: { month: string; revenue: string | number }) => {
+    // Parse YYYY-MM format correctly (e.g., "2025-01")
+    const [year, month] = item.month.split('-').map(Number);
+    // Create date with explicit year, month (0-indexed), and day 1
+    const date = new Date(year, month - 1, 1);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric"
+    });
+
+    // Parse revenue and validate it's a number
+    const revenue = parseFloat(item.revenue?.toString() || "0");
+    const validRevenue = isNaN(revenue) ? 0 : revenue;
+
+    return {
+      date: formattedDate,
+      revenue: validRevenue,
+    };
+  });
 
   const timeRangeLabels: Record<string, string> = {
     "7d": "7D",
@@ -272,8 +287,8 @@ export default function Analytics() {
               )}
             </div>
             
-            <div className="h-[300px]">
-              {chartData.length > 0 ? (
+            <div className="h-[400px]">
+              {chartData.length > 0 && chartData.some(d => d.revenue > 0) ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
                     <defs>
