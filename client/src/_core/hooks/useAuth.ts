@@ -1,4 +1,4 @@
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, isLocalDevMode } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
@@ -61,13 +61,18 @@ export function useAuth(options?: UseAuthOptions) {
   ]);
 
   useEffect(() => {
+    // In local dev mode, don't redirect to OAuth - the backend handles auth bypass
+    if (isLocalDevMode()) {
+      return;
+    }
+    
     if (!redirectOnUnauthenticated) return;
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
 
-    window.location.href = redirectPath
+    window.location.href = redirectPath;
   }, [
     redirectOnUnauthenticated,
     redirectPath,
