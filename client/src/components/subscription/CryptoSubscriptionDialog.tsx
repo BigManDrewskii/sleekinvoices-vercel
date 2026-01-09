@@ -181,7 +181,7 @@ export function CryptoSubscriptionDialog({
 
         {/* Step 1: Duration Selection */}
         {step === "duration" && (
-          <div className="space-y-6 py-4">
+          <div className="px-6 py-4 space-y-6">
             {/* Benefits reminder */}
             {!isExtension && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
@@ -240,7 +240,7 @@ export function CryptoSubscriptionDialog({
 
         {/* Step 2: Crypto Selection */}
         {step === "crypto" && (
-          <div className="space-y-6 py-4">
+          <div className="px-6 py-4 space-y-6">
             {/* Selected duration summary */}
             {selectedTier && (
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 flex justify-between items-center">
@@ -324,7 +324,7 @@ export function CryptoSubscriptionDialog({
 
         {/* Step 3: Payment Created */}
         {step === "payment" && paymentData && (
-          <div className="space-y-6 py-4">
+          <div className="px-6 py-4 space-y-6">
             {/* Payment created success */}
             <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-center">
               <Check className="h-8 w-8 text-green-500 mx-auto mb-2" />

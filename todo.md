@@ -1841,3 +1841,13 @@
 - [x] Implement viewport-aware positioning
 - [x] Add scroll-into-view for target elements
 - [x] Test on mobile, tablet, and desktop viewports
+
+
+## Modal Windows Spacing Refinement (Jan 9, 2026)
+- [x] Audit all modal components for spacing inconsistencies
+- [x] Define consistent modal spacing standards (padding, margins, gaps)
+- [x] Fix Create Recurring Invoice modal spacing
+- [x] Fix all Dialog components with tight spacing
+- [x] Apply consistent header/content/footer padding
+- [x] Ensure visual harmony across all modals
+- [x] Test modal consistency across the application

@@ -290,8 +290,11 @@ export function QuickBooksSettings() {
 
       <Dialog open={showDisconnectDialog} onOpenChange={setShowDisconnectDialog}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Disconnect QuickBooks?</DialogTitle><DialogDescription>This will stop syncing data with QuickBooks. Your existing data in QuickBooks will not be affected.</DialogDescription></DialogHeader>
-          <DialogFooter>
+          <DialogHeader>
+            <DialogTitle>Disconnect QuickBooks?</DialogTitle>
+            <DialogDescription>This will stop syncing data with QuickBooks. Your existing data in QuickBooks will not be affected.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3">
             <Button variant="outline" onClick={() => setShowDisconnectDialog(false)}>Cancel</Button>
             <Button variant="destructive" onClick={() => disconnectMutation.mutate()} disabled={disconnectMutation.isPending}>Disconnect</Button>
           </DialogFooter>
@@ -300,7 +303,11 @@ export function QuickBooksSettings() {
 
       <Dialog open={showHistory} onOpenChange={setShowHistory}>
         <DialogContent className="max-w-2xl">
-          <DialogHeader><DialogTitle>Sync History</DialogTitle><DialogDescription>Recent synchronization activity with QuickBooks</DialogDescription></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Sync History</DialogTitle>
+            <DialogDescription>Recent synchronization activity with QuickBooks</DialogDescription>
+          </DialogHeader>
+          <div className="px-6 py-4">
           <ScrollArea className="h-[400px]">
             {syncHistory && syncHistory.length > 0 ? (
               <div className="space-y-2">
@@ -321,6 +328,7 @@ export function QuickBooksSettings() {
               <div className="text-center py-8 text-muted-foreground">No sync history yet</div>
             )}
           </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
     </>

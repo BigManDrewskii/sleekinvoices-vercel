@@ -290,7 +290,8 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-5 py-4">
+          {/* Dialog Body - consistent padding applied via px-6 py-4 */}
+          <div className="px-6 py-4 space-y-6">
             {/* Contact Information Section */}
             <div className="space-y-4">
               <div className="space-y-1">
@@ -444,7 +445,7 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
             </div>
           </div>
           
-          <DialogFooter className="gap-2 sm:gap-2 pt-2">
+          <DialogFooter>
             <Button
               type="button"
               variant="ghost"

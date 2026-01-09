@@ -339,14 +339,15 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4">
           {step === "upload" && renderUploadStep()}
           {step === "preview" && renderPreviewStep()}
           {step === "importing" && renderImportingStep()}
           {step === "complete" && renderCompleteStep()}
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+        <DialogFooter className="gap-3">
           {step === "upload" && (
             <Button variant="ghost" onClick={handleClose}>
               Cancel

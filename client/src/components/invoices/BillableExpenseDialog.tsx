@@ -97,7 +97,8 @@ export function BillableExpenseDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4 space-y-4">
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -181,7 +182,7 @@ export function BillableExpenseDialog({
           )}
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+        <DialogFooter className="gap-3">
           <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>

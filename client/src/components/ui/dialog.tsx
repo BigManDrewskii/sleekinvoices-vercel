@@ -127,13 +127,17 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
+          // Positioning
           "fixed top-[50%] left-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%]",
-          "grid gap-4 rounded-xl border border-border bg-card p-6 shadow-2xl",
+          // Layout - increased padding for better breathing room
+          "grid gap-0 rounded-xl border border-border bg-card shadow-2xl",
+          // Animations
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-[0.98] data-[state=open]:zoom-in-[0.98]",
           "data-[state=closed]:slide-out-to-top-[2%] data-[state=open]:slide-in-from-top-[2%]",
           "duration-200 ease-out",
+          // Default max-width
           "sm:max-w-lg",
           className
         )}
@@ -145,7 +149,7 @@ function DialogContent({
           <DialogPrimitive.Close
             data-slot="dialog-close"
             className={cn(
-              "absolute top-4 right-4 rounded-md p-1",
+              "absolute top-5 right-5 rounded-md p-1.5",
               "text-muted-foreground hover:text-foreground",
               "hover:bg-secondary/50 transition-colors duration-150",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -166,7 +170,12 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      className={cn(
+        // Consistent header padding with proper spacing
+        "flex flex-col gap-2 text-center sm:text-left",
+        "px-6 pt-6 pb-4",
+        className
+      )}
       {...props}
     />
   );
@@ -177,7 +186,9 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        // Consistent footer padding with border separator
+        "flex flex-col-reverse gap-3 sm:flex-row sm:justify-end",
+        "px-6 py-5 border-t border-border bg-muted/30 rounded-b-xl",
         className
       )}
       {...props}
@@ -211,8 +222,24 @@ function DialogDescription({
   );
 }
 
+// New component for dialog body content with consistent padding
+function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-body"
+      className={cn(
+        // Consistent body padding
+        "px-6 py-4",
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,

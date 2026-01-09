@@ -55,8 +55,11 @@ function AlertDialogContent({
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"
         className={cn(
+          // Positioning
           "fixed top-[50%] left-[50%] z-50 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%]",
-          "grid gap-4 rounded-xl border border-border bg-card p-6 shadow-2xl",
+          // Layout - consistent with Dialog component
+          "grid gap-0 rounded-xl border border-border bg-card shadow-2xl",
+          // Animations
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-[0.98] data-[state=open]:zoom-in-[0.98]",
@@ -78,7 +81,12 @@ function AlertDialogHeader({
   return (
     <div
       data-slot="alert-dialog-header"
-      className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
+      className={cn(
+        // Consistent header padding with proper spacing
+        "flex flex-col gap-2 text-center sm:text-left",
+        "px-6 pt-6 pb-4",
+        className
+      )}
       {...props}
     />
   );
@@ -92,7 +100,9 @@ function AlertDialogFooter({
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        // Consistent footer padding with border separator
+        "flex flex-col-reverse gap-3 sm:flex-row sm:justify-end",
+        "px-6 py-5 border-t border-border bg-muted/30 rounded-b-xl",
         className
       )}
       {...props}

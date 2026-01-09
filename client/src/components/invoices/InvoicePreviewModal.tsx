@@ -102,6 +102,8 @@ export function InvoicePreviewModal({
           </DialogDescription>
         </DialogHeader>
 
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4">
         {/* Template Selector */}
         <div className="mb-4">
           <TemplateSelector
@@ -296,6 +298,7 @@ export function InvoicePreviewModal({
             <X className="h-4 w-4 mr-2" />
             Close
           </Button>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

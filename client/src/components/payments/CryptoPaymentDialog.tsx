@@ -133,7 +133,8 @@ export function CryptoPaymentDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-2">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4 space-y-5">
           {!paymentUrl ? (
             <>
               {/* Currency Selection */}
@@ -252,7 +253,7 @@ export function CryptoPaymentDialog({
           )}
         </div>
         
-        <DialogFooter className="gap-2 sm:gap-2 pt-2">
+        <DialogFooter className="gap-3">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             {paymentUrl ? "Close" : "Cancel"}
           </Button>

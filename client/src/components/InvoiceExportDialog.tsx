@@ -161,7 +161,8 @@ export function InvoiceExportDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4 space-y-6">
           {/* Summary Stats */}
           <div className="rounded-lg border p-4 bg-muted/50">
             <p className="text-sm font-medium mb-3">Export Summary</p>
@@ -217,7 +218,7 @@ export function InvoiceExportDialog({
           </div>
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
             Cancel
           </Button>

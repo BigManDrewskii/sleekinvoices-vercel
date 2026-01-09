@@ -73,7 +73,8 @@ export function SaveBatchTemplateDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="template-name">Template Name *</Label>
             <Input
@@ -121,7 +122,7 @@ export function SaveBatchTemplateDialog({
           </div>
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
             Cancel
           </Button>
@@ -188,7 +189,8 @@ export function LoadBatchTemplateDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="py-4">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -249,7 +251,7 @@ export function LoadBatchTemplateDialog({
           )}
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

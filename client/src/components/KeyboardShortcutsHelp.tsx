@@ -75,7 +75,8 @@ export function KeyboardShortcutsHelp() {
           </div>
         </DialogHeader>
         
-        <div className="mt-4 space-y-6">
+        {/* Dialog Body - consistent padding */}
+        <div className="px-6 py-4 space-y-6">
           {Object.entries(groupedShortcuts).map(([category, items]) => (
             <div key={category}>
               <h4 className="mb-3 text-sm font-medium text-muted-foreground">
