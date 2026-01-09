@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { DialogBody } from "@/components/shared/DialogPatterns";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 import { Keyboard } from "lucide-react";
 
@@ -74,9 +75,8 @@ export function KeyboardShortcutsHelp() {
             </div>
           </div>
         </DialogHeader>
-        
-        {/* Dialog Body - consistent padding */}
-        <div className="px-6 py-4 space-y-6">
+
+        <DialogBody spacing="relaxed">
           {Object.entries(groupedShortcuts).map(([category, items]) => (
             <div key={category}>
               <h4 className="mb-3 text-sm font-medium text-muted-foreground">
@@ -99,11 +99,11 @@ export function KeyboardShortcutsHelp() {
               </div>
             </div>
           ))}
-        </div>
-        
-        <div className="mt-4 rounded-lg border border-border/50 bg-muted/30 p-3 text-center text-xs text-muted-foreground">
-          Press <ShortcutKey>Shift</ShortcutKey> + <ShortcutKey>?</ShortcutKey> anytime to show this help
-        </div>
+
+          <div className="mt-4 rounded-lg border border-border/50 bg-muted/30 p-3 text-center text-xs text-muted-foreground">
+            Press <ShortcutKey>Shift</ShortcutKey> + <ShortcutKey>?</ShortcutKey> anytime to show this help
+          </div>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

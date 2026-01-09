@@ -222,24 +222,8 @@ function DialogDescription({
   );
 }
 
-// New component for dialog body content with consistent padding
-function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="dialog-body"
-      className={cn(
-        // Consistent body padding
-        "px-6 py-4",
-        className
-      )}
-      {...props}
-    />
-  );
-}
-
 export {
   Dialog,
-  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,

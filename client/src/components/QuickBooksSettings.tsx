@@ -12,7 +12,8 @@ import {
   RefreshCw, Link2, Unlink, Cloud, CheckCircle2, AlertCircle, 
   History, Building2, Settings2, Download, DollarSign 
 } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Collapsible,
@@ -294,10 +295,14 @@ export function QuickBooksSettings() {
             <DialogTitle>Disconnect QuickBooks?</DialogTitle>
             <DialogDescription>This will stop syncing data with QuickBooks. Your existing data in QuickBooks will not be affected.</DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-3">
-            <Button variant="outline" onClick={() => setShowDisconnectDialog(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={() => disconnectMutation.mutate()} disabled={disconnectMutation.isPending}>Disconnect</Button>
-          </DialogFooter>
+          <DialogActions
+            onClose={() => setShowDisconnectDialog(false)}
+            onSubmit={() => disconnectMutation.mutate()}
+            submitText="Disconnect"
+            cancelText="Cancel"
+            submitVariant="destructive"
+            isLoading={disconnectMutation.isPending}
+          />
         </DialogContent>
       </Dialog>
 
@@ -307,7 +312,7 @@ export function QuickBooksSettings() {
             <DialogTitle>Sync History</DialogTitle>
             <DialogDescription>Recent synchronization activity with QuickBooks</DialogDescription>
           </DialogHeader>
-          <div className="px-6 py-4">
+          <DialogBody>
           <ScrollArea className="h-[400px]">
             {syncHistory && syncHistory.length > 0 ? (
               <div className="space-y-2">
@@ -328,7 +333,7 @@ export function QuickBooksSettings() {
               <div className="text-center py-8 text-muted-foreground">No sync history yet</div>
             )}
           </ScrollArea>
-          </div>
+          </DialogBody>
         </DialogContent>
       </Dialog>
     </>
