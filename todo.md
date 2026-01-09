@@ -1802,3 +1802,13 @@
 - [x] Add search/filter functionality (search, method filter, status filter)
 - [x] Add sortable columns (date, amount)
 - [x] Test the improvements
+
+
+## Payment Details Modal (Jan 9, 2026)
+- [x] Create payment details modal component
+- [x] Display all payment fields including crypto details
+- [x] Add clickable row functionality to open modal
+- [x] Style modal consistently with other dialogs
+- [x] Add copy-to-clipboard for transaction hashes and wallet addresses
+- [x] Add block explorer links for crypto transactions
+- [x] Test the modal functionality

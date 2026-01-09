@@ -42,7 +42,13 @@ import {
   Filter,
   X,
   ArrowUpDown,
-  Calendar
+  Calendar,
+  Clock,
+  Hash,
+  Wallet,
+  ExternalLink,
+  Copy,
+  Check
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -50,8 +56,32 @@ import { PaymentsPageSkeleton } from "@/components/skeletons";
 
 const ITEMS_PER_PAGE = 10;
 
+// Payment type definition
+type Payment = {
+  id: number;
+  invoiceId: number;
+  userId: number;
+  amount: string;
+  currency: string;
+  paymentMethod: "stripe" | "manual" | "bank_transfer" | "check" | "cash" | "crypto";
+  stripePaymentIntentId?: string | null;
+  cryptoAmount?: string | null;
+  cryptoCurrency?: string | null;
+  cryptoNetwork?: string | null;
+  cryptoTxHash?: string | null;
+  cryptoWalletAddress?: string | null;
+  paymentDate: Date | string;
+  receivedDate?: Date | string | null;
+  status: "pending" | "completed" | "failed" | "refunded";
+  notes?: string | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+};
+
 export default function Payments() {
   const [recordPaymentOpen, setRecordPaymentOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     invoiceId: "",
     amount: "",
@@ -224,6 +254,16 @@ export default function Payments() {
     });
   };
 
+  const formatDateTime = (date: Date | string) => {
+    return new Date(date).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const toggleSort = (field: "date" | "amount") => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -241,6 +281,31 @@ export default function Payments() {
   };
 
   const hasActiveFilters = searchQuery || methodFilter !== "all" || statusFilter !== "all";
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    toast.success("Copied to clipboard");
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const getBlockExplorerUrl = (txHash: string, network?: string | null) => {
+    const networkLower = (network || "mainnet").toLowerCase();
+    switch (networkLower) {
+      case "polygon":
+        return `https://polygonscan.com/tx/${txHash}`;
+      case "arbitrum":
+        return `https://arbiscan.io/tx/${txHash}`;
+      case "optimism":
+        return `https://optimistic.etherscan.io/tx/${txHash}`;
+      case "bsc":
+        return `https://bscscan.com/tx/${txHash}`;
+      case "solana":
+        return `https://solscan.io/tx/${txHash}`;
+      default:
+        return `https://etherscan.io/tx/${txHash}`;
+    }
+  };
 
   return (
     <PageLayout
@@ -440,7 +505,11 @@ export default function Payments() {
                   </TableHeader>
                   <TableBody>
                     {paginatedPayments.map((payment) => (
-                      <TableRow key={payment.id} className="hover:bg-muted/30 transition-colors">
+                      <TableRow 
+                        key={payment.id} 
+                        className="hover:bg-muted/30 transition-colors cursor-pointer"
+                        onClick={() => setSelectedPayment(payment as Payment)}
+                      >
                         <TableCell className="font-medium">
                           {formatDate(payment.paymentDate)}
                         </TableCell>
@@ -531,6 +600,199 @@ export default function Payments() {
           )}
         </CardContent>
       </Card>
+
+      {/* Payment Details Modal */}
+      <Dialog open={!!selectedPayment} onOpenChange={(open) => !open && setSelectedPayment(null)}>
+        <DialogContent className="sm:max-w-[550px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10">
+                {selectedPayment && getPaymentMethodIcon(selectedPayment.paymentMethod)}
+              </div>
+              <div>
+                <span className="text-lg">Payment Details</span>
+                <p className="text-sm font-normal text-muted-foreground mt-0.5">
+                  Payment #{selectedPayment?.id}
+                </p>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedPayment && (
+            <div className="space-y-6 py-4">
+              {/* Amount and Status */}
+              <div className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/10">
+                <div>
+                  <p className="text-sm text-muted-foreground">Amount</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {formatCurrency(selectedPayment.amount, selectedPayment.currency)}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground mb-1">Status</p>
+                  {getStatusBadge(selectedPayment.status)}
+                </div>
+              </div>
+
+              {/* Basic Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Hash className="h-3.5 w-3.5" />
+                    Invoice ID
+                  </div>
+                  <p className="font-mono font-medium">#{selectedPayment.invoiceId}</p>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CreditCard className="h-3.5 w-3.5" />
+                    Payment Method
+                  </div>
+                  <p className="font-medium capitalize">{selectedPayment.paymentMethod.replace("_", " ")}</p>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5" />
+                    Payment Date
+                  </div>
+                  <p className="font-medium">{formatDate(selectedPayment.paymentDate)}</p>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    Recorded At
+                  </div>
+                  <p className="font-medium">{formatDateTime(selectedPayment.createdAt)}</p>
+                </div>
+              </div>
+
+              {/* Stripe Details */}
+              {selectedPayment.paymentMethod === "stripe" && selectedPayment.stripePaymentIntentId && (
+                <div className="p-4 rounded-xl bg-muted/30 border space-y-3">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <CreditCard className="h-4 w-4 text-[#635BFF]" />
+                    Stripe Details
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">Payment Intent ID</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-sm bg-muted px-2 py-1 rounded font-mono flex-1 truncate">
+                        {selectedPayment.stripePaymentIntentId}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0"
+                        onClick={() => copyToClipboard(selectedPayment.stripePaymentIntentId!, "stripe")}
+                      >
+                        {copiedField === "stripe" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Crypto Details */}
+              {selectedPayment.paymentMethod === "crypto" && (
+                <div className="p-4 rounded-xl bg-gradient-to-r from-orange-500/5 to-yellow-500/5 border border-orange-500/10 space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Bitcoin className="h-4 w-4 text-orange-500" />
+                    Cryptocurrency Details
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedPayment.cryptoAmount && (
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Crypto Amount</p>
+                        <p className="font-mono font-medium">
+                          {parseFloat(selectedPayment.cryptoAmount).toFixed(8)} {selectedPayment.cryptoCurrency?.toUpperCase()}
+                        </p>
+                      </div>
+                    )}
+                    {selectedPayment.cryptoNetwork && (
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Network</p>
+                        <p className="font-medium capitalize">{selectedPayment.cryptoNetwork}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedPayment.cryptoTxHash && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Transaction Hash</p>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted/50 px-2 py-1.5 rounded font-mono flex-1 truncate">
+                          {selectedPayment.cryptoTxHash}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => copyToClipboard(selectedPayment.cryptoTxHash!, "txHash")}
+                        >
+                          {copiedField === "txHash" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          asChild
+                        >
+                          <a 
+                            href={getBlockExplorerUrl(selectedPayment.cryptoTxHash, selectedPayment.cryptoNetwork)} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedPayment.cryptoWalletAddress && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Wallet className="h-3.5 w-3.5" />
+                        Receiving Wallet
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted/50 px-2 py-1.5 rounded font-mono flex-1 truncate">
+                          {selectedPayment.cryptoWalletAddress}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => copyToClipboard(selectedPayment.cryptoWalletAddress!, "wallet")}
+                        >
+                          {copiedField === "wallet" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Notes */}
+              {selectedPayment.notes && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Notes</p>
+                  <p className="text-sm p-3 rounded-lg bg-muted/30 border">
+                    {selectedPayment.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedPayment(null)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Record Payment Dialog */}
       <Dialog open={recordPaymentOpen} onOpenChange={setRecordPaymentOpen}>
