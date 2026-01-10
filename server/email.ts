@@ -56,6 +56,7 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
   try {
     const resendClient = getResend();
     
+    // Receipt-style email template - minimalist, monospace design
     const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -63,122 +64,213 @@ export async function sendInvoiceEmail(params: SendInvoiceEmailParams): Promise<
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'IBM Plex Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
       line-height: 1.6;
-      color: #374151;
+      color: #18181b;
       max-width: 600px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 0;
+      background: #fafafa;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      background: white;
+      margin: 24px auto;
+      padding: 48px 40px;
+      box-shadow: 0 0 1px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.05);
     }
     .header {
-      text-align: center;
-      padding: 32px 0;
-      border-bottom: 2px solid #e5e7eb;
-      margin-bottom: 32px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #111827;
-    }
-    .invoice-details {
-      background: #f9fafb;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 32px;
-    }
-    .detail-row {
       display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
     }
-    .detail-label {
-      color: #6b7280;
+    .logo-box {
+      width: 32px;
+      height: 32px;
+      background: #18181b;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .company-name {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: #18181b;
+    }
+    .divider {
+      border: none;
+      border-top: 1px dashed #e4e4e7;
+      margin: 24px 0;
+    }
+    .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a1a1aa;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .value {
+      font-size: 14px;
+      color: #27272a;
+      font-variant-numeric: tabular-nums;
+    }
+    .value-bold {
       font-weight: 500;
     }
-    .detail-value {
-      color: #111827;
-      font-weight: 600;
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
-    .amount {
-      font-size: 24px;
-      color: #111827;
+    .total-section {
+      text-align: right;
+      margin-top: 24px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 32px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .total-label {
+      color: #a1a1aa;
+    }
+    .total-value {
+      color: #27272a;
+      font-variant-numeric: tabular-nums;
+      min-width: 100px;
+      text-align: right;
+    }
+    .grand-total {
+      font-size: 18px;
+      font-weight: 500;
+      color: #18181b;
+      border-top: 1px solid #f4f4f5;
+      padding-top: 12px;
+      margin-top: 8px;
     }
     .button {
       display: inline-block;
-      background: #2563eb;
-      color: white;
+      background: #18181b;
+      color: white !important;
       text-decoration: none;
       padding: 14px 32px;
-      border-radius: 8px;
-      font-weight: 600;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 13px;
       text-align: center;
       margin: 24px 0;
+      letter-spacing: 0.01em;
+    }
+    .button:hover {
+      background: #27272a;
+    }
+    .message {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #52525b;
+      margin-bottom: 24px;
     }
     .footer {
       margin-top: 48px;
-      padding-top: 24px;
-      border-top: 1px solid #e5e7eb;
+      font-size: 10px;
+      color: #d4d4d8;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
       text-align: center;
-      font-size: 14px;
-      color: #6b7280;
     }
-    .message {
-      font-size: 16px;
-      line-height: 1.8;
-      margin-bottom: 24px;
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f59e0b;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>Invoice from ${user.companyName || user.name || 'Your Company'}</h1>
-  </div>
-  
-  <div class="message">
-    <p>Hello ${client.name},</p>
-    <p>Thank you for your business! Please find attached invoice ${invoice.invoiceNumber} for your review.</p>
-  </div>
-  
-  <div class="invoice-details">
-    <div class="detail-row">
-      <span class="detail-label">Invoice Number:</span>
-      <span class="detail-value">${invoice.invoiceNumber}</span>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
+      </div>
+      <span class="company-name">${user.companyName || user.name || 'SleekInvoices'}</span>
     </div>
-    <div class="detail-row">
-      <span class="detail-label">Issue Date:</span>
-      <span class="detail-value">${formatDate(invoice.issueDate)}</span>
+
+    <hr class="divider">
+
+    <!-- Greeting -->
+    <div class="message">
+      <p style="margin: 0 0 12px 0;">Hello ${client.name},</p>
+      <p style="margin: 0;">Thank you for your business! Please find your invoice details below.</p>
     </div>
-    <div class="detail-row">
-      <span class="detail-label">Due Date:</span>
-      <span class="detail-value">${formatDate(invoice.dueDate)}</span>
+
+    <hr class="divider">
+
+    <!-- Invoice Meta -->
+    <div style="margin-bottom: 16px;">
+      <div class="label">Invoice #</div>
+      <div class="value value-bold">${invoice.invoiceNumber}</div>
     </div>
-    <div class="detail-row" style="border-top: 2px solid #e5e7eb; margin-top: 16px; padding-top: 16px;">
-      <span class="detail-label">Amount Due:</span>
-      <span class="detail-value amount">${formatCurrency(invoice.total)}</span>
+
+    <div class="info-grid">
+      <div>
+        <div class="label">Issued</div>
+        <div class="value">${formatDate(invoice.issueDate)}</div>
+      </div>
+      <div>
+        <div class="label">Due</div>
+        <div class="value">${formatDate(invoice.dueDate)}</div>
+      </div>
     </div>
-  </div>
-  
-  ${paymentLinkUrl ? `
-  <div style="text-align: center;">
-    <a href="${paymentLinkUrl}" class="button">Pay Invoice Online</a>
-    <p style="font-size: 14px; color: #6b7280; margin-top: 16px;">
-      Click the button above to pay securely with credit card or bank transfer.
-    </p>
-  </div>
-  ` : ''}
-  
-  <div class="message">
-    <p>The invoice is attached as a PDF. If you have any questions, please don't hesitate to reach out.</p>
-    <p>Best regards,<br>${user.name || 'Your Company'}</p>
-  </div>
-  
-  <div class="footer">
-    ${user.companyName ? `<p>${user.companyName}</p>` : ''}
-    ${user.companyAddress ? `<p>${user.companyAddress}</p>` : ''}
-    ${user.email ? `<p>${user.email}</p>` : ''}
-    ${user.companyPhone ? `<p>${user.companyPhone}</p>` : ''}
+
+    <hr class="divider">
+
+    <!-- Amount Due -->
+    <div class="total-section">
+      <div class="total-row grand-total">
+        <span class="total-label">Amount Due</span>
+        <span class="total-value">${formatCurrency(invoice.total)}</span>
+      </div>
+    </div>
+
+    ${paymentLinkUrl ? `
+    <div style="text-align: center; margin-top: 32px;">
+      <a href="${paymentLinkUrl}" class="button">Pay Invoice Online</a>
+      <p style="font-size: 12px; color: #71717a; margin-top: 12px;">
+        Click the button above to pay securely with credit card or bank transfer.
+      </p>
+    </div>
+    ` : ''}
+
+    <hr class="divider">
+
+    <div class="message">
+      <p style="margin: 0 0 12px 0;">The full invoice is attached as a PDF. If you have any questions, please don't hesitate to reach out.</p>
+      <p style="margin: 0;">Best regards,<br>${user.name || 'Your Company'}</p>
+    </div>
+
+    <div class="footer">
+      This is a digital record generated by SleekInvoices
+    </div>
   </div>
 </body>
 </html>

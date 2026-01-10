@@ -8,6 +8,7 @@ interface InvoicePDFData {
   lineItems: InvoiceLineItem[];
   user: User;
   template?: InvoiceTemplate | null;
+  style?: 'classic' | 'receipt';
 }
 
 function formatCurrency(amount: number | string): string {
@@ -37,7 +38,274 @@ function formatDate(date: Date | null, dateFormat: string = 'MM/DD/YYYY'): strin
   }
 }
 
-function generateInvoiceHTML(data: InvoicePDFData): string {
+function formatLongDate(date: Date | null): string {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function getStatusColor(status: string): string {
+  switch (status.toLowerCase()) {
+    case 'paid': return '#10b981';
+    case 'overdue': return '#ef4444';
+    case 'pending': 
+    case 'sent': return '#f59e0b';
+    case 'draft': return '#71717a';
+    default: return '#71717a';
+  }
+}
+
+function getStatusLabel(status: string): string {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+/**
+ * Generate Receipt Style Invoice HTML
+ * Minimalist, thermal receipt-inspired design with monospace typography
+ */
+function generateReceiptStyleHTML(data: InvoicePDFData): string {
+  const { invoice, client, lineItems, user, template } = data;
+  
+  const logoUrl = template?.logoUrl || user.logoUrl;
+  const companyName = user.companyName || user.name || 'Your Company';
+  const companyAddress = user.companyAddress || '';
+  const companyEmail = user.email || '';
+  const companyPhone = user.companyPhone || '';
+  const taxId = user.taxId || '';
+  
+  const lineItemsHTML = lineItems.map(item => `
+    <div style="display: grid; grid-template-columns: repeat(12, 1fr); font-size: 14px; color: #27272a; gap: 4px 0; margin-bottom: 16px;">
+      <div style="grid-column: span 6; padding-right: 16px;">${item.description}</div>
+      <div style="grid-column: span 2; text-align: right; font-variant-numeric: tabular-nums; color: #71717a;">${item.quantity}</div>
+      <div style="grid-column: span 4; text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(item.amount)}</div>
+      <div style="grid-column: span 12; font-size: 10px; color: #a1a1aa; font-variant-numeric: tabular-nums;">
+        ${item.quantity} × ${formatCurrency(item.rate)}
+      </div>
+    </div>
+  `).join('');
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice ${invoice.invoiceNumber}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      color: #18181b;
+      font-size: 14px;
+      line-height: 1.6;
+      background: white;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .receipt-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 64px;
+      background: white;
+    }
+    
+    .divider {
+      margin: 24px 0;
+      border-top: 1px dashed #e4e4e7;
+      width: 100%;
+    }
+    
+    .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #a1a1aa;
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="receipt-container">
+    <!-- Header -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 32px;">
+      ${logoUrl ? `
+        <img src="${logoUrl}" alt="Logo" style="height: 32px; width: auto; object-fit: contain;">
+      ` : `
+        <div style="width: 32px; height: 32px; background: #18181b; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+        </div>
+      `}
+      <span style="font-size: 14px; font-weight: 500; letter-spacing: -0.01em; color: #18181b;">
+        ${companyName}
+      </span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Meta Info -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 8px;">
+      <div>
+        <div class="label">Invoice #</div>
+        <div style="font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums;">${invoice.invoiceNumber}</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <div class="label">Issued</div>
+          <div style="font-size: 14px; font-variant-numeric: tabular-nums;">${formatLongDate(invoice.issueDate)}</div>
+        </div>
+        <div>
+          <div class="label">Due</div>
+          <div style="font-size: 14px; font-variant-numeric: tabular-nums;">${formatLongDate(invoice.dueDate)}</div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Status</div>
+        <div style="font-size: 14px; display: flex; align-items: center; gap: 6px; color: ${getStatusColor(invoice.status)};">
+          <span style="font-size: 8px; line-height: 1;">●</span>
+          <span style="font-weight: 500;">${getStatusLabel(invoice.status)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- From -->
+    <div style="margin-bottom: 24px;">
+      <div class="label">From</div>
+      <div style="font-size: 14px; line-height: 1.7; color: #27272a;">
+        <div style="font-weight: 500;">${companyName}</div>
+        ${companyAddress ? `<div style="white-space: pre-line;">${companyAddress}</div>` : ''}
+        ${companyEmail ? `<div style="color: #71717a;">${companyEmail}</div>` : ''}
+        ${companyPhone ? `<div style="color: #71717a;">${companyPhone}</div>` : ''}
+        ${taxId ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-variant-numeric: tabular-nums;">Tax ID: ${taxId}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- To -->
+    <div style="margin-bottom: 24px;">
+      <div class="label">To</div>
+      <div style="font-size: 14px; line-height: 1.7; color: #27272a;">
+        <div style="font-weight: 500;">${client.name}</div>
+        ${client.companyName ? `<div>${client.companyName}</div>` : ''}
+        ${client.address ? `<div style="white-space: pre-line;">${client.address}</div>` : ''}
+        ${client.email ? `<div style="color: #71717a;">${client.email}</div>` : ''}
+        ${client.vatNumber ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-variant-numeric: tabular-nums;">VAT: ${client.vatNumber}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Items -->
+    <div style="margin-bottom: 24px;">
+      <div class="label">Items</div>
+      <div style="margin-top: 16px;">
+        <!-- Header -->
+        <div style="display: grid; grid-template-columns: repeat(12, 1fr); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #a1a1aa; font-weight: 500; margin-bottom: 8px; padding-bottom: 8px;">
+          <div style="grid-column: span 6;">Description</div>
+          <div style="grid-column: span 2; text-align: right;">Qty</div>
+          <div style="grid-column: span 4; text-align: right;">Price</div>
+        </div>
+        <!-- Line Items -->
+        ${lineItemsHTML}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Totals -->
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; font-size: 14px; color: #27272a; margin-bottom: 24px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
+        <div style="color: #a1a1aa;">Subtotal</div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.subtotal)}</div>
+      </div>
+      ${Number(invoice.discountAmount) > 0 ? `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
+        <div style="color: #10b981;">Discount</div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums; color: #10b981;">-${formatCurrency(invoice.discountAmount)}</div>
+      </div>
+      ` : ''}
+      ${Number(invoice.taxAmount) > 0 && !client.taxExempt ? `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
+        <div style="color: #a1a1aa;">Tax (${invoice.taxRate}%)</div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.taxAmount)}</div>
+      </div>
+      ` : ''}
+      ${client.taxExempt && client.vatNumber ? `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
+        <div style="color: #a1a1aa; font-size: 12px;">Reverse Charge - VAT 0%</div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(0)}</div>
+      </div>
+      ` : ''}
+      <div style="width: 100%; max-width: 240px; border-top: 1px solid #f4f4f5; margin: 4px 0;"></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px; font-size: 18px; font-weight: 500;">
+        <div style="color: #18181b;">Total</div>
+        <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.total)}</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Payment & Notes -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+      ${invoice.paymentTerms ? `
+      <div>
+        <div class="label">Payment Terms</div>
+        <div style="font-size: 12px; color: #71717a; white-space: pre-wrap; line-height: 1.7; font-variant-numeric: tabular-nums;">
+          ${invoice.paymentTerms}
+        </div>
+      </div>
+      ` : ''}
+      ${invoice.notes ? `
+      <div>
+        <div class="label">Notes</div>
+        <div style="font-size: 12px; color: #71717a; line-height: 1.7; font-style: italic;">
+          ${invoice.notes}
+        </div>
+      </div>
+      ` : ''}
+    </div>
+
+    ${client.taxExempt && client.vatNumber ? `
+    <div style="margin-top: 32px; padding: 16px; background: #fafafa; border-left: 4px solid #18181b; font-size: 12px;">
+      <strong style="color: #18181b;">Reverse Charge Notice:</strong><br>
+      <span style="color: #71717a;">VAT reverse charge applies. The customer is liable for VAT in their country of establishment under Article 196 of Council Directive 2006/112/EC.</span>
+    </div>
+    ` : ''}
+
+    <!-- Footer -->
+    <div style="margin-top: 64px; font-size: 10px; color: #d4d4d8; text-transform: uppercase; letter-spacing: 0.1em; text-align: center;">
+      This is a digital record generated by SleekInvoices
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Generate Classic Style Invoice HTML (original design)
+ */
+function generateClassicStyleHTML(data: InvoicePDFData): string {
   const { invoice, client, lineItems, user, template } = data;
   
   // Default template values
@@ -508,6 +776,19 @@ function generateInvoiceHTML(data: InvoicePDFData): string {
 }
 
 /**
+ * Generate Invoice HTML based on style
+ */
+function generateInvoiceHTML(data: InvoicePDFData): string {
+  const style = data.style || 'receipt'; // Default to receipt style
+  
+  if (style === 'receipt') {
+    return generateReceiptStyleHTML(data);
+  }
+  
+  return generateClassicStyleHTML(data);
+}
+
+/**
  * Generate PDF from invoice data with optional template
  */
 export async function generateInvoicePDF(data: InvoicePDFData): Promise<Buffer> {
@@ -537,4 +818,11 @@ export async function generateInvoicePDF(data: InvoicePDFData): Promise<Buffer> 
   } finally {
     await browser.close();
   }
+}
+
+/**
+ * Generate Invoice HTML for email embedding
+ */
+export function generateInvoiceHTMLForEmail(data: InvoicePDFData): string {
+  return generateInvoiceHTML(data);
 }
