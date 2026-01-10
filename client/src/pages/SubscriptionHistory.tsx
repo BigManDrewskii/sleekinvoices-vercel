@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { Currency, Numeric } from "@/components/ui/typography";
 import { 
   ArrowLeft,
   Bitcoin,
@@ -152,7 +153,7 @@ export default function SubscriptionHistory() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Total Spent</p>
-                    <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
+                    <p className="text-2xl"><Currency amount={totalSpent} bold /></p>
                   </div>
                 </div>
               </CardContent>
@@ -252,16 +253,16 @@ export default function SubscriptionHistory() {
                             </p>
                             {item.type === 'crypto' && 'cryptoCurrency' in item && (
                               <p className="text-xs text-muted-foreground mt-1">
-                                Paid {item.cryptoAmount.toFixed(6)} {item.cryptoCurrency}
+                                Paid <Numeric value={item.cryptoAmount} decimals={6} /> {item.cryptoCurrency}
                               </p>
                             )}
                           </div>
-                          
+
                           <div className="text-right flex-shrink-0">
                             <div className="flex items-center gap-2">
                               {getStatusIcon(item.status)}
-                              <span className="font-bold text-lg">
-                                ${item.amount.toFixed(2)}
+                              <span className="text-lg">
+                                <Currency amount={item.amount} bold />
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground">

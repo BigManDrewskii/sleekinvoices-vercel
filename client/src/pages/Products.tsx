@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Currency } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -423,7 +424,7 @@ export default function Products() {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <DollarSign className="h-3 w-3 text-muted-foreground" />
-                        {parseFloat(product.rate).toFixed(2)}
+                        <Currency amount={parseFloat(product.rate)} bold />
                       </div>
                     </TableCell>
                     <TableCell className="capitalize">{product.unit || "unit"}</TableCell>

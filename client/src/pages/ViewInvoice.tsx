@@ -637,7 +637,7 @@ function PaymentHistoryCard({ invoiceId, invoiceTotal }: { invoiceId: number; in
               {payments.map((payment) => (
                 <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
-                    <p className="font-medium">{formatCurrency(payment.amount)}</p>
+                    <p className="font-medium"><Currency amount={payment.amount} bold /></p>
                     <p className="text-sm text-muted-foreground">
                       {formatDate(payment.paymentDate)} • {payment.paymentMethod.replace("_", " ")}
                     </p>

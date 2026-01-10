@@ -14,6 +14,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { Currency } from "@/components/ui/typography";
 import {
   FileText,
   Edit,
@@ -323,10 +324,10 @@ export default function ViewEstimate() {
                         <TableCell>{item.description}</TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
                         <TableCell className="text-right">
-                          {formatCurrency(Number(item.rate), estimate.currency)}
+                          <Currency amount={Number(item.rate)} currency={estimate.currency} />
                         </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {formatCurrency(Number(item.amount), estimate.currency)}
+                        <TableCell className="text-right">
+                          <Currency amount={Number(item.amount)} currency={estimate.currency} bold />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -337,7 +338,7 @@ export default function ViewEstimate() {
                 <div className="mt-6 space-y-2 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>{formatCurrency(Number(estimate.subtotal), estimate.currency)}</span>
+                    <Currency amount={Number(estimate.subtotal)} currency={estimate.currency} />
                   </div>
                   {Number(estimate.discountAmount) > 0 && (
                     <div className="flex justify-between text-red-500">
@@ -345,18 +346,18 @@ export default function ViewEstimate() {
                         Discount
                         {estimate.discountType === "percentage" && ` (${estimate.discountValue}%)`}
                       </span>
-                      <span>-{formatCurrency(Number(estimate.discountAmount), estimate.currency)}</span>
+                      <span>-<Currency amount={Number(estimate.discountAmount)} currency={estimate.currency} /></span>
                     </div>
                   )}
                   {Number(estimate.taxAmount) > 0 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Tax ({estimate.taxRate}%)</span>
-                      <span>{formatCurrency(Number(estimate.taxAmount), estimate.currency)}</span>
+                      <Currency amount={Number(estimate.taxAmount)} currency={estimate.currency} />
                     </div>
                   )}
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t">
-                    <span>Total</span>
-                    <span>{formatCurrency(Number(estimate.total), estimate.currency)}</span>
+                  <div className="flex justify-between text-lg pt-2 border-t">
+                    <span className="font-bold">Total</span>
+                    <Currency amount={Number(estimate.total)} currency={estimate.currency} bold />
                   </div>
                 </div>
               </CardContent>
