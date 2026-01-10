@@ -902,7 +902,7 @@ export default function Clients() {
           <div className="p-5 pb-4">
             <h3 className="text-lg font-semibold text-foreground">All Clients</h3>
             <p className="text-sm text-muted-foreground">
-              {totalItems} client{totalItems !== 1 ? "s" : ""} found
+              <span className="font-numeric">{totalItems}</span> client{totalItems !== 1 ? "s" : ""} found
             </p>
           </div>
           <div className="px-5 pb-5">

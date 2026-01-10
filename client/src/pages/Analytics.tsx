@@ -223,7 +223,7 @@ export default function Analytics() {
                   <TrendingDown className="h-4 w-4 text-red-500" />
                 )}
                 <span className={`text-sm font-medium ${revenueChangePercent >= 0 ? "text-green-500" : "text-red-500"}`}>
-                  {revenueChangePercent >= 0 ? "+" : ""}{revenueChangePercent.toFixed(0)}%
+                  <span className="font-numeric">{revenueChangePercent >= 0 ? "+" : ""}{revenueChangePercent.toFixed(0)}%</span>
                 </span>
                 <span className="text-xs text-muted-foreground">vs previous period</span>
               </div>
@@ -243,7 +243,7 @@ export default function Analytics() {
                 <Currency amount={outstandingNum} />
               </div>
               <div className="text-sm text-muted-foreground">
-                {totalInvoices - paidInvoices} unpaid invoices
+                <span className="font-numeric">{totalInvoices - paidInvoices}</span> unpaid invoices
               </div>
             </CardContent>
           </Card>
@@ -261,7 +261,7 @@ export default function Analytics() {
                 <Currency amount={overdueAmount} />
               </div>
               <div className="text-sm text-muted-foreground">
-                {overdueCount > 0 ? `${overdueCount} invoices need attention` : "All invoices on track"}
+                {overdueCount > 0 ? <><span className="font-numeric">{overdueCount}</span> invoices need attention</> : "All invoices on track"}
               </div>
             </CardContent>
           </Card>
@@ -348,28 +348,28 @@ export default function Analytics() {
           <Card className="hover:border-primary/30 transition-colors">
             <CardContent className="p-5">
               <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Total Invoices</p>
-              <p className="text-3xl font-bold text-foreground">{totalInvoices}</p>
+              <p className="text-3xl font-numeric-bold text-foreground">{totalInvoices}</p>
             </CardContent>
           </Card>
           
           <Card className="hover:border-green-500/30 transition-colors">
             <CardContent className="p-5">
               <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Paid Invoices</p>
-              <p className="text-3xl font-bold text-green-500">{paidInvoices}</p>
+              <p className="text-3xl font-numeric-bold text-green-500">{paidInvoices}</p>
             </CardContent>
           </Card>
           
           <Card className="hover:border-primary/30 transition-colors">
             <CardContent className="p-5">
               <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Collection Rate</p>
-              <p className="text-3xl font-bold text-foreground">{collectionRate}%</p>
+              <p className="text-3xl font-numeric-bold text-foreground">{collectionRate}%</p>
             </CardContent>
           </Card>
           
           <Card className="hover:border-primary/30 transition-colors">
             <CardContent className="p-5">
               <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">Avg Days to Pay</p>
-              <p className="text-3xl font-bold text-foreground">{dso}</p>
+              <p className="text-3xl font-numeric-bold text-foreground">{dso}</p>
             </CardContent>
           </Card>
         </div>
@@ -435,7 +435,7 @@ export default function Analytics() {
                       <span className="text-sm font-medium text-foreground">{bucket.label}</span>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-semibold text-foreground"><Currency amount={amount} /></span>
-                        <span className="text-xs text-muted-foreground w-16 text-right">{bucket.count} inv</span>
+                        <span className="text-xs text-muted-foreground w-16 text-right font-numeric">{bucket.count} inv</span>
                       </div>
                     </div>
                     <div className={`h-3 ${bucket.bgColor} rounded-full overflow-hidden`}>
