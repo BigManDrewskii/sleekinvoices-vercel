@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, Loader2, Upload, X, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, Loader2, Upload, X, RotateCcw, Receipt, FileText, Eye, Smartphone, Monitor, Tablet } from "lucide-react";
 import { FloppyDisk } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,18 @@ import { CollapsibleSection, ColorInput, SliderInput } from "@/components/ui/col
 import { GoogleFontPicker } from "@/components/ui/google-font-picker";
 import { SleekDefaultTemplate, defaultSleekSettings, type SleekTemplateSettings } from "./SleekDefaultTemplate";
 import { loadGoogleFont } from "@/lib/google-fonts";
+import { ReceiptStyleInvoice } from "@/components/invoices/ReceiptStyleInvoice";
+import { ClassicStyleInvoice } from "@/components/invoices/ClassicStyleInvoice";
+import { cn } from "@/lib/utils";
 
 interface SleekTemplateEditorProps {
   templateId?: number | null;
   onComplete: () => void;
   onCancel: () => void;
 }
+
+type InvoiceStyle = 'receipt' | 'classic';
+type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 
 // Brand color presets - curated for professional invoices
 const BRAND_PRESETS = [
@@ -30,9 +36,34 @@ const BRAND_PRESETS = [
   { name: 'Rose', primary: '#f43f5e', secondary: '#4c0519', accent: '#fb7185', bg: '#ffffff' },
   { name: 'Indigo', primary: '#6366f1', secondary: '#1e1b4b', accent: '#818cf8', bg: '#ffffff' },
   { name: 'Teal', primary: '#14b8a6', secondary: '#134e4a', accent: '#2dd4bf', bg: '#ffffff' },
-  { name: 'Midnight', primary: '#8b5cf6', secondary: '#1e1b4b', accent: '#a78bfa', bg: '#0f172a' },
-  { name: 'Charcoal', primary: '#f59e0b', secondary: '#fafafa', accent: '#fbbf24', bg: '#18181b' },
 ];
+
+// Sample invoice data for preview
+const sampleInvoiceData = {
+  invoiceNumber: 'INV-0042',
+  clientName: 'Acme Corporation',
+  clientEmail: 'billing@acme.com',
+  clientAddress: '123 Business Ave\nSuite 100\nNew York, NY 10001',
+  issueDate: new Date(),
+  dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+  lineItems: [
+    { description: 'Website Design & Development', quantity: 1, rate: 3500 },
+    { description: 'Brand Identity Package', quantity: 1, rate: 1500 },
+    { description: 'Monthly Hosting (12 months)', quantity: 12, rate: 49 },
+  ],
+  subtotal: 5588,
+  discountAmount: 0,
+  taxAmount: 447.04,
+  taxRate: 8,
+  total: 6035.04,
+  notes: 'Thank you for your business! Payment is due within 30 days.',
+  paymentTerms: 'Net 30',
+  companyName: 'Your Company',
+  companyAddress: '456 Creative Blvd\nLos Angeles, CA 90001',
+  companyEmail: 'hello@yourcompany.com',
+  companyPhone: '+1 (555) 123-4567',
+  status: 'sent',
+};
 
 export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekTemplateEditorProps) {
   const isNew = !templateId;
@@ -46,10 +77,15 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
   const updateMutation = trpc.templates.update.useMutation();
   const utils = trpc.useUtils();
 
-  // Settings state - using the SleekTemplateSettings interface
+  // Settings state
   const [settings, setSettings] = useState<SleekTemplateSettings>(defaultSleekSettings);
   const [isDefault, setIsDefault] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  
+  // Preview state
+  const [invoiceStyle, setInvoiceStyle] = useState<InvoiceStyle>('receipt');
+  const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop');
+  const [showSidebar, setShowSidebar] = useState(true);
 
   const { data: user } = trpc.auth.me.useQuery();
 
@@ -101,7 +137,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
         primaryColor: existingTemplate.primaryColor,
         secondaryColor: existingTemplate.secondaryColor,
         accentColor: existingTemplate.accentColor,
-        backgroundColor: '#ffffff', // Default if not stored
+        backgroundColor: '#ffffff',
         headingFont: existingTemplate.headingFont,
         headingWeight: 600,
         bodyFont: existingTemplate.bodyFont,
@@ -150,7 +186,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
 
     const templateData = {
       name: settings.name,
-      templateType: 'modern' as const, // Sleek uses modern type
+      templateType: 'modern' as const,
       primaryColor: settings.primaryColor,
       secondaryColor: settings.secondaryColor,
       accentColor: settings.accentColor,
@@ -190,156 +226,185 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
 
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
+  // Get preview width based on device
+  const getPreviewWidth = () => {
+    switch (previewDevice) {
+      case 'mobile': return 'max-w-[375px]';
+      case 'tablet': return 'max-w-[768px]';
+      default: return 'max-w-[900px]';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={onCancel}>
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={onCancel} className="shrink-0">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-lg font-semibold text-white">
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-semibold truncate">
                 {isNew ? 'Create Template' : 'Edit Template'}
               </h1>
-              <p className="text-sm text-slate-400">Sleek - Default</p>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+                Customize your invoice appearance
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={onCancel}>
+          
+          {/* Header Actions */}
+          <div className="flex items-center gap-2">
+            {/* Toggle Sidebar - Desktop */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="hidden lg:flex"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              {showSidebar ? 'Hide Editor' : 'Show Editor'}
+            </Button>
+            
+            <Button variant="ghost" size="sm" onClick={onCancel} className="hidden sm:flex">
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={handleSave} disabled={isSaving} size="sm">
               {isSaving ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <FloppyDisk weight="bold" className="h-4 w-4 mr-2" />
               )}
-              Save Template
+              <span className="hidden sm:inline">Save Template</span>
+              <span className="sm:hidden">Save</span>
             </Button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex">
+      <div className="flex flex-col lg:flex-row">
         {/* Editor Sidebar */}
-        <div className="w-[400px] h-[calc(100vh-73px)] overflow-y-auto border-r border-slate-800 bg-slate-900/50">
-          <div className="p-4 space-y-2">
-            
-            {/* Brand Identity */}
-            <CollapsibleSection title="Brand Identity" defaultOpen>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-slate-300 text-sm">Template Name</Label>
-                  <Input
-                    value={settings.name}
-                    onChange={(e) => updateSetting('name', e.target.value)}
-                    placeholder="e.g., My Invoice Template"
-                    className="mt-1.5 bg-slate-800/50 border-slate-700"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-slate-300 text-sm">Company Logo</Label>
-                  <div className="mt-1.5">
-                    {settings.logoUrl ? (
-                      <div className="relative inline-block">
-                        <img 
-                          src={settings.logoUrl} 
-                          alt="Logo" 
-                          className="h-16 rounded border border-slate-700"
-                        />
-                        <button
-                          onClick={() => updateSetting('logoUrl', null)}
-                          className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-700 rounded-lg cursor-pointer hover:border-slate-600 transition-colors">
-                        <Upload className="h-6 w-6 text-slate-500 mb-2" />
-                        <span className="text-sm text-slate-500">
-                          {isUploadingLogo ? 'Uploading...' : 'Click to upload'}
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => handleLogoUpload(e.target.files?.[0] || null)}
-                          disabled={isUploadingLogo}
-                        />
-                      </label>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
+        <div className={cn(
+          "lg:w-[380px] xl:w-[420px] border-r bg-muted/30 transition-all duration-300",
+          showSidebar ? "block" : "hidden lg:hidden"
+        )}>
+          <div className="h-[calc(100vh-57px)] overflow-y-auto">
+            <div className="p-4 space-y-2">
+              
+              {/* Brand Identity */}
+              <CollapsibleSection title="Brand Identity" defaultOpen>
+                <div className="space-y-4">
                   <div>
-                    <Label className="text-slate-300 text-sm">Logo Position</Label>
-                    <Select
-                      value={settings.logoPosition}
-                      onValueChange={(v) => updateSetting('logoPosition', v as 'left' | 'center' | 'right')}
-                    >
-                      <SelectTrigger className="mt-1.5 bg-slate-800/50 border-slate-700">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="left">Left</SelectItem>
-                        <SelectItem value="center">Center</SelectItem>
-                        <SelectItem value="right">Right</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-slate-300 text-sm">Logo Width</Label>
+                    <Label className="text-sm font-medium">Template Name</Label>
                     <Input
-                      type="number"
-                      value={settings.logoWidth}
-                      onChange={(e) => updateSetting('logoWidth', parseInt(e.target.value) || 120)}
-                      min={60}
-                      max={300}
-                      className="mt-1.5 bg-slate-800/50 border-slate-700"
+                      value={settings.name}
+                      onChange={(e) => updateSetting('name', e.target.value)}
+                      placeholder="e.g., My Invoice Template"
+                      className="mt-1.5"
                     />
                   </div>
-                </div>
 
-                <div className="flex items-center justify-between pt-2">
-                  <Label className="text-slate-300 text-sm">Set as Default</Label>
-                  <Switch checked={isDefault} onCheckedChange={setIsDefault} />
-                </div>
-              </div>
-            </CollapsibleSection>
-
-            {/* Colors */}
-            <CollapsibleSection title="Colors" defaultOpen>
-              <div className="space-y-4">
-                {/* Brand Presets */}
-                <div>
-                  <Label className="text-slate-300 text-sm mb-2 block">Quick Presets</Label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {BRAND_PRESETS.map((preset) => (
-                      <button
-                        key={preset.name}
-                        onClick={() => applyPreset(preset)}
-                        className="group relative"
-                        title={preset.name}
-                      >
-                        <div className="flex h-8 rounded-md overflow-hidden border border-slate-700 hover:border-slate-500 transition-colors">
-                          <div className="flex-1" style={{ backgroundColor: preset.primary }} />
-                          <div className="flex-1" style={{ backgroundColor: preset.accent }} />
+                  <div>
+                    <Label className="text-sm font-medium">Company Logo</Label>
+                    <div className="mt-1.5">
+                      {settings.logoUrl ? (
+                        <div className="relative inline-block">
+                          <img 
+                            src={settings.logoUrl} 
+                            alt="Logo" 
+                            className="h-16 rounded border bg-white p-2"
+                          />
+                          <button
+                            onClick={() => updateSetting('logoUrl', null)}
+                            className="absolute -top-2 -right-2 p-1 bg-destructive rounded-full text-white hover:bg-destructive/90"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
                         </div>
-                        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                          {preset.name}
-                        </span>
-                      </button>
-                    ))}
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                          <div className="flex flex-col items-center justify-center pt-2 pb-3">
+                            {isUploadingLogo ? (
+                              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                            ) : (
+                              <>
+                                <Upload className="h-6 w-6 text-muted-foreground mb-2" />
+                                <p className="text-xs text-muted-foreground">Click to upload logo</p>
+                              </>
+                            )}
+                          </div>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={(e) => handleLogoUpload(e.target.files?.[0] || null)}
+                          />
+                        </label>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="pt-4 space-y-3">
+                  {settings.logoUrl && (
+                    <>
+                      <div>
+                        <Label className="text-sm font-medium">Logo Position</Label>
+                        <Select
+                          value={settings.logoPosition}
+                          onValueChange={(v) => updateSetting('logoPosition', v as 'left' | 'center' | 'right')}
+                        >
+                          <SelectTrigger className="mt-1.5">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="left">Left</SelectItem>
+                            <SelectItem value="center">Center</SelectItem>
+                            <SelectItem value="right">Right</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <SliderInput
+                        label="Logo Size"
+                        value={settings.logoWidth}
+                        onChange={(v) => updateSetting('logoWidth', v)}
+                        min={60}
+                        max={200}
+                        step={10}
+                        unit="px"
+                      />
+                    </>
+                  )}
+                </div>
+              </CollapsibleSection>
+
+              {/* Colors */}
+              <CollapsibleSection title="Colors" defaultOpen>
+                <div className="space-y-4">
+                  {/* Color Presets */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Quick Presets</Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {BRAND_PRESETS.map((preset) => (
+                        <button
+                          key={preset.name}
+                          onClick={() => applyPreset(preset)}
+                          className="group relative aspect-square rounded-lg overflow-hidden border hover:ring-2 hover:ring-primary transition-all"
+                          title={preset.name}
+                        >
+                          <div className="absolute inset-0 flex">
+                            <div className="w-1/2 h-full" style={{ backgroundColor: preset.primary }} />
+                            <div className="w-1/2 h-full" style={{ backgroundColor: preset.accent }} />
+                          </div>
+                          <div className="absolute inset-x-0 bottom-0 bg-black/60 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span className="text-[10px] text-white font-medium">{preset.name}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <ColorInput
                     label="Primary Color"
                     value={settings.primaryColor}
@@ -355,171 +420,266 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     value={settings.accentColor}
                     onChange={(v) => updateSetting('accentColor', v)}
                   />
-                  <ColorInput
-                    label="Background"
-                    value={settings.backgroundColor}
-                    onChange={(v) => updateSetting('backgroundColor', v)}
-                  />
                 </div>
-              </div>
-            </CollapsibleSection>
+              </CollapsibleSection>
 
-            {/* Typography */}
-            <CollapsibleSection title="Typography" defaultOpen>
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-slate-300 text-sm mb-1.5 block">Heading Font</Label>
-                  <GoogleFontPicker
-                    value={settings.headingFont}
-                    weight={settings.headingWeight}
-                    onFontChange={(f) => updateSetting('headingFont', f)}
-                    onWeightChange={(w) => updateSetting('headingWeight', w)}
-                    previewType="heading"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-slate-300 text-sm mb-1.5 block">Body Font</Label>
-                  <GoogleFontPicker
-                    value={settings.bodyFont}
-                    weight={settings.bodyWeight}
-                    onFontChange={(f) => updateSetting('bodyFont', f)}
-                    onWeightChange={(w) => updateSetting('bodyWeight', w)}
-                    previewType="body"
-                  />
-                </div>
-
-                <SliderInput
-                  label="Base Font Size"
-                  value={settings.fontSize}
-                  onChange={(v) => updateSetting('fontSize', v)}
-                  min={10}
-                  max={18}
-                  step={1}
-                  unit="px"
-                />
-              </div>
-            </CollapsibleSection>
-
-            {/* Layout */}
-            <CollapsibleSection title="Layout">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-slate-300 text-sm">Header Style</Label>
-                  <Select
-                    value={settings.headerLayout}
-                    onValueChange={(v) => updateSetting('headerLayout', v as 'standard' | 'centered' | 'split')}
-                  >
-                    <SelectTrigger className="mt-1.5 bg-slate-800/50 border-slate-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="centered">Centered</SelectItem>
-                      <SelectItem value="split">Split (Logo Left, Info Right)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-slate-300 text-sm">Table Style</Label>
-                  <Select
-                    value={settings.tableStyle}
-                    onValueChange={(v) => updateSetting('tableStyle', v as 'minimal' | 'bordered' | 'striped')}
-                  >
-                    <SelectTrigger className="mt-1.5 bg-slate-800/50 border-slate-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="minimal">Minimal</SelectItem>
-                      <SelectItem value="bordered">Bordered</SelectItem>
-                      <SelectItem value="striped">Striped</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-slate-300 text-sm">Date Format</Label>
-                  <Select
-                    value={settings.dateFormat}
-                    onValueChange={(v) => updateSetting('dateFormat', v)}
-                  >
-                    <SelectTrigger className="mt-1.5 bg-slate-800/50 border-slate-700">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-                      <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-                      <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-                      <SelectItem value="MMM DD, YYYY">MMM DD, YYYY</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CollapsibleSection>
-
-            {/* Field Visibility */}
-            <CollapsibleSection title="Field Visibility">
-              <div className="space-y-3">
-                {[
-                  { key: 'showCompanyAddress', label: 'Company Address' },
-                  { key: 'showPaymentTerms', label: 'Payment Terms' },
-                  { key: 'showTaxField', label: 'Tax Field' },
-                  { key: 'showDiscountField', label: 'Discount Field' },
-                  { key: 'showNotesField', label: 'Notes Section' },
-                ].map(({ key, label }) => (
-                  <div key={key} className="flex items-center justify-between">
-                    <Label className="text-slate-300 text-sm">{label}</Label>
-                    <Switch
-                      checked={settings[key as keyof SleekTemplateSettings] as boolean}
-                      onCheckedChange={(v) => updateSetting(key as keyof SleekTemplateSettings, v as any)}
+              {/* Typography */}
+              <CollapsibleSection title="Typography">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Heading Font</Label>
+                    <GoogleFontPicker
+                      value={settings.headingFont}
+                      onFontChange={(v: string) => updateSetting('headingFont', v)}
+                      className="mt-1.5"
                     />
                   </div>
-                ))}
-              </div>
-            </CollapsibleSection>
 
-            {/* Footer */}
-            <CollapsibleSection title="Footer">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-slate-300 text-sm">Footer Message</Label>
-                  <Textarea
-                    value={settings.footerText || ''}
-                    onChange={(e) => updateSetting('footerText', e.target.value || null)}
-                    placeholder="Thank you for your business!"
-                    className="mt-1.5 bg-slate-800/50 border-slate-700 min-h-[80px]"
+                  <div>
+                    <Label className="text-sm font-medium">Body Font</Label>
+                    <GoogleFontPicker
+                      value={settings.bodyFont}
+                      onFontChange={(v: string) => updateSetting('bodyFont', v)}
+                      className="mt-1.5"
+                    />
+                  </div>
+
+                  <SliderInput
+                    label="Base Font Size"
+                    value={settings.fontSize}
+                    onChange={(v) => updateSetting('fontSize', v)}
+                    min={12}
+                    max={18}
+                    step={1}
+                    unit="px"
                   />
                 </div>
-              </div>
-            </CollapsibleSection>
+              </CollapsibleSection>
 
-            {/* Reset Button */}
-            <div className="pt-4 pb-8">
-              <Button
-                variant="outline"
-                className="w-full border-slate-700 text-slate-400 hover:text-white"
-                onClick={resetToDefaults}
-              >
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset to Defaults
-              </Button>
+              {/* Layout */}
+              <CollapsibleSection title="Layout">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Header Style</Label>
+                    <Select
+                      value={settings.headerLayout}
+                      onValueChange={(v) => updateSetting('headerLayout', v as 'standard' | 'centered' | 'split')}
+                    >
+                      <SelectTrigger className="mt-1.5">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        <SelectItem value="centered">Centered</SelectItem>
+                        <SelectItem value="split">Split</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium">Date Format</Label>
+                    <Select
+                      value={settings.dateFormat}
+                      onValueChange={(v) => updateSetting('dateFormat', v)}
+                    >
+                      <SelectTrigger className="mt-1.5">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                        <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                        <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+                        <SelectItem value="MMM DD, YYYY">MMM DD, YYYY</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CollapsibleSection>
+
+              {/* Field Visibility */}
+              <CollapsibleSection title="Field Visibility">
+                <div className="space-y-3">
+                  {[
+                    { key: 'showCompanyAddress', label: 'Company Address' },
+                    { key: 'showPaymentTerms', label: 'Payment Terms' },
+                    { key: 'showTaxField', label: 'Tax Field' },
+                    { key: 'showDiscountField', label: 'Discount Field' },
+                    { key: 'showNotesField', label: 'Notes Section' },
+                  ].map(({ key, label }) => (
+                    <div key={key} className="flex items-center justify-between">
+                      <Label className="text-sm">{label}</Label>
+                      <Switch
+                        checked={settings[key as keyof SleekTemplateSettings] as boolean}
+                        onCheckedChange={(v) => updateSetting(key as keyof SleekTemplateSettings, v as any)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+
+              {/* Footer */}
+              <CollapsibleSection title="Footer">
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium">Footer Message</Label>
+                    <Textarea
+                      value={settings.footerText || ''}
+                      onChange={(e) => updateSetting('footerText', e.target.value || null)}
+                      placeholder="Thank you for your business!"
+                      className="mt-1.5 min-h-[80px]"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm">Set as Default Template</Label>
+                    <Switch
+                      checked={isDefault}
+                      onCheckedChange={setIsDefault}
+                    />
+                  </div>
+                </div>
+              </CollapsibleSection>
+
+              {/* Reset Button */}
+              <div className="pt-4 pb-8">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={resetToDefaults}
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Reset to Defaults
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Live Preview */}
-        <div className="flex-1 h-[calc(100vh-73px)] overflow-auto bg-slate-950 p-8">
-          <div className="sticky top-0 mb-4 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white">Live Preview</h2>
-              <p className="text-sm text-slate-400">See how your invoice will look</p>
+        <div className="flex-1 min-h-[calc(100vh-57px)] bg-muted/20">
+          {/* Preview Controls */}
+          <div className="sticky top-[57px] z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b px-4 py-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              {/* Style Toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground mr-2">Style:</span>
+                <div className="flex bg-muted p-1 rounded-lg">
+                  <button
+                    onClick={() => setInvoiceStyle('receipt')}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                      invoiceStyle === 'receipt' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <Receipt className="h-4 w-4" />
+                    <span className="hidden sm:inline">Receipt</span>
+                  </button>
+                  <button
+                    onClick={() => setInvoiceStyle('classic')}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                      invoiceStyle === 'classic' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <FileText className="h-4 w-4" />
+                    <span className="hidden sm:inline">Classic</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Device Preview Toggle */}
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground mr-2 hidden sm:inline">Preview:</span>
+                <div className="flex bg-muted p-1 rounded-lg">
+                  <button
+                    onClick={() => setPreviewDevice('mobile')}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all",
+                      previewDevice === 'mobile' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    title="Mobile"
+                  >
+                    <Smartphone className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice('tablet')}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all",
+                      previewDevice === 'tablet' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    title="Tablet"
+                  >
+                    <Tablet className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice('desktop')}
+                    className={cn(
+                      "p-1.5 rounded-md transition-all",
+                      previewDevice === 'desktop' 
+                        ? "bg-background text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    title="Desktop"
+                  >
+                    <Monitor className="h-4 w-4" />
+                  </button>
+                </div>
+                
+                {/* Mobile: Toggle Editor */}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  className="lg:hidden ml-2"
+                >
+                  {showSidebar ? 'Preview' : 'Edit'}
+                </Button>
+              </div>
             </div>
           </div>
           
-          <div className="flex justify-center">
-            <div className="bg-slate-900/50 rounded-xl p-6 shadow-2xl">
-              <SleekDefaultTemplate settings={settings} scale={0.85} />
+          {/* Preview Area */}
+          <div className="p-4 sm:p-6 lg:p-8">
+            <div className={cn(
+              "mx-auto transition-all duration-300",
+              getPreviewWidth()
+            )}>
+              <div className="bg-muted/50 rounded-xl p-3 sm:p-4 lg:p-6 shadow-lg">
+                <div className="shadow-[0_0_1px_rgba(0,0,0,0.1),0_8px_40px_rgba(0,0,0,0.08)] rounded-xl overflow-hidden">
+                  {invoiceStyle === 'receipt' ? (
+                    <ReceiptStyleInvoice
+                      {...sampleInvoiceData}
+                      logoUrl={settings.logoUrl || undefined}
+                    />
+                  ) : (
+                    <ClassicStyleInvoice
+                      {...sampleInvoiceData}
+                      logoUrl={settings.logoUrl || undefined}
+                      primaryColor={settings.primaryColor}
+                      accentColor={settings.accentColor}
+                    />
+                  )}
+                </div>
+              </div>
+              
+              {/* Preview Info */}
+              <div className="mt-4 text-center">
+                <p className="text-xs text-muted-foreground">
+                  {invoiceStyle === 'receipt' ? 'Receipt Style' : 'Classic Style'} • 
+                  {previewDevice === 'mobile' ? ' Mobile' : previewDevice === 'tablet' ? ' Tablet' : ' Desktop'} Preview
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This preview shows sample data. Your actual invoices will use real client information.
+                </p>
+              </div>
             </div>
           </div>
         </div>

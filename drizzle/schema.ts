@@ -23,6 +23,9 @@ export const users = mysqlTable("users", {
   logoUrl: text("logoUrl"),
   taxId: varchar("taxId", { length: 50 }), // VAT/Tax ID for invoices
   
+  // Invoice preferences
+  defaultInvoiceStyle: mysqlEnum("defaultInvoiceStyle", ["receipt", "classic"]).default("receipt"), // Default invoice style
+  
   // Subscription info
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   subscriptionStatus: mysqlEnum("subscriptionStatus", ["free", "active", "canceled", "past_due"]).default("free").notNull(),

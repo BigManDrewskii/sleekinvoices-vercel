@@ -146,6 +146,7 @@ export async function seedInvoices(
           companyPhone: null,
           logoUrl: null,
           taxId: null,
+          defaultInvoiceStyle: "receipt",
           stripeCustomerId: null,
           subscriptionStatus: user.subscriptionStatus as any,
           subscriptionId: null,
