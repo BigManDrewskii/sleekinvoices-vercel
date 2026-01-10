@@ -105,10 +105,15 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
       background: white;
       -webkit-font-smoothing: antialiased;
     }
+    @page {
+      size: A4;
+      margin: 0;
+    }
     .receipt-container {
-      max-width: 800px;
+      width: 210mm;
+      min-height: 297mm;
       margin: 0 auto;
-      padding: 48px 64px;
+      padding: 32px 40px;
       background: white;
     }
     .divider {
@@ -334,8 +339,13 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
       background: white;
       -webkit-font-smoothing: antialiased;
     }
+    @page {
+      size: A4;
+      margin: 0;
+    }
     .invoice-container {
-      max-width: 800px;
+      width: 210mm;
+      min-height: 297mm;
       margin: 0 auto;
       background: white;
     }
