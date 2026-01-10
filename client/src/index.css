@@ -3,6 +3,9 @@
 @import "./styles/design-system.css";
 @import "./styles/responsive.css";
 
+/* SUSE Mono - For numerical displays (Normal: 400, Bold: 700) */
+@import url('https://fonts.googleapis.com/css2?family=SUSE+Mono:wght@400;700&display=swap');
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -10,6 +13,7 @@
   --font-sans: "Google Sans Flex", system-ui, -apple-system, sans-serif;
   --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
+  --font-numeric: "SUSE Mono", ui-monospace, monospace;
 
   /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
@@ -252,6 +256,32 @@
   
   .status-success {
     @apply bg-green-500/10 text-green-400;
+  }
+
+  /* Numeric font utilities - SUSE Mono for all numerical displays */
+  .font-numeric {
+    font-family: var(--font-numeric);
+    font-weight: 400;
+    font-feature-settings: "tnum" 1, "lnum" 1; /* Tabular & lining numbers */
+  }
+
+  .font-numeric-bold {
+    font-family: var(--font-numeric);
+    font-weight: 700;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  /* Apply to all numerical contexts */
+  .numeric,
+  [class*="amount"],
+  [class*="price"],
+  [class*="total"],
+  [class*="balance"],
+  [class*="revenue"],
+  [class*="invoice-number"],
+  .currency {
+    font-family: var(--font-numeric);
+    font-feature-settings: "tnum" 1, "lnum" 1;
   }
 
   @media (min-width: 640px) {

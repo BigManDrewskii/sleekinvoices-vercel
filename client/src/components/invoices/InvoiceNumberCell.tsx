@@ -28,7 +28,7 @@ export function InvoiceNumberCell({
   if (!isLong) {
     return (
       <div className="flex items-center gap-2">
-        <span className="font-medium">{invoiceNumber}</span>
+        <span className="font-numeric-bold">{invoiceNumber}</span>
         <Button
           variant="ghost"
           size="sm"
@@ -47,7 +47,7 @@ export function InvoiceNumberCell({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-2 cursor-help">
-            <span className="font-medium text-muted-foreground">{displayText}</span>
+            <span className="font-numeric-bold text-muted-foreground">{displayText}</span>
             <Button
               variant="ghost"
               size="sm"
@@ -60,7 +60,7 @@ export function InvoiceNumberCell({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p className="font-mono text-sm">{invoiceNumber}</p>
+          <p className="font-numeric text-sm">{invoiceNumber}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

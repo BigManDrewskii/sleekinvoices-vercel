@@ -22,7 +22,7 @@ import { useLocation } from "wouter";
 import { MonthlyUsageCard } from "@/components/dashboard/MonthlyUsageCard";
 import { StatsGridSkeleton, RecentInvoicesSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { formatCurrency } from "@/lib/utils";
-import { Currency, DateDisplay, Numeric } from "@/components/ui/typography";
+import { Currency, DateDisplay, Numeric, InvoiceNumber } from "@/components/ui/typography";
 
 export default function Dashboard() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -190,8 +190,8 @@ export default function Dashboard() {
                   +{stats?.revenueChangePercent?.toFixed(1) || 12.5}%
                 </span>
               </div>
-              <p className="text-2xl font-bold tracking-tight text-foreground">
-                <Currency amount={stats?.totalRevenue || 0} />
+              <p className="text-2xl tracking-tight text-foreground">
+                <Currency amount={stats?.totalRevenue || 0} bold />
               </p>
               <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
                 <TrendingUp className="h-3 w-3 text-emerald-500" />
@@ -210,8 +210,8 @@ export default function Dashboard() {
                   </span>
                 )}
               </div>
-              <p className="text-2xl font-bold tracking-tight text-foreground">
-                <Currency amount={stats?.outstandingBalance || 0} />
+              <p className="text-2xl tracking-tight text-foreground">
+                <Currency amount={stats?.outstandingBalance || 0} bold />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Awaiting payment
@@ -223,8 +223,8 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
               </div>
-              <p className="text-2xl font-bold tracking-tight text-foreground">
-                <Numeric value={stats?.totalInvoices || 0} />
+              <p className="text-2xl tracking-tight text-foreground">
+                <Numeric value={stats?.totalInvoices || 0} bold />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 All time invoices created
@@ -240,8 +240,8 @@ export default function Dashboard() {
                   Paid
                 </span>
               </div>
-              <p className="text-2xl font-bold tracking-tight text-foreground">
-                <Numeric value={stats?.paidInvoices || 0} />
+              <p className="text-2xl tracking-tight text-foreground">
+                <Numeric value={stats?.paidInvoices || 0} bold />
               </p>
               <p className="text-xs text-muted-foreground mt-2">
                 Successfully collected
@@ -302,7 +302,9 @@ export default function Dashboard() {
                           <FileText className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">{invoice.invoiceNumber}</p>
+                          <p className="font-medium text-foreground">
+                            <InvoiceNumber value={invoice.invoiceNumber} />
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(invoice.issueDate).toLocaleDateString()}
                           </p>
