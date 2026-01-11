@@ -141,11 +141,8 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
         accentColor: existingTemplate.accentColor,
         backgroundColor: '#ffffff',
         headingFont: existingTemplate.headingFont,
-        headingWeight: 600,
         bodyFont: existingTemplate.bodyFont,
-        bodyWeight: 400,
         fontSize: existingTemplate.fontSize,
-        headerLayout: existingTemplate.headerLayout as 'standard' | 'centered' | 'split',
         tableStyle: 'minimal',
         showCompanyAddress: existingTemplate.showCompanyAddress,
         showPaymentTerms: existingTemplate.showPaymentTerms,
@@ -205,7 +202,6 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
       logoUrl: settings.logoUrl || undefined,
       logoPosition: settings.logoPosition,
       logoWidth: settings.logoWidth,
-      headerLayout: settings.headerLayout,
       footerLayout: 'simple' as const,
       showCompanyAddress: settings.showCompanyAddress,
       showPaymentTerms: settings.showPaymentTerms,
@@ -447,6 +443,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     <GoogleFontPicker
                       value={settings.headingFont}
                       onFontChange={(v: string) => updateSetting('headingFont', v)}
+                      showWeightPicker={false}
                       className="mt-1.5"
                     />
                   </div>
@@ -456,6 +453,7 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     <GoogleFontPicker
                       value={settings.bodyFont}
                       onFontChange={(v: string) => updateSetting('bodyFont', v)}
+                      showWeightPicker={false}
                       className="mt-1.5"
                     />
                   </div>
@@ -643,57 +641,6 @@ export function SleekTemplateEditor({ templateId, onComplete, onCancel }: SleekT
                     {showSidebar ? 'Preview' : 'Edit'}
                   </Button>
                 </div>
-              </div>
-
-              {/* Style Capabilities Indicator */}
-              <div className="w-full">
-                {invoiceStyle === 'receipt' ? (
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                    <div className="flex items-start gap-2">
-                      <Receipt className="h-4 w-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-blue-900 dark:text-blue-100 mb-1">Receipt Style - Minimalist Design</p>
-                        <div className="space-y-1 text-xs text-blue-700 dark:text-blue-300">
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            <span>Logo customization</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            <span>Primary color (text) & accent color (totals)</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Circle className="h-3 w-3 shrink-0 opacity-50" />
-                            <span className="opacity-75">Fixed monospace typography & minimal layout</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
-                    <div className="flex items-start gap-2">
-                      <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0 mt-0.5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-purple-900 dark:text-purple-100 mb-1">Classic Style - Modern Professional</p>
-                        <div className="space-y-1 text-xs text-purple-700 dark:text-purple-300">
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            <span>Logo customization</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircle2 className="h-3 w-3 shrink-0" />
-                            <span>Primary & accent colors with gradient accents</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Circle className="h-3 w-3 shrink-0 opacity-50" />
-                            <span className="opacity-75">Fixed Inter typography & rounded table design</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

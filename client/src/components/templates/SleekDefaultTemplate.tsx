@@ -16,13 +16,10 @@ export interface SleekTemplateSettings {
   
   // Typography
   headingFont: string;
-  headingWeight: number;
   bodyFont: string;
-  bodyWeight: number;
   fontSize: number;
-  
+
   // Layout
-  headerLayout: 'standard' | 'centered' | 'split';
   tableStyle: 'minimal' | 'bordered' | 'striped';
   
   // Field Visibility
@@ -490,11 +487,8 @@ export const defaultSleekSettings: SleekTemplateSettings = {
   accentColor: '#10b981',
   backgroundColor: '#ffffff',
   headingFont: 'Inter',
-  headingWeight: 600,
   bodyFont: 'Inter',
-  bodyWeight: 400,
   fontSize: 14,
-  headerLayout: 'split',
   tableStyle: 'minimal',
   showCompanyAddress: true,
   showPaymentTerms: true,
