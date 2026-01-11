@@ -11,6 +11,7 @@ Add these to Manus.IM Environment Variables/Secrets:
 # CRYPTO PAYMENTS (NOWPayments) - REQUIRED
 # ========================
 NOWPAYMENTS_API_KEY=0qWqCGrZq8cMmhwxDECxaF9EXH7A/fgl
+NOWPAYMENTS_IPN_SECRET=533b3e8d-ab02-40d1-8209-dff57087cedd
 NOWPAYMENTS_PUBLIC_KEY=Z530954-ZVG42WG-HM8C74B-1J0RF4Y
 
 # ========================
@@ -158,19 +159,22 @@ Please sync SleekInvoices to the latest commit from the main branch:
 
 Repository: https://github.com/BigManDrewskii/sleekinvoices
 Branch: main
-Latest Commit: a7dd0fcda99b50877bb72a60604b4b0ac452902c
+Latest Commit: 79ebfb20cccc4fb50d2c93211ad66c728bbfed3c
 
 Recent updates include:
-- Template editor refinements with single-color system
-- Production-ready fixes (batch queries, validation, race condition handling)
-- Independent scrolling for template editor
-- Crypto payment system fully configured
-- All broken features removed, all controls functional
+- Template editor refinements with auto-accent color generation
+- Production-ready fixes (batch queries, validation, race conditions)
+- Independent scrolling, cleaned UI
+- NOWPayments crypto integration updated (customer-side currency selection)
+- Database schema fixes (expanded currency column for crypto)
+- IPN secret support for webhook verification
+- All deployment documentation complete
 
 Please also verify the following environment variables are configured:
 
 REQUIRED:
 - NOWPAYMENTS_API_KEY
+- NOWPAYMENTS_IPN_SECRET
 - NOWPAYMENTS_PUBLIC_KEY
 - RESEND_API_KEY
 - S3_BUCKET
@@ -200,7 +204,8 @@ Thanks!
 | Variable | Value | Purpose |
 |----------|-------|---------|
 | `NOWPAYMENTS_API_KEY` | `0qWqCGrZq8cMmhwxDECxaF9EXH7A/fgl` | NOWPayments API authentication |
-| `NOWPAYMENTS_PUBLIC_KEY` | `Z530954-ZVG42WG-HM8C74B-1J0RF4Y` | Webhook signature verification |
+| `NOWPAYMENTS_IPN_SECRET` | `533b3e8d-ab02-40d1-8209-dff57087cedd` | Webhook signature verification (primary) |
+| `NOWPAYMENTS_PUBLIC_KEY` | `Z530954-ZVG42WG-HM8C74B-1J0RF4Y` | Webhook signature verification (fallback) |
 | `RESEND_API_KEY` | (Get from resend.com) | Email sending |
 | `S3_BUCKET` | Your bucket name | File storage |
 | `S3_REGION` | `us-east-1` (or your region) | AWS region |
@@ -253,6 +258,7 @@ Before asking Manus to sync:
 
 ```
 NOWPAYMENTS_API_KEY=0qWqCGrZq8cMmhwxDECxaF9EXH7A/fgl
+NOWPAYMENTS_IPN_SECRET=533b3e8d-ab02-40d1-8209-dff57087cedd
 NOWPAYMENTS_PUBLIC_KEY=Z530954-ZVG42WG-HM8C74B-1J0RF4Y
 RESEND_API_KEY=[YOUR_RESEND_KEY]
 S3_BUCKET=[YOUR_S3_BUCKET]
