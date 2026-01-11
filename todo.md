@@ -2055,3 +2055,13 @@
 - [x] Create tRPC endpoint for manual retry
 - [x] Log retry attempts and results
 - [x] Write tests for email retry system (17 tests passing)
+
+### Email Analytics Dashboard Widget
+- [x] Create tRPC endpoint for email analytics over time
+- [x] Calculate open rate (opened / delivered) by period
+- [x] Calculate click rate (clicked / opened) by period
+- [x] Support daily/weekly/monthly time periods
+- [x] Create EmailAnalyticsWidget component with chart
+- [x] Show trend indicators (up/down vs previous period)
+- [x] Add widget to Analytics page
+- [x] Write tests for analytics endpoint (15 tests passing)

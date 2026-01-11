@@ -27,6 +27,7 @@ import {
 } from "recharts";
 import { Navigation } from "@/components/Navigation";
 import { AnalyticsPageSkeleton } from "@/components/skeletons";
+import { EmailAnalyticsWidget } from "@/components/EmailAnalyticsWidget";
 
 export default function Analytics() {
   const { loading, isAuthenticated } = useAuth();
@@ -374,6 +375,9 @@ export default function Analytics() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Email Performance */}
+        <EmailAnalyticsWidget className="mb-6" />
 
         {/* Receivables Aging */}
         <Card>
