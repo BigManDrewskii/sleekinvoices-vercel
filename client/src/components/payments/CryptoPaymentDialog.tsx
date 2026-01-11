@@ -10,7 +10,7 @@ import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/utils";
-import { Loader2, ExternalLink, Bitcoin, Copy, Check, Coins } from "lucide-react";
+import { Loader2, ExternalLink, Bitcoin, Copy, Check, Coins, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface CryptoPaymentDialogProps {
@@ -86,7 +86,9 @@ export function CryptoPaymentDialog({
             Pay with Cryptocurrency
           </DialogTitle>
           <DialogDescription>
-            Pay {formatCurrency(amount)} {currency} using your preferred cryptocurrency
+            {amount < 10
+              ? `Pay ${formatCurrency(amount)} ${currency} — Select a low-fee cryptocurrency for best results`
+              : `Pay ${formatCurrency(amount)} ${currency} using your preferred cryptocurrency`}
           </DialogDescription>
         </DialogHeader>
 
@@ -128,6 +130,41 @@ export function CryptoPaymentDialog({
                   {formatCurrency(amount)} {currency}
                 </div>
               </div>
+
+              {/* Small Amount Warning */}
+              {amount < 10 && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
+                        Small Amount Notice
+                      </h4>
+                      <p className="text-xs text-amber-800 dark:text-amber-200 mb-3 leading-relaxed">
+                        Cryptocurrency payments include network fees that vary by currency.
+                        For amounts under $10, we recommend:
+                      </p>
+                      <ul className="text-xs text-amber-700 dark:text-amber-300 space-y-1.5">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          <span><strong className="font-semibold">Litecoin (LTC)</strong> — Fast, low fees</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          <span><strong className="font-semibold">Stellar (XLM)</strong> — Near-instant, minimal fees</span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          <span><strong className="font-semibold">USDT on Tron</strong> — Stablecoin, low fees</span>
+                        </li>
+                      </ul>
+                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-3">
+                        You'll select your currency on the NOWPayments checkout page.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Create Payment Button */}
               <Button

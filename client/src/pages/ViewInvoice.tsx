@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
+import { Badge } from "@/components/ui/badge";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -260,17 +261,25 @@ export default function ViewInvoice() {
                 Create Payment Link
               </Button>
             )}
-            {(invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed") && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCryptoDialogOpen(true)}
-                className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-              >
-                <Bitcoin className="h-4 w-4 mr-2" />
-                Pay with Crypto
-              </Button>
-            )}
+            {(invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed") && (() => {
+              const remainingBalance = parseFloat(invoice.total) - parseFloat(invoice.amountPaid);
+              return (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCryptoDialogOpen(true)}
+                  className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 gap-2"
+                >
+                  <Bitcoin className="h-4 w-4" />
+                  Pay with Crypto
+                  {remainingBalance < 10 && (
+                    <Badge variant="outline" className="ml-1 text-[10px] border-amber-500 text-amber-600 dark:text-amber-500">
+                      $10+ recommended
+                    </Badge>
+                  )}
+                </Button>
+              );
+            })()}
             {(invoice.status === "sent" || invoice.status === "overdue" || invoice.status === "viewed") && (
               <Button
                 variant="outline"
