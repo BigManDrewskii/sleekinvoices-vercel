@@ -1981,3 +1981,7 @@
 - [x] Ensure all color combinations meet WCAG AA contrast (4.5:1)
 - [x] Test with various color combinations (18 tests passing)
 - [x] Save checkpoint
+
+## NOWPayments IPN Secret
+- [x] Add NOWPAYMENTS_IPN_SECRET environment variable for webhook signature verification
+- [x] Update nowpayments library to use IPN secret instead of public key for signature verification

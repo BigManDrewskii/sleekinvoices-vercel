@@ -12,17 +12,19 @@ const NOWPAYMENTS_API_URL = 'https://api.nowpayments.io/v1';
 interface NOWPaymentsConfig {
   apiKey: string;
   publicKey: string;
+  ipnSecret?: string;
 }
 
 function getConfig(): NOWPaymentsConfig {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   const publicKey = process.env.NOWPAYMENTS_PUBLIC_KEY;
+  const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
   
   if (!apiKey || !publicKey) {
     throw new Error('NOWPayments API credentials not configured');
   }
   
-  return { apiKey, publicKey };
+  return { apiKey, publicKey, ipnSecret };
 }
 
 async function makeRequest<T>(
@@ -294,6 +296,14 @@ export function verifyIPNSignature(
 ): boolean {
   const config = getConfig();
   
+  // Use IPN secret if available, otherwise fall back to public key
+  const secretKey = config.ipnSecret || config.publicKey;
+  
+  if (!secretKey) {
+    console.warn('[NOWPayments] No IPN secret configured, skipping signature verification');
+    return true; // Allow through if no secret configured (development mode)
+  }
+  
   // Sort payload keys alphabetically and create string
   const sortedPayload = Object.keys(payload)
     .sort()
@@ -304,8 +314,8 @@ export function verifyIPNSignature(
   
   const payloadString = JSON.stringify(sortedPayload);
   
-  // Create HMAC signature using the IPN secret (public key)
-  const hmac = crypto.createHmac('sha512', config.publicKey);
+  // Create HMAC signature using the IPN secret
+  const hmac = crypto.createHmac('sha512', secretKey);
   hmac.update(payloadString);
   const calculatedSignature = hmac.digest('hex');
   
