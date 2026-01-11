@@ -361,13 +361,11 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
                   label="Primary"
                   value={primaryColor}
                   onChange={setPrimaryColor}
-                  showSwap
                 />
                 <ColorInput
                   label="Primary Foreground"
                   value={primaryForeground}
                   onChange={setPrimaryForeground}
-                  showSwap
                 />
               </div>
             </CollapsibleSection>
@@ -379,13 +377,11 @@ export function TemplateEditor({ templateId, onComplete, onCancel }: TemplateEdi
                   label="Secondary"
                   value={secondaryColor}
                   onChange={setSecondaryColor}
-                  showSwap
                 />
                 <ColorInput
                   label="Secondary Foreground"
                   value={secondaryForeground}
                   onChange={setSecondaryForeground}
-                  showSwap
                 />
               </div>
             </CollapsibleSection>

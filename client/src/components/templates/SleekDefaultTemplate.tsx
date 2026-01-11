@@ -142,14 +142,14 @@ export function SleekDefaultTemplate({
         style={{
           fontFamily: `"${settings.bodyFont}", sans-serif`,
           fontSize: `${settings.fontSize}px`,
-          fontWeight: settings.bodyWeight,
+          fontWeight: 400,
           color: textColor,
           backgroundColor: settings.backgroundColor,
         }}
       >
         {/* Header */}
-        <header className={`mb-10 ${getHeaderAlignment(settings.headerLayout)}`}>
-          {settings.headerLayout === 'split' ? (
+        <header className={`mb-10 ${getHeaderAlignment(settings.logoPosition)}`}>
+          {settings.logoPosition === 'left' ? (
             <div className="flex justify-between items-start">
               <Logo settings={settings} />
               <div className="text-right">
@@ -157,7 +157,7 @@ export function SleekDefaultTemplate({
                   className="text-4xl tracking-tight mb-3"
                   style={{ 
                     fontFamily: `"${settings.headingFont}", sans-serif`,
-                    fontWeight: settings.headingWeight,
+                    fontWeight: 600,
                     color: settings.primaryColor,
                   }}
                 >
@@ -171,18 +171,18 @@ export function SleekDefaultTemplate({
             </div>
           ) : (
             <>
-              <Logo settings={settings} centered={settings.headerLayout === 'centered'} />
+              <Logo settings={settings} centered={settings.logoPosition === 'center'} />
               <h1 
-                className={`text-4xl tracking-tight mt-6 mb-4 ${settings.headerLayout === 'centered' ? 'text-center' : ''}`}
+                className={`text-4xl tracking-tight mt-6 mb-4 ${settings.logoPosition === 'center' ? 'text-center' : ''}`}
                 style={{ 
                   fontFamily: `"${settings.headingFont}", sans-serif`,
-                  fontWeight: settings.headingWeight,
+                  fontWeight: 600,
                   color: settings.primaryColor,
                 }}
               >
                 INVOICE
               </h1>
-              <div className={`flex gap-8 ${settings.headerLayout === 'centered' ? 'justify-center' : ''}`} style={{ color: mutedTextColor }}>
+              <div className={`flex gap-8 ${settings.logoPosition === 'center' ? 'justify-center' : ''}`} style={{ color: mutedTextColor }}>
                 <p><span className="font-medium" style={{ color: textColor }}>Invoice #:</span> {invoiceData.invoiceNumber}</p>
                 <p><span className="font-medium" style={{ color: textColor }}>Date:</span> {formatDate(invoiceData.date)}</p>
               </div>
