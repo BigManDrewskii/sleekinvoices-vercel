@@ -61,28 +61,18 @@ export function TemplatePreviewCard({
   };
 
   return (
-    <div 
-      className={`${sizeClasses[size]} rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group relative`}
-      style={{ backgroundColor: bgColor }}
+    <div
+      className={`${sizeClasses[size]} rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group relative bg-card border border-border`}
       onClick={onClick}
     >
-      {/* Background pattern - subtle grid */}
-      <div 
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(${template.secondaryColor} 1px, transparent 1px), linear-gradient(90deg, ${template.secondaryColor} 1px, transparent 1px)`,
-          backgroundSize: '20px 20px'
-        }}
-      />
-      
       {/* Content */}
-      <div className="relative h-full flex">
-        {/* Left side - Typography showcase */}
-        <div className="flex-1 flex flex-col justify-center items-center p-4">
+      <div className="relative h-full flex flex-col justify-between p-6">
+        {/* Top - Typography showcase */}
+        <div className="flex flex-col items-center justify-center flex-1">
           {/* Large "Aa" typography demo */}
-          <div 
-            className={`${typographySizes[size].heading} leading-none`}
-            style={{ 
+          <div
+            className={`${typographySizes[size].heading} leading-none mb-3`}
+            style={{
               fontFamily: `"${template.headingFont}", sans-serif`,
               fontWeight: headingWeight,
               color: template.primaryColor
@@ -90,50 +80,40 @@ export function TemplatePreviewCard({
           >
             Aa
           </div>
-          
-          {/* Font name */}
-          <div 
-            className={`${typographySizes[size].body} mt-2 opacity-60`}
-            style={{ 
-              fontFamily: `"${template.bodyFont}", sans-serif`,
-              fontWeight: bodyWeight,
-              color: template.secondaryColor
-            }}
-          >
-            {template.headingFont}
-          </div>
-        </div>
-        
-        {/* Right side - Color palette */}
-        <div className="flex flex-col justify-center gap-2 pr-4">
-          {/* Primary color */}
+
+          {/* Color Palette - Horizontal circles */}
           <div className="flex items-center gap-2">
-            <div 
-              className="w-8 h-8 rounded-lg shadow-sm ring-1 ring-black/5"
+            {/* Background color (white) */}
+            <div
+              className="w-8 h-8 rounded-full shadow-sm ring-2 ring-border/50"
+              style={{ backgroundColor: bgColor }}
+            />
+            {/* Primary color */}
+            <div
+              className="w-8 h-8 rounded-full shadow-sm ring-1 ring-border/30"
               style={{ backgroundColor: template.primaryColor }}
             />
-          </div>
-          
-          {/* Secondary color */}
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-8 h-8 rounded-lg shadow-sm ring-1 ring-black/5"
-              style={{ backgroundColor: template.secondaryColor }}
-            />
-          </div>
-          
-          {/* Accent color */}
-          <div className="flex items-center gap-2">
-            <div 
-              className="w-8 h-8 rounded-lg shadow-sm ring-1 ring-black/5"
+            {/* Accent color */}
+            <div
+              className="w-8 h-8 rounded-full shadow-sm ring-1 ring-border/30"
               style={{ backgroundColor: template.accentColor }}
             />
           </div>
         </div>
+
+        {/* Bottom - Template info */}
+        <div className="flex flex-col gap-1 text-center">
+          <div className="font-medium text-sm text-foreground">
+            {template.name}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {template.headingFont}
+          </div>
+        </div>
       </div>
-      
+
       {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-xl" />
     </div>
   );
 }
@@ -164,17 +144,16 @@ export function CompactTemplatePreview({
   }, [template.headingFont]);
 
   return (
-    <div 
-      className="h-28 w-full rounded-lg overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] group relative"
-      style={{ backgroundColor: bgColor }}
+    <div
+      className="h-32 w-full rounded-lg overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] group relative bg-card border border-border"
       onClick={onClick}
     >
       {/* Content */}
-      <div className="relative h-full flex items-center justify-between p-4">
+      <div className="relative h-full flex flex-col items-center justify-center p-4 gap-3">
         {/* Typography showcase */}
-        <div 
+        <div
           className="text-4xl leading-none"
-          style={{ 
+          style={{
             fontFamily: `"${template.headingFont}", sans-serif`,
             fontWeight: headingWeight,
             color: template.primaryColor
@@ -182,26 +161,34 @@ export function CompactTemplatePreview({
         >
           Aa
         </div>
-        
-        {/* Color dots */}
-        <div className="flex gap-1.5">
-          <div 
-            className="w-5 h-5 rounded-full shadow-sm ring-1 ring-black/10"
+
+        {/* Color palette - Horizontal circles */}
+        <div className="flex items-center gap-2">
+          {/* Background color (white) */}
+          <div
+            className="w-6 h-6 rounded-full shadow-sm ring-2 ring-border/50"
+            style={{ backgroundColor: bgColor }}
+          />
+          {/* Primary color */}
+          <div
+            className="w-6 h-6 rounded-full shadow-sm ring-1 ring-border/30"
             style={{ backgroundColor: template.primaryColor }}
           />
-          <div 
-            className="w-5 h-5 rounded-full shadow-sm ring-1 ring-black/10"
-            style={{ backgroundColor: template.secondaryColor }}
-          />
-          <div 
-            className="w-5 h-5 rounded-full shadow-sm ring-1 ring-black/10"
+          {/* Accent color */}
+          <div
+            className="w-6 h-6 rounded-full shadow-sm ring-1 ring-border/30"
             style={{ backgroundColor: template.accentColor }}
           />
         </div>
+
+        {/* Template name */}
+        <div className="text-xs text-muted-foreground font-medium">
+          {template.name}
+        </div>
       </div>
-      
+
       {/* Hover overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors rounded-lg" />
     </div>
   );
 }
