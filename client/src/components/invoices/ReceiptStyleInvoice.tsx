@@ -9,6 +9,7 @@ import {
 } from "@/lib/color-contrast";
 import { useMemo, useEffect } from "react";
 import { loadGoogleFont } from "@/lib/google-fonts";
+import { cn } from "@/lib/utils";
 
 interface LineItem {
   description: string;
