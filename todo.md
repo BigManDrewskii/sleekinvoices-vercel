@@ -335,3 +335,5 @@
 - [x] Fixed SQL query error on /expenses page (ambiguous column names with Drizzle ORM dynamic queries)
 - [x] Added missing database columns: `billedAt` and `isTaxDeductible` to expenses table
 - [x] Created comprehensive test suite for expenses query (8 passing tests)
+
+- [x] Fix onboarding tour modal - allow clicking outside to dismiss

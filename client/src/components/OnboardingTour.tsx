@@ -235,8 +235,11 @@ export function OnboardingTour() {
       {/* Overlay layer - absolute positioning for full document coverage */}
       <div className="fixed inset-0 z-[9998] pointer-events-none">
         <svg
-          className="absolute inset-0 w-full h-full pointer-events-auto"
+          className="absolute inset-0 w-full h-full pointer-events-auto cursor-pointer"
           style={{ minHeight: document.documentElement.scrollHeight }}
+          onClick={skipOnboarding}
+          role="button"
+          aria-label="Click to dismiss tour"
         >
           <defs>
             <mask id="spotlight-mask">
@@ -296,6 +299,7 @@ export function OnboardingTour() {
           left: tooltipPosition.left,
           width: tooltipWidth,
         }}
+        onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-title"
