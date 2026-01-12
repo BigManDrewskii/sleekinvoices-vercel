@@ -552,15 +552,25 @@
 /* Compact/Monogram logo - mobile and tablet (< 1024px) */
 .navbar-logo-compact {
   display: block;
-  height: 32px;
-  width: 32px;
-  min-width: 32px;
-  max-width: 32px;
+  height: 36px;
+  width: 36px;
+  min-width: 36px;
+  max-width: 36px;
   /* Snappy transitions with bounce effect */
   transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
               filter 150ms ease-out,
               drop-shadow 200ms ease-out;
   will-change: transform;
+}
+
+/* Slightly larger on tablet for better visibility */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .navbar-logo-compact {
+    height: 40px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+  }
 }
 
 .navbar-logo:hover .navbar-logo-compact {
@@ -586,14 +596,21 @@
   flex-shrink: 0;
 }
 
+/* Better spacing on tablet */
 @media (min-width: 768px) {
   .navbar-actions {
     gap: var(--space-3);
   }
 }
 
-/* Ensure all navbar buttons meet 48px touch target on mobile */
-@media (max-width: 767px) {
+@media (min-width: 1024px) {
+  .navbar-actions {
+    gap: var(--space-4);
+  }
+}
+
+/* Ensure all navbar buttons meet 44px touch target on mobile and tablet */
+@media (max-width: 1023px) {
   .navbar-actions button,
   .navbar-actions a {
     min-height: 44px;
@@ -601,51 +618,33 @@
   }
 }
 
-/* Tablet-specific navigation (768px - 1023px) */
+/* Tablet-specific styles (768px - 1023px) - uses hamburger menu */
 @media (min-width: 768px) and (max-width: 1023px) {
   .navbar-inner {
-    height: 60px;
+    height: 64px;
+    gap: var(--space-4);
   }
   
-  .navbar-tablet-nav {
-    display: flex;
-    align-items: center;
-    gap: var(--space-1);
-    flex: 1;
-    justify-content: center;
-    margin: 0 var(--space-3);
+  .navbar-container {
+    padding-left: var(--space-5);
+    padding-right: var(--space-5);
   }
-  
-  .navbar-tablet-nav a,
-  .navbar-tablet-nav button {
-    padding: var(--space-2) var(--space-3);
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: var(--radius);
-    color: var(--muted-foreground);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-    position: relative;
-  }
-  
-  .navbar-tablet-nav a:hover,
-  .navbar-tablet-nav button:hover {
-    background: oklch(from var(--accent) l c h / 0.8);
-    color: var(--foreground);
-    transform: translateY(-1px);
-  }
-  
-  .navbar-tablet-nav a.active,
-  .navbar-tablet-nav button.active {
-    background: var(--accent);
-    color: var(--foreground);
-    font-weight: 600;
-  }
-  
-  .navbar-tablet-nav a:focus-visible,
-  .navbar-tablet-nav button:focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+}
+
+/* Desktop navigation container (1024px+) */
+.navbar-desktop-tablet-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 1;
+  justify-content: center;
+  margin: 0 var(--space-4);
+}
+
+@media (min-width: 1200px) {
+  .navbar-desktop-tablet-nav {
+    gap: var(--space-2);
+    margin: 0 var(--space-6);
   }
 }
 

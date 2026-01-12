@@ -211,26 +211,27 @@ export function Navigation() {
   );
 
   // Desktop & Tablet Navigation - unified snappy UX with DropdownMenu
+  // Shows at lg (1024px+) for full nav, tablet gets hamburger menu for better UX
   const DesktopTabletNav = () => (
-    <div className="hidden md:flex navbar-desktop-tablet-nav">
+    <div className="hidden lg:flex navbar-desktop-tablet-nav">
       <Link
         href="/dashboard"
-        className={cn(
-          "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all",
-          isActive("/dashboard") 
-            ? "bg-accent text-foreground" 
-            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-        )}
-      >
-        <NavigationIcon icon={LayoutDashboard} isActive={isActive("/dashboard")} className="h-4 w-4" />
-        <span>Dashboard</span>
-      </Link>
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            isActive("/dashboard") 
+              ? "bg-accent text-foreground" 
+              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+          )}
+        >
+          <NavigationIcon icon={LayoutDashboard} isActive={isActive("/dashboard")} className="h-4 w-4" />
+          <span>Dashboard</span>
+        </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all",
+              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
               isGroupActive(navigationConfig.billing.items)
                 ? "bg-accent text-foreground"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -253,24 +254,24 @@ export function Navigation() {
         </DropdownMenuContent>
       </DropdownMenu>
       
-      <Link
-        href="/clients"
-        className={cn(
-          "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all",
-          isActive("/clients")
-            ? "bg-accent text-foreground"
-            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-        )}
-      >
-        <NavigationIcon icon={Users} isActive={isActive("/clients")} className="h-4 w-4" />
-        <span>Clients</span>
-      </Link>
+        <Link
+          href="/clients"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            isActive("/clients")
+              ? "bg-accent text-foreground"
+              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+          )}
+        >
+          <NavigationIcon icon={Users} isActive={isActive("/clients")} className="h-4 w-4" />
+          <span>Clients</span>
+        </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all",
+              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
               isGroupActive(navigationConfig.finances.items)
                 ? "bg-accent text-foreground"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
@@ -293,18 +294,18 @@ export function Navigation() {
         </DropdownMenuContent>
       </DropdownMenu>
       
-      <Link
-        href="/templates"
-        className={cn(
-          "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all",
-          isActive("/templates")
-            ? "bg-accent text-foreground"
-            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-        )}
-      >
-        <NavigationIcon icon={LayoutTemplate} isActive={isActive("/templates")} className="h-4 w-4" />
-        <span>Templates</span>
-      </Link>
+        <Link
+          href="/templates"
+          className={cn(
+            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            isActive("/templates")
+              ? "bg-accent text-foreground"
+              : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+          )}
+        >
+          <NavigationIcon icon={LayoutTemplate} isActive={isActive("/templates")} className="h-4 w-4" />
+          <span>Templates</span>
+        </Link>
     </div>
   );
 
@@ -489,38 +490,38 @@ export function Navigation() {
             className="navbar-logo group relative"
             aria-label="SleekInvoices - Go to Dashboard"
           >
-            {/* Wide logo for desktop and tablet (md+) */}
+            {/* Wide logo for desktop (lg+) */}
             <img
               src="/logos/wide/SleekInvoices-Logo-Wide.svg"
               alt="SleekInvoices"
-              className="hidden md:block navbar-logo-wide transition-all duration-150 ease-out group-hover:scale-[1.03] group-hover:brightness-110 group-active:scale-[0.98]"
+              className="hidden lg:block navbar-logo-wide transition-all duration-150 ease-out group-hover:scale-[1.03] group-hover:brightness-110 group-active:scale-[0.98]"
               style={{ height: '28px', width: 'auto', maxWidth: '200px' }}
             />
-            {/* Monogram icon for mobile (below md) */}
+            {/* Monogram icon for mobile and tablet (below lg) */}
             <img
               src="/logos/monogram/SleekInvoices-Monogram-White.svg"
               alt="SleekInvoices"
-              className="md:hidden navbar-logo-compact transition-all duration-150 ease-out group-hover:scale-110 group-hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] group-active:scale-95"
-              style={{ height: '32px', width: '32px', maxWidth: '32px' }}
+              className="lg:hidden navbar-logo-compact transition-all duration-150 ease-out group-hover:scale-110 group-hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.3)] group-active:scale-95"
+              style={{ height: '36px', width: '36px', maxWidth: '36px' }}
             />
           </Link>
 
-          {/* Desktop & Tablet Navigation - Unified UX (768px+) */}
+          {/* Desktop Navigation - Unified UX (1024px+) */}
           <DesktopTabletNav />
 
           {/* Right Side Actions */}
           <div className="navbar-actions">
-            {/* Search Button - All viewports */}
+            {/* Search Button - All viewports with improved touch targets */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSearchOpen(true)}
-              className="h-9 gap-2 px-3 text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              className="h-11 min-h-[44px] min-w-[44px] gap-2 px-3 text-muted-foreground hover:text-foreground hover:bg-accent/50"
               aria-label="Open search (Cmd+K)"
             >
               <Search className="h-4 w-4" />
-              <span className="hidden sm:inline">Search</span>
-              <kbd className="hidden md:inline-flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-border/50 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <span className="hidden md:inline">Search</span>
+              <kbd className="hidden lg:inline-flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-border/50 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 ⌘K
               </kbd>
             </Button>
@@ -532,10 +533,10 @@ export function Navigation() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex items-center justify-center rounded-full h-10 w-10 min-w-[40px] hover:ring-2 hover:ring-primary/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex items-center justify-center rounded-full h-11 w-11 min-w-[44px] min-h-[44px] hover:ring-2 hover:ring-primary/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="User menu"
                 >
-                  {user && <UserAvatar user={user} size={40} />}
+                  {user && <UserAvatar user={user} size={44} />}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -579,13 +580,13 @@ export function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Mobile Menu - Visible below md (768px) */}
+            {/* Mobile Menu - Visible below lg (1024px) for better tablet experience */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="lg:hidden">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-10 w-10 min-w-[44px] transition-all duration-200" 
+                  className="h-11 w-11 min-w-[44px] min-h-[44px] transition-all duration-200" 
                   aria-label="Open navigation menu"
                 >
                   <Menu className={cn(
