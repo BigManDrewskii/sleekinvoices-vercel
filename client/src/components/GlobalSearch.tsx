@@ -129,19 +129,19 @@ export function GlobalSearch() {
         >
           <Command className="bg-transparent">
             {/* Search Input Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-border/50">
-              <Search className="h-5 w-5 text-muted-foreground shrink-0" />
+            <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/50">
+              <Search className="h-4.5 w-4.5 text-muted-foreground/70 shrink-0" />
               <Input
                 ref={inputRef}
                 aria-label="Search invoices and clients"
                 placeholder="Search invoices, clients..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 border-0 bg-transparent p-0 text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="flex-1 border-0 bg-transparent p-0 text-[15px] placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 h-7"
               />
               <button
                 onClick={handleClose}
-                className="shrink-0 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className="shrink-0 p-1 rounded-md text-muted-foreground/60 hover:text-foreground hover:bg-accent/80 transition-colors"
                 aria-label="Close search"
               >
                 <X className="h-4 w-4" />
