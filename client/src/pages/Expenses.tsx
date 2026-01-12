@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, DollarSign, Tag, ChevronDown, ChevronUp, FileText, Receipt, Filter, X } from "lucide-react";
+import { Plus, Trash2, DollarSign, Tag, ChevronDown, ChevronUp, FileText, Receipt } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { ExpensesPageSkeleton } from "@/components/skeletons/ExpensesPageSkeleton";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
+import { FilterSection, FilterSelect, ActiveFilters } from "@/components/ui/filter-section";
 
 // Payment method display names
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -158,7 +159,7 @@ export default function Expenses() {
   }, [filteredExpenses]);
 
   // Check if any filters are active
-  const hasActiveFilters = paymentMethodFilter || billableFilter !== 'all' || clientFilter || categoryFilter;
+  const hasActiveFilters = !!(paymentMethodFilter || billableFilter !== 'all' || clientFilter || categoryFilter);
 
   const clearAllFilters = () => {
     setPaymentMethodFilter(null);
@@ -738,27 +739,13 @@ export default function Expenses() {
       </div>
 
       {/* Filters Section */}
-      <Card className="p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">Filters</span>
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
-              className="ml-auto text-muted-foreground hover:text-foreground"
-            >
-              <X className="w-4 h-4 mr-1" />
-              Clear All
-            </Button>
-          )}
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <FilterSection
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearAllFilters}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
           {/* Payment Method Filter */}
-          <div>
-            <Label className="text-sm text-muted-foreground mb-1.5 block">Payment Method</Label>
+          <FilterSelect label="Payment Method">
             <Select
               value={paymentMethodFilter || "all"}
               onValueChange={(v) => setPaymentMethodFilter(v === "all" ? null : v)}
@@ -776,11 +763,10 @@ export default function Expenses() {
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FilterSelect>
 
           {/* Billable Status Filter */}
-          <div>
-            <Label className="text-sm text-muted-foreground mb-1.5 block">Billable Status</Label>
+          <FilterSelect label="Billable Status">
             <Select
               value={billableFilter}
               onValueChange={(v) => setBillableFilter(v as 'all' | 'billable' | 'non-billable')}
@@ -794,11 +780,10 @@ export default function Expenses() {
                 <SelectItem value="non-billable">Non-Billable Only</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FilterSelect>
 
           {/* Client Filter */}
-          <div>
-            <Label className="text-sm text-muted-foreground mb-1.5 block">Client</Label>
+          <FilterSelect label="Client">
             <Select
               value={clientFilter?.toString() || "all"}
               onValueChange={(v) => setClientFilter(v === "all" ? null : parseInt(v))}
@@ -815,11 +800,10 @@ export default function Expenses() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FilterSelect>
 
           {/* Category Filter */}
-          <div>
-            <Label className="text-sm text-muted-foreground mb-1.5 block">Category</Label>
+          <FilterSelect label="Category">
             <Select
               value={categoryFilter?.toString() || "all"}
               onValueChange={(v) => setCategoryFilter(v === "all" ? null : parseInt(v))}
@@ -836,49 +820,39 @@ export default function Expenses() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
+          </FilterSelect>
         </div>
 
         {/* Active Filters Summary */}
-        {hasActiveFilters && (
-          <div className="mt-4 pt-4 border-t">
-            <div className="flex flex-wrap gap-2">
-              {paymentMethodFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md">
-                  Payment: {PAYMENT_METHOD_LABELS[paymentMethodFilter] || paymentMethodFilter}
-                  <button onClick={() => setPaymentMethodFilter(null)} className="hover:text-primary/70">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {billableFilter !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md">
-                  {billableFilter === 'billable' ? 'Billable' : 'Non-Billable'}
-                  <button onClick={() => setBillableFilter('all')} className="hover:text-primary/70">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {clientFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md">
-                  Client: {clients?.find((c: any) => c.id === clientFilter)?.name || 'Unknown'}
-                  <button onClick={() => setClientFilter(null)} className="hover:text-primary/70">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {categoryFilter && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md">
-                  Category: {categories?.find((c: any) => c.id === categoryFilter)?.name || 'Unknown'}
-                  <button onClick={() => setCategoryFilter(null)} className="hover:text-primary/70">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-      </Card>
+        <ActiveFilters
+          filters={[
+            ...(paymentMethodFilter ? [{
+              key: 'payment',
+              label: 'Payment',
+              value: PAYMENT_METHOD_LABELS[paymentMethodFilter] || paymentMethodFilter,
+              onRemove: () => setPaymentMethodFilter(null),
+            }] : []),
+            ...(billableFilter !== 'all' ? [{
+              key: 'billable',
+              label: 'Status',
+              value: billableFilter === 'billable' ? 'Billable' : 'Non-Billable',
+              onRemove: () => setBillableFilter('all'),
+            }] : []),
+            ...(clientFilter ? [{
+              key: 'client',
+              label: 'Client',
+              value: clients?.find((c: any) => c.id === clientFilter)?.name || 'Unknown',
+              onRemove: () => setClientFilter(null),
+            }] : []),
+            ...(categoryFilter ? [{
+              key: 'category',
+              label: 'Category',
+              value: categories?.find((c: any) => c.id === categoryFilter)?.name || 'Unknown',
+              onRemove: () => setCategoryFilter(null),
+            }] : []),
+          ]}
+        />
+      </FilterSection>
 
       {/* Expense List */}
       {!expenses || expenses.length === 0 ? (
