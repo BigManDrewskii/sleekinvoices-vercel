@@ -72,7 +72,9 @@ export function QuickBooksSettings() {
         toast.info("No new payments found in QuickBooks");
       }
       if (data.errors.length > 0) {
-        console.error("Payment sync errors:", data.errors);
+        if (import.meta.env.DEV) {
+          console.error("Payment sync errors:", data.errors);
+        }
       }
     },
     onError: (error) => toast.error(error.message),

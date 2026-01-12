@@ -17,7 +17,9 @@ export const getLoginUrl = () => {
   // In local dev mode, return a safe placeholder URL
   // The auth system will bypass login anyway when SKIP_AUTH=true
   if (isLocalDevMode()) {
-    console.log("[Auth] Local dev mode detected - auth bypass enabled");
+    if (import.meta.env.DEV) {
+      console.log("[Auth] Local dev mode detected - auth bypass enabled");
+    }
     return "/"; // Redirect to home instead of OAuth
   }
 
@@ -26,10 +28,12 @@ export const getLoginUrl = () => {
 
   // Validate required environment variables
   if (!oauthPortalUrl || !appId) {
-    console.error("[Auth] Missing required environment variables:");
-    if (!oauthPortalUrl) console.error("  - VITE_OAUTH_PORTAL_URL");
-    if (!appId) console.error("  - VITE_APP_ID");
-    console.error("[Auth] Set VITE_SKIP_AUTH=true for local development without OAuth");
+    if (import.meta.env.DEV) {
+      console.error("[Auth] Missing required environment variables:");
+      if (!oauthPortalUrl) console.error("  - VITE_OAUTH_PORTAL_URL");
+      if (!appId) console.error("  - VITE_APP_ID");
+      console.error("[Auth] Set VITE_SKIP_AUTH=true for local development without OAuth");
+    }
     return "/";
   }
 

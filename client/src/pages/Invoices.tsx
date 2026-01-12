@@ -634,7 +634,7 @@ export default function Invoices() {
       <Navigation />
 
       {/* Main Content */}
-      <div className="page-content page-transition">
+      <main id="main-content" className="page-content page-transition" role="main" aria-label="Invoices">
         {/* Page Header */}
         <div className="page-header">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1203,7 +1203,7 @@ export default function Invoices() {
             )}
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Single Delete Confirmation Dialog */}
       <DeleteConfirmDialog

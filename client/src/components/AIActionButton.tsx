@@ -217,14 +217,18 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
           // Navigate to settings reminders tab
           navigate("/settings?tab=reminders");
           break;
-          
+
         default:
-          console.warn("Unknown action type:", action.type);
+          if (import.meta.env.DEV) {
+            console.warn("Unknown action type:", action.type);
+          }
       }
-      
+
       onComplete?.();
     } catch (error) {
-      console.error("Action failed:", error);
+      if (import.meta.env.DEV) {
+        console.error("Action failed:", error);
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Home, ArrowLeft } from "lucide-react";
+import { AlertCircle, Home, ArrowLeft, Mail } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
@@ -59,6 +59,22 @@ export default function NotFound() {
               <Home className="w-4 h-4 mr-2" />
               Go Home
             </Button>
+          </div>
+
+          {/* Support Contact */}
+          <div className="mt-8 pt-6 border-t border-border">
+            <p className="text-sm text-muted-foreground mb-3">
+              Need help? Contact our support team:
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center text-sm">
+              <a
+                href="mailto:support@sleekinvoices.com"
+                className="inline-flex items-center gap-1.5 text-primary hover:underline"
+              >
+                <Mail className="h-4 w-4" />
+                support@sleekinvoices.com
+              </a>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -45,7 +45,9 @@ export function AvatarSelector({
       setSelectedType('upload');
       onSelect(uploadedUrl, 'upload');
     } catch (error) {
-      console.error('Avatar upload failed:', error);
+      if (import.meta.env.DEV) {
+        console.error('Avatar upload failed:', error);
+      }
     } finally {
       setUploading(false);
     }

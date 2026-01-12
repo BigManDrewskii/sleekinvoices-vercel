@@ -19,6 +19,7 @@ import ClientPortal from "./pages/ClientPortal";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import RefundPolicy from "./pages/RefundPolicy";
 
 // Lazy load: Authenticated pages
 // These are only loaded when user navigates to them after login
@@ -64,16 +65,23 @@ function LoadingFallback() {
 
 function Router() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Switch>
-        {/* Public routes - eager loaded */}
-        <Route path={"/"} component={Home} />
-        <Route path={"/landing"} component={Landing} />
-        <Route path="/portal/:accessToken" component={ClientPortal} />
-        <Route path="/terms" component={Terms} />
-        <Route path="/privacy" component={Privacy} />
-        
-        {/* Authenticated routes - lazy loaded */}
+    <>
+      {/* Skip to main content link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      <Suspense fallback={<LoadingFallback />}>
+        <Switch>
+          {/* Public routes - eager loaded */}
+          <Route path={"/"} component={Home} />
+          <Route path={"/landing"} component={Landing} />
+          <Route path="/portal/:accessToken" component={ClientPortal} />
+          <Route path="/terms" component={Terms} />
+          <Route path="/privacy" component={Privacy} />
+          <Route path="/refund-policy" component={RefundPolicy} />
+
+          {/* Authenticated routes - lazy loaded */}
         <Route path={"/dashboard"} component={Dashboard} />
         <Route path={"/clients"} component={Clients} />
         <Route path={"/invoices"} component={Invoices} />
@@ -105,6 +113,7 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
     </Suspense>
+    </>
   );
 }
 

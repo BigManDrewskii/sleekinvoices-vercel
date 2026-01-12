@@ -623,6 +623,34 @@ export function Navigation() {
                       <Sparkles className="h-5 w-5 text-amber-500" />
                       Subscription
                     </Link>
+
+                    {/* Support Links */}
+                    <div className="pt-2 mt-2 border-t border-border/30">
+                      <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Support
+                      </div>
+                      <a
+                        href="mailto:hello@sleekinvoices.com"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-all duration-200 min-h-[44px]"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <div className="flex flex-col">
+                          <span className="font-medium">General Inquiries</span>
+                          <span className="text-xs text-muted-foreground">hello@sleekinvoices.com</span>
+                        </div>
+                      </a>
+                      <a
+                        href="mailto:support@sleekinvoices.com"
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-all duration-200 min-h-[44px]"
+                      >
+                        <Mail className="h-4 w-4" />
+                        <div className="flex flex-col">
+                          <span className="font-medium">Technical Support</span>
+                          <span className="text-xs text-muted-foreground">support@sleekinvoices.com</span>
+                        </div>
+                      </a>
+                    </div>
+
                     <div className="pt-2 mt-2 border-t border-border/30">
                       <button
                         onClick={() => {

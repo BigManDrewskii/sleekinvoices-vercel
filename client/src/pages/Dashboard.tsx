@@ -62,7 +62,7 @@ export default function Dashboard() {
       <Navigation />
 
       {/* Main Content */}
-      <div className="page-content page-transition">
+      <main id="main-content" className="page-content page-transition" role="main" aria-label="Dashboard">
         <div className="section-stack">
           {/* Header */}
           <div className="page-header">
@@ -324,7 +324,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

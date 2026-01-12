@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
-import { Save, Upload, User, Building2, LogOut, Mail, Bell, Link2 } from "lucide-react";
+import { Save, Upload, User, Building2, LogOut, Mail, Bell, Link2, HelpCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -210,6 +210,10 @@ export default function Settings() {
             <TabsTrigger value="integrations" className="gap-2">
               <Link2 className="h-4 w-4 hidden sm:block" />
               Integrations
+            </TabsTrigger>
+            <TabsTrigger value="support" className="gap-2">
+              <HelpCircle className="h-4 w-4 hidden sm:block" />
+              Support
             </TabsTrigger>
           </TabsList>
 
@@ -579,6 +583,72 @@ export default function Settings() {
           {/* Integrations Tab */}
           <TabsContent value="integrations" className="space-y-6">
             <QuickBooksSettings />
+          </TabsContent>
+
+          {/* Support Tab */}
+          <TabsContent value="support" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Support</CardTitle>
+                <CardDescription>
+                  Need help? Our support team is here to assist you with any questions or issues.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* General Inquiries */}
+                <div className="flex items-start gap-4 p-4 border border-border rounded-lg bg-accent/5 hover:bg-accent/10 transition-colors">
+                  <div className="flex-shrink-0 mt-1">
+                    <Mail className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-foreground mb-1">
+                      General Inquiries
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Questions about features, billing, or general information
+                    </p>
+                    <a
+                      href="mailto:hello@sleekinvoices.com"
+                      className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+                    >
+                      hello@sleekinvoices.com
+                    </a>
+                  </div>
+                </div>
+
+                {/* Technical Support */}
+                <div className="flex items-start gap-4 p-4 border border-border rounded-lg bg-accent/5 hover:bg-accent/10 transition-colors">
+                  <div className="flex-shrink-0 mt-1">
+                    <HelpCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-foreground mb-1">
+                      Technical Support
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Get help with technical issues, bugs, or account problems
+                    </p>
+                    <a
+                      href="mailto:support@sleekinvoices.com"
+                      className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+                    >
+                      support@sleekinvoices.com
+                    </a>
+                  </div>
+                </div>
+
+                {/* Support Information */}
+                <div className="rounded-lg bg-muted/50 p-4">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">
+                    Response Time
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    We typically respond to support requests within 24 hours during business days.
+                    For urgent issues, please mark your email as "URGENT" in the subject line.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

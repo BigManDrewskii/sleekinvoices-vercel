@@ -68,7 +68,9 @@ export default function ReceiptUpload({ value, onChange, disabled }: ReceiptUplo
           onChange({ url: result.url, key: result.key });
           toast.success("Receipt uploaded successfully");
         } catch (error) {
-          console.error("Upload error:", error);
+          if (import.meta.env.DEV) {
+            console.error("Upload error:", error);
+          }
           toast.error("Failed to upload receipt");
         } finally {
           setIsUploading(false);
@@ -82,7 +84,9 @@ export default function ReceiptUpload({ value, onChange, disabled }: ReceiptUplo
 
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("File processing error:", error);
+      if (import.meta.env.DEV) {
+        console.error("File processing error:", error);
+      }
       toast.error("Failed to process file");
       setIsUploading(false);
     }

@@ -107,7 +107,9 @@ export default function CreateInvoice() {
           })));
         }
       } catch (e) {
-        console.error('Failed to parse line items from URL:', e);
+        if (import.meta.env.DEV) {
+          console.error('Failed to parse line items from URL:', e);
+        }
       }
     }
   }, [searchString]);
@@ -321,7 +323,7 @@ export default function CreateInvoice() {
       <Navigation />
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <main id="main-content" className="container mx-auto px-4 py-8" role="main" aria-label="Create Invoice">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Create Invoice</h1>
@@ -566,8 +568,8 @@ export default function CreateInvoice() {
             </div>
           </div>
         </div>
-      </div>
-      
+      </main>
+
       {/* Billable Expenses Dialog */}
       <BillableExpenseDialog
         open={showExpenseDialog}

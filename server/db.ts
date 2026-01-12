@@ -517,21 +517,25 @@ export async function getInvoiceStats(userId: number, periodDays: number = 30) {
   });
   
   console.log(`[Analytics] Found ${allInvoices.length} invoices`);
-  
+
+  // Get payment totals for all invoices in one query (N+1 fix)
+  const allInvoiceIds = allInvoices.map(inv => inv.id);
+  const paymentTotals = await getBulkPaymentTotals(allInvoiceIds);
+
   // Calculate payment status for each invoice
   let totalRevenue = 0;
   let outstandingBalance = 0;
   let paidInvoices = 0;
   let partiallyPaidInvoices = 0;
   let unpaidInvoices = 0;
-  
+
   for (const invoice of allInvoices) {
-    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    const totalPaid = paymentTotals.get(invoice.id) || 0;
     const invoiceTotal = Number(invoice.total);
-    
+
     // Add to revenue (sum of all payments received)
     totalRevenue += totalPaid;
-    
+
     // Determine payment status
     if (totalPaid === 0) {
       unpaidInvoices++;
@@ -544,22 +548,22 @@ export async function getInvoiceStats(userId: number, periodDays: number = 30) {
       outstandingBalance += (invoiceTotal - totalPaid);
     }
   }
-  
+
   const totalInvoices = allInvoices.length;
   const overdueInvoices = allInvoices.filter(inv => inv.status === 'overdue').length;
   const averageInvoiceValue = paidInvoices > 0 ? totalRevenue / paidInvoices : 0;
-  
+
   // Calculate period-specific revenue for comparison
   let currentPeriodRevenue = 0;
   let previousPeriodRevenue = 0;
-  
+
   for (const invoice of currentPeriodInvoices) {
-    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    const totalPaid = paymentTotals.get(invoice.id) || 0;
     currentPeriodRevenue += totalPaid;
   }
-  
+
   for (const invoice of previousPeriodInvoices) {
-    const totalPaid = await getTotalPaidForInvoice(invoice.id);
+    const totalPaid = paymentTotals.get(invoice.id) || 0;
     previousPeriodRevenue += totalPaid;
   }
   
@@ -1718,7 +1722,7 @@ export async function deletePayment(paymentId: number): Promise<void> {
 export async function getTotalPaidForInvoice(invoiceId: number): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   const result = await db
     .select({
       total: sql<string>`SUM(${payments.amount})`,
@@ -1730,8 +1734,49 @@ export async function getTotalPaidForInvoice(invoiceId: number): Promise<number>
         eq(payments.status, "completed")
       )
     );
-  
+
   return parseFloat(result[0]?.total || "0");
+}
+
+/**
+ * Get total paid amounts for multiple invoices in a single query (optimized for N+1 prevention)
+ * Returns a Map of invoiceId => totalPaid
+ */
+export async function getBulkPaymentTotals(invoiceIds: number[]): Promise<Map<number, number>> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  if (invoiceIds.length === 0) {
+    return new Map();
+  }
+
+  const results = await db
+    .select({
+      invoiceId: payments.invoiceId,
+      total: sql<string>`COALESCE(SUM(${payments.amount}), 0)`,
+    })
+    .from(payments)
+    .where(
+      and(
+        inArray(payments.invoiceId, invoiceIds),
+        eq(payments.status, "completed")
+      )
+    )
+    .groupBy(payments.invoiceId);
+
+  const paymentMap = new Map<number, number>();
+
+  // Initialize all invoices with 0
+  for (const id of invoiceIds) {
+    paymentMap.set(id, 0);
+  }
+
+  // Update with actual payment totals
+  for (const row of results) {
+    paymentMap.set(row.invoiceId, parseFloat(row.total));
+  }
+
+  return paymentMap;
 }
 
 /**

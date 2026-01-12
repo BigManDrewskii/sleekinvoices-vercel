@@ -273,7 +273,9 @@ export default function Clients() {
           }
           setClientTagsMap(newMap);
         } catch (error) {
-          console.error('Failed to load client tags:', error);
+          if (import.meta.env.DEV) {
+            console.error('Failed to load client tags:', error);
+          }
           // Set empty tags for all clients on error
           const newMap = new Map<number, ClientTag[]>();
           for (const client of clients) {
@@ -674,7 +676,7 @@ export default function Clients() {
       <Navigation />
 
       {/* Main Content */}
-      <div className="page-content page-transition">
+      <main id="main-content" className="page-content page-transition" role="main" aria-label="Clients">
         {/* Page Header */}
         <div className="page-header">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1201,7 +1203,7 @@ export default function Clients() {
             )}
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Dialogs */}
       <ClientDialog
