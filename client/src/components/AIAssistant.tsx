@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { 
-  Sparkles, 
-  X, 
-  Send, 
-  Loader2, 
-  FileText, 
-  Users, 
+import {
+  X,
+  Send,
+  Loader2,
+  FileText,
+  Users,
   TrendingUp,
   Clock,
   Lightbulb,
@@ -18,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Orb } from "@/components/ui/orb";
 import { cn } from "@/lib/utils";
+import { SleekyAIAvatar } from "@/components/SleekyAIAvatar";
 import { LowCreditsPrompt, CreditTopUp } from "@/components/CreditTopUp";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -274,14 +274,12 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent flex items-center justify-center ring-1 ring-primary/20">
-                <Sparkles className="h-5 w-5 text-primary" />
-              </div>
+              <SleekyAIAvatar size="md" />
               {/* Subtle glow effect */}
               <div className="absolute inset-0 rounded-xl bg-primary/10 blur-md -z-10" />
             </div>
             <div>
-              <h2 className="font-semibold text-[15px] tracking-tight">AI Assistant</h2>
+              <h2 className="font-semibold text-[15px] tracking-tight">Sleeky AI Assistant</h2>
               <p className="text-xs text-muted-foreground/80">
                 {credits ? (
                   <span className="flex items-center gap-1.5">
@@ -350,13 +348,11 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {/* Welcome Section - Manus-inspired */}
               <div className="text-center pt-8 pb-4">
                 <div className="relative inline-flex mb-5">
-                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent flex items-center justify-center ring-1 ring-primary/20">
-                    <Sparkles className="h-8 w-8 text-primary" />
-                  </div>
+                  <SleekyAIAvatar size="xl" />
                   {/* Animated glow */}
                   <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-xl animate-pulse" />
                 </div>
-                <h3 className="text-xl font-semibold tracking-tight mb-2">What can I help with?</h3>
+                <h3 className="text-xl font-semibold tracking-tight mb-2">What can Sleeky help with?</h3>
                 <p className="text-sm text-muted-foreground/80 max-w-[280px] mx-auto leading-relaxed">
                   Create invoices, analyze your business, draft emails, and more.
                 </p>
@@ -423,8 +419,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   )}
                 >
                   {message.role === "assistant" && (
-                    <div className="shrink-0 h-8 w-8 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center ring-1 ring-primary/10">
-                      <Sparkles className="h-4 w-4 text-primary" />
+                    <div className="shrink-0">
+                      <SleekyAIAvatar size="sm" />
                     </div>
                   )}
                   <div

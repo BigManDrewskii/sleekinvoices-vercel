@@ -162,43 +162,67 @@ export function EmptyState({
 
 /**
  * Preset empty states for common scenarios
- * These can be customized with mascot illustrations later
+ * Now featuring Sleeky the otter mascot!
  */
 export const EmptyStatePresets = {
   invoices: {
+    illustration: '/sleeky/empty-states/invoices.png',
     title: 'No invoices yet',
     description: 'Create your first invoice to start tracking your revenue and getting paid faster.',
   },
   clients: {
+    illustration: '/sleeky/empty-states/clients.png',
     title: 'No clients yet',
     description: 'Add your first client to start creating invoices and building relationships.',
   },
   expenses: {
+    illustration: '/sleeky/empty-states/expenses.png',
     title: 'No expenses recorded',
     description: 'Track your business expenses to get a complete picture of your finances.',
   },
   estimates: {
+    illustration: '/sleeky/empty-states/estimates.png',
     title: 'No estimates yet',
     description: 'Create estimates to send professional quotes to potential clients.',
   },
   payments: {
+    illustration: '/sleeky/empty-states/payments.png',
     title: 'No payments recorded',
     description: 'Payments will appear here once your clients start paying their invoices.',
   },
   products: {
+    illustration: '/sleeky/empty-states/products.png',
     title: 'No products or services',
     description: 'Add your products and services to quickly add them to invoices.',
   },
   templates: {
+    illustration: '/sleeky/empty-states/analytics.png',
     title: 'No custom templates',
     description: 'Create custom invoice templates to match your brand.',
   },
   recurring: {
+    illustration: '/sleeky/empty-states/invoices.png',
     title: 'No recurring invoices',
     description: 'Set up recurring invoices to automate billing for regular clients.',
   },
   search: {
+    illustration: '/sleeky/empty-states/search-results.png',
     title: 'No results found',
     description: 'Try adjusting your search or filters to find what you\'re looking for.',
+  },
+  emailHistory: {
+    illustration: '/sleeky/empty-states/email-history.png',
+    title: 'No emails sent yet',
+    description: 'Email history will appear here once you start sending invoices to clients.',
+  },
+  analytics: {
+    illustration: '/sleeky/empty-states/analytics.png',
+    title: 'No data yet',
+    description: 'Analytics will show once you have invoices and payments to analyze.',
+  },
+  subscriptionHistory: {
+    illustration: '/sleeky/empty-states/subscription-history.png',
+    title: 'No subscription history',
+    description: 'Your subscription and payment history will appear here.',
   },
 };

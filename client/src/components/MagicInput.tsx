@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, Loader2, X, Wand2, AlertCircle, ArrowRight, Zap } from "lucide-react";
+import { Loader2, X, Wand2, AlertCircle, ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
+import { SleekyAIAvatar } from "@/components/SleekyAIAvatar";
 
 interface ExtractedData {
   clientName?: string;
@@ -88,7 +89,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
         </div>
         <div className="flex-1 text-left">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-foreground">Magic Invoice</span>
+            <span className="text-sm font-medium text-foreground">Sleeky's Magic Invoice</span>
             {credits && (
               <span className="text-xs text-muted-foreground tabular-nums">
                 {credits.remaining}/{credits.limit}
@@ -125,10 +126,10 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 ring-1 ring-primary/30">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <SleekyAIAvatar size="sm" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Magic Invoice</h3>
+              <h3 className="font-semibold text-foreground">Sleeky's Magic Invoice</h3>
               <p className="text-xs text-muted-foreground">
                 AI-powered invoice creation
               </p>
@@ -224,7 +225,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" />
+                <Wand2 className="h-4 w-4" />
                 <span>Generate Invoice</span>
               </>
             )}
