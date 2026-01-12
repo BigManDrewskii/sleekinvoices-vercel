@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,26 +29,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Plus, 
-  DollarSign, 
-  CreditCard, 
-  Banknote, 
-  FileCheck, 
-  Bitcoin, 
-  Search, 
-  ChevronLeft, 
-  ChevronRight,
-  Filter,
-  X,
-  ArrowUpDown,
-  Calendar,
-  Clock,
+import {
+  Plus,
+  DollarSign,
+  CreditCard,
+  Banknote,
+  FileCheck,
+  Bitcoin,
   Hash,
   Wallet,
   ExternalLink,
   Copy,
-  Check
+  Check,
+  Calendar,
+  Clock
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -56,8 +50,10 @@ import { PaymentsPageSkeleton } from "@/components/skeletons";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { Currency, DateDisplay } from "@/components/ui/typography";
 import { AnimatedCurrency, AnimatedInteger } from "@/components/ui/animated-number";
-
-const ITEMS_PER_PAGE = 10;
+import { Pagination } from "@/components/shared/Pagination";
+import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { useTableSort } from "@/hooks/useTableSort";
+import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
 
 // Payment type definition
 type Payment = {
@@ -102,11 +98,14 @@ export default function Payments() {
 
   // Pagination and filtering state
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
   const [methodFilter, setMethodFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortField, setSortField] = useState<"date" | "amount">("date");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [dateRange, setDateRange] = useState<string>("all");
+
+  // Sorting with useTableSort hook
+  const { sort, handleSort, sortData } = useTableSort({ defaultKey: "paymentDate", defaultDirection: "desc" });
 
   const { data: payments, isLoading, refetch } = trpc.payments.list.useQuery({});
   const { data: stats } = trpc.payments.getStats.useQuery();
@@ -137,56 +136,68 @@ export default function Payments() {
   // Filter and sort payments
   const filteredAndSortedPayments = useMemo(() => {
     if (!payments) return [];
-    
+
     let result = [...payments];
-    
+
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter((payment) => 
+      result = result.filter((payment) =>
         payment.invoiceId.toString().includes(query) ||
         payment.notes?.toLowerCase().includes(query) ||
         payment.paymentMethod.toLowerCase().includes(query)
       );
     }
-    
+
     // Apply method filter
     if (methodFilter !== "all") {
       result = result.filter((payment) => payment.paymentMethod === methodFilter);
     }
-    
+
     // Apply status filter
     if (statusFilter !== "all") {
       result = result.filter((payment) => payment.status === statusFilter);
     }
-    
-    // Apply sorting
-    result.sort((a, b) => {
-      if (sortField === "date") {
-        const dateA = new Date(a.paymentDate).getTime();
-        const dateB = new Date(b.paymentDate).getTime();
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-      } else {
-        const amountA = parseFloat(a.amount);
-        const amountB = parseFloat(b.amount);
-        return sortOrder === "asc" ? amountA - amountB : amountB - amountA;
-      }
-    });
-    
-    return result;
-  }, [payments, searchQuery, methodFilter, statusFilter, sortField, sortOrder]);
+
+    // Apply date range filter
+    if (dateRange !== "all") {
+      const now = new Date();
+      result = result.filter((payment) => {
+        const paymentDate = new Date(payment.paymentDate);
+
+        switch (dateRange) {
+          case "today":
+            return paymentDate.toDateString() === now.toDateString();
+          case "7days":
+            return paymentDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          case "30days":
+            return paymentDate >= new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          case "90days":
+            return paymentDate >= new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+          case "year":
+            return paymentDate >= new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply sorting using useTableSort
+    return sortData(result);
+  }, [payments, searchQuery, methodFilter, statusFilter, dateRange, sortData]);
 
   // Pagination calculations
-  const totalPages = Math.ceil(filteredAndSortedPayments.length / ITEMS_PER_PAGE);
+  const totalItems = filteredAndSortedPayments.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
   const paginatedPayments = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredAndSortedPayments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredAndSortedPayments, currentPage]);
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredAndSortedPayments.slice(startIndex, startIndex + pageSize);
+  }, [filteredAndSortedPayments, currentPage, pageSize]);
 
   // Reset to page 1 when filters change
-  const handleFilterChange = () => {
+  useEffect(() => {
     setCurrentPage(1);
-  };
+  }, [searchQuery, methodFilter, statusFilter, dateRange]);
 
   const handleRecordPayment = () => {
     if (!formData.invoiceId || !formData.amount) {
@@ -267,23 +278,15 @@ export default function Payments() {
     });
   };
 
-  const toggleSort = (field: "date" | "amount") => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("desc");
-    }
-  };
-
   const clearFilters = () => {
     setSearchQuery("");
     setMethodFilter("all");
     setStatusFilter("all");
+    setDateRange("all");
     setCurrentPage(1);
   };
 
-  const hasActiveFilters = searchQuery || methodFilter !== "all" || statusFilter !== "all";
+  const hasActiveFilters = !!(searchQuery || methodFilter !== "all" || statusFilter !== "all" || dateRange !== "all");
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -361,45 +364,26 @@ export default function Payments() {
         </div>
       )}
 
-      {/* Payments Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <CardTitle>Payment History</CardTitle>
-              <CardDescription>
-                {filteredAndSortedPayments.length} payment{filteredAndSortedPayments.length !== 1 ? 's' : ''} found
-              </CardDescription>
-            </div>
+      {/* Filters Section */}
+      <FilterSection
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearFilters}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Input
+              placeholder="Search by invoice ID, notes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 mt-4">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by invoice ID, notes..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  handleFilterChange();
-                }}
-                className="pl-9"
-              />
-            </div>
-            
-            {/* Method Filter */}
-            <Select 
-              value={methodFilter} 
-              onValueChange={(value) => {
-                setMethodFilter(value);
-                handleFilterChange();
-              }}
-            >
-              <SelectTrigger className="w-full sm:w-[160px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Method" />
+
+          {/* Method Filter */}
+          <FilterSelect label="Payment Method">
+            <Select value={methodFilter} onValueChange={setMethodFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Methods" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Methods</SelectItem>
@@ -411,17 +395,13 @@ export default function Payments() {
                 <SelectItem value="crypto">Crypto</SelectItem>
               </SelectContent>
             </Select>
-            
-            {/* Status Filter */}
-            <Select 
-              value={statusFilter} 
-              onValueChange={(value) => {
-                setStatusFilter(value);
-                handleFilterChange();
-              }}
-            >
-              <SelectTrigger className="w-full sm:w-[140px]">
-                <SelectValue placeholder="Status" />
+          </FilterSelect>
+
+          {/* Status Filter */}
+          <FilterSelect label="Status">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
@@ -431,16 +411,35 @@ export default function Payments() {
                 <SelectItem value="refunded">Refunded</SelectItem>
               </SelectContent>
             </Select>
-            
-            {/* Clear Filters */}
-            {hasActiveFilters && (
-              <Button variant="ghost" size="icon" onClick={clearFilters} className="shrink-0">
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          </FilterSelect>
+
+          {/* Date Range Filter */}
+          <FilterSelect label="Date Range">
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
+                <SelectItem value="30days">Last 30 Days</SelectItem>
+                <SelectItem value="90days">Last 90 Days</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterSelect>
+        </div>
+      </FilterSection>
+
+      {/* Payments Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment History</CardTitle>
+          <CardDescription>
+            {filteredAndSortedPayments.length} payment{filteredAndSortedPayments.length !== 1 ? 's' : ''} found
+          </CardDescription>
         </CardHeader>
-        
         <CardContent>
           {isLoading ? (
             <PaymentsPageSkeleton />
@@ -468,30 +467,19 @@ export default function Payments() {
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30">
-                      <TableHead>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 -ml-3 font-medium"
-                          onClick={() => toggleSort("date")}
-                        >
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Date
-                          <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />
-                        </Button>
-                      </TableHead>
+                      <SortableTableHeader
+                        label="Date"
+                        sortKey="paymentDate"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
                       <TableHead>Invoice</TableHead>
-                      <TableHead>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 -ml-3 font-medium"
-                          onClick={() => toggleSort("amount")}
-                        >
-                          Amount
-                          <ArrowUpDown className="h-3 w-3 ml-1 opacity-50" />
-                        </Button>
-                      </TableHead>
+                      <SortableTableHeader
+                        label="Amount"
+                        sortKey="amount"
+                        currentSort={sort}
+                        onSort={handleSort}
+                      />
                       <TableHead>Method</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="hidden md:table-cell">Notes</TableHead>
@@ -537,57 +525,19 @@ export default function Payments() {
               
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <p className="text-sm text-muted-foreground">
-                    Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredAndSortedPayments.length)} of {filteredAndSortedPayments.length} payments
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Previous
-                    </Button>
-                    
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
-                        }
-                        return (
-                          <Button
-                            key={pageNum}
-                            variant={currentPage === pageNum ? "default" : "outline"}
-                            size="sm"
-                            className="w-8 h-8 p-0"
-                            onClick={() => setCurrentPage(pageNum)}
-                          >
-                            {pageNum}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={pageSize}
+                    totalItems={totalItems}
+                    onPageChange={setCurrentPage}
+                    onPageSizeChange={(size) => {
+                      setPageSize(size);
+                      setCurrentPage(1);
+                    }}
+                    pageSizeOptions={[10, 25, 50, 100]}
+                  />
                 </div>
               )}
             </>
