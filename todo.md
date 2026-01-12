@@ -362,3 +362,9 @@
 - [x] Update error state displays with Sleeky images (ErrorBoundary component)
 - [x] Update AI avatar to use sleekyAI-Avatar.png
 - [x] Ensure all images load properly across the app
+
+## UI Refinements (Jan 12, 2026)
+
+- [x] Replace Wand2 icon with Sleeky avatar in MagicInput collapsed state
+- [x] Replace sparkle orb with Sleeky avatar in AI Assistant button
+- [x] Remove outer frame from Magic Invoice section on Dashboard

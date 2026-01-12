@@ -84,9 +84,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
           className
         )}
       >
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all">
-          <Wand2 className="h-4 w-4 text-primary" />
-        </div>
+        <SleekyAIAvatar size="sm" className="ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
         <div className="flex-1 text-left">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">Sleeky's Magic Invoice</span>
