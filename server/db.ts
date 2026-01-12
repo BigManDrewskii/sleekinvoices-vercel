@@ -1232,7 +1232,26 @@ export async function getExpensesByUserId(userId: number, filters?: {
   const db = await getDb();
   if (!db) return [];
 
-  let query = db
+  // Build where conditions array
+  const conditions = [eq(expenses.userId, userId)];
+
+  if (filters?.categoryId) {
+    conditions.push(eq(expenses.categoryId, filters.categoryId));
+  }
+  if (filters?.startDate) {
+    conditions.push(gte(expenses.date, filters.startDate));
+  }
+  if (filters?.endDate) {
+    conditions.push(lte(expenses.date, filters.endDate));
+  }
+  if (filters?.isBillable !== undefined) {
+    conditions.push(eq(expenses.isBillable, filters.isBillable));
+  }
+  if (filters?.clientId) {
+    conditions.push(eq(expenses.clientId, filters.clientId));
+  }
+
+  const results = await db
     .select({
       id: expenses.id,
       categoryId: expenses.categoryId,
@@ -1259,26 +1278,9 @@ export async function getExpensesByUserId(userId: number, filters?: {
     .from(expenses)
     .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
     .leftJoin(clients, eq(expenses.clientId, clients.id))
-    .where(eq(expenses.userId, userId))
-    .$dynamic();
+    .where(and(...conditions))
+    .orderBy(desc(expenses.date));
 
-  if (filters?.categoryId) {
-    query = query.where(eq(expenses.categoryId, filters.categoryId));
-  }
-  if (filters?.startDate) {
-    query = query.where(gte(expenses.date, filters.startDate));
-  }
-  if (filters?.endDate) {
-    query = query.where(lte(expenses.date, filters.endDate));
-  }
-  if (filters?.isBillable !== undefined) {
-    query = query.where(eq(expenses.isBillable, filters.isBillable));
-  }
-  if (filters?.clientId) {
-    query = query.where(eq(expenses.clientId, filters.clientId));
-  }
-
-  const results = await query.orderBy(desc(expenses.date));
   return results;
 }
 
