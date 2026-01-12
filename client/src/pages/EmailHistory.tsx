@@ -30,8 +30,6 @@ import {
 import { 
   Mail, 
   Search, 
-  ChevronLeft, 
-  ChevronRight,
   Filter,
   X,
   RefreshCw,
@@ -49,6 +47,8 @@ import {
 import { toast } from "sonner";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { DateDisplay } from "@/components/ui/typography";
+import { DataTableEmpty, DataTableLoading } from "@/components/ui/data-table-empty";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -224,7 +224,7 @@ export default function EmailHistory() {
     >
       {/* Stats Cards */}
       {stats && (
-        <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="bg-card/50">
             <CardHeader className="pb-2">
               <CardDescription>Total Sent</CardDescription>
@@ -328,17 +328,25 @@ export default function EmailHistory() {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
-                    <RefreshCw className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
-                  </TableCell>
-                </TableRow>
+                <DataTableLoading colSpan={7} rows={5} />
               ) : emails.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                    No emails found
-                  </TableCell>
-                </TableRow>
+                hasActiveFilters ? (
+                  <DataTableEmpty
+                    colSpan={7}
+                    title="No matching emails"
+                    description="No emails match your current filters"
+                    illustration="/sleeky/empty-states/search-results.png"
+                    action={{
+                      label: "Clear Filters",
+                      onClick: clearFilters,
+                    }}
+                  />
+                ) : (
+                  <DataTableEmpty
+                    colSpan={7}
+                    preset="emailHistory"
+                  />
+                )
               ) : (
                 emails.map((email) => (
                   <TableRow key={email.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openDetails(email)}>
@@ -377,31 +385,13 @@ export default function EmailHistory() {
         </CardContent>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t">
-            <p className="text-sm text-muted-foreground">
-              Showing {page * ITEMS_PER_PAGE + 1} to {Math.min((page + 1) * ITEMS_PER_PAGE, totalCount)} of {totalCount}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(p => Math.max(0, p - 1))}
-                disabled={page === 0}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                disabled={page >= totalPages - 1}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
+        <DataTablePagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setPage}
+        />
       </Card>
 
       {/* Email Details Dialog */}
