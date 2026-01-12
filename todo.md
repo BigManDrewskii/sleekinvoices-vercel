@@ -423,3 +423,6 @@
 - [x] Verify visual cohesion across all Finances group pages
 
 - [x] Apply FilterSection component to Expenses page
+
+- [x] Fix non-functional dropdown on Expenses page
+- [x] Standardize Expenses list to use Table component for consistency

@@ -1,13 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, DollarSign, Tag, ChevronDown, ChevronUp, FileText, Receipt } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, DollarSign, Tag, FileText, Receipt, Eye, MoreHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
@@ -18,6 +21,8 @@ import { ExpensesPageSkeleton } from "@/components/skeletons/ExpensesPageSkeleto
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 import { FilterSection, FilterSelect, ActiveFilters } from "@/components/ui/filter-section";
+import { DataTableEmpty, DataTableLoading } from "@/components/ui/data-table-empty";
+import { DateDisplay } from "@/components/ui/typography";
 
 // Payment method display names
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -51,7 +56,9 @@ export default function Expenses() {
     window.addEventListener('open-new-expense-dialog', handleOpenDialog);
     return () => window.removeEventListener('open-new-expense-dialog', handleOpenDialog);
   }, []);
-  const [expandedExpenses, setExpandedExpenses] = useState<Set<number>>(new Set());
+  // State for expense details dialog
+  const [selectedExpense, setSelectedExpense] = useState<any>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   
   // Filter state
   const [paymentMethodFilter, setPaymentMethodFilter] = useState<string | null>(null);
@@ -313,16 +320,9 @@ export default function Expenses() {
     pendingExpenseDeleteRef.current = { timeoutId, expenseId: id };
   };
 
-  const toggleExpenseRow = (id: number) => {
-    setExpandedExpenses(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
+  const openExpenseDetails = (expense: any) => {
+    setSelectedExpense(expense);
+    setIsDetailsDialogOpen(true);
   };
 
   const handleDeleteCategory = async (id: number) => {
@@ -854,141 +854,236 @@ export default function Expenses() {
         />
       </FilterSection>
 
-      {/* Expense List */}
-      {!expenses || expenses.length === 0 ? (
-        <Card className="p-4">
-          <EmptyState
-            {...EmptyStatePresets.expenses}
-            action={{
-              label: "Add Your First Expense",
-              onClick: () => setIsExpenseDialogOpen(true),
-              icon: Plus,
-            }}
-          />
-        </Card>
-      ) : filteredExpenses.length === 0 ? (
-        <Card className="p-4">
-          <EmptyState
-            illustration="/sleeky/empty-states/search-results.png"
-            title="No matching expenses"
-            description="No expenses match your current filters"
-            action={{
-              label: "Clear Filters",
-              onClick: clearAllFilters,
-            }}
-            size="sm"
-          />
-        </Card>
-      ) : (
-        <Card>
-          <div className="divide-y">
-            {filteredExpenses.map((expense: any) => {
-              const isExpanded = expandedExpenses.has(expense.id);
-              return (
-                <div key={expense.id}>
-                  {/* Main Row */}
-                  <div className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-4 flex-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleExpenseRow(expense.id)}
-                        className="p-1 h-8 w-8"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </Button>
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: expense.categoryColor || "#3B82F6" }}
-                      />
-                      <div className="flex-1">
-                        <p className="font-medium">{expense.description}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {expense.categoryName} • {new Date(expense.date).toLocaleDateString()}
-                          {expense.isBillable && (
-                            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                              Billable
-                            </span>
+      {/* Expense Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Expenses</CardTitle>
+          <CardDescription>
+            {filteredExpenses.length} expense{filteredExpenses.length !== 1 ? 's' : ''} found
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <DataTableLoading colSpan={7} rows={5} />
+              ) : !expenses || expenses.length === 0 ? (
+                <DataTableEmpty
+                  colSpan={7}
+                  preset="expenses"
+                  action={{
+                    label: "Add Your First Expense",
+                    onClick: () => setIsExpenseDialogOpen(true),
+                  }}
+                />
+              ) : filteredExpenses.length === 0 ? (
+                <DataTableEmpty
+                  colSpan={7}
+                  title="No matching expenses"
+                  description="No expenses match your current filters"
+                  illustration="/sleeky/empty-states/search-results.png"
+                  action={{
+                    label: "Clear Filters",
+                    onClick: clearAllFilters,
+                  }}
+                />
+              ) : (
+                filteredExpenses.map((expense: any) => (
+                  <TableRow 
+                    key={expense.id} 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => openExpenseDetails(expense)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-3 h-3 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: expense.categoryColor || "#3B82F6" }}
+                        />
+                        <div>
+                          <div className="font-medium">{expense.description}</div>
+                          {expense.vendor && (
+                            <div className="text-sm text-muted-foreground">{expense.vendor}</div>
                           )}
-                        </p>
+                        </div>
                       </div>
-                      <p className="text-lg font-semibold"><Currency amount={parseFloat(expense.amount)} /></p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteExpense(expense.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  {/* Expanded Details */}
-                  {isExpanded && (
-                    <div className="px-4 pb-4 pt-2 bg-muted/30 border-t">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                        {expense.vendor && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Vendor</p>
-                            <p className="font-medium">{expense.vendor}</p>
-                          </div>
-                        )}
-                        {expense.paymentMethod && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Payment Method</p>
-                            <p className="font-medium">{PAYMENT_METHOD_LABELS[expense.paymentMethod] || expense.paymentMethod}</p>
-                          </div>
-                        )}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{expense.categoryName}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <DateDisplay date={expense.date} />
+                    </TableCell>
+                    <TableCell>
+                      {expense.paymentMethod ? (
+                        <span className="text-sm">{PAYMENT_METHOD_LABELS[expense.paymentMethod] || expense.paymentMethod}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div>
+                        <Currency amount={parseFloat(expense.amount)} bold />
                         {expense.taxAmount && parseFloat(expense.taxAmount) > 0 && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Tax Amount</p>
-                            <p className="font-medium"><Currency amount={parseFloat(expense.taxAmount)} /></p>
+                          <div className="text-xs text-muted-foreground">
+                            +<Currency amount={parseFloat(expense.taxAmount)} /> tax
                           </div>
                         )}
-                        {(expense.taxAmount && parseFloat(expense.taxAmount) > 0) && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Total (incl. tax)</p>
-                            <p className="font-medium"><Currency amount={parseFloat(expense.amount) + parseFloat(expense.taxAmount)} /></p>
-                          </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {expense.isBillable ? (
+                          <Badge variant="default" className="bg-green-500/10 text-green-500 hover:bg-green-500/20">
+                            Billable
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary">Non-Billable</Badge>
                         )}
                         {expense.receiptUrl && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Receipt</p>
-                            <a
-                              href={expense.receiptUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-primary hover:underline"
-                            >
-                              <Receipt className="w-4 h-4" />
-                              View Receipt
-                            </a>
-                          </div>
-                        )}
-                        {expense.isBillable && (
-                          <div>
-                            <p className="text-muted-foreground mb-1">Billable To</p>
-                            <p className="font-medium">
-                              {expense.clientName || 'Unassigned'}
-                              {expense.invoiceId && (
-                                <span className="ml-2 text-xs text-muted-foreground">(Linked to invoice)</span>
-                              )}
-                            </p>
-                          </div>
+                          <Receipt className="w-4 h-4 text-muted-foreground" />
                         )}
                       </div>
-                    </div>
-                  )}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openExpenseDetails(expense); }}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          {expense.receiptUrl && (
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(expense.receiptUrl, '_blank'); }}>
+                              <Receipt className="mr-2 h-4 w-4" />
+                              View Receipt
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem 
+                            onClick={(e) => { e.stopPropagation(); handleDeleteExpense(expense.id); }}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Expense Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Expense Details</DialogTitle>
+          </DialogHeader>
+          {selectedExpense && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: selectedExpense.categoryColor || "#3B82F6" }}
+                />
+                <div>
+                  <h3 className="font-semibold text-lg">{selectedExpense.description}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedExpense.categoryName}</p>
                 </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1">Date</p>
+                  <p className="font-medium"><DateDisplay date={selectedExpense.date} /></p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1">Amount</p>
+                  <p className="font-medium"><Currency amount={parseFloat(selectedExpense.amount)} /></p>
+                </div>
+                {selectedExpense.vendor && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Vendor</p>
+                    <p className="font-medium">{selectedExpense.vendor}</p>
+                  </div>
+                )}
+                {selectedExpense.paymentMethod && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Payment Method</p>
+                    <p className="font-medium">{PAYMENT_METHOD_LABELS[selectedExpense.paymentMethod] || selectedExpense.paymentMethod}</p>
+                  </div>
+                )}
+                {selectedExpense.taxAmount && parseFloat(selectedExpense.taxAmount) > 0 && (
+                  <>
+                    <div>
+                      <p className="text-muted-foreground mb-1">Tax Amount</p>
+                      <p className="font-medium"><Currency amount={parseFloat(selectedExpense.taxAmount)} /></p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1">Total (incl. tax)</p>
+                      <p className="font-medium"><Currency amount={parseFloat(selectedExpense.amount) + parseFloat(selectedExpense.taxAmount)} /></p>
+                    </div>
+                  </>
+                )}
+                <div>
+                  <p className="text-muted-foreground mb-1">Billable Status</p>
+                  <p className="font-medium">
+                    {selectedExpense.isBillable ? (
+                      <Badge variant="default" className="bg-green-500/10 text-green-500">Billable</Badge>
+                    ) : (
+                      <Badge variant="secondary">Non-Billable</Badge>
+                    )}
+                  </p>
+                </div>
+                {selectedExpense.isBillable && (
+                  <div>
+                    <p className="text-muted-foreground mb-1">Billable To</p>
+                    <p className="font-medium">
+                      {selectedExpense.clientName || 'Unassigned'}
+                      {selectedExpense.invoiceId && (
+                        <span className="ml-2 text-xs text-muted-foreground">(Linked to invoice)</span>
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {selectedExpense.receiptUrl && (
+                <div className="pt-4 border-t">
+                  <a
+                    href={selectedExpense.receiptUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-primary hover:underline"
+                  >
+                    <Receipt className="w-4 h-4" />
+                    View Receipt
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }
