@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, DollarSign, Tag, FileText, Receipt, Eye, MoreHorizontal } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Plus, Trash2, DollarSign, Tag, FileText, Receipt, Eye, MoreHorizontal, Edit, ExternalLink } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { toast } from "sonner";
@@ -23,6 +23,9 @@ import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 import { FilterSection, FilterSelect, ActiveFilters } from "@/components/ui/filter-section";
 import { DataTableEmpty, DataTableLoading } from "@/components/ui/data-table-empty";
 import { DateDisplay } from "@/components/ui/typography";
+import { Pagination } from "@/components/shared/Pagination";
+import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { useTableSort } from "@/hooks/useTableSort";
 
 // Payment method display names
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -39,6 +42,7 @@ export default function Expenses() {
   const { data: categories } = trpc.expenses.categories.list.useQuery();
   const { data: clients } = trpc.clients.list.useQuery();
   const createExpenseMutation = trpc.expenses.create.useMutation();
+  const updateExpenseMutation = trpc.expenses.update.useMutation();
   const deleteExpenseMutation = trpc.expenses.delete.useMutation();
   const createCategoryMutation = trpc.expenses.categories.create.useMutation();
   const deleteCategoryMutation = trpc.expenses.categories.delete.useMutation();
@@ -65,7 +69,18 @@ export default function Expenses() {
   const [billableFilter, setBillableFilter] = useState<'all' | 'billable' | 'non-billable'>('all');
   const [clientFilter, setClientFilter] = useState<number | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<number | null>(null);
-  
+  const [dateRange, setDateRange] = useState<string>("all");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  // Sorting state
+  const { sort, handleSort, sortData } = useTableSort({ defaultKey: "date", defaultDirection: "desc" });
+
+  // Edit state
+  const [editingExpense, setEditingExpense] = useState<any | null>(null);
+
   const [expenseForm, setExpenseForm] = useState({
     categoryId: 0,
     amount: "",
@@ -84,16 +99,16 @@ export default function Expenses() {
     color: "#3B82F6",
   });
 
-  // Filter expenses based on active filters
-  const filteredExpenses = useMemo(() => {
+  // Filter and sort expenses
+  const filteredAndSortedExpenses = useMemo(() => {
     if (!expenses) return [];
-    
-    return expenses.filter((expense: any) => {
+
+    const filtered = expenses.filter((expense: any) => {
       // Payment method filter
       if (paymentMethodFilter && expense.paymentMethod !== paymentMethodFilter) {
         return false;
       }
-      
+
       // Billable filter
       if (billableFilter === 'billable' && !expense.isBillable) {
         return false;
@@ -101,24 +116,64 @@ export default function Expenses() {
       if (billableFilter === 'non-billable' && expense.isBillable) {
         return false;
       }
-      
+
       // Client filter
       if (clientFilter && expense.clientId !== clientFilter) {
         return false;
       }
-      
+
       // Category filter
       if (categoryFilter && expense.categoryId !== categoryFilter) {
         return false;
       }
-      
+
+      // Date range filter
+      if (dateRange !== "all") {
+        const expenseDate = new Date(expense.date);
+        const now = new Date();
+
+        switch (dateRange) {
+          case "today":
+            if (expenseDate.toDateString() !== now.toDateString()) return false;
+            break;
+          case "7days":
+            if (expenseDate < new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)) return false;
+            break;
+          case "30days":
+            if (expenseDate < new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)) return false;
+            break;
+          case "90days":
+            if (expenseDate < new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)) return false;
+            break;
+          case "year":
+            if (expenseDate < new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)) return false;
+            break;
+        }
+      }
+
       return true;
     });
-  }, [expenses, paymentMethodFilter, billableFilter, clientFilter, categoryFilter]);
+
+    // Apply sorting
+    return sortData(filtered);
+  }, [expenses, paymentMethodFilter, billableFilter, clientFilter, categoryFilter, dateRange, sortData]);
+
+  // Pagination
+  const totalItems = filteredAndSortedExpenses.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const paginatedExpenses = filteredAndSortedExpenses.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [paymentMethodFilter, billableFilter, clientFilter, categoryFilter, dateRange]);
 
   // Calculate stats based on filtered expenses
   const stats = useMemo(() => {
-    const data = filteredExpenses;
+    const data = filteredAndSortedExpenses;
     
     const totalAmount = data.reduce((sum: number, exp: any) => sum + parseFloat(exp.amount || "0"), 0);
     const totalTax = data.reduce((sum: number, exp: any) => sum + parseFloat(exp.taxAmount || "0"), 0);
@@ -163,19 +218,20 @@ export default function Expenses() {
       byPaymentMethod,
       byCategory,
     };
-  }, [filteredExpenses]);
+  }, [filteredAndSortedExpenses]);
 
   // Check if any filters are active
-  const hasActiveFilters = !!(paymentMethodFilter || billableFilter !== 'all' || clientFilter || categoryFilter);
+  const hasActiveFilters = !!(paymentMethodFilter || billableFilter !== 'all' || clientFilter || categoryFilter || dateRange !== 'all');
 
   const clearAllFilters = () => {
     setPaymentMethodFilter(null);
     setBillableFilter('all');
     setClientFilter(null);
     setCategoryFilter(null);
+    setDateRange('all');
   };
 
-  const handleCreateExpense = async (e: React.FormEvent) => {
+  const handleSaveExpense = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!expenseForm.categoryId) {
@@ -189,7 +245,7 @@ export default function Expenses() {
     }
 
     try {
-      await createExpenseMutation.mutateAsync({
+      const expenseData = {
         categoryId: expenseForm.categoryId,
         amount: parseFloat(expenseForm.amount),
         date: new Date(expenseForm.date),
@@ -201,26 +257,26 @@ export default function Expenses() {
         receiptKey: expenseForm.receipt?.key,
         isBillable: expenseForm.isBillable,
         clientId: expenseForm.clientId || undefined,
-      });
+      };
+
+      if (editingExpense) {
+        // Update existing expense
+        await updateExpenseMutation.mutateAsync({
+          id: editingExpense.id,
+          ...expenseData,
+        });
+        toast.success("Expense updated");
+      } else {
+        // Create new expense
+        await createExpenseMutation.mutateAsync(expenseData);
+        toast.success("Expense added");
+      }
 
       utils.expenses.list.invalidate();
       utils.expenses.stats.invalidate();
-      toast.success("Expense added");
       setIsExpenseDialogOpen(false);
-      setExpenseForm({
-        categoryId: 0,
-        amount: "",
-        date: new Date().toISOString().split("T")[0],
-        description: "",
-        vendor: "",
-        paymentMethod: "",
-        taxAmount: "",
-        receipt: null,
-        isBillable: false,
-        clientId: null,
-      });
     } catch (error) {
-      toast.error("Failed to add expense");
+      toast.error(editingExpense ? "Failed to update expense" : "Failed to add expense");
     }
   };
 
@@ -324,6 +380,44 @@ export default function Expenses() {
     setSelectedExpense(expense);
     setIsDetailsDialogOpen(true);
   };
+
+  const handleEdit = (expense: any) => {
+    setEditingExpense(expense);
+    setIsExpenseDialogOpen(true);
+  };
+
+  // Populate form when editing an expense
+  useEffect(() => {
+    if (editingExpense && isExpenseDialogOpen) {
+      setExpenseForm({
+        categoryId: editingExpense.categoryId || 0,
+        amount: editingExpense.amount?.toString() || "",
+        date: new Date(editingExpense.date).toISOString().split("T")[0],
+        description: editingExpense.description || "",
+        vendor: editingExpense.vendor || "",
+        paymentMethod: editingExpense.paymentMethod || "",
+        taxAmount: editingExpense.taxAmount?.toString() || "",
+        receipt: editingExpense.receiptUrl ? { url: editingExpense.receiptUrl, key: editingExpense.receiptKey || "" } : null,
+        isBillable: editingExpense.isBillable || false,
+        clientId: editingExpense.clientId || null,
+      });
+    } else if (!isExpenseDialogOpen) {
+      // Reset when dialog closes
+      setEditingExpense(null);
+      setExpenseForm({
+        categoryId: 0,
+        amount: "",
+        date: new Date().toISOString().split("T")[0],
+        description: "",
+        vendor: "",
+        paymentMethod: "",
+        taxAmount: "",
+        receipt: null,
+        isBillable: false,
+        clientId: null,
+      });
+    }
+  }, [editingExpense, isExpenseDialogOpen]);
 
   const handleDeleteCategory = async (id: number) => {
     if (!confirm("Are you sure you want to delete this category?")) return;
@@ -497,10 +591,10 @@ export default function Expenses() {
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Add Expense</DialogTitle>
+                <DialogTitle>{editingExpense ? "Edit Expense" : "Add Expense"}</DialogTitle>
               </DialogHeader>
-              
-              <form onSubmit={handleCreateExpense} className="space-y-4">
+
+              <form onSubmit={handleSaveExpense} className="space-y-4">
                 <div>
                   <Label htmlFor="category">Category</Label>
                   <Select
@@ -662,8 +756,8 @@ export default function Expenses() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createExpenseMutation.isPending}>
-                    Add Expense
+                  <Button type="submit" disabled={createExpenseMutation.isPending || updateExpenseMutation.isPending}>
+                    {editingExpense ? "Update Expense" : "Add Expense"}
                   </Button>
                   <Button
                     type="button"
@@ -743,7 +837,7 @@ export default function Expenses() {
         hasActiveFilters={hasActiveFilters}
         onClearFilters={clearAllFilters}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 w-full">
           {/* Payment Method Filter */}
           <FilterSelect label="Payment Method">
             <Select
@@ -821,6 +915,26 @@ export default function Expenses() {
               </SelectContent>
             </Select>
           </FilterSelect>
+
+          {/* Date Range Filter */}
+          <FilterSelect label="Date Range">
+            <Select
+              value={dateRange}
+              onValueChange={setDateRange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="All Time" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
+                <SelectItem value="30days">Last 30 Days</SelectItem>
+                <SelectItem value="90days">Last 90 Days</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterSelect>
         </div>
 
         {/* Active Filters Summary */}
@@ -850,6 +964,18 @@ export default function Expenses() {
               value: categories?.find((c: any) => c.id === categoryFilter)?.name || 'Unknown',
               onRemove: () => setCategoryFilter(null),
             }] : []),
+            ...(dateRange !== 'all' ? [{
+              key: 'dateRange',
+              label: 'Date Range',
+              value: {
+                today: 'Today',
+                '7days': 'Last 7 Days',
+                '30days': 'Last 30 Days',
+                '90days': 'Last 90 Days',
+                year: 'Last Year',
+              }[dateRange] || dateRange,
+              onRemove: () => setDateRange('all'),
+            }] : []),
           ]}
         />
       </FilterSection>
@@ -859,18 +985,39 @@ export default function Expenses() {
         <CardHeader>
           <CardTitle>All Expenses</CardTitle>
           <CardDescription>
-            {filteredExpenses.length} expense{filteredExpenses.length !== 1 ? 's' : ''} found
+            {filteredAndSortedExpenses.length} expense{filteredAndSortedExpenses.length !== 1 ? 's' : ''} found
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Date</TableHead>
+                <SortableTableHeader
+                  label="Description"
+                  sortKey="description"
+                  currentSort={sort}
+                  onSort={handleSort}
+                />
+                <SortableTableHeader
+                  label="Category"
+                  sortKey="categoryName"
+                  currentSort={sort}
+                  onSort={handleSort}
+                />
+                <SortableTableHeader
+                  label="Date"
+                  sortKey="date"
+                  currentSort={sort}
+                  onSort={handleSort}
+                />
                 <TableHead>Payment</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <SortableTableHeader
+                  label="Amount"
+                  sortKey="amount"
+                  currentSort={sort}
+                  onSort={handleSort}
+                  align="right"
+                />
                 <TableHead>Status</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -887,7 +1034,7 @@ export default function Expenses() {
                     onClick: () => setIsExpenseDialogOpen(true),
                   }}
                 />
-              ) : filteredExpenses.length === 0 ? (
+              ) : filteredAndSortedExpenses.length === 0 ? (
                 <DataTableEmpty
                   colSpan={7}
                   title="No matching expenses"
@@ -899,7 +1046,7 @@ export default function Expenses() {
                   }}
                 />
               ) : (
-                filteredExpenses.map((expense: any) => (
+                paginatedExpenses.map((expense: any) => (
                   <TableRow 
                     key={expense.id} 
                     className="cursor-pointer hover:bg-muted/50"
@@ -970,11 +1117,16 @@ export default function Expenses() {
                           </DropdownMenuItem>
                           {expense.receiptUrl && (
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(expense.receiptUrl, '_blank'); }}>
-                              <Receipt className="mr-2 h-4 w-4" />
+                              <ExternalLink className="mr-2 h-4 w-4" />
                               View Receipt
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem 
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(expense); }}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Expense
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
                             onClick={(e) => { e.stopPropagation(); handleDeleteExpense(expense.id); }}
                             className="text-destructive"
                           >
@@ -990,6 +1142,23 @@ export default function Expenses() {
             </TableBody>
           </Table>
         </CardContent>
+        {/* Pagination */}
+        {!isLoading && expenses && expenses.length > 0 && filteredAndSortedExpenses.length > 0 && totalPages > 1 && (
+          <div className="px-5 pb-4 border-t border-border/20 pt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(1);
+              }}
+              pageSizeOptions={[10, 25, 50, 100]}
+            />
+          </div>
+        )}
       </Card>
 
       {/* Expense Details Dialog */}
