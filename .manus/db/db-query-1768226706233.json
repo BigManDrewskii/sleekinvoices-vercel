@@ -1,0 +1,218 @@
+{
+  "query": "SHOW COLUMNS FROM invoiceTemplates;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute SHOW COLUMNS FROM invoiceTemplates;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "userId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "varchar(100)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "isDefault",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "primaryColor",
+      "Type": "varchar(7)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "#5f6fff",
+      "Extra": ""
+    },
+    {
+      "Field": "secondaryColor",
+      "Type": "varchar(7)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "#252f33",
+      "Extra": ""
+    },
+    {
+      "Field": "accentColor",
+      "Type": "varchar(7)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "#10b981",
+      "Extra": ""
+    },
+    {
+      "Field": "fontSize",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "14",
+      "Extra": ""
+    },
+    {
+      "Field": "logoPosition",
+      "Type": "enum('left','center','right')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "left",
+      "Extra": ""
+    },
+    {
+      "Field": "showCompanyAddress",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "showPaymentTerms",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "footerText",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "templateType",
+      "Type": "enum('sleek','modern','classic','minimal','bold','professional','creative')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "sleek",
+      "Extra": ""
+    },
+    {
+      "Field": "headingFont",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "Inter",
+      "Extra": ""
+    },
+    {
+      "Field": "bodyFont",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "Inter",
+      "Extra": ""
+    },
+    {
+      "Field": "logoUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "logoWidth",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "150",
+      "Extra": ""
+    },
+    {
+      "Field": "headerLayout",
+      "Type": "enum('standard','centered','split')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "standard",
+      "Extra": ""
+    },
+    {
+      "Field": "footerLayout",
+      "Type": "enum('simple','detailed','minimal')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "simple",
+      "Extra": ""
+    },
+    {
+      "Field": "showTaxField",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "showDiscountField",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "showNotesField",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "language",
+      "Type": "varchar(10)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "en",
+      "Extra": ""
+    },
+    {
+      "Field": "dateFormat",
+      "Type": "varchar(20)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "MM/DD/YYYY",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nuserId\tint(11)\tNO\t\tNULL\t\nname\tvarchar(100)\tNO\t\tNULL\t\nisDefault\ttinyint(1)\tNO\t\t0\t\nprimaryColor\tvarchar(7)\tNO\t\t#5f6fff\t\nsecondaryColor\tvarchar(7)\tNO\t\t#252f33\t\naccentColor\tvarchar(7)\tNO\t\t#10b981\t\nfontSize\tint(11)\tNO\t\t14\t\nlogoPosition\tenum('left','center','right')\tNO\t\tleft\t\nshowCompanyAddress\ttinyint(1)\tNO\t\t1\t\nshowPaymentTerms\ttinyint(1)\tNO\t\t1\t\nfooterText\ttext\tYES\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ntemplateType\tenum('sleek','modern','classic','minimal','bold','professional','creative')\tNO\t\tsleek\t\nheadingFont\tvarchar(50)\tNO\t\tInter\t\nbodyFont\tvarchar(50)\tNO\t\tInter\t\nlogoUrl\ttext\tYES\t\tNULL\t\nlogoWidth\tint(11)\tNO\t\t150\t\nheaderLayout\tenum('standard','centered','split')\tNO\t\tstandard\t\nfooterLayout\tenum('simple','detailed','minimal')\tNO\t\tsimple\t\nshowTaxField\ttinyint(1)\tNO\t\t1\t\nshowDiscountField\ttinyint(1)\tNO\t\t1\t\nshowNotesField\ttinyint(1)\tNO\t\t1\t\nlanguage\tvarchar(10)\tNO\t\ten\t\ndateFormat\tvarchar(20)\tNO\t\tMM/DD/YYYY\t\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

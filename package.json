@@ -11,6 +11,10 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "db:audit": "node scripts/audit-schema.mjs",
+    "db:sync": "node scripts/sync-schema.mjs",
+    "db:seed": "node scripts/seed-dev-data.mjs",
+    "db:reset": "node scripts/reset-user-data.mjs",
     "seed": "NODE_ENV=development tsx server/seed/index.ts"
   },
   "dependencies": {

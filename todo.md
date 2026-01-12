@@ -337,3 +337,15 @@
 - [x] Created comprehensive test suite for expenses query (8 passing tests)
 
 - [x] Fix onboarding tour modal - allow clicking outside to dismiss
+
+
+---
+
+## 🗄️ Database Preparation for Production
+
+- [x] Audit database schema and identify missing columns/errors
+- [x] Apply database migrations to sync schema with Drizzle definitions (added 9 emailLog columns)
+- [x] Create seed script for development mock data (scripts/seed-dev-data.mjs)
+- [x] Create database reset script for empty state testing (scripts/reset-user-data.mjs)
+- [x] Document environment management workflow (docs/DATABASE.md)
+- [x] Add npm scripts: db:audit, db:sync, db:seed, db:reset

@@ -1,0 +1,133 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user REX6DRAh92xmf1o.58be8e717db2 --database coKdAkLfsbebvczbYNFn3V --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "aiCreditPurchases"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "aiCredits"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "aiUsageLogs"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "batchInvoiceTemplateLineItems"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "batchInvoiceTemplates"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "clientPortalAccess"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "clientTagAssignments"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "clientTags"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "clients"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "cryptoSubscriptionPayments"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "currencies"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "customFields"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "emailLog"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "estimateLineItems"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "estimates"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "expenseCategories"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "expenses"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoiceCustomFieldValues"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoiceGenerationLogs"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoiceLineItems"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoiceTemplates"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoiceViews"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "invoices"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "paymentGateways"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "payments"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "products"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksConnections"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksCustomerMapping"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksInvoiceMapping"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksPaymentMapping"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksSyncLog"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "quickbooksSyncSettings"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "recurringInvoiceLineItems"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "recurringInvoices"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "reminderLogs"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "reminderSettings"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "stripeWebhookEvents"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "usageTracking"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "userWallets"
+    },
+    {
+      "Tables_in_coKdAkLfsbebvczbYNFn3V": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_coKdAkLfsbebvczbYNFn3V\n__drizzle_migrations\naiCreditPurchases\naiCredits\naiUsageLogs\nbatchInvoiceTemplateLineItems\nbatchInvoiceTemplates\nclientPortalAccess\nclientTagAssignments\nclientTags\nclients\ncryptoSubscriptionPayments\ncurrencies\ncustomFields\nemailLog\nestimateLineItems\nestimates\nexpenseCategories\nexpenses\ninvoiceCustomFieldValues\ninvoiceGenerationLogs\ninvoiceLineItems\ninvoiceTemplates\ninvoiceViews\ninvoices\npaymentGateways\npayments\nproducts\nquickbooksConnections\nquickbooksCustomerMapping\nquickbooksInvoiceMapping\nquickbooksPaymentMapping\nquickbooksSyncLog\nquickbooksSyncSettings\nrecurringInvoiceLineItems\nrecurringInvoices\nreminderLogs\nreminderSettings\nstripeWebhookEvents\nusageTracking\nuserWallets\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 85
+}
