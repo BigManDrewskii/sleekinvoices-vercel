@@ -397,3 +397,9 @@
 
 - [x] Replace existing Sleeky images with new larger versions
 - [x] Verify all empty states display correctly with new images
+
+
+## Increase Sleeky Size in Empty States
+
+- [x] Update EmptyState component illustration sizes to be larger (sm: h-40, md: h-56, lg: h-72)
+- [x] Verify Sleeky appears more prominent in all empty states

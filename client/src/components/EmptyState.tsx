@@ -64,21 +64,21 @@ export function EmptyState({
   const sizeClasses = {
     sm: {
       container: 'py-8',
-      illustration: 'h-24 w-24',
+      illustration: 'h-40 w-40',
       icon: 'h-10 w-10',
       title: 'text-base',
       description: 'text-sm',
     },
     md: {
       container: 'py-12',
-      illustration: 'h-32 w-32',
+      illustration: 'h-56 w-56',
       icon: 'h-12 w-12',
       title: 'text-lg',
       description: 'text-sm',
     },
     lg: {
       container: 'py-16',
-      illustration: 'h-48 w-48',
+      illustration: 'h-72 w-72',
       icon: 'h-16 w-16',
       title: 'text-xl',
       description: 'text-base',
