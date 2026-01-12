@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { SleekyAvatar, type SleekyAvatarState } from "@/components/SleekyAvatar";
 
 export type OrbState = "idle" | "listening" | "thinking" | "talking";
 
@@ -12,24 +11,15 @@ interface OrbProps {
   onClick?: () => void;
 }
 
-// Map Orb states to SleekyAvatar states
-const stateMap: Record<OrbState, SleekyAvatarState> = {
-  idle: "idle",
-  listening: "idle",
-  thinking: "thinking",
-  talking: "talking",
-};
-
-// Map Orb sizes to SleekyAvatar sizes
-const sizeMap: Record<"sm" | "md" | "lg", "sm" | "md" | "lg"> = {
-  sm: "sm",
-  md: "md",
-  lg: "lg",
+const sizeClasses: Record<"sm" | "md" | "lg", string> = {
+  sm: "w-8 h-8",
+  md: "w-12 h-12",
+  lg: "w-16 h-16",
 };
 
 /**
- * Orb component - AI Assistant floating button using Sleeky avatar
- * Now uses the unified SleekyAvatar component for consistent styling
+ * Orb component - AI Assistant floating button using Sleeky Avatar 02
+ * Uses the winking otter avatar specifically for the AI Assistant
  */
 export function Orb({
   state = "idle",
@@ -47,15 +37,41 @@ export function Orb({
         }}
       />
 
-      {/* Sleeky Avatar with card-matching border */}
-      <SleekyAvatar
-        size={sizeMap[size]}
-        state={stateMap[state]}
-        bordered={true}
-        glow={true}
+      {/* Sleeky AI Avatar 02 - winking otter with gold chain */}
+      <button
         onClick={onClick}
-        alt="Sleeky AI Assistant"
-      />
+        className={cn(
+          "relative inline-flex items-center justify-center rounded-full overflow-hidden",
+          "transition-all duration-300",
+          sizeClasses[size],
+          "ring-2 ring-border/40 hover:ring-border/60",
+          "hover:shadow-lg hover:shadow-primary/20",
+          "cursor-pointer hover:scale-105 active:scale-95",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+          state === "thinking" && "animate-pulse",
+          state === "talking" && "animate-bounce"
+        )}
+        aria-label="Sleeky AI Assistant"
+        type="button"
+      >
+        <img
+          src="/sleeky/ai-avatars/sleekyAI-Avatar-02.png"
+          alt="Sleeky AI Assistant"
+          className="w-full h-full object-cover"
+          draggable={false}
+        />
+
+        {/* Glow overlay for active states */}
+        {state !== "idle" && (
+          <div
+            className={cn(
+              "absolute inset-0 rounded-full pointer-events-none",
+              state === "thinking" && "bg-primary/10 animate-pulse",
+              state === "talking" && "bg-primary/20"
+            )}
+          />
+        )}
+      </button>
     </div>
   );
 }

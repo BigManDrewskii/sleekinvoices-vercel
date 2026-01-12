@@ -21,7 +21,7 @@ export function SleekyAIAvatar({
   return (
     <div className={cn("relative inline-block", className)}>
       <img
-        src="/sleeky/ai-avatars/avatar.png"
+        src="/sleeky/ai-avatars/sleekyAI-Avatar-02.png"
         alt="Sleeky AI Assistant"
         className={cn(
           sizeClasses[size],
