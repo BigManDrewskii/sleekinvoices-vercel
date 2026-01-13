@@ -22,6 +22,9 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { LandingNavigation } from "@/components/LandingNavigation";
+import { DemoVideoSection } from "@/components/landing/DemoVideoSection";
+import { AIActionFeed } from "@/components/landing/AIActionFeed";
+import { AnimatedProductDemo } from "@/components/landing/AnimatedProductDemo";
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
@@ -84,69 +87,49 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Social Proof Bar */}
-      <section className="py-10 border-y border-border/50">
-        <div className="container max-w-4xl mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-center gap-12 text-muted-foreground text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-foreground">1,200+</span>
-              <span>invoices sent</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-foreground">$2M+</span>
-              <span>processed</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-foreground">4.9★</span>
-              <span>user rating</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Demo Video Section */}
+      <DemoVideoSection />
 
-      {/* Features Section - Improved aesthetic */}
+      {/* AI-Powered Features Narrative */}
       <section id="features" className="py-20 md:py-24">
-        <div className="container max-w-4xl mx-auto px-6">
+        <div className="container max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Everything you need
+              AI does the work, you get paid
             </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Professional invoicing without the complexity
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Watch SleekInvoices handle your invoicing workflow automatically,
+              from creation to payment tracking.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FeatureCard
-              icon={<Zap className="h-5 w-5" />}
-              title="30-Second Invoices"
-              description="Smart templates and auto-fill get you paid faster."
-            />
-            <FeatureCard
-              icon={<CreditCard className="h-5 w-5" />}
-              title="Stripe + Crypto"
-              description="Accept cards or 300+ cryptocurrencies."
-            />
-            <FeatureCard
-              icon={<Bell className="h-5 w-5" />}
-              title="Auto Reminders"
-              description="Never chase payments again."
-            />
-            <FeatureCard
-              icon={<RefreshCw className="h-5 w-5" />}
-              title="Recurring Billing"
-              description="Set up once, get paid automatically."
-            />
-            <FeatureCard
-              icon={<FileCheck className="h-5 w-5" />}
-              title="Estimates & Quotes"
-              description="Convert to invoices with one click."
-            />
-            <FeatureCard
-              icon={<BarChart3 className="h-5 w-5" />}
-              title="Real-Time Analytics"
-              description="Track revenue and outstanding balances."
-            />
+          {/* Two-column layout: AI Actions + Product Demo */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Left: AI Action Feed */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  Real-time automation
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  See how AI handles every step of your invoicing process
+                </p>
+              </div>
+              <AIActionFeed />
+            </div>
+
+            {/* Right: Product Demo */}
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  Your invoicing journey
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  From blank canvas to payment received in seconds
+                </p>
+              </div>
+              <AnimatedProductDemo />
+            </div>
           </div>
         </div>
       </section>

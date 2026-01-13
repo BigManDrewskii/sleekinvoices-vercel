@@ -21,6 +21,7 @@ import { CookieConsentBanner } from "./components/CookieConsentBanner";
 // These are needed immediately for anonymous visitors
 import Home from "./pages/Home";
 import Landing from "./pages/Landing";
+import Docs from "./pages/Docs";
 import ClientPortal from "./pages/ClientPortal";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
@@ -82,6 +83,7 @@ function Router() {
           {/* Public routes - eager loaded */}
           <Route path={"/"} component={Home} />
           <Route path={"/landing"} component={Landing} />
+          <Route path={"/docs"} component={Docs} />
           <Route path="/portal/:accessToken" component={ClientPortal} />
           <Route path="/terms" component={Terms} />
           <Route path="/privacy" component={Privacy} />

@@ -87,6 +87,12 @@ export function LandingNavigation() {
             >
               Pricing
             </button>
+            <Link
+              href="/docs"
+              className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all inline-block"
+            >
+              Docs
+            </Link>
             <button
               onClick={() => scrollToSection("faq")}
               className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all"
@@ -153,6 +159,13 @@ export function LandingNavigation() {
                 >
                   Pricing
                 </button>
+                <Link
+                  href="/docs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl transition-all text-left block"
+                >
+                  Docs
+                </Link>
                 <button
                   onClick={() => scrollToSection("faq")}
                   className="px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl transition-all text-left"
