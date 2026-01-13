@@ -55,7 +55,7 @@ export default function SubscriptionHistory() {
       case 'failed':
       case 'expired':
       case 'refunded':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+        return <XCircle className="h-5 w-5 text-destructive" />;
       default:
         return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
     }
@@ -73,8 +73,8 @@ export default function SubscriptionHistory() {
       bgColor = 'bg-amber-500/20';
       textColor = 'text-amber-500';
     } else if (['failed', 'expired', 'refunded'].includes(statusLower)) {
-      bgColor = 'bg-red-500/20';
-      textColor = 'text-red-500';
+      bgColor = 'bg-destructive/100/20';
+      textColor = 'text-destructive';
     }
     
     return (

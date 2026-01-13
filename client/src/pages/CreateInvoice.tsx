@@ -374,41 +374,41 @@ export default function CreateInvoice() {
 
                   <div className="space-y-2">
                     <Label htmlFor="issue-date">
-                      Issue Date <span className="text-red-500">*</span>
+                      Issue Date <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="issue-date"
                       type="date"
                       value={issueDate}
                       onChange={(e) => setIssueDate(e.target.value)}
-                      className={errors.issueDate ? "border-red-500" : ""}
+                      className={errors.issueDate ? "border-destructive" : ""}
                       aria-label="Invoice issue date"
                       aria-required="true"
                       aria-invalid={!!errors.issueDate}
                       aria-describedby={errors.issueDate ? "issue-date-error" : undefined}
                     />
                     {errors.issueDate && (
-                      <p id="issue-date-error" className="text-sm text-red-500" role="alert">{errors.issueDate}</p>
+                      <p id="issue-date-error" className="text-sm text-destructive" role="alert">{errors.issueDate}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="due-date">
-                      Due Date <span className="text-red-500">*</span>
+                      Due Date <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       id="due-date"
                       type="date"
                       value={dueDate}
                       onChange={(e) => setDueDate(e.target.value)}
-                      className={errors.dueDate ? "border-red-500" : ""}
+                      className={errors.dueDate ? "border-destructive" : ""}
                       aria-label="Invoice due date"
                       aria-required="true"
                       aria-invalid={!!errors.dueDate}
                       aria-describedby={errors.dueDate ? "due-date-error" : undefined}
                     />
                     {errors.dueDate && (
-                      <p id="due-date-error" className="text-sm text-red-500" role="alert">{errors.dueDate}</p>
+                      <p id="due-date-error" className="text-sm text-destructive" role="alert">{errors.dueDate}</p>
                     )}
                   </div>
                 </div>
@@ -464,7 +464,7 @@ export default function CreateInvoice() {
                 ))}
 
                 {errors.lineItems && (
-                  <p className="text-sm text-red-500">{errors.lineItems}</p>
+                  <p className="text-sm text-destructive">{errors.lineItems}</p>
                 )}
               </CardContent>
             </Card>

@@ -140,7 +140,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
                 "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
                 credits.remaining > 0 
                   ? "bg-emerald-500/10 text-emerald-500" 
-                  : "bg-red-500/10 text-red-500"
+                  : "bg-destructive/10 text-destructive"
               )}>
                 <Zap className="h-3 w-3" />
                 {credits.remaining} credits
@@ -190,14 +190,14 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
 
         {/* Error Messages */}
         {smartCompose.error && (
-          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-500">
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{smartCompose.error.message}</span>
           </div>
         )}
 
         {smartCompose.data && !smartCompose.data.success && (
-          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-500">
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{smartCompose.data.error}</span>
           </div>

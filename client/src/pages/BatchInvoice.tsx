@@ -454,7 +454,7 @@ export default function BatchInvoice() {
                         <CheckCircle className="h-5 w-5 text-green-500" />
                       )}
                       {result.status === 'error' && (
-                        <XCircle className="h-5 w-5 text-red-500" />
+                        <XCircle className="h-5 w-5 text-destructive" />
                       )}
                       <div>
                         <p className="font-medium">{result.clientName}</p>
@@ -462,7 +462,7 @@ export default function BatchInvoice() {
                           <p className="text-sm text-muted-foreground">{result.invoiceNumber}</p>
                         )}
                         {result.error && (
-                          <p className="text-sm text-red-500">{result.error}</p>
+                          <p className="text-sm text-destructive">{result.error}</p>
                         )}
                       </div>
                     </div>

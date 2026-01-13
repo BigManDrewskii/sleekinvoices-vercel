@@ -222,9 +222,9 @@ export default function Analytics() {
                 {revenueChangePercent >= 0 ? (
                   <TrendingUp className="h-4 w-4 text-green-500" />
                 ) : (
-                  <TrendingDown className="h-4 w-4 text-red-500" />
+                  <TrendingDown className="h-4 w-4 text-destructive" />
                 )}
-                <span className={`text-sm font-medium ${revenueChangePercent >= 0 ? "text-green-500" : "text-red-500"}`}>
+                <span className={`text-sm font-medium ${revenueChangePercent >= 0 ? "text-green-500" : "text-destructive"}`}>
                   <AnimatedPercentage value={revenueChangePercent} showSign duration={600} delay={200} />
                 </span>
                 <span className="text-xs text-muted-foreground">vs previous period</span>
@@ -251,11 +251,11 @@ export default function Analytics() {
           </Card>
 
           {/* Overdue */}
-          <Card className={`bg-gradient-to-br ${overdueAmount > 0 ? "from-red-500/5 to-red-500/10 border-red-500/20" : "from-green-500/5 to-green-500/10 border-green-500/20"}`}>
+          <Card className={`bg-gradient-to-br ${overdueAmount > 0 ? "from-red-500/5 to-red-500/10 border-destructive/20" : "from-green-500/5 to-green-500/10 border-green-500/20"}`}>
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg ${overdueAmount > 0 ? "bg-red-500/10" : "bg-green-500/10"}`}>
-                  <AlertTriangle className={`h-5 w-5 ${overdueAmount > 0 ? "text-red-500" : "text-green-500"}`} />
+                <div className={`p-2 rounded-lg ${overdueAmount > 0 ? "bg-destructive/10" : "bg-green-500/10"}`}>
+                  <AlertTriangle className={`h-5 w-5 ${overdueAmount > 0 ? "text-destructive" : "text-green-500"}`} />
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">Overdue</span>
               </div>
@@ -426,8 +426,8 @@ export default function Analytics() {
                   label: "90+ Days", 
                   amount: agingReport?.days_90_plus?.amount || 0, 
                   count: agingReport?.days_90_plus?.count || 0,
-                  color: "bg-red-600",
-                  bgColor: "bg-red-600/20"
+                  color: "bg-destructive",
+                  bgColor: "bg-destructive/20"
                 },
               ].map((bucket) => {
                 const amount = parseFloat(bucket.amount?.toString() || "0");

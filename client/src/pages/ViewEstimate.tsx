@@ -219,7 +219,7 @@ export default function ViewEstimate() {
                   size="sm"
                   onClick={() => markAsRejected.mutate({ id: estimateId })}
                   disabled={markAsRejected.isPending}
-                  className="text-red-600"
+                  className="text-destructive"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
                   Mark as Rejected
@@ -252,7 +252,7 @@ export default function ViewEstimate() {
               variant="outline"
               size="sm"
               onClick={() => setDeleteDialogOpen(true)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete
@@ -290,7 +290,7 @@ export default function ViewEstimate() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Valid Until</span>
-                      <span className={`font-medium ${isExpired ? "text-red-500" : ""}`}>
+                      <span className={`font-medium ${isExpired ? "text-destructive" : ""}`}>
                         {formatDate(estimate.validUntil)}
                       </span>
                     </div>
@@ -341,7 +341,7 @@ export default function ViewEstimate() {
                     <Currency amount={Number(estimate.subtotal)} currency={estimate.currency} />
                   </div>
                   {Number(estimate.discountAmount) > 0 && (
-                    <div className="flex justify-between text-red-500">
+                    <div className="flex justify-between text-destructive">
                       <span>
                         Discount
                         {estimate.discountType === "percentage" && ` (${estimate.discountValue}%)`}

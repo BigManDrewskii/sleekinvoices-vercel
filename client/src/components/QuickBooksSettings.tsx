@@ -321,7 +321,7 @@ export function QuickBooksSettings() {
                 {syncHistory.map((log: any) => (
                   <div key={log.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div className="flex items-center gap-3">
-                      {log.status === "success" ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <AlertCircle className="h-4 w-4 text-red-600" />}
+                      {log.status === "success" ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <AlertCircle className="h-4 w-4 text-destructive" />}
                       <div>
                         <p className="font-medium capitalize">{log.action} {log.entityType}</p>
                         <p className="text-xs text-muted-foreground">{new Date(log.syncedAt).toLocaleString()}</p>

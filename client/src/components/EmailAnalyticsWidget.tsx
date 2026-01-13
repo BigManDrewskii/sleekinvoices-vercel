@@ -92,7 +92,7 @@ export function EmailAnalyticsWidget({ className }: EmailAnalyticsWidgetProps) {
       );
     } else if (value < 0) {
       return (
-        <div className="flex items-center gap-1 text-red-500">
+        <div className="flex items-center gap-1 text-destructive">
           <TrendingDown className="h-3.5 w-3.5" />
           <span className="text-xs font-medium">{value.toFixed(1)}%</span>
         </div>

@@ -293,7 +293,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   <span className="flex items-center gap-1.5">
                     <span className={cn(
                       "inline-block h-1.5 w-1.5 rounded-full",
-                      credits.remaining > 10 ? "bg-emerald-500" : credits.remaining > 0 ? "bg-amber-500" : "bg-red-500"
+                      credits.remaining > 10 ? "bg-emerald-500" : credits.remaining > 0 ? "bg-amber-500" : "bg-destructive/100"
                     )} />
                     {credits.remaining} credits
                   </span>

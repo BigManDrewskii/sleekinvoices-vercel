@@ -10,8 +10,8 @@ export function PaymentStatusBadge({ status, className }: PaymentStatusBadgeProp
   const config = {
     unpaid: {
       label: "Unpaid",
-      bgClass: "bg-red-500/10",
-      textClass: "text-red-400",
+      bgClass: "bg-destructive/10",
+      textClass: "text-destructive",
       icon: Circle,
     },
     partial: {

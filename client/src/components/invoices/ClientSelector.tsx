@@ -33,14 +33,14 @@ export function ClientSelector({ value, onChange, error }: ClientSelectorProps) 
   return (
     <div className="space-y-2">
       <Label>
-        Client <span className="text-red-500">*</span>
+        Client <span className="text-destructive">*</span>
       </Label>
       <div className="flex gap-2">
         <Select
           value={value?.toString() || "none"}
           onValueChange={(val) => val !== "none" && onChange(parseInt(val))}
         >
-          <SelectTrigger className={error ? "border-red-500" : ""}>
+          <SelectTrigger className={error ? "border-destructive" : ""}>
             <SelectValue placeholder="Select a client" />
           </SelectTrigger>
           <SelectContent>
@@ -72,7 +72,7 @@ export function ClientSelector({ value, onChange, error }: ClientSelectorProps) 
           New Client
         </Button>
       </div>
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <ClientDialog
         open={createDialogOpen}

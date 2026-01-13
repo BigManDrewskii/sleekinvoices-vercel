@@ -309,7 +309,7 @@ export default function EmailHistory() {
           <Card className="bg-card/50">
             <CardHeader className="pb-2">
               <CardDescription>Failed</CardDescription>
-              <CardTitle className="text-2xl text-red-400">{stats.failed}</CardTitle>
+              <CardTitle className="text-2xl text-destructive">{stats.failed}</CardTitle>
             </CardHeader>
           </Card>
         </div>
@@ -566,7 +566,7 @@ export default function EmailHistory() {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Bounce Type</p>
-                    <p className="font-medium text-red-400">{selectedEmail.bounceType || 'Unknown'}</p>
+                    <p className="font-medium text-destructive">{selectedEmail.bounceType || 'Unknown'}</p>
                   </div>
                 </div>
               )}
@@ -574,7 +574,7 @@ export default function EmailHistory() {
               {selectedEmail.errorMessage && (
                 <div>
                   <p className="text-sm text-muted-foreground">Error Message</p>
-                  <p className="font-medium text-red-400">{selectedEmail.errorMessage}</p>
+                  <p className="font-medium text-destructive">{selectedEmail.errorMessage}</p>
                 </div>
               )}
 

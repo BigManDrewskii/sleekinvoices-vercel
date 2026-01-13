@@ -59,10 +59,10 @@ export function MonthlyUsageCard({
   if (isAtLimit) {
     accentColor = "red";
     StatusIcon = AlertCircle;
-    statusBg = "bg-red-500/10";
+    statusBg = "bg-destructive/10";
     statusRing = "ring-red-500/20";
-    statusText = "text-red-500";
-    progressBg = "bg-red-500";
+    statusText = "text-destructive";
+    progressBg = "bg-destructive/100";
     gradientFrom = "from-red-500/5";
     gradientTo = "to-red-500/10";
     shadowColor = "shadow-red-500/10";

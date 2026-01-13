@@ -63,7 +63,7 @@ export function AnalyticsMetricCard({
                 "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
                 trend.isPositive
                   ? "text-green-600 bg-green-50 dark:bg-green-950/30"
-                  : "text-red-600 bg-red-50 dark:bg-red-950/30"
+                  : "text-destructive bg-destructive/10"
               )}>
                 {trend.isPositive ? (
                   <TrendingUp className="h-3 w-3" />

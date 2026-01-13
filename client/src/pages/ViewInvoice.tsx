@@ -306,7 +306,7 @@ export default function ViewInvoice() {
               variant="outline"
               size="sm"
               onClick={() => setDeleteDialogOpen(true)}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete
@@ -412,7 +412,7 @@ export default function ViewInvoice() {
                           ? ` (${invoice.discountValue}%)`
                           : ""}
                       </span>
-                      <span className="text-red-600">-<Currency amount={invoice.discountAmount} /></span>
+                      <span className="text-destructive">-<Currency amount={invoice.discountAmount} /></span>
                     </div>
                   )}
                   {parseFloat(invoice.taxAmount) > 0 && (

@@ -182,8 +182,8 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
             <div className="text-2xl font-bold text-green-500">{parseResult.validRows}</div>
             <div className="text-xs text-muted-foreground">Valid</div>
           </div>
-          <div className="p-3 bg-red-500/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-red-500">{parseResult.errors.length}</div>
+          <div className="p-3 bg-destructive/10 rounded-lg text-center">
+            <div className="text-2xl font-bold text-destructive">{parseResult.errors.length}</div>
             <div className="text-xs text-muted-foreground">Issues</div>
           </div>
         </div>
@@ -297,8 +297,8 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
             <div className="text-2xl font-bold text-yellow-500">{importResult.skipped}</div>
             <div className="text-xs text-muted-foreground">Skipped</div>
           </div>
-          <div className="p-3 bg-red-500/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-red-500">{importResult.errors.length}</div>
+          <div className="p-3 bg-destructive/10 rounded-lg text-center">
+            <div className="text-2xl font-bold text-destructive">{importResult.errors.length}</div>
             <div className="text-xs text-muted-foreground">Errors</div>
           </div>
         </div>

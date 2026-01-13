@@ -45,7 +45,7 @@ export default function QuickBooksCallback() {
             </div>
           )}
           {status === "success" && <><CheckCircle2 className="h-12 w-12 text-green-600" /><p className="text-sm text-muted-foreground">Redirecting to settings...</p></>}
-          {status === "error" && <><XCircle className="h-12 w-12 text-red-600" /><p className="text-sm text-red-600 text-center">{errorMessage}</p><Button onClick={() => setLocation("/settings")}>Back to Settings</Button></>}
+          {status === "error" && <><XCircle className="h-12 w-12 text-destructive" /><p className="text-sm text-destructive text-center">{errorMessage}</p><Button onClick={() => setLocation("/settings")}>Back to Settings</Button></>}
         </CardContent>
       </Card>
     </div>

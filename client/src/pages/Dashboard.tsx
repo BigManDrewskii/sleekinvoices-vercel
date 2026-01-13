@@ -402,7 +402,7 @@ function StatusBadge({ status }: { status: string }) {
     draft: { bg: "bg-gray-500/10", text: "text-gray-400", label: "Draft" },
     sent: { bg: "bg-blue-500/10", text: "text-blue-400", label: "Sent" },
     paid: { bg: "bg-green-500/10", text: "text-green-400", label: "Paid" },
-    overdue: { bg: "bg-red-500/10", text: "text-red-400", label: "Overdue" },
+    overdue: { bg: "bg-destructive/10", text: "text-destructive", label: "Overdue" },
     canceled: { bg: "bg-gray-500/10", text: "text-gray-500", label: "Canceled" },
   };
 
@@ -427,7 +427,7 @@ function QuickStatChip({
   onClick: () => void;
 }) {
   const variantStyles = {
-    destructive: "bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/30",
+    destructive: "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/100/20 hover:border-destructive/30",
     warning: "bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/30",
     secondary: "bg-gray-500/10 text-gray-400 border-gray-500/20 hover:bg-gray-500/20 hover:border-gray-500/30",
   };

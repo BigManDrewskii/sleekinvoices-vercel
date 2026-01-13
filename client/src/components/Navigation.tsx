@@ -570,7 +570,7 @@ export function Navigation() {
                 <DropdownMenuSeparator />
                 <div className="py-1">
                   <DropdownMenuItem
-                    className="h-11 gap-3 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20"
+                    className="h-11 gap-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
                     onClick={() => logout.mutate()}
                   >
                     <LogOut className="h-4 w-4" />
@@ -681,7 +681,7 @@ export function Navigation() {
                           setMobileMenuOpen(false);
                           logout.mutate();
                         }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-all duration-200 min-h-[48px]"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-base font-medium text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-200 min-h-[48px]"
                       >
                         <LogOut className="h-5 w-5" />
                         Log Out

@@ -530,7 +530,7 @@ export default function Estimates() {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                   onClick={() => handleDelete(estimate)}
-                                  className="text-red-600"
+                                  className="text-destructive"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Delete
@@ -598,7 +598,7 @@ export default function Estimates() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(estimate)}
-                          className="text-red-600 hover:text-red-700"
+                          className="text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

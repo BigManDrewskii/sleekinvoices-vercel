@@ -274,7 +274,7 @@ export function ClientDialog({ open, onOpenChange, client, onSuccess }: ClientDi
       case 'valid':
         return <LucideCheck className="h-4 w-4 text-green-500" />;
       case 'invalid':
-        return <X className="h-4 w-4 text-red-500" />;
+        return <X className="h-4 w-4 text-destructive" />;
       default:
         return null;
     }

@@ -13,8 +13,8 @@ export function TrendIndicator({
 }: TrendIndicatorProps) {
   const absPercentage = Math.abs(percentage);
   const Icon = isPositive ? TrendingUp : TrendingDown;
-  const color = isPositive ? "text-green-500" : "text-red-500";
-  const bgColor = isPositive ? "bg-green-50 dark:bg-green-950" : "bg-red-50 dark:bg-red-950";
+  const color = isPositive ? "text-green-500" : "text-destructive";
+  const bgColor = isPositive ? "bg-green-50 dark:bg-green-950" : "bg-destructive/10";
 
   return (
     <div className={`flex items-center gap-1 px-2 py-1 rounded ${bgColor}`}>

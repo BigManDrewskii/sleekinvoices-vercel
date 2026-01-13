@@ -149,7 +149,7 @@ export function InvoiceActionsMenu({
         <DropdownMenuItem
           onClick={onDelete}
           disabled={isLoading.delete}
-          className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950"
+          className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
         >
           <Trash2 className="mr-2 h-4 w-4" />
           <span>Delete Invoice</span>

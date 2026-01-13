@@ -30,9 +30,9 @@ export function ExpirationWarningBanner({
     : 'soon';
 
   const isUrgent = daysRemaining <= 3;
-  const bgColor = isUrgent ? 'bg-red-500/10 border-red-500/30' : 'bg-amber-500/10 border-amber-500/30';
-  const textColor = isUrgent ? 'text-red-400' : 'text-amber-400';
-  const iconColor = isUrgent ? 'text-red-500' : 'text-amber-500';
+  const bgColor = isUrgent ? 'bg-destructive/10 border-destructive/30' : 'bg-amber-500/10 border-amber-500/30';
+  const textColor = isUrgent ? 'text-destructive' : 'text-amber-400';
+  const iconColor = isUrgent ? 'text-destructive' : 'text-amber-500';
 
   return (
     <div className={`relative rounded-lg border ${bgColor} p-4 mb-6`}>

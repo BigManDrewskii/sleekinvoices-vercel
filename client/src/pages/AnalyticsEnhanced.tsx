@@ -347,9 +347,9 @@ export default function AnalyticsEnhanced() {
                     {formatCurrency(parseFloat(analytics?.totalRevenue?.toString() || "0"))}
                   </p>
                 </div>
-                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30">
                   <p className="text-sm font-medium text-muted-foreground mb-2">Total Expenses</p>
-                  <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+                  <p className="text-3xl font-bold text-destructive dark:text-destructive">
                     {formatCurrency(parseFloat(expenseStats?.totalExpenses?.toString() || "0"))}
                   </p>
                 </div>
@@ -466,15 +466,15 @@ export default function AnalyticsEnhanced() {
                     <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{agingReport.days_31_60.count}</div>
                     <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">{formatCurrency(agingReport.days_31_60.amount)}</div>
                   </div>
-                  <div className="p-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
+                  <div className="p-4 rounded-lg border border-destructive/30 bg-destructive/10">
                     <div className="text-xs text-muted-foreground mb-1 font-medium">61-90 Days</div>
-                    <div className="text-2xl font-bold text-red-600 dark:text-red-400">{agingReport.days_61_90.count}</div>
-                    <div className="text-xs text-red-600 dark:text-red-400 mt-1">{formatCurrency(agingReport.days_61_90.amount)}</div>
+                    <div className="text-2xl font-bold text-destructive dark:text-destructive">{agingReport.days_61_90.count}</div>
+                    <div className="text-xs text-destructive dark:text-destructive mt-1">{formatCurrency(agingReport.days_61_90.amount)}</div>
                   </div>
-                  <div className="p-4 rounded-lg border border-red-700 dark:border-red-700 bg-red-100 dark:bg-red-950/40">
+                  <div className="p-4 rounded-lg border border-destructive bg-destructive/20">
                     <div className="text-xs text-muted-foreground mb-1 font-medium">90+ Days</div>
-                    <div className="text-2xl font-bold text-red-700 dark:text-red-300">{agingReport.days_90_plus.count}</div>
-                    <div className="text-xs text-red-700 dark:text-red-300 mt-1 font-semibold">{formatCurrency(agingReport.days_90_plus.amount)}</div>
+                    <div className="text-2xl font-bold text-red-700">{agingReport.days_90_plus.count}</div>
+                    <div className="text-xs text-red-700 mt-1 font-semibold">{formatCurrency(agingReport.days_90_plus.amount)}</div>
                   </div>
                 </div>
               </CardContent>
@@ -505,16 +505,16 @@ export default function AnalyticsEnhanced() {
                         <tr key={client.clientId} className="border-b hover:bg-muted/50 transition-colors">
                           <td className="p-3 font-medium">{client.clientName}</td>
                           <td className="text-right p-3 text-green-600 dark:text-green-400">{formatCurrency(client.revenue)}</td>
-                          <td className="text-right p-3 text-red-600 dark:text-red-400">{formatCurrency(client.expenses)}</td>
+                          <td className="text-right p-3 text-destructive dark:text-destructive">{formatCurrency(client.expenses)}</td>
                           <td className={cn(
                             "text-right p-3 font-semibold",
-                            client.profit >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                            client.profit >= 0 ? "text-green-600 dark:text-green-400" : "text-destructive dark:text-destructive"
                           )}>
                             {formatCurrency(client.profit)}
                           </td>
                           <td className={cn(
                             "text-right p-3",
-                            client.margin >= 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+                            client.margin >= 0 ? "text-green-600 dark:text-green-400" : "text-destructive dark:text-destructive"
                           )}>
                             {client.margin.toFixed(1)}%
                           </td>

@@ -455,7 +455,7 @@ export default function CreateEstimate() {
                   {calculations.discountAmount > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Discount</span>
-                      <span className="text-red-500">
+                      <span className="text-destructive">
                         -{formData.currency} {calculations.discountAmount.toFixed(2)}
                       </span>
                     </div>
