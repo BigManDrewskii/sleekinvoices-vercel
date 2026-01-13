@@ -542,3 +542,12 @@
 
 ## AI Credits Badge Enhancement (Jan 13, 2026)
 - [x] Make AI credits badge show exact count dynamically instead of capping at 9+
+
+## Authentication & Navigation Flow Enhancement (Jan 13, 2026)
+- [x] Update landing page navbar: Show "Dashboard" for authenticated users, "Sign In"/"Sign Up" for unauthenticated
+- [x] Implement proper auth state detection on page load
+- [x] Handle authentication persistence across page refreshes
+- [x] Protect AI features - only allow authenticated users
+- [x] Add loading states during authentication checks
+- [x] Implement proper error handling for unauthorized access
+- [x] Add error boundaries and fallback states for auth failures

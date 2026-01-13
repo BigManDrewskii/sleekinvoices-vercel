@@ -5,15 +5,19 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, ArrowRight } from "lucide-react";
+import { Menu, ArrowRight, LayoutDashboard, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { getLoginUrl } from "@/const";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export function LandingNavigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [scrollAnnouncement, setScrollAnnouncement] = useState("");
+  
+  // Get auth state - don't redirect on unauthenticated since this is a public page
+  const { isAuthenticated, loading } = useAuth({ redirectOnUnauthenticated: false });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +35,19 @@ export function LandingNavigation() {
       // Announce to screen readers
       setScrollAnnouncement(`Navigating to ${id} section`);
       setTimeout(() => setScrollAnnouncement(""), 1000);
+    }
+  };
+
+  // Generate sign up URL (same as login but with signUp type)
+  const getSignUpUrl = () => {
+    const loginUrl = getLoginUrl();
+    if (loginUrl === "/") return "/";
+    try {
+      const url = new URL(loginUrl);
+      url.searchParams.set("type", "signUp");
+      return url.toString();
+    } catch {
+      return loginUrl;
     }
   };
 
@@ -80,15 +97,33 @@ export function LandingNavigation() {
 
           {/* Auth CTAs - Desktop */}
           <div className="hidden md:flex items-center gap-2">
-            <Button variant="ghost" size="sm" asChild className="rounded-full">
-              <a href={getLoginUrl()}>Sign In</a>
-            </Button>
-            <Button size="sm" asChild className="rounded-full">
-              <a href={getLoginUrl()}>
-                Get Started
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </a>
-            </Button>
+            {loading ? (
+              // Loading state
+              <div className="flex items-center gap-2 px-4 py-2">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            ) : isAuthenticated ? (
+              // Authenticated: Show Dashboard button
+              <Button size="sm" asChild className="rounded-full">
+                <Link href="/dashboard">
+                  <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                  Dashboard
+                </Link>
+              </Button>
+            ) : (
+              // Unauthenticated: Show Sign In and Sign Up
+              <>
+                <Button variant="ghost" size="sm" asChild className="rounded-full">
+                  <a href={getLoginUrl()}>Sign In</a>
+                </Button>
+                <Button size="sm" asChild className="rounded-full">
+                  <a href={getSignUpUrl()}>
+                    Get Started
+                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                  </a>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -126,15 +161,33 @@ export function LandingNavigation() {
                 </button>
 
                 <div className="border-t border-border pt-4 mt-4 space-y-3">
-                  <Button variant="outline" className="w-full rounded-xl" asChild>
-                    <a href={getLoginUrl()}>Sign In</a>
-                  </Button>
-                  <Button className="w-full rounded-xl" asChild>
-                    <a href={getLoginUrl()}>
-                      Get Started
-                      <ArrowRight className="ml-1.5 h-4 w-4" />
-                    </a>
-                  </Button>
+                  {loading ? (
+                    // Loading state
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : isAuthenticated ? (
+                    // Authenticated: Show Dashboard button
+                    <Button className="w-full rounded-xl" asChild>
+                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <LayoutDashboard className="mr-1.5 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </Button>
+                  ) : (
+                    // Unauthenticated: Show Sign In and Sign Up
+                    <>
+                      <Button variant="outline" className="w-full rounded-xl" asChild>
+                        <a href={getLoginUrl()}>Sign In</a>
+                      </Button>
+                      <Button className="w-full rounded-xl" asChild>
+                        <a href={getSignUpUrl()}>
+                          Get Started
+                          <ArrowRight className="ml-1.5 h-4 w-4" />
+                        </a>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

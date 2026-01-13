@@ -108,10 +108,17 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [location] = useLocation();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  const { data: credits } = trpc.ai.getCredits.useQuery();
-  const { data: stats } = trpc.analytics.getStats.useQuery();
+  // Only query if authenticated to prevent unauthorized errors
+  const { data: credits } = trpc.ai.getCredits.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
+  const { data: stats } = trpc.analytics.getStats.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
   
   const chatMutation = trpc.ai.chat.useMutation({
     onSuccess: (response) => {
@@ -130,13 +137,19 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       setIsTyping(false);
     },
     onError: (error) => {
+      // Check if this is an authentication error
+      const isAuthError = error.data?.code === 'UNAUTHORIZED' || error.message.includes('UNAUTHORIZED');
+      const errorMessage = isAuthError 
+        ? "Your session has expired. Please refresh the page to continue."
+        : `Sorry, I encountered an error: ${error.message}. Please try again.`;
+      
       setMessages(prev => {
         const updated = [...prev];
         const lastIndex = updated.length - 1;
         if (updated[lastIndex]?.role === "assistant" && updated[lastIndex]?.isStreaming) {
           updated[lastIndex] = {
             ...updated[lastIndex],
-            content: `Sorry, I encountered an error: ${error.message}. Please try again.`,
+            content: errorMessage,
             isStreaming: false,
           };
         }
@@ -557,9 +570,16 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
 /**
  * Floating AI Assistant trigger button with animated orb
+ * Only renders when user is authenticated (handled by AIAssistantProvider)
  */
 export function AIAssistantTrigger({ onClick, className }: { onClick: () => void; className?: string }) {
-  const { data: credits } = trpc.ai.getCredits.useQuery();
+  const { isAuthenticated } = useAuth();
+  
+  // Only query credits if authenticated to prevent unauthorized errors
+  const { data: credits } = trpc.ai.getCredits.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
   
   return (
     <div className={cn("fixed bottom-6 right-6 z-40", className)} data-onboarding="ai-assistant">
