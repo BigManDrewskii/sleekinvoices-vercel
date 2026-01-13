@@ -59,6 +59,7 @@ import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
 
 type Product = {
@@ -145,9 +146,7 @@ export default function Products() {
   });
 
   const utils = trpc.useUtils();
-  
-  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; productId: number } | null>(null);
-  
+
   const deleteMutation = trpc.products.delete.useMutation({
     onSuccess: () => {
       // Success is silent since the item is already removed from UI
@@ -158,70 +157,33 @@ export default function Products() {
     },
   });
 
+  const { executeDelete } = useUndoableDelete();
+
   const handleUndoableDelete = (product: Product) => {
-    // Cancel any existing pending delete
-    if (pendingDeleteRef.current) {
-      clearTimeout(pendingDeleteRef.current.timeoutId);
-      pendingDeleteRef.current = null;
-    }
-
-    // Snapshot the previous value for potential restore
     const previousProducts = utils.products.list.getData({ includeInactive: showInactive });
-    
-    // Optimistically remove from UI immediately
-    utils.products.list.setData({ includeInactive: showInactive }, (old) => 
-      old?.filter((p) => p.id !== product.id)
-    );
-    
-    // Close dialog
-    setIsDeleteDialogOpen(false);
-    setSelectedProduct(null);
 
-    // Show undo toast
-    toast(
-      `Product "${product.name}" archived`,
-      {
-        description: 'Click undo to restore',
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            // Cancel the pending delete
-            if (pendingDeleteRef.current) {
-              clearTimeout(pendingDeleteRef.current.timeoutId);
-              pendingDeleteRef.current = null;
-            }
-            
-            // Restore the product to UI
-            if (previousProducts) {
-              utils.products.list.setData({ includeInactive: showInactive }, previousProducts);
-            } else {
-              refetch();
-            }
-            
-            toast.success('Product restored');
-          },
-        },
-      }
-    );
-
-    // Set timeout to permanently delete after 5 seconds
-    const timeoutId = setTimeout(async () => {
-      pendingDeleteRef.current = null;
-      
-      try {
-        await deleteMutation.mutateAsync({ id: product.id });
-      } catch (error) {
-        // Restore the product on error
+    executeDelete({
+      item: product,
+      itemName: product.name,
+      itemType: "product",
+      onOptimisticDelete: () => {
+        utils.products.list.setData({ includeInactive: showInactive }, (old) =>
+          old?.filter((p) => p.id !== product.id)
+        );
+        setIsDeleteDialogOpen(false);
+        setSelectedProduct(null);
+      },
+      onRestore: () => {
         if (previousProducts) {
           utils.products.list.setData({ includeInactive: showInactive }, previousProducts);
         } else {
           refetch();
         }
-      }
-    }, 5000);
-
-    pendingDeleteRef.current = { timeoutId, productId: product.id };
+      },
+      onConfirmDelete: async () => {
+        await deleteMutation.mutateAsync({ id: product.id });
+      },
+    });
   };
 
   const resetForm = () => {

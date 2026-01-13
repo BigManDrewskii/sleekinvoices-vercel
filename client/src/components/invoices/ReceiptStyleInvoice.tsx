@@ -10,6 +10,7 @@ import {
 import { useMemo, useEffect } from "react";
 import { loadGoogleFont } from "@/lib/google-fonts";
 import { cn } from "@/lib/utils";
+import { INVOICE_TEMPLATE_DEFAULTS } from "@shared/template-presets";
 
 interface LineItem {
   description: string;
@@ -89,13 +90,13 @@ export function ReceiptStyleInvoice({
   taxId,
   status = "pending",
   logoUrl,
-  logoPosition = 'left',
-  logoWidth = 120,
-  primaryColor = "#18181b",
-  accentColor = "#10b981",
-  headingFont = "IBM Plex Mono",
-  bodyFont = "IBM Plex Mono",
-  fontSize = 14,
+  logoPosition = INVOICE_TEMPLATE_DEFAULTS.logoPosition,
+  logoWidth = INVOICE_TEMPLATE_DEFAULTS.logoWidth,
+  primaryColor = INVOICE_TEMPLATE_DEFAULTS.primaryColor,
+  accentColor = INVOICE_TEMPLATE_DEFAULTS.accentColor,
+  headingFont = INVOICE_TEMPLATE_DEFAULTS.headingFont,
+  bodyFont = INVOICE_TEMPLATE_DEFAULTS.bodyFont,
+  fontSize = INVOICE_TEMPLATE_DEFAULTS.fontSize,
   dateFormat = "MMM DD, YYYY",
   showCompanyAddress = true,
   showPaymentTerms = true,
@@ -147,9 +148,9 @@ export function ReceiptStyleInvoice({
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'paid': return colors.accent;
-      case 'overdue': return '#dc2626';
-      case 'pending': 
-      case 'sent': return '#d97706';
+      case 'overdue': return INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue;
+      case 'pending':
+      case 'sent': return INVOICE_TEMPLATE_DEFAULTS.statusColors.pending;
       case 'draft': return colors.muted;
       default: return colors.muted;
     }

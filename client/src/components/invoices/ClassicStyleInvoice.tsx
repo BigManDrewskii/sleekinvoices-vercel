@@ -10,6 +10,7 @@ import {
 } from "@/lib/color-contrast";
 import { useMemo, useEffect } from "react";
 import { loadGoogleFont } from "@/lib/google-fonts";
+import { INVOICE_TEMPLATE_DEFAULTS } from "@shared/template-presets";
 
 interface LineItem {
   description: string;
@@ -84,13 +85,13 @@ export function ClassicStyleInvoice({
   taxId,
   status = "draft",
   logoUrl,
-  logoPosition = 'left',
-  logoWidth = 120,
-  primaryColor = "#18181b",
-  accentColor = "#5f6fff",
+  logoPosition = INVOICE_TEMPLATE_DEFAULTS.logoPosition,
+  logoWidth = INVOICE_TEMPLATE_DEFAULTS.logoWidth,
+  primaryColor = INVOICE_TEMPLATE_DEFAULTS.primaryColor,
+  accentColor = INVOICE_TEMPLATE_DEFAULTS.classicAccentColor,
   headingFont = "Inter",
   bodyFont = "Inter",
-  fontSize = 14,
+  fontSize = INVOICE_TEMPLATE_DEFAULTS.fontSize,
   dateFormat = "MMM DD, YYYY",
   showCompanyAddress = true,
   showPaymentTerms = true,
@@ -150,16 +151,24 @@ export function ClassicStyleInvoice({
   const getStatusStyles = (status: string) => {
     switch (status.toLowerCase()) {
       case 'paid':
-        return { 
-          bg: withAlpha(colors.accent, 0.1), 
-          text: colors.accent, 
-          dot: colors.accent 
+        return {
+          bg: withAlpha(colors.accent, 0.1),
+          text: colors.accent,
+          dot: colors.accent
         };
       case 'overdue':
-        return { bg: '#fef2f2', text: '#dc2626', dot: '#dc2626' };
+        return {
+          bg: '#fef2f2',
+          text: INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue,
+          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue
+        };
       case 'sent':
       case 'pending':
-        return { bg: '#fffbeb', text: '#d97706', dot: '#d97706' };
+        return {
+          bg: '#fffbeb',
+          text: INVOICE_TEMPLATE_DEFAULTS.statusColors.pending,
+          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.pending
+        };
       default:
         return { 
           bg: withAlpha(colors.primary, 0.1), 

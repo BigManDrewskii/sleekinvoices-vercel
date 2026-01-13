@@ -85,6 +85,11 @@
 
   /* Special Colors */
   --color-crypto: #f7931a;
+  --color-bitcoin: #f7931a;
+  --color-ethereum: #627eea;
+  --color-usdt: #26a17b;
+  --color-usdc: #2775ca;
+  --color-stripe: #635BFF;
   --color-manus-bg: #f8f8f7;
   --color-manus-text: #34322d;
   --color-manus-muted: #858481;

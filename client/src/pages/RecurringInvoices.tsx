@@ -10,6 +10,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { RecurringInvoicesPageSkeleton } from "@/components/skeletons";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { DateDisplay } from "@/components/ui/typography";
+import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 
 export default function RecurringInvoices() {
   const [, setLocation] = useLocation();
@@ -41,73 +42,37 @@ export default function RecurringInvoices() {
     }
   };
 
-  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; id: number } | null>(null);
+  const { executeDelete } = useUndoableDelete();
 
   const handleDelete = async (id: number, clientName?: string) => {
     if (!confirm("Are you sure you want to delete this recurring invoice?")) return;
-    
-    // Cancel any existing pending delete
-    if (pendingDeleteRef.current) {
-      clearTimeout(pendingDeleteRef.current.timeoutId);
-      pendingDeleteRef.current = null;
-    }
 
-    // Snapshot the previous value for potential restore
     const previousData = utils.recurringInvoices.list.getData();
-    
-    // Optimistically remove from UI immediately
-    utils.recurringInvoices.list.setData(undefined, (old) => 
-      old?.filter((item: any) => item.id !== id)
-    );
+    const item = previousData?.find((item: any) => item.id === id);
 
-    // Show undo toast
-    toast(
-      `Recurring invoice deleted`,
-      {
-        description: 'Click undo to restore',
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            // Cancel the pending delete
-            if (pendingDeleteRef.current) {
-              clearTimeout(pendingDeleteRef.current.timeoutId);
-              pendingDeleteRef.current = null;
-            }
-            
-            // Restore to UI
-            if (previousData) {
-              utils.recurringInvoices.list.setData(undefined, previousData);
-            } else {
-              utils.recurringInvoices.list.invalidate();
-            }
-            
-            toast.success('Recurring invoice restored');
-          },
-        },
-      }
-    );
+    if (!item) return;
 
-    // Set timeout to permanently delete after 5 seconds
-    const timeoutId = setTimeout(async () => {
-      pendingDeleteRef.current = null;
-      
-      try {
-        await deleteMutation.mutateAsync({ id });
-      } catch (error) {
-        // Restore on error
+    executeDelete({
+      item,
+      itemName: clientName || "Recurring invoice",
+      itemType: "recurring invoice",
+      onOptimisticDelete: () => {
+        utils.recurringInvoices.list.setData(undefined, (old) =>
+          old?.filter((item: any) => item.id !== id)
+        );
+      },
+      onRestore: () => {
         if (previousData) {
           utils.recurringInvoices.list.setData(undefined, previousData);
         } else {
           utils.recurringInvoices.list.invalidate();
         }
-        toast.error("Failed to delete recurring invoice. Item has been restored.");
-      } finally {
+      },
+      onConfirmDelete: async () => {
+        await deleteMutation.mutateAsync({ id });
         utils.recurringInvoices.list.invalidate();
-      }
-    }, 5000);
-
-    pendingDeleteRef.current = { timeoutId, id };
+      },
+    });
   };
 
   const getFrequencyLabel = (frequency: string) => {

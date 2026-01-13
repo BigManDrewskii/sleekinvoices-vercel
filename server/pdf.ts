@@ -8,6 +8,7 @@ const PDF_GENERATION_TIMEOUT_MS = 30000;
 import { Invoice, Client, InvoiceLineItem, User } from '../drizzle/schema';
 import type { InvoiceTemplate } from '../drizzle/schema';
 import { createPDFColorPalette, getOptimalTextColor, withAlpha } from './color-contrast';
+import { INVOICE_TEMPLATE_DEFAULTS } from '../shared/template-presets';
 
 interface InvoicePDFData {
   invoice: Invoice;
@@ -82,8 +83,8 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
   const taxId = user.taxId || '';
   
   // Get contrast-safe colors from template or defaults
-  const primaryColor = template?.primaryColor || '#18181b';
-  const accentColor = template?.accentColor || '#10b981';
+  const primaryColor = template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
+  const accentColor = template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.accentColor;
   const colors = createPDFColorPalette(primaryColor, accentColor);
   
   const lineItemsHTML = lineItems.map(item => `
@@ -313,8 +314,8 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
   const { invoice, client, lineItems, user, template } = data;
   
   // Get contrast-safe colors from template or defaults
-  const primaryColor = template?.primaryColor || '#18181b';
-  const accentColor = template?.accentColor || '#5f6fff';
+  const primaryColor = template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
+  const accentColor = template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.classicAccentColor;
   const colors = createPDFColorPalette(primaryColor, accentColor);
   
   const logoUrl = template?.logoUrl || user.logoUrl;

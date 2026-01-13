@@ -168,8 +168,8 @@ export function CryptoSubscriptionDialog({
                 <ArrowLeft className="size-4" />
               </Button>
             )}
-            <div className="flex size-8 items-center justify-center rounded-lg bg-[#f7931a]/10">
-              <Bitcoin className="size-4 text-[#f7931a]" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-[hsl(var(--color-bitcoin))]/10">
+              <Bitcoin className="size-4 text-[hsl(var(--color-bitcoin))]" />
             </div>
             {isExtension ? "Extend Subscription" : "Pay with Cryptocurrency"}
           </DialogTitle>

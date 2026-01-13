@@ -262,7 +262,7 @@ export function PartialPaymentDialog({
 
               {/* Crypto Fields */}
               {paymentMethod === "crypto" && (
-                <div className="space-y-4 p-3 border border-[#f7931a]/30 bg-[#f7931a]/5 rounded-lg">
+                <div className="space-y-4 p-3 border border-[hsl(var(--color-bitcoin))]/30 bg-[hsl(var(--color-bitcoin))]/5 rounded-lg">
                   <div className="space-y-2">
                     <Label htmlFor="cryptoCurrency" className="text-sm font-medium">Cryptocurrency</Label>
                     <Input

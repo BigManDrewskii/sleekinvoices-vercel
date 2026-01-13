@@ -25,6 +25,7 @@ import { DeleteConfirmDialog } from "@/components/shared/DeleteConfirmDialog";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { FileText, Plus, Edit, Trash2, Mail, Phone, MapPin, Users, Key, ShieldCheck, Upload, Download, X, Calendar, Tag, Tags, MoreHorizontal, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
@@ -133,7 +134,7 @@ export default function Clients() {
 
   const utils = trpc.useUtils();
   const { pushUndoAction } = useKeyboardShortcuts();
-  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; clientId: number } | null>(null);
+  const { executeDelete } = useUndoableDelete();
   
   const deleteClient = trpc.clients.delete.useMutation({
     onSuccess: () => {
@@ -499,26 +500,9 @@ export default function Clients() {
   };
 
   const handleUndoableDelete = (client: Client) => {
-    if (pendingDeleteRef.current) {
-      clearTimeout(pendingDeleteRef.current.timeoutId);
-      pendingDeleteRef.current = null;
-    }
-
     const previousClients = utils.clients.list.getData();
-    
-    utils.clients.list.setData(undefined, (old) => 
-      old?.filter((c) => c.id !== client.id)
-    );
-    
-    setDeleteDialogOpen(false);
-    setClientToDelete(null);
 
     const undoDelete = () => {
-      if (pendingDeleteRef.current) {
-        clearTimeout(pendingDeleteRef.current.timeoutId);
-        pendingDeleteRef.current = null;
-      }
-      
       if (previousClients) {
         utils.clients.list.setData(undefined, previousClients);
       } else {
@@ -533,36 +517,22 @@ export default function Clients() {
       undo: undoDelete,
     });
 
-    toast(
-      `Client "${client.name}" deleted`,
-      {
-        description: 'Click undo to restore or press ⌘Z',
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            undoDelete();
-            toast.success('Client restored');
-          },
-        },
-      }
-    );
-
-    const timeoutId = setTimeout(async () => {
-      pendingDeleteRef.current = null;
-      
-      try {
+    executeDelete({
+      item: client,
+      itemName: client.name,
+      itemType: "client",
+      onOptimisticDelete: () => {
+        utils.clients.list.setData(undefined, (old) =>
+          old?.filter((c) => c.id !== client.id)
+        );
+        setDeleteDialogOpen(false);
+        setClientToDelete(null);
+      },
+      onRestore: undoDelete,
+      onConfirmDelete: async () => {
         await deleteClient.mutateAsync({ id: client.id });
-      } catch (error) {
-        if (previousClients) {
-          utils.clients.list.setData(undefined, previousClients);
-        } else {
-          utils.clients.list.invalidate();
-        }
-      }
-    }, 5000);
-
-    pendingDeleteRef.current = { timeoutId, clientId: client.id };
+      },
+    });
   };
 
   if (loading) {

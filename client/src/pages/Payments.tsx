@@ -614,7 +614,7 @@ export default function Payments() {
               {selectedPayment.paymentMethod === "stripe" && selectedPayment.stripePaymentIntentId && (
                 <div className="p-4 rounded-xl bg-muted/30 border space-y-3">
                   <div className="flex items-center gap-2 text-sm font-medium">
-                    <CreditCard className="h-4 w-4 text-[#635BFF]" />
+                    <CreditCard className="h-4 w-4 text-[hsl(var(--color-stripe))]" />
                     Stripe Details
                   </div>
                   <div className="space-y-1">

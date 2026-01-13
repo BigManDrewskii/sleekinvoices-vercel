@@ -282,8 +282,8 @@ export default function ClientPortal() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-[#f7931a]/10">
-                <Bitcoin className="size-4 text-[#f7931a]" />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[hsl(var(--color-bitcoin))]/10">
+                <Bitcoin className="size-4 text-[hsl(var(--color-bitcoin))]" />
               </div>
               Pay with Cryptocurrency
             </DialogTitle>
@@ -331,8 +331,8 @@ export default function ClientPortal() {
                 )}
                 
                 {/* Info about crypto payment */}
-                <div className="rounded-lg bg-[#f7931a]/5 border border-[#f7931a]/20 p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-[#f7931a]">
+                <div className="rounded-lg bg-[hsl(var(--color-bitcoin))]/5 border border-[hsl(var(--color-bitcoin))]/20 p-4 space-y-3">
+                  <div className="flex items-center gap-2 text-[hsl(var(--color-bitcoin))]">
                     <Coins className="h-5 w-5" />
                     <span className="font-medium">300+ Cryptocurrencies Supported</span>
                   </div>
@@ -341,16 +341,16 @@ export default function ClientPortal() {
                   </p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                      <span className="text-[#f7931a]">₿</span> BTC
+                      <span className="text-[hsl(var(--color-bitcoin))]">₿</span> BTC
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                      <span className="text-[#627eea]">Ξ</span> ETH
+                      <span className="text-[hsl(var(--color-ethereum))]">Ξ</span> ETH
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                      <span className="text-[#26a17b]">₮</span> USDT
+                      <span className="text-[hsl(var(--color-usdt))]">₮</span> USDT
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                      <span className="text-[#2775ca]">$</span> USDC
+                      <span className="text-[hsl(var(--color-usdc))]">$</span> USDC
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium text-muted-foreground">
                       +300 more
@@ -373,7 +373,7 @@ export default function ClientPortal() {
 
                 {/* Create Payment Button */}
                 <Button
-                  className="w-full bg-gradient-to-r from-[#f7931a] to-[#f9a825] hover:from-[#e8850f] hover:to-[#e89920] text-white"
+                  className="w-full bg-gradient-to-r from-[hsl(var(--color-bitcoin))] to-[#f9a825] hover:from-[#e8850f] hover:to-[#e89920] text-white"
                   size="lg"
                   onClick={handleCreatePayment}
                   disabled={createCryptoPayment.isPending}

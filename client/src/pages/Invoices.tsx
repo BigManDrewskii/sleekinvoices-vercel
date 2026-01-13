@@ -62,6 +62,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { useTableSort } from "@/hooks/useTableSort";
+import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
@@ -145,9 +146,7 @@ export default function Invoices() {
 
   const utils = trpc.useUtils();
   const { pushUndoAction } = useKeyboardShortcuts();
-  
-  const pendingDeleteRef = useRef<{ timeoutId: NodeJS.Timeout; invoiceId: number } | null>(null);
-  
+
   const deleteInvoice = trpc.invoices.delete.useMutation({
     onSuccess: () => {
       // Success is silent since the item is already removed from UI
@@ -158,34 +157,12 @@ export default function Invoices() {
     },
   });
 
+  const { executeDelete } = useUndoableDelete();
+
   const handleUndoableDelete = (invoice: Invoice) => {
-    // Cancel any existing pending delete
-    if (pendingDeleteRef.current) {
-      clearTimeout(pendingDeleteRef.current.timeoutId);
-      pendingDeleteRef.current = null;
-    }
-
-    // Snapshot the previous value for potential restore
     const previousInvoices = utils.invoices.list.getData();
-    
-    // Optimistically remove from UI immediately
-    utils.invoices.list.setData(undefined, (old) => 
-      old?.filter((inv) => inv.id !== invoice.id)
-    );
-    
-    // Close dialog
-    setDeleteDialogOpen(false);
-    setInvoiceToDelete(null);
 
-    // Create undo function
     const undoDelete = () => {
-      // Cancel the pending delete
-      if (pendingDeleteRef.current) {
-        clearTimeout(pendingDeleteRef.current.timeoutId);
-        pendingDeleteRef.current = null;
-      }
-      
-      // Restore the invoice to UI
       if (previousInvoices) {
         utils.invoices.list.setData(undefined, previousInvoices);
       } else {
@@ -201,39 +178,22 @@ export default function Invoices() {
       undo: undoDelete,
     });
 
-    // Show undo toast
-    toast(
-      `Invoice ${invoice.invoiceNumber} deleted`,
-      {
-        description: 'Click undo to restore or press ⌘Z',
-        duration: 5000,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            undoDelete();
-            toast.success('Invoice restored');
-          },
-        },
-      }
-    );
-
-    // Set timeout to permanently delete after 5 seconds
-    const timeoutId = setTimeout(async () => {
-      pendingDeleteRef.current = null;
-      
-      try {
+    executeDelete({
+      item: invoice,
+      itemName: invoice.invoiceNumber,
+      itemType: "invoice",
+      onOptimisticDelete: () => {
+        utils.invoices.list.setData(undefined, (old) =>
+          old?.filter((inv) => inv.id !== invoice.id)
+        );
+        setDeleteDialogOpen(false);
+        setInvoiceToDelete(null);
+      },
+      onRestore: undoDelete,
+      onConfirmDelete: async () => {
         await deleteInvoice.mutateAsync({ id: invoice.id });
-      } catch (error) {
-        // Restore the invoice on error
-        if (previousInvoices) {
-          utils.invoices.list.setData(undefined, previousInvoices);
-        } else {
-          utils.invoices.list.invalidate();
-        }
-      }
-    }, 5000);
-
-    pendingDeleteRef.current = { timeoutId, invoiceId: invoice.id };
+      },
+    });
   };
 
   const bulkDeleteInvoices = trpc.invoices.bulkDelete.useMutation({
