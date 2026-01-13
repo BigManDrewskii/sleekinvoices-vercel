@@ -498,3 +498,4 @@
 ## Navbar Responsiveness Fixes (Jan 13, 2026)
 
 - [x] Fix navbar responsiveness issues across all viewport sizes
+- [x] Fix navbar showing desktop nav items at mobile width instead of hamburger menu

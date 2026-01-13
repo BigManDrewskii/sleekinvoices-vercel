@@ -137,7 +137,7 @@ export function Navigation() {
           className="navbar-quick-action h-11 min-w-[44px] min-h-[44px] gap-1.5 px-2 sm:px-3 w-11 sm:w-auto group relative overflow-hidden border-primary/50 hover:border-primary hover:bg-primary/10 text-primary transition-all duration-200"
         >
           <Plus weight="bold" className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-90" />
-          <span className="hidden sm:inline">New</span>
+          <span className="hidden md:inline">New</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
@@ -213,7 +213,7 @@ export function Navigation() {
   // Desktop & Tablet Navigation - unified snappy UX with DropdownMenu
   // Shows at lg (1024px+) for full nav, tablet gets hamburger menu for better UX
   const DesktopTabletNav = () => (
-    <div className="hidden lg:flex navbar-desktop-tablet-nav">
+    <div className="navbar-desktop-tablet-nav">
       <Link
         href="/dashboard"
           className={cn(
@@ -522,7 +522,7 @@ export function Navigation() {
               data-onboarding="search-bar"
             >
               <Search className="h-4 w-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Search</span>
+              <span className="hidden md:inline">Search</span>
               <kbd className="hidden lg:inline-flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-border/50 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 ⌘K
               </kbd>

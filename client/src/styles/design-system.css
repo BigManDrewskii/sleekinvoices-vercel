@@ -520,19 +520,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3); /* 12px mobile */
+  gap: var(--space-2); /* 8px mobile - tighter on small screens */
   height: 64px; /* Fixed height for consistency */
+  width: 100%;
+  overflow: hidden; /* Prevent horizontal overflow */
 }
 
 @media (min-width: 640px) {
   .navbar-inner {
-    gap: var(--space-4); /* 16px sm+ */
+    gap: var(--space-3); /* 12px sm+ */
   }
 }
 
 @media (min-width: 1024px) {
   .navbar-inner {
-    gap: var(--space-5); /* 20px lg+ */
+    gap: var(--space-4); /* 16px lg+ */
   }
 }
 
@@ -627,19 +629,19 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2); /* 8px mobile */
+  gap: var(--space-1); /* 4px mobile - very tight */
   flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
   .navbar-actions {
-    gap: var(--space-3); /* 12px sm+ */
+    gap: var(--space-2); /* 8px sm+ */
   }
 }
 
 @media (min-width: 1024px) {
   .navbar-actions {
-    gap: var(--space-4); /* 16px lg+ */
+    gap: var(--space-3); /* 12px lg+ */
   }
 }
 
@@ -653,14 +655,21 @@
 }
 
 
-/* Desktop navigation container (1024px+) */
+/* Desktop navigation container - HIDDEN by default, shown at lg (1024px+) */
 .navbar-desktop-tablet-nav {
-  display: flex;
+  display: none !important; /* Hidden on mobile/tablet - use !important to override Tailwind */
   align-items: center;
   gap: var(--space-1); /* 4px base */
   flex: 1;
   justify-content: center;
   margin: 0 var(--space-4); /* 16px */
+}
+
+/* Show desktop nav at lg breakpoint (1024px+) */
+@media (min-width: 1024px) {
+  .navbar-desktop-tablet-nav {
+    display: flex !important;
+  }
 }
 
 @media (min-width: 1200px) {
