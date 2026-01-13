@@ -277,7 +277,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               {/* Sleeky AI Avatar 02 - winking otter with gold chain */}
               <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-border/40 hover:ring-border/60 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
                 <img
-                  src="/sleeky/ai-avatars/sleekyAI-Avatar-02.png"
+                  src="/sleeky/sleekyAI-Avatar.png"
                   alt="Sleeky AI Assistant"
                   className="w-full h-full object-cover"
                   draggable={false}

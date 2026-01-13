@@ -94,7 +94,7 @@ export function SleekyAvatar({
     >
       {/* Sleeky image - no borders on the PNG itself */}
       <img
-        src="/sleeky/ai-avatars/avatar.png"
+        src="/sleeky/sleekyAI-Avatar.png"
         alt={alt}
         className="w-full h-full object-cover"
         draggable={false}
