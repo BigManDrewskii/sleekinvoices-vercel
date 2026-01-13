@@ -273,19 +273,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           
           <div className="flex items-center gap-3">
-            <div className="relative">
-              {/* Sleeky AI Avatar 02 - winking otter with gold chain */}
-              <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-border/40 hover:ring-border/60 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
-                <img
-                  src="/sleeky/sleekyAI-Avatar.png"
-                  alt="Sleeky AI Assistant"
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
-              </div>
-              {/* Subtle glow effect */}
-              <div className="absolute inset-0 rounded-full bg-primary/10 blur-md -z-10" />
-            </div>
+<SleekyAvatar size="md" bordered glow />
             <div>
               <h2 className="font-semibold text-[15px] tracking-tight">Sleeky AI Assistant</h2>
               <p className="text-xs text-muted-foreground/80">
@@ -473,8 +461,8 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                     )}
                   </div>
                   {message.role === "user" && (
-                    <div className="shrink-0 h-8 w-8 rounded-xl bg-secondary/80 flex items-center justify-center ring-1 ring-border/30">
-                      <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                    <div className="shrink-0 h-8 w-8 rounded-xl bg-primary/20 flex items-center justify-center ring-1 ring-primary/30 overflow-hidden">
+                      <span className="text-xs font-semibold text-primary">You</span>
                     </div>
                   )}
                 </div>
