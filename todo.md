@@ -536,3 +536,6 @@
 - [x] Refine typography and spacing for markdown elements
 - [x] Ensure proper contrast and styling for code blocks
 - [x] Add better visual hierarchy for headings and lists
+- [x] Fix action button syntax showing as raw text instead of buttons
+- [x] Improve bold text rendering for better prominence
+- [x] Ensure proper paragraph spacing in AI responses

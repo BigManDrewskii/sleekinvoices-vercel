@@ -1,13 +1,53 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo, useState, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { Check, Copy } from "lucide-react";
+import { AIActionButton, parseAIResponse, AIAction } from "./AIActionButton";
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
   isStreaming?: boolean;
+}
+
+/**
+ * Pre-process content to convert action markers to placeholder tokens
+ * that won't be affected by markdown parsing
+ */
+function extractActions(content: string): {
+  processedContent: string;
+  actions: Map<string, AIAction>;
+} {
+  const actionRegex = /\[\[action:(\w+)\|([^|\]]+)(?:\|([^\]]+))?\]\]/g;
+  const actions = new Map<string, AIAction>();
+  let counter = 0;
+
+  const processedContent = content.replace(actionRegex, (_, type, label, dataStr) => {
+    let data: Record<string, string | number | boolean> | undefined;
+
+    if (dataStr) {
+      try {
+        data = JSON.parse(dataStr);
+      } catch {
+        data = {};
+        dataStr.split(",").forEach((pair: string) => {
+          const [key, value] = pair.split("=");
+          if (key && value) {
+            data![key.trim()] = value.trim();
+          }
+        });
+      }
+    }
+
+    const placeholder = `__ACTION_${counter}__`;
+    actions.set(placeholder, { type, label, data });
+    counter++;
+
+    return placeholder;
+  });
+
+  return { processedContent, actions };
 }
 
 /**
@@ -19,6 +59,7 @@ interface MarkdownRendererProps {
  * - Styled code blocks with copy button
  * - Responsive tables
  * - Proper link handling
+ * - Inline action buttons
  * - Refined typography for AI assistant responses
  */
 export const MarkdownRenderer = memo(function MarkdownRenderer({
@@ -28,14 +69,21 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
 }: MarkdownRendererProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // Memoize the processed content to avoid re-renders during streaming
-  const processedContent = useMemo(() => {
-    // Add a blinking cursor at the end if streaming
-    if (isStreaming && content) {
-      return content + "▊";
+  // Extract actions and create placeholders
+  const { processedContent: contentWithPlaceholders, actions } = useMemo(() => {
+    if (isStreaming) {
+      return { processedContent: content, actions: new Map<string, AIAction>() };
     }
-    return content;
+    return extractActions(content);
   }, [content, isStreaming]);
+
+  // Add blinking cursor if streaming
+  const displayContent = useMemo(() => {
+    if (isStreaming && contentWithPlaceholders) {
+      return contentWithPlaceholders + "▊";
+    }
+    return contentWithPlaceholders;
+  }, [contentWithPlaceholders, isStreaming]);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -43,8 +91,49 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  /**
+   * Process text nodes to replace action placeholders with actual buttons
+   */
+  const processTextWithActions = (text: string): ReactNode => {
+    if (!text || actions.size === 0) return text;
+
+    const parts: ReactNode[] = [];
+    let lastIndex = 0;
+    const regex = /__ACTION_(\d+)__/g;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      // Add text before the placeholder
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      // Add the action button
+      const placeholder = match[0];
+      const action = actions.get(placeholder);
+      if (action) {
+        parts.push(
+          <AIActionButton
+            key={placeholder}
+            action={action}
+            className="inline-flex mx-1 my-0.5 align-middle"
+          />
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
+  };
+
   return (
-    <div className={cn("markdown-content text-sm", className)}>
+    <div className={cn("markdown-content text-sm leading-relaxed", className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -66,29 +155,59 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
           ),
           
           // Paragraphs - improved line height and spacing
-          p: ({ children }) => (
-            <p className="mb-2.5 last:mb-0 leading-relaxed text-foreground/90">
-              {children}
-            </p>
-          ),
+          p: ({ children }) => {
+            // Process children to handle action placeholders
+            const processedChildren = Array.isArray(children)
+              ? children.map((child, i) =>
+                  typeof child === "string" ? (
+                    <span key={i}>{processTextWithActions(child)}</span>
+                  ) : (
+                    child
+                  )
+                )
+              : typeof children === "string"
+              ? processTextWithActions(children)
+              : children;
+
+            return (
+              <p className="mb-3 last:mb-0 leading-[1.7] text-foreground/90">
+                {processedChildren}
+              </p>
+            );
+          },
           
           // Lists - better visual hierarchy
           ul: ({ children }) => (
-            <ul className="mb-2.5 space-y-1.5 pl-0">
+            <ul className="mb-3 space-y-1.5 pl-0">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="mb-2.5 space-y-1.5 pl-0 list-decimal list-inside">
+            <ol className="mb-3 space-y-1.5 pl-0 list-decimal list-inside">
               {children}
             </ol>
           ),
-          li: ({ children }) => (
-            <li className="leading-relaxed text-foreground/90 flex items-start gap-2">
-              <span className="text-primary/70 mt-1.5 shrink-0">•</span>
-              <span className="flex-1">{children}</span>
-            </li>
-          ),
+          li: ({ children }) => {
+            // Process children to handle action placeholders
+            const processedChildren = Array.isArray(children)
+              ? children.map((child, i) =>
+                  typeof child === "string" ? (
+                    <span key={i}>{processTextWithActions(child)}</span>
+                  ) : (
+                    child
+                  )
+                )
+              : typeof children === "string"
+              ? processTextWithActions(children)
+              : children;
+
+            return (
+              <li className="leading-[1.7] text-foreground/90 flex items-start gap-2">
+                <span className="text-primary/70 mt-1.5 shrink-0">•</span>
+                <span className="flex-1">{processedChildren}</span>
+              </li>
+            );
+          },
           
           // Code blocks - enhanced styling with better copy button
           code: ({ className, children, ...props }) => {
@@ -151,7 +270,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
           
           // Block quotes - refined styling
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-primary/40 pl-3 my-2.5 text-foreground/80 italic">
+            <blockquote className="border-l-2 border-primary/40 pl-3 my-3 text-foreground/80 italic">
               {children}
             </blockquote>
           ),
@@ -191,10 +310,17 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
           // Horizontal rule
           hr: () => <hr className="my-4 border-border/50" />,
           
-          // Strong and emphasis
-          strong: ({ children }) => (
-            <strong className="font-semibold text-foreground">{children}</strong>
-          ),
+          // Strong and emphasis - more prominent styling
+          strong: ({ children }) => {
+            // Process children to handle action placeholders
+            const processedChildren = typeof children === "string"
+              ? processTextWithActions(children)
+              : children;
+
+            return (
+              <strong className="font-semibold text-foreground">{processedChildren}</strong>
+            );
+          },
           em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
           
           // Task lists (GFM)
@@ -207,9 +333,17 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               {...props}
             />
           ),
+
+          // Text nodes - process for action placeholders
+          text: ({ children }) => {
+            if (typeof children === "string") {
+              return <>{processTextWithActions(children)}</>;
+            }
+            return <>{children}</>;
+          },
         }}
       >
-        {processedContent}
+        {displayContent}
       </ReactMarkdown>
     </div>
   );
