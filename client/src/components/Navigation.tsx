@@ -134,9 +134,9 @@ export function Navigation() {
         <Button
           size="sm"
           variant="outline"
-          className="navbar-quick-action h-11 min-w-[44px] min-h-[44px] gap-1.5 px-3 group relative overflow-hidden border-primary/50 hover:border-primary hover:bg-primary/10 text-primary transition-all duration-200"
+          className="navbar-quick-action h-11 min-w-[44px] min-h-[44px] gap-1.5 px-2 sm:px-3 w-11 sm:w-auto group relative overflow-hidden border-primary/50 hover:border-primary hover:bg-primary/10 text-primary transition-all duration-200"
         >
-          <Plus weight="bold" className="h-4 w-4 transition-transform duration-200 group-hover:rotate-90" />
+          <Plus weight="bold" className="h-4 w-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-90" />
           <span className="hidden sm:inline">New</span>
         </Button>
       </DropdownMenuTrigger>
@@ -517,12 +517,12 @@ export function Navigation() {
               variant="ghost"
               size="sm"
               onClick={() => setSearchOpen(true)}
-              className="h-11 min-h-[44px] min-w-[44px] gap-2 px-3 text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              className="h-11 min-h-[44px] min-w-[44px] gap-2 px-3 sm:px-4 text-muted-foreground hover:text-foreground hover:bg-accent/50"
               aria-label="Open search (Cmd+K)"
               data-onboarding="search-bar"
             >
-              <Search className="h-4 w-4" />
-              <span className="hidden md:inline">Search</span>
+              <Search className="h-4 w-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Search</span>
               <kbd className="hidden lg:inline-flex pointer-events-none h-5 select-none items-center gap-1 rounded border border-border/50 bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 ⌘K
               </kbd>
@@ -535,10 +535,10 @@ export function Navigation() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex items-center justify-center rounded-full h-11 w-11 min-w-[44px] min-h-[44px] hover:ring-2 hover:ring-primary/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="flex items-center justify-center rounded-full h-10 w-10 sm:h-11 sm:w-11 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] hover:ring-2 hover:ring-primary/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary"
                   aria-label="User menu"
                 >
-                  {user && <UserAvatar user={user} size={44} />}
+                  {user && <UserAvatar user={user} size={40} className="sm:w-11 sm:h-11" />}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -585,14 +585,14 @@ export function Navigation() {
             {/* Mobile Menu - Visible below lg (1024px) for better tablet experience */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="lg:hidden">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-11 w-11 min-w-[44px] min-h-[44px] transition-all duration-200" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-11 sm:w-11 min-w-[40px] min-h-[40px] sm:min-w-[44px] sm:min-h-[44px] transition-all duration-200"
                   aria-label="Open navigation menu"
                 >
                   <Menu className={cn(
-                    "h-5 w-5 transition-transform duration-300",
+                    "h-5 w-5 flex-shrink-0 transition-transform duration-300",
                     mobileMenuOpen && "rotate-90"
                   )} />
                 </Button>
