@@ -659,10 +659,12 @@
 .navbar-desktop-tablet-nav {
   display: none !important; /* Hidden on mobile/tablet - use !important to override Tailwind */
   align-items: center;
-  gap: var(--space-1); /* 4px base */
+  gap: 2px; /* Minimal gap at base */
   flex: 1;
+  min-width: 0; /* Allow shrinking */
   justify-content: center;
-  margin: 0 var(--space-4); /* 16px */
+  margin: 0 var(--space-2); /* Reduced margin */
+  overflow: hidden; /* Prevent overflow */
 }
 
 /* Show desktop nav at lg breakpoint (1024px+) */
@@ -674,14 +676,43 @@
 
 @media (min-width: 1200px) {
   .navbar-desktop-tablet-nav {
+    gap: var(--space-1); /* 4px */
+    margin: 0 var(--space-3); /* 12px */
+  }
+}
+
+@media (min-width: 1400px) {
+  .navbar-desktop-tablet-nav {
     gap: var(--space-2); /* 8px */
-    margin: 0 var(--space-6); /* 24px */
+    margin: 0 var(--space-4); /* 16px */
   }
 }
 
 @media (min-width: 1536px) {
   .navbar-desktop-tablet-nav {
     gap: var(--space-3); /* 12px */
+    margin: 0 var(--space-6); /* 24px */
+  }
+}
+
+/* Nav items should shrink if needed */
+.navbar-desktop-tablet-nav > a,
+.navbar-desktop-tablet-nav > button,
+.navbar-desktop-tablet-nav > div {
+  flex-shrink: 0;
+}
+
+/* At smaller desktop sizes, reduce nav item padding */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .navbar-desktop-tablet-nav > a,
+  .navbar-desktop-tablet-nav > button {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  .navbar-desktop-tablet-nav > a > span,
+  .navbar-desktop-tablet-nav > button > span {
+    font-size: 0.8125rem; /* 13px */
   }
 }
 

@@ -219,28 +219,28 @@ export function Navigation() {
       <Link
         href="/dashboard"
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
             isActive("/dashboard") 
               ? "bg-accent text-foreground" 
               : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           )}
         >
-          <NavigationIcon icon={LayoutDashboard} isActive={isActive("/dashboard")} className="h-4 w-4" />
-          <span>Dashboard</span>
+          <NavigationIcon icon={LayoutDashboard} isActive={isActive("/dashboard")} className="h-4 w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">Dashboard</span>
         </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+              "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
               isGroupActive(navigationConfig.billing.items)
                 ? "bg-accent text-foreground"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
             )}
           >
-            <NavigationIcon icon={FileText} isActive={isGroupActive(navigationConfig.billing.items)} className="h-4 w-4" />
-            <span>Billing</span>
+            <NavigationIcon icon={FileText} isActive={isGroupActive(navigationConfig.billing.items)} className="h-4 w-4 flex-shrink-0" />
+            <span className="whitespace-nowrap">Billing</span>
             <ChevronDown className="h-3 w-3 opacity-60" />
           </button>
         </DropdownMenuTrigger>
@@ -259,28 +259,28 @@ export function Navigation() {
         <Link
           href="/clients"
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
             isActive("/clients")
               ? "bg-accent text-foreground"
               : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           )}
         >
-          <NavigationIcon icon={Users} isActive={isActive("/clients")} className="h-4 w-4" />
-          <span>Clients</span>
+          <NavigationIcon icon={Users} isActive={isActive("/clients")} className="h-4 w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">Clients</span>
         </Link>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+              "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
               isGroupActive(navigationConfig.finances.items)
                 ? "bg-accent text-foreground"
                 : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
             )}
           >
-            <NavigationIcon icon={BarChart3} isActive={isGroupActive(navigationConfig.finances.items)} className="h-4 w-4" />
-            <span>Finances</span>
+            <NavigationIcon icon={BarChart3} isActive={isGroupActive(navigationConfig.finances.items)} className="h-4 w-4 flex-shrink-0" />
+            <span className="whitespace-nowrap">Finances</span>
             <ChevronDown className="h-3 w-3 opacity-60" />
           </button>
         </DropdownMenuTrigger>
@@ -299,27 +299,27 @@ export function Navigation() {
         <Link
           href="/templates"
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
             isActive("/templates")
               ? "bg-accent text-foreground"
               : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           )}
         >
-          <NavigationIcon icon={LayoutTemplate} isActive={isActive("/templates")} className="h-4 w-4" />
-          <span>Templates</span>
+          <NavigationIcon icon={LayoutTemplate} isActive={isActive("/templates")} className="h-4 w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">Templates</span>
         </Link>
         
         <Link
           href="/docs"
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all min-h-[44px]",
+            "flex items-center gap-1.5 px-2.5 lg:px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-all min-h-[40px]",
             isActive("/docs")
               ? "bg-accent text-foreground"
               : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
           )}
         >
-          <NavigationIcon icon={BookOpen} isActive={isActive("/docs")} className="h-4 w-4" />
-          <span>Docs</span>
+          <NavigationIcon icon={BookOpen} isActive={isActive("/docs")} className="h-4 w-4 flex-shrink-0" />
+          <span className="whitespace-nowrap">Docs</span>
         </Link>
     </div>
   );
