@@ -448,7 +448,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                               <MarkdownRenderer 
                                 content={text} 
                                 isStreaming={message.isStreaming}
-                                className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:my-1.5"
+                                className="max-w-none"
                               />
                               {!message.isStreaming && actions.length > 0 && (
                                 <div className="mt-3 pt-3 border-t border-border/30">

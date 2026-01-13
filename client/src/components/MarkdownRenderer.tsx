@@ -1,7 +1,8 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
+import { Check, Copy } from "lucide-react";
 
 interface MarkdownRendererProps {
   content: string;
@@ -18,12 +19,15 @@ interface MarkdownRendererProps {
  * - Styled code blocks with copy button
  * - Responsive tables
  * - Proper link handling
+ * - Refined typography for AI assistant responses
  */
 export const MarkdownRenderer = memo(function MarkdownRenderer({
   content,
   className,
   isStreaming = false,
 }: MarkdownRendererProps) {
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
   // Memoize the processed content to avoid re-renders during streaming
   const processedContent = useMemo(() => {
     // Add a blinking cursor at the end if streaming
@@ -33,46 +37,68 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
     return content;
   }, [content, isStreaming]);
 
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   return (
-    <div className={cn("markdown-content", className)}>
+    <div className={cn("markdown-content text-sm", className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          // Headings
+          // Headings - refined sizing and spacing
           h1: ({ children }) => (
-            <h1 className="text-xl font-bold mt-4 mb-2 first:mt-0">{children}</h1>
+            <h1 className="text-base font-semibold mt-4 mb-2 first:mt-0 text-foreground">
+              {children}
+            </h1>
           ),
           h2: ({ children }) => (
-            <h2 className="text-lg font-semibold mt-3 mb-2 first:mt-0">{children}</h2>
+            <h2 className="text-sm font-semibold mt-3 mb-1.5 first:mt-0 text-foreground">
+              {children}
+            </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="text-base font-semibold mt-2 mb-1 first:mt-0">{children}</h3>
+            <h3 className="text-sm font-medium mt-2.5 mb-1 first:mt-0 text-foreground">
+              {children}
+            </h3>
           ),
           
-          // Paragraphs
+          // Paragraphs - improved line height and spacing
           p: ({ children }) => (
-            <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+            <p className="mb-2.5 last:mb-0 leading-relaxed text-foreground/90">
+              {children}
+            </p>
           ),
           
-          // Lists
+          // Lists - better visual hierarchy
           ul: ({ children }) => (
-            <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>
+            <ul className="mb-2.5 space-y-1.5 pl-0">
+              {children}
+            </ul>
           ),
           ol: ({ children }) => (
-            <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>
+            <ol className="mb-2.5 space-y-1.5 pl-0 list-decimal list-inside">
+              {children}
+            </ol>
           ),
           li: ({ children }) => (
-            <li className="leading-relaxed">{children}</li>
+            <li className="leading-relaxed text-foreground/90 flex items-start gap-2">
+              <span className="text-primary/70 mt-1.5 shrink-0">•</span>
+              <span className="flex-1">{children}</span>
+            </li>
           ),
           
-          // Code blocks
+          // Code blocks - enhanced styling with better copy button
           code: ({ className, children, ...props }) => {
             const isInline = !className;
+            const codeString = String(children).replace(/\n$/, "");
             
             if (isInline) {
               return (
                 <code
-                  className="px-1.5 py-0.5 rounded bg-muted text-sm font-mono"
+                  className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[13px] font-mono font-medium"
                   {...props}
                 >
                   {children}
@@ -82,78 +108,94 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
             
             // Block code
             const language = className?.replace("language-", "") || "";
+            const isCopied = copiedCode === codeString;
+            
             return (
-              <div className="relative group my-3">
-                {language && (
-                  <div className="absolute top-0 right-0 px-2 py-1 text-xs text-muted-foreground bg-muted/50 rounded-bl rounded-tr-lg">
-                    {language}
-                  </div>
-                )}
-                <pre className="p-3 rounded-lg bg-muted/50 overflow-x-auto">
-                  <code className="text-sm font-mono" {...props}>
+              <div className="relative group my-3 rounded-lg overflow-hidden border border-border/50">
+                {/* Header with language badge */}
+                <div className="flex items-center justify-between px-3 py-1.5 bg-muted/70 border-b border-border/50">
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {language || "code"}
+                  </span>
+                  <button
+                    onClick={() => handleCopyCode(codeString)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2 py-1 text-xs rounded-md transition-all duration-200",
+                      isCopied 
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                        : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3" />
+                        <span>Copy</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                {/* Code content */}
+                <pre className="p-3 bg-muted/30 overflow-x-auto">
+                  <code className="text-[13px] font-mono leading-relaxed" {...props}>
                     {children}
                   </code>
                 </pre>
-                <button
-                  onClick={() => {
-                    const text = String(children).replace(/\n$/, "");
-                    navigator.clipboard.writeText(text);
-                  }}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs bg-background/80 rounded border border-border hover:bg-accent"
-                >
-                  Copy
-                </button>
               </div>
             );
           },
           
-          // Block quotes
+          // Block quotes - refined styling
           blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-primary/30 pl-4 my-2 italic text-muted-foreground">
+            <blockquote className="border-l-2 border-primary/40 pl-3 my-2.5 text-foreground/80 italic">
               {children}
             </blockquote>
           ),
           
-          // Tables
+          // Tables - improved styling
           table: ({ children }) => (
-            <div className="overflow-x-auto my-3">
-              <table className="min-w-full border-collapse text-sm">
+            <div className="overflow-x-auto my-3 rounded-lg border border-border/50">
+              <table className="min-w-full text-sm">
                 {children}
               </table>
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-muted/50">{children}</thead>
+            <thead className="bg-muted/50 border-b border-border/50">{children}</thead>
           ),
           th: ({ children }) => (
-            <th className="px-3 py-2 text-left font-semibold border-b border-border">
+            <th className="px-3 py-2 text-left font-medium text-foreground text-xs uppercase tracking-wide">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="px-3 py-2 border-b border-border/50">{children}</td>
+            <td className="px-3 py-2 border-b border-border/30 text-foreground/90">{children}</td>
           ),
           
-          // Links
+          // Links - styled with primary color
           a: ({ href, children }) => (
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className="text-primary hover:text-primary/80 underline underline-offset-2 decoration-primary/30 hover:decoration-primary/60 transition-colors"
             >
               {children}
             </a>
           ),
           
           // Horizontal rule
-          hr: () => <hr className="my-4 border-border" />,
+          hr: () => <hr className="my-4 border-border/50" />,
           
           // Strong and emphasis
           strong: ({ children }) => (
-            <strong className="font-semibold">{children}</strong>
+            <strong className="font-semibold text-foreground">{children}</strong>
           ),
-          em: ({ children }) => <em className="italic">{children}</em>,
+          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
           
           // Task lists (GFM)
           input: ({ checked, ...props }) => (
@@ -161,7 +203,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               type="checkbox"
               checked={checked}
               readOnly
-              className="mr-2 rounded"
+              className="mr-2 rounded border-border accent-primary"
               {...props}
             />
           ),
