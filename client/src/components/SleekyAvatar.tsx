@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
  * 
  * This component provides consistent styling across all AI features with:
  * - Card-matching border colors (border-border)
- * - Consistent rounded styling
- * - Multiple size variants
+ * - Consistent rounded-xl styling (matching bordered icons)
+ * - Multiple size variants (enlarged for better visibility)
  * - Optional animation states
  * - No internal borders on the PNG image
  */
@@ -31,13 +31,14 @@ interface SleekyAvatarProps {
   alt?: string;
 }
 
+// Enlarged sizes for better visibility
 const sizeClasses: Record<SleekyAvatarSize, string> = {
-  xs: "w-6 h-6",
-  sm: "w-8 h-8",
-  md: "w-12 h-12",
-  lg: "w-16 h-16",
-  xl: "w-24 h-24",
-  "2xl": "w-32 h-32",
+  xs: "w-8 h-8",      // was w-6 h-6
+  sm: "w-10 h-10",    // was w-8 h-8
+  md: "w-14 h-14",    // was w-12 h-12
+  lg: "w-20 h-20",    // was w-16 h-16
+  xl: "w-28 h-28",    // was w-24 h-24
+  "2xl": "w-36 h-36", // was w-32 h-32
 };
 
 const borderSizeClasses: Record<SleekyAvatarSize, string> = {
@@ -47,6 +48,16 @@ const borderSizeClasses: Record<SleekyAvatarSize, string> = {
   lg: "ring-2",
   xl: "ring-2",
   "2xl": "ring-[3px]",
+};
+
+// Border radius matching bordered icons (rounded-xl)
+const borderRadiusClasses: Record<SleekyAvatarSize, string> = {
+  xs: "rounded-lg",
+  sm: "rounded-lg",
+  md: "rounded-xl",
+  lg: "rounded-xl",
+  xl: "rounded-2xl",
+  "2xl": "rounded-2xl",
 };
 
 export function SleekyAvatar({
@@ -65,9 +76,10 @@ export function SleekyAvatar({
     <Component
       onClick={onClick}
       className={cn(
-        "relative inline-flex items-center justify-center rounded-full overflow-hidden",
+        "relative inline-flex items-center justify-center overflow-hidden",
         "transition-all duration-300",
         sizeClasses[size],
+        borderRadiusClasses[size], // Use matching border radius instead of rounded-full
         // Border styling matching card borders
         bordered && [
           borderSizeClasses[size],
@@ -96,7 +108,7 @@ export function SleekyAvatar({
       <img
         src="/sleeky/sleekyAI-Avatar.png"
         alt={alt}
-        className="w-full h-full object-cover"
+        className={cn("w-full h-full object-cover", borderRadiusClasses[size])}
         draggable={false}
       />
 
@@ -104,7 +116,8 @@ export function SleekyAvatar({
       {state !== "idle" && (
         <div
           className={cn(
-            "absolute inset-0 rounded-full pointer-events-none",
+            "absolute inset-0 pointer-events-none",
+            borderRadiusClasses[size],
             state === "thinking" && "bg-primary/10 animate-pulse",
             state === "talking" && "bg-primary/20",
             state === "success" && "bg-emerald-500/20"

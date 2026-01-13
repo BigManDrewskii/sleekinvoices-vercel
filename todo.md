@@ -393,6 +393,14 @@
 - [x] Test all empty states display Sleeky correctly
 
 
+## Sleeky Avatar Styling Update (Jan 13, 2026)
+
+- [x] Enlarged avatar sizes for better visibility (all sizes increased)
+- [x] Changed border radius from rounded-full to rounded-xl (matching bordered icons)
+- [x] Updated Orb component with same treatment and new unified image
+- [x] Swapped Orb image to use unified sleekyAI-Avatar.png
+
+
 ## Update Sleeky Images with Larger Versions
 
 - [x] Replace existing Sleeky images with new larger versions
