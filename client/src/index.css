@@ -383,14 +383,14 @@ label {
 
 /* Numeric values - amounts, dates, invoice numbers */
 .font-numeric {
-  font-family: var(--font-mono); /* Atkinson Hyperlegible Mono - ONLY for numbers */
+  font-family: var(--font-numeric); /* SUSE Mono - ONLY for numbers */
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
 }
 
 /* Bold numeric values - for prominent amounts like totals and prices */
 .font-numeric-bold {
-  font-family: var(--font-mono); /* Atkinson Hyperlegible Mono - ONLY for numbers */
+  font-family: var(--font-numeric); /* SUSE Mono - ONLY for numbers */
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
   font-weight: 700;

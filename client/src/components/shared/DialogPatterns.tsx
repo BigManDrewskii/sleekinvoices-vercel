@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
+import { Loader2, type LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 /**
@@ -14,7 +14,7 @@ export function DialogIconHeader({
   variant = "primary",
   size = "md",
 }: {
-  icon: any;
+  icon: LucideIcon;
   title: string;
   variant?: "primary" | "destructive" | "success" | "warning";
   size?: "sm" | "md" | "lg";
@@ -123,7 +123,7 @@ export function DialogCenteredIconHeader({
   variant = "primary",
   size = "md",
 }: {
-  icon: any;
+  icon: LucideIcon;
   variant?: "primary" | "destructive" | "success" | "warning";
   size?: "sm" | "md" | "lg";
 }) {

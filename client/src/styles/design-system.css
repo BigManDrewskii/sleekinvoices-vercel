@@ -484,21 +484,14 @@
   max-width: var(--max-w-content);
   margin-left: auto;
   margin-right: auto;
-  padding-left: var(--space-4);
-  padding-right: var(--space-4);
+  padding-left: clamp(1rem, 2vw + 0.5rem, 2rem);
+  padding-right: clamp(1rem, 2vw + 0.5rem, 2rem);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1536px) {
   .navbar-container {
-    padding-left: var(--space-6);
-    padding-right: var(--space-6);
-  }
-}
-
-@media (min-width: 1200px) {
-  .navbar-container {
-    padding-left: var(--space-8);
-    padding-right: var(--space-8);
+    padding-left: var(--space-10);
+    padding-right: var(--space-10);
   }
 }
 
@@ -506,20 +499,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3); /* 12px mobile */
-  height: 64px; /* Fixed height for consistency */
-}
-
-@media (min-width: 640px) {
-  .navbar-inner {
-    gap: var(--space-4); /* 16px tablet+ */
-  }
-}
-
-@media (min-width: 1024px) {
-  .navbar-inner {
-    gap: var(--space-5); /* 20px desktop */
-  }
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  height: clamp(56px, 8vh, 72px);
 }
 
 /* Logo container with dynamic sizing */
@@ -537,9 +518,9 @@
 /* Wide logo - only on desktop (1024px+) */
 .navbar-logo-wide {
   display: none;
-  height: 28px;
+  height: clamp(32px, 4vh, 40px);
   width: auto;
-  max-width: 180px;
+  max-width: clamp(180px, 15vw, 220px);
   /* Snappy transitions */
   transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
               filter 150ms ease-out;
@@ -564,25 +545,15 @@
 /* Compact/Monogram logo - mobile and tablet (< 1024px) */
 .navbar-logo-compact {
   display: block;
-  height: 36px;
-  width: 36px;
-  min-width: 36px;
-  max-width: 36px;
+  height: clamp(32px, 8vw, 36px);
+  width: clamp(32px, 8vw, 36px);
+  min-width: clamp(32px, 8vw, 36px);
+  max-width: clamp(32px, 8vw, 36px);
   /* Snappy transitions with bounce effect */
   transition: transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
               filter 150ms ease-out,
               drop-shadow 200ms ease-out;
   will-change: transform;
-}
-
-/* Slightly larger on tablet for better visibility */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .navbar-logo-compact {
-    height: 40px;
-    width: 40px;
-    min-width: 40px;
-    max-width: 40px;
-  }
 }
 
 .navbar-logo:hover .navbar-logo-compact {
@@ -604,32 +575,8 @@
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2); /* 8px mobile */
+  gap: clamp(0.5rem, 1vw, 1rem);
   flex-shrink: 0;
-}
-
-@media (min-width: 640px) {
-  .navbar-actions {
-    gap: var(--space-2); /* 8px small tablet */
-  }
-}
-
-@media (min-width: 768px) {
-  .navbar-actions {
-    gap: var(--space-3); /* 12px tablet */
-  }
-}
-
-@media (min-width: 1024px) {
-  .navbar-actions {
-    gap: var(--space-3); /* 12px desktop */
-  }
-}
-
-@media (min-width: 1200px) {
-  .navbar-actions {
-    gap: var(--space-4); /* 16px large desktop */
-  }
 }
 
 /* Ensure all navbar buttons meet 44px touch target on mobile and tablet */
@@ -641,40 +588,33 @@
   }
 }
 
-/* Tablet-specific styles (768px - 1023px) - uses hamburger menu */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .navbar-inner {
-    height: 64px;
-    gap: var(--space-4);
-  }
-  
-  .navbar-container {
-    padding-left: var(--space-5);
-    padding-right: var(--space-5);
-  }
-}
 
 /* Desktop navigation container (1024px+) */
 .navbar-desktop-tablet-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: clamp(0.5rem, 1vw + 0.25rem, 1rem);
   flex: 1;
   justify-content: center;
-  margin: 0 var(--space-2);
+  margin: 0 clamp(0.75rem, 2vw, 2rem);
 }
 
-@media (min-width: 1200px) {
+/* Ultra-wide condensation (1536px+) */
+@media (min-width: 1536px) {
+  .navbar-inner {
+    height: clamp(60px, 6vh, 68px);
+  }
+
   .navbar-desktop-tablet-nav {
-    gap: var(--space-2);
-    margin: 0 var(--space-4);
+    gap: clamp(0.75rem, 1.2vw, 1.25rem);
   }
 }
 
-@media (min-width: 1440px) {
-  .navbar-desktop-tablet-nav {
-    gap: var(--space-3);
-    margin: 0 var(--space-6);
+/* Ultra-wide enhanced padding (1920px+) */
+@media (min-width: 1920px) {
+  .navbar-container {
+    padding-left: clamp(2rem, 3vw, 3rem);
+    padding-right: clamp(2rem, 3vw, 3rem);
   }
 }
 
