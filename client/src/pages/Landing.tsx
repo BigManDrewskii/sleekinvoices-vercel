@@ -39,7 +39,7 @@ export default function Landing() {
           {/* Sleeky Mascot - Animated hero */}
           <div className="mb-8">
             <video
-              src="/sleeky-hero.webm"
+              src="/webm-web-optimized.webm"
               autoPlay
               loop
               muted
