@@ -23,8 +23,8 @@ import {
 import { Link } from "wouter";
 import { LandingNavigation } from "@/components/LandingNavigation";
 import { DemoVideoSection } from "@/components/landing/DemoVideoSection";
-import { AIActionFeed } from "@/components/landing/AIActionFeed";
-import { AnimatedProductDemo } from "@/components/landing/AnimatedProductDemo";
+import { DashboardMockup } from "@/components/landing/DashboardMockup";
+import { InvoiceJourney } from "@/components/landing/InvoiceJourney";
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
@@ -98,107 +98,91 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Product Screenshot Placeholder */}
-          <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
-            <div className="relative w-full bg-white/10 backdrop-blur-sm" style={{ paddingBottom: "56.25%" }}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                <div className="text-center">
-                  <Sparkles className="h-16 w-16 md:h-20 md:w-20 text-white/80 mx-auto mb-4" />
-                  <p className="text-white/90 text-lg md:text-xl font-semibold">
-                    Product dashboard coming soon
-                  </p>
-                  <p className="text-white/70 text-sm md:text-base mt-2">
-                    See the full experience in our docs
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Dashboard Mockup */}
+          <DashboardMockup />
         </div>
       </section>
 
-      {/* AI-Powered Features Narrative - Headroom-inspired */}
+      {/* How It Works - Single Column Journey */}
       <section id="features" className="py-24 md:py-32">
-        <div className="container max-w-6xl mx-auto px-6">
-          <div className="text-center mb-20">
+        <div className="container max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 uppercase tracking-tight">
-              AI does the work,
+              From idea to invoice
               <br />
-              <span className="text-primary">You get paid</span>
+              <span className="text-primary">in seconds</span>
             </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Watch SleekInvoices handle your invoicing workflow automatically,
-              from creation to payment tracking.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              No forms. No templates. Just tell Sleeky what you did and watch the magic happen.
             </p>
           </div>
 
-          {/* Two-column layout: AI Actions + Product Demo */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            {/* Left: AI Action Feed */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                  Real-time automation
-                </h3>
-                <p className="text-base md:text-lg text-muted-foreground">
-                  See how AI handles every step of your invoicing process
-                </p>
-              </div>
-              <AIActionFeed />
-            </div>
-
-            {/* Right: Product Demo */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                  Your invoicing journey
-                </h3>
-                <p className="text-base md:text-lg text-muted-foreground">
-                  From blank canvas to payment received in seconds
-                </p>
-              </div>
-              <AnimatedProductDemo />
-            </div>
-          </div>
+          {/* Single Column Journey */}
+          <InvoiceJourney />
         </div>
       </section>
 
-      {/* Crypto Highlight - Streamlined */}
-      <section className="py-20 md:py-24 border-y border-border/50">
-        <div className="container max-w-4xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-10">
-            <div className="flex-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 text-orange-400 text-sm font-medium mb-4">
-                <Bitcoin className="h-4 w-4" />
-                Exclusive
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-foreground mb-4 uppercase">
-                Accept crypto payments
-              </h2>
-              <p className="text-muted-foreground mb-5">
-                The only invoicing tool with native crypto support. 
-                No chargebacks, instant settlement.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 rounded-full bg-card border border-border text-sm text-foreground/80">BTC</span>
-                <span className="px-3 py-1.5 rounded-full bg-card border border-border text-sm text-foreground/80">ETH</span>
-                <span className="px-3 py-1.5 rounded-full bg-card border border-border text-sm text-foreground/80">USDT</span>
-                <span className="px-3 py-1.5 rounded-full bg-card border border-border text-sm text-foreground/80">+300 more</span>
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-5 rounded-xl bg-card border border-border text-center">
-                  <div className="text-xl font-bold text-foreground">0</div>
-                  <div className="text-xs text-muted-foreground">Chargebacks</div>
+      {/* Crypto Payments - Clean Card Design */}
+      <section className="py-20 md:py-28">
+        <div className="container max-w-5xl mx-auto px-6">
+          <div className="relative rounded-3xl overflow-hidden">
+            {/* Gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-yellow-500/10" />
+            <div className="absolute inset-0 bg-card/80 backdrop-blur-sm" />
+            
+            {/* Content */}
+            <div className="relative p-8 md:p-12 lg:p-16">
+              <div className="grid md:grid-cols-2 gap-10 items-center">
+                {/* Left: Content */}
+                <div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 mb-6">
+                    <Bitcoin className="h-5 w-5 text-orange-400" />
+                    <span className="text-sm font-semibold text-orange-400">Crypto-Native</span>
+                  </div>
+                  
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4 uppercase tracking-tight">
+                    Get paid in crypto
+                  </h2>
+                  
+                  <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                    Accept Bitcoin, Ethereum, and 300+ cryptocurrencies. 
+                    Instant settlement, zero chargebacks, global reach.
+                  </p>
+                  
+                  {/* Crypto badges */}
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-sm font-semibold text-orange-400">BTC</span>
+                    <span className="px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-sm font-semibold text-blue-400">ETH</span>
+                    <span className="px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-sm font-semibold text-green-400">USDT</span>
+                    <span className="px-4 py-2 rounded-xl bg-muted/50 border border-border text-sm font-semibold text-muted-foreground">+300 more</span>
+                  </div>
                 </div>
-                <div className="p-5 rounded-xl bg-card border border-border text-center">
-                  <div className="text-xl font-bold text-foreground">24/7</div>
-                  <div className="text-xs text-muted-foreground">Settlement</div>
-                </div>
-                <div className="p-5 rounded-xl bg-card border border-border text-center">
-                  <div className="text-xl font-bold text-foreground">1%</div>
-                  <div className="text-xs text-muted-foreground">Fee</div>
+                
+                {/* Right: Stats */}
+                <div className="space-y-4">
+                  <div className="p-6 rounded-2xl bg-background/50 border border-border/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Chargebacks</span>
+                      <span className="text-3xl font-black text-green-500">0%</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">Crypto payments are final and irreversible</p>
+                  </div>
+                  
+                  <div className="p-6 rounded-2xl bg-background/50 border border-border/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Settlement</span>
+                      <span className="text-3xl font-black text-primary">Instant</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">Funds available immediately, 24/7/365</p>
+                  </div>
+                  
+                  <div className="p-6 rounded-2xl bg-background/50 border border-border/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Processing Fee</span>
+                      <span className="text-3xl font-black text-foreground">1%</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">Lower than credit cards, no hidden fees</p>
+                  </div>
                 </div>
               </div>
             </div>

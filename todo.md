@@ -591,3 +591,14 @@
 - [x] Fix desktop navbar being cut off after adding Docs link
 - [x] Ensure proper spacing and overflow handling
 - [x] Test across all viewport sizes
+
+
+---
+
+## 🎨 Landing Page Refinements - Jan 13, 2026
+
+- [x] Replace dashboard placeholder with minified mockup of actual dashboard UI
+- [x] Refine AI automation section to single column with valid details
+- [x] Improve crypto payments section UI
+- [x] Create better animation with modern design and improved copy
+- [x] Remove unnecessary design elements
