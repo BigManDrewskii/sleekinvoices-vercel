@@ -21,7 +21,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
-import { Navigation } from "@/components/Navigation";
+import { PageLayout } from "@/components/layout/PageLayout";
 import { CurrencySelector } from "@/components/CurrencySelector";
 import { getCurrencyDecimals, getCurrencySymbol, isCryptoCurrency } from "../../../shared/currencies";
 import { 
@@ -319,18 +319,12 @@ export default function CreateInvoice() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
-      {/* Main Content */}
-      <main id="main-content" className="container mx-auto px-4 py-8" role="main" aria-label="Create Invoice">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Create Invoice</h1>
-            <p className="text-muted-foreground">Fill in the details to create a new invoice</p>
-          </div>
-
-          <div className="space-y-6">
+    <>
+      <PageLayout
+        narrow
+        title="Create Invoice"
+        subtitle="Fill in the details to create a new invoice"
+      >
             {/* Client and Invoice Info */}
             <Card>
               <CardHeader>
@@ -568,9 +562,7 @@ export default function CreateInvoice() {
                 )}
               </Button>
             </div>
-          </div>
-        </div>
-      </main>
+      </PageLayout>
 
       {/* Billable Expenses Dialog */}
       <BillableExpenseDialog
@@ -613,6 +605,6 @@ export default function CreateInvoice() {
           onTemplateChange={setTemplateId}
         />
       )}
-    </div>
+    </>
   );
 }
