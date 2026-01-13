@@ -36,12 +36,15 @@ export default function Landing() {
       {/* Hero Section - Headroom-inspired bold typography */}
       <section className="pt-32 pb-20 md:pt-40 md:pb-28">
         <div className="container max-w-6xl mx-auto px-6 text-center">
-          {/* Sleeky Mascot - Integrated with headline */}
+          {/* Sleeky Mascot - Animated hero */}
           <div className="mb-8">
-            <img
-              src="/sleeky.svg"
-              alt="Sleeky - SleekInvoices mascot"
-              className="h-48 sm:h-56 md:h-64 mx-auto sleeky-float"
+            <video
+              src="/sleeky-hero.webm"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-48 sm:h-56 md:h-64 mx-auto"
             />
           </div>
 
