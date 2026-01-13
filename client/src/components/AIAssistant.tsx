@@ -570,8 +570,8 @@ export function AIAssistantTrigger({ onClick, className }: { onClick: () => void
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
       />
       {credits && credits.remaining > 0 && (
-        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md ring-2 ring-background z-10">
-          {credits.remaining > 9 ? "9+" : credits.remaining}
+        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md ring-2 ring-background z-10">
+          {credits.remaining}
         </span>
       )}
     </div>

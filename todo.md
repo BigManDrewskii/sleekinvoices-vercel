@@ -539,3 +539,6 @@
 - [x] Fix action button syntax showing as raw text instead of buttons
 - [x] Improve bold text rendering for better prominence
 - [x] Ensure proper paragraph spacing in AI responses
+
+## AI Credits Badge Enhancement (Jan 13, 2026)
+- [x] Make AI credits badge show exact count dynamically instead of capping at 9+
