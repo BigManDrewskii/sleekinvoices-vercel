@@ -45,14 +45,14 @@ export function LandingNavigation() {
 
   return (
     <nav
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl transition-all duration-300 ${
+      className={`fixed top-3 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl transition-all duration-300 ${
         scrolled
           ? "bg-background/90 backdrop-blur-xl border border-border shadow-lg shadow-black/20"
           : "bg-transparent"
       } rounded-full`}
     >
-      <div className="px-3 sm:px-6 py-2.5">
-        <div className="flex items-center justify-between gap-2">
+      <div className="px-5 sm:px-6 py-2.5">
+        <div className="flex items-center justify-between gap-3">
           {/* Logo */}
           <Link
             href="/landing"
@@ -62,14 +62,12 @@ export function LandingNavigation() {
             <img
               src="/logos/wide/SleekInvoices-Logo-Wide.svg"
               alt=""
-              role="presentation"
               className="h-5 sm:h-6 w-auto max-w-[120px] sm:max-w-none transition-transform duration-150 ease-out group-hover:scale-[1.03]"
-              style={{ filter: "brightness(1.1)" }}
             />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-2">
             <button
               type="button"
               onClick={() => scrollToSection("features")}
@@ -86,7 +84,9 @@ export function LandingNavigation() {
             </button>
             <button
               type="button"
-              onClick={() => (window.location.href = "/docs")}
+              onClick={() => {
+                window.location.href = "/docs";
+              }}
               className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-full transition-all"
             >
               Docs
@@ -101,7 +101,7 @@ export function LandingNavigation() {
           </div>
 
           {/* Auth CTAs - Desktop */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-3">
             {loading ? (
               <div className="flex items-center gap-2 px-4 py-2">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -139,7 +139,7 @@ export function LandingNavigation() {
               variant="ghost"
               size="icon"
               aria-label="Open navigation menu"
-              className="lg:hidden rounded-full -mr-2"
+              className="lg:hidden rounded-full"
             >
               <Menu className="h-5 w-5" />
             </Button>
@@ -147,12 +147,7 @@ export function LandingNavigation() {
         </div>
       </div>
       {/* ARIA live region for scroll announcements */}
-      <div
-        className="sr-only"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
         {scrollAnnouncement}
       </div>
     </nav>
