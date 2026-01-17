@@ -154,20 +154,14 @@ const expectedSchema = {
     'id', 'userId', 'feature', 'inputTokens', 'outputTokens', 'model',
     'success', 'errorMessage', 'createdAt'
   ],
-  promoCodes: [
-    'id', 'code', 'type', 'value', 'maxUses', 'usedCount', 'validFrom',
-    'validUntil', 'isActive', 'createdBy', 'createdAt'
-  ],
-  promoCodeRedemptions: [
-    'id', 'promoCodeId', 'userId', 'redeemedAt'
-  ],
+
   quickbooksConnections: [
-    'id', 'userId', 'realmId', 'accessToken', 'refreshToken', 'accessTokenExpiresAt',
-    'refreshTokenExpiresAt', 'companyName', 'isActive', 'lastSyncAt', 'createdAt', 'updatedAt'
+    'id', 'userId', 'realmId', 'accessToken', 'refreshToken', 'tokenExpiresAt',
+    'refreshTokenExpiresAt', 'companyName', 'isActive', 'environment', 'lastSyncAt', 'createdAt', 'updatedAt'
   ],
-  quickbooksSyncLogs: [
-    'id', 'userId', 'entityType', 'entityId', 'quickbooksId', 'action',
-    'status', 'errorMessage', 'createdAt'
+  quickbooksSyncLog: [
+    'id', 'userId', 'entityType', 'localEntityId', 'qbEntityId', 'syncDirection',
+    'syncStatus', 'errorCode', 'errorMessage', 'syncedAt', 'createdAt'
   ]
 };
 

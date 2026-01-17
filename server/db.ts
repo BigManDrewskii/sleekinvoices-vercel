@@ -96,6 +96,9 @@ export async function getDb() {
         multipleStatements: false,
         supportBigNumbers: true,
         bigNumberStrings: false,
+        ssl: {
+          rejectUnauthorized: true,
+        },
       };
 
       _pool = mysql.createPool(connectionConfig) as unknown as Exclude<
