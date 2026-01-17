@@ -21,12 +21,15 @@ let sentryInitialized = false;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let Sentry: any = null;
 
+// Hardcoded Sentry DSN for server-side monitoring
+const SENTRY_DSN = 'https://8b4b2baee3c20047bad87165533e755f@o4510235027636224.ingest.de.sentry.io/4510235029798992';
+
 /**
  * Initialize error monitoring
  * Call this at server startup
  */
 export async function initializeErrorMonitoring(): Promise<void> {
-  const dsn = process.env.SENTRY_DSN;
+  const dsn = process.env.SENTRY_DSN || SENTRY_DSN;
   
   if (!dsn) {
     console.log('[ErrorMonitoring] No SENTRY_DSN configured - using console logging only');

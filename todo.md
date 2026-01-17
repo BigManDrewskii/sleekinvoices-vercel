@@ -383,3 +383,13 @@
 - [x] Add error boundary for React components
 - [x] Write and pass integration tests (5 tests passing)
 - [ ] Verify errors appear in Sentry dashboard (requires production deployment)
+
+
+---
+
+## 🔍 Sentry Server-Side Monitoring - Jan 17, 2026
+
+- [x] Install @sentry/node package
+- [x] Configure Sentry initialization in server/_core/errorMonitoring.ts with hardcoded DSN
+- [x] Error handling already configured (uncaughtException, unhandledRejection handlers)
+- [x] Write and pass integration tests (12 tests passing - 5 client, 7 server)

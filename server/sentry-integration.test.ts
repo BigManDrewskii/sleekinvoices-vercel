@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Test both client and server Sentry integration
+
 describe('Sentry Integration', () => {
   it('should have @sentry/react installed', () => {
     const packageJsonPath = path.join(__dirname, '..', 'package.json');
@@ -47,5 +49,63 @@ describe('Sentry Integration', () => {
     const mainTsxContent = fs.readFileSync(mainTsxPath, 'utf-8');
     
     expect(mainTsxContent).toContain('tracesSampleRate:');
+  });
+});
+
+describe('Sentry Server-Side Integration', () => {
+  it('should have @sentry/node installed', () => {
+    const packageJsonPath = path.join(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    
+    expect(packageJson.dependencies['@sentry/node']).toBeDefined();
+  });
+
+  it('should have errorMonitoring module with Sentry DSN', () => {
+    const errorMonitoringPath = path.join(__dirname, '..', 'server', '_core', 'errorMonitoring.ts');
+    const errorMonitoringContent = fs.readFileSync(errorMonitoringPath, 'utf-8');
+    
+    // Check for Sentry DSN configuration
+    expect(errorMonitoringContent).toContain('SENTRY_DSN');
+    expect(errorMonitoringContent).toContain('o4510235027636224.ingest.de.sentry.io');
+  });
+
+  it('should have initializeErrorMonitoring function', () => {
+    const errorMonitoringPath = path.join(__dirname, '..', 'server', '_core', 'errorMonitoring.ts');
+    const errorMonitoringContent = fs.readFileSync(errorMonitoringPath, 'utf-8');
+    
+    expect(errorMonitoringContent).toContain('export async function initializeErrorMonitoring');
+  });
+
+  it('should have captureException function', () => {
+    const errorMonitoringPath = path.join(__dirname, '..', 'server', '_core', 'errorMonitoring.ts');
+    const errorMonitoringContent = fs.readFileSync(errorMonitoringPath, 'utf-8');
+    
+    expect(errorMonitoringContent).toContain('export function captureException');
+  });
+
+  it('should initialize Sentry in server startup', () => {
+    const indexPath = path.join(__dirname, '..', 'server', '_core', 'index.ts');
+    const indexContent = fs.readFileSync(indexPath, 'utf-8');
+    
+    // Check for error monitoring initialization
+    expect(indexContent).toContain('initializeErrorMonitoring');
+    expect(indexContent).toContain('captureException');
+  });
+
+  it('should handle uncaught exceptions', () => {
+    const indexPath = path.join(__dirname, '..', 'server', '_core', 'index.ts');
+    const indexContent = fs.readFileSync(indexPath, 'utf-8');
+    
+    expect(indexContent).toContain("process.on('uncaughtException'");
+    expect(indexContent).toContain("process.on('unhandledRejection'");
+  });
+
+  it('should scrub sensitive headers before sending to Sentry', () => {
+    const errorMonitoringPath = path.join(__dirname, '..', 'server', '_core', 'errorMonitoring.ts');
+    const errorMonitoringContent = fs.readFileSync(errorMonitoringPath, 'utf-8');
+    
+    expect(errorMonitoringContent).toContain('beforeSend');
+    expect(errorMonitoringContent).toContain("delete headers['authorization']");
+    expect(errorMonitoringContent).toContain("delete headers['cookie']");
   });
 });
