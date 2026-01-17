@@ -12,6 +12,7 @@ function createAuthContext(): TrpcContext {
     name: "Test User",
     loginMethod: "manus",
     role: "user",
+    subscriptionStatus: "active", // Pro subscription to bypass invoice limit
     createdAt: new Date(),
     updatedAt: new Date(),
     lastSignedIn: new Date(),
@@ -41,8 +42,9 @@ describe("Expense Categories", () => {
       color: "#3B82F6",
     });
 
-    expect(result).toHaveProperty("success");
-    expect(result.success).toBe(true);
+    // createExpenseCategory now returns the created category with id
+    expect(result).toHaveProperty("id");
+    expect(result.id).toBeGreaterThan(0);
   });
 
   it("lists expense categories", async () => {
@@ -76,8 +78,9 @@ describe("Expenses", () => {
         description: "Flight to conference",
       });
 
-      expect(result).toHaveProperty("success");
-      expect(result.success).toBe(true);
+      // createExpense now returns the created expense object with id
+      expect(result).toHaveProperty("id");
+      expect(result.id).toBeGreaterThan(0);
     }
   });
 

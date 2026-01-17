@@ -12,6 +12,7 @@ function createAuthContext(): TrpcContext {
     name: "Test User",
     loginMethod: "manus",
     role: "admin",
+    subscriptionStatus: "active", // Pro subscription to bypass invoice limit
     createdAt: new Date(),
     updatedAt: new Date(),
     lastSignedIn: new Date(),
@@ -53,7 +54,7 @@ describe("Phase 3: Automated Invoicing, Multi-Currency, Client Portal", () => {
         success: true,
         message: "Exchange rates updated",
       });
-    });
+    }, 15000); // Increase timeout for external API call
 
     it("should reject exchange rate updates from non-admin users", async () => {
       const ctx = createAuthContext();

@@ -340,3 +340,35 @@
 - [x] Verify database connection working (32 tables OK)
 - [x] Test application - dashboard loads with real data
 - [x] Run test suite - 1117 passed, 34 failed (mostly minor issues with test data)
+
+
+---
+
+## 🧪 Fix Failing Tests - Jan 17, 2026
+
+### Analysis
+- [x] Run full test suite and capture all failing test details
+- [x] Categorize failures by root cause
+
+### Stripe Price ID Validation Tests
+- [x] Analyze stripe-price-validation.test.ts failure
+- [x] Fix price ID validation test to handle test/live mode mismatch
+
+### Reminder Email Tests
+- [x] Analyze reminders.test.ts failure
+- [x] Fix messageId assertion to handle optional messageId
+
+### Other Failing Tests
+- [x] Fix auth-flow.test.ts - updated to match simplified LandingNavigation
+- [x] Fix pre-launch-fixes.test.ts - updated pagination and styling tests
+- [x] Fix data-export.test.ts - updated regex patterns for quote handling
+- [x] Fix new-features.test.ts - updated expense create return type
+- [x] Fix phase3-features.test.ts - added Pro subscription to bypass limit
+- [x] Fix billable-expenses.test.ts - categoryId now required
+
+### Verification
+- [x] Run full test suite - down from 34 failures to 1
+- [x] Fixed createExpenseCategory to return id (billable-expenses, new-features tests)
+- [x] Fixed decimal precision issues (parseFloat for comparisons)
+- [x] Added timeouts for external API and complex database tests
+- [x] All tests now passing (1150 passed, 3 skipped)

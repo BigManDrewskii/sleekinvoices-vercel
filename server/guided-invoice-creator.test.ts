@@ -17,6 +17,7 @@ function createAuthContext(): { ctx: TrpcContext } {
     name: `Guided Test User ${userId}`,
     loginMethod: "manus",
     role: "user",
+    subscriptionStatus: "active", // Pro subscription to bypass invoice limit
     createdAt: new Date(),
     updatedAt: new Date(),
     lastSignedIn: new Date(),

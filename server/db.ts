@@ -1409,8 +1409,16 @@ export async function createExpenseCategory(category: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db.insert(expenseCategories).values(category);
-  return { success: true };
+  const result = await db.insert(expenseCategories).values(category);
+  const insertId = result[0].insertId;
+  
+  // Fetch and return the created category
+  const [created] = await db
+    .select()
+    .from(expenseCategories)
+    .where(eq(expenseCategories.id, insertId));
+  
+  return created || { success: true, id: insertId, ...category };
 }
 
 export async function getExpenseCategoriesByUserId(userId: number) {
@@ -1462,8 +1470,16 @@ export async function createExpense(expense: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db.insert(expenses).values(expense);
-  return { success: true };
+  const result = await db.insert(expenses).values(expense);
+  const insertId = result[0].insertId;
+  
+  // Fetch and return the created expense
+  const [created] = await db
+    .select()
+    .from(expenses)
+    .where(eq(expenses.id, insertId));
+  
+  return created || { success: true, id: insertId, ...expense };
 }
 
 export async function getExpensesByUserId(

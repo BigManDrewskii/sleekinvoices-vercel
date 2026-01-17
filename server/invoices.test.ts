@@ -12,6 +12,7 @@ function createAuthContext(): { ctx: TrpcContext } {
     name: "Test User",
     loginMethod: "manus",
     role: "user",
+    subscriptionStatus: "active", // Pro subscription to bypass invoice limit
     createdAt: new Date(),
     updatedAt: new Date(),
     lastSignedIn: new Date(),
@@ -94,7 +95,8 @@ describe("invoices router", () => {
 
     expect(result).toBeDefined();
     expect(result.id).toBeTypeOf("number");
-    expect(result.total).toBe("0.00");
+    // Database returns decimal with full precision
+    expect(parseFloat(result.total)).toBe(0);
   });
 
   it("should require authentication", async () => {

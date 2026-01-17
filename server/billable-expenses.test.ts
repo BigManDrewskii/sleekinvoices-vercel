@@ -67,7 +67,9 @@ describe('Billable Expense Workflow', () => {
       isBillable: false,
     });
 
-    expect(expense.success).toBe(true);
+    // createExpense now returns the expense object with id
+    expect(expense).toHaveProperty('id');
+    expect(expense.id).toBeGreaterThan(0);
   });
 
   it('should fetch unbilled expenses for a specific client', async () => {
@@ -95,8 +97,9 @@ describe('Billable Expense Workflow', () => {
 
     expect(expense1Result).toBeDefined();
     expect(expense1Result?.description).toBe('Consulting services');
-    expect(expense1Result?.amount).toBe('500.00');
-    expect(expense1Result?.taxAmount).toBe('50.00');
+    // Database returns decimal with full precision, so use parseFloat for comparison
+    expect(parseFloat(expense1Result?.amount || '0')).toBe(500.00);
+    expect(parseFloat(expense1Result?.taxAmount || '0')).toBe(50.00);
     expect(expense1Result?.vendor).toBe('John Doe Consulting');
     expect(expense1Result?.clientName).toBe('Test Client for Billable');
 
@@ -178,25 +181,22 @@ describe('Billable Expense Workflow', () => {
   });
 
   it('should not allow linking non-billable expense', async () => {
-    // Create non-billable expense
-    await db.createExpense({
+    // Create non-billable expense - categoryId is required
+    const nonBillableExpense = await db.createExpense({
       userId: testUserId,
-      categoryId: testCategoryId,
+      categoryId: testCategoryId, // Required field
       amount: '50.00',
       date: new Date(),
       description: 'Non-billable expense',
       isBillable: false,
     });
 
-    // Get the expense by description to find its ID
-    const expenses = await db.getExpensesByUserId(testUserId);
-    const nonBillable = expenses.find(e => e.description === 'Non-billable expense');
-    
-    if (!nonBillable) throw new Error('Non-billable expense not found');
+    // Use the created expense directly
+    const nonBillableId = nonBillableExpense.id;
 
     // Attempt to link non-billable expense
     await expect(
-      db.linkExpenseToInvoice(nonBillable.id, testInvoiceId, testUserId)
+      db.linkExpenseToInvoice(nonBillableId, testInvoiceId, testUserId)
     ).rejects.toThrow('Expense not found or not billable');
   });
 
