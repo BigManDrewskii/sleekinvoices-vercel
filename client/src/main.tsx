@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -9,6 +10,19 @@ import { getLoginUrl } from "./const";
 import { KeyboardShortcutsProvider } from "./contexts/KeyboardShortcutsContext";
 
 import "./index.css";
+
+// Initialize Sentry for error monitoring
+Sentry.init({
+  dsn: "https://8b4b2baee3c20047bad87165533e755f@o4510235027636224.ingest.de.sentry.io/4510235029798992",
+  // Setting this option to true will send default PII data to Sentry
+  sendDefaultPii: true,
+  // Only enable in production
+  enabled: import.meta.env.PROD,
+  // Set environment
+  environment: import.meta.env.MODE,
+  // Capture 100% of transactions for performance monitoring
+  tracesSampleRate: 1.0,
+});
 
 // Suppress benign ResizeObserver warnings
 // These occur when components resize faster than the observer can process
@@ -89,11 +103,13 @@ const trpcClient = trpc.createClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
-      <KeyboardShortcutsProvider>
-        <App />
-      </KeyboardShortcutsProvider>
-    </QueryClientProvider>
-  </trpc.Provider>
+  <Sentry.ErrorBoundary fallback={<div className="flex items-center justify-center min-h-screen"><p>An error occurred. Please refresh the page.</p></div>}>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <KeyboardShortcutsProvider>
+          <App />
+        </KeyboardShortcutsProvider>
+      </QueryClientProvider>
+    </trpc.Provider>
+  </Sentry.ErrorBoundary>
 );
