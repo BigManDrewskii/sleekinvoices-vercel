@@ -393,3 +393,12 @@
 - [x] Configure Sentry initialization in server/_core/errorMonitoring.ts with hardcoded DSN
 - [x] Error handling already configured (uncaughtException, unhandledRejection handlers)
 - [x] Write and pass integration tests (12 tests passing - 5 client, 7 server)
+
+
+---
+
+## 🏷️ Sentry Release Tracking - Jan 17, 2026
+
+- [x] Add release version to client-side Sentry config (main.tsx)
+- [x] Add release version to server-side Sentry config (errorMonitoring.ts)
+- [x] Update tests to verify release tracking configuration (14 tests passing)

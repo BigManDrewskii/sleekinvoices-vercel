@@ -50,6 +50,15 @@ describe('Sentry Integration', () => {
     
     expect(mainTsxContent).toContain('tracesSampleRate:');
   });
+
+  it('should have release tracking configured', () => {
+    const mainTsxPath = path.join(__dirname, '..', 'client', 'src', 'main.tsx');
+    const mainTsxContent = fs.readFileSync(mainTsxPath, 'utf-8');
+    
+    // Check for release configuration
+    expect(mainTsxContent).toContain('release:');
+    expect(mainTsxContent).toContain('sleekinvoices@');
+  });
 });
 
 describe('Sentry Server-Side Integration', () => {
@@ -107,5 +116,14 @@ describe('Sentry Server-Side Integration', () => {
     expect(errorMonitoringContent).toContain('beforeSend');
     expect(errorMonitoringContent).toContain("delete headers['authorization']");
     expect(errorMonitoringContent).toContain("delete headers['cookie']");
+  });
+
+  it('should have release tracking configured', () => {
+    const errorMonitoringPath = path.join(__dirname, '..', 'server', '_core', 'errorMonitoring.ts');
+    const errorMonitoringContent = fs.readFileSync(errorMonitoringPath, 'utf-8');
+    
+    // Check for release configuration
+    expect(errorMonitoringContent).toContain('release');
+    expect(errorMonitoringContent).toContain('sleekinvoices@');
   });
 });

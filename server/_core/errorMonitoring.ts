@@ -46,9 +46,14 @@ export async function initializeErrorMonitoring(): Promise<void> {
       return;
     }
     
+    // Get release version from environment or package.json
+    const release = process.env.SENTRY_RELEASE || `sleekinvoices@${process.env.npm_package_version || '1.0.0'}`;
+    
     Sentry.init({
       dsn,
       environment: process.env.NODE_ENV || 'development',
+      // Release tracking - associates errors with specific deployments
+      release,
       // Capture 100% of errors in production
       tracesSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0.1,
       // Don't send errors in development unless explicitly enabled
@@ -64,6 +69,8 @@ export async function initializeErrorMonitoring(): Promise<void> {
         return event;
       },
     });
+    
+    console.log(`[ErrorMonitoring] Sentry release: ${release}`);
     
     sentryInitialized = true;
     console.log('[ErrorMonitoring] Sentry initialized successfully');

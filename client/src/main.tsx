@@ -20,6 +20,9 @@ Sentry.init({
   enabled: import.meta.env.PROD,
   // Set environment
   environment: import.meta.env.MODE,
+  // Release tracking - associates errors with specific deployments
+  // Format: sleekinvoices@version+git-commit-hash (set by build process)
+  release: import.meta.env.VITE_SENTRY_RELEASE || `sleekinvoices@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
   // Capture 100% of transactions for performance monitoring
   tracesSampleRate: 1.0,
 });
