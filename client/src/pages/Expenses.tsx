@@ -65,6 +65,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { CategoryDialog } from "@/components/expenses/CategoryDialog";
+import { ExpenseStats } from "@/components/expenses/ExpenseStats";
+import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { Currency } from "@/components/ui/typography";
@@ -1000,8 +1002,7 @@ export default function Expenses() {
         </Card>
       </div>
 
-      {/* Filters Section */}
-      <FilterSection
+      <ExpenseFilters
         hasActiveFilters={hasActiveFilters}
         onClearFilters={clearAllFilters}
         searchValue={searchQuery}
@@ -1009,116 +1010,19 @@ export default function Expenses() {
         searchPlaceholder="Search expenses..."
         activeFilters={activeFilters}
         onClearAll={clearAllFilters}
-      >
-        <div className="flex flex-wrap items-end gap-3 md:gap-4 w-full">
-          {/* Payment Method Filter */}
-          <FilterSelect label="Payment Method">
-            <Select
-              value={paymentMethodFilter || "all"}
-              onValueChange={v =>
-                setPaymentMethodFilter(v === "all" ? null : v)
-              }
-            >
-              <SelectTrigger className="w-[160px] md:w-[180px]">
-                <SelectValue placeholder="All Methods" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Methods</SelectItem>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="credit_card">Credit Card</SelectItem>
-                <SelectItem value="debit_card">Debit Card</SelectItem>
-                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                <SelectItem value="check">Check</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </FilterSelect>
-
-          {/* Billable Status Filter */}
-          <FilterSelect label="Billable Status">
-            <Select
-              value={billableFilter}
-              onValueChange={v =>
-                setBillableFilter(v as "all" | "billable" | "non-billable")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="billable">Billable Only</SelectItem>
-                <SelectItem value="non-billable">Non-Billable Only</SelectItem>
-              </SelectContent>
-            </Select>
-          </FilterSelect>
-
-          {/* Client Filter */}
-          <FilterSelect label="Client">
-            <Select
-              value={clientFilter?.toString() || "all"}
-              onValueChange={v =>
-                setClientFilter(v === "all" ? null : parseInt(v))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Clients" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Clients</SelectItem>
-                {clients &&
-                  clients.map((client: Client) => (
-                    <SelectItem key={client.id} value={client.id.toString()}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </FilterSelect>
-
-          {/* Category Filter */}
-          <FilterSelect label="Category">
-            <Select
-              value={categoryFilter?.toString() || "all"}
-              onValueChange={v =>
-                setCategoryFilter(v === "all" ? null : parseInt(v))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories &&
-                  categories.map(
-                    (cat: { id: number; name: string; color: string }) => (
-                      <SelectItem key={cat.id} value={cat.id.toString()}>
-                        {cat.name}
-                      </SelectItem>
-                    )
-                  )}
-              </SelectContent>
-            </Select>
-          </FilterSelect>
-
-          {/* Date Range Filter */}
-          <FilterSelect label="Date Range">
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="7days">Last 7 Days</SelectItem>
-                <SelectItem value="30days">Last 30 Days</SelectItem>
-                <SelectItem value="90days">Last 90 Days</SelectItem>
-                <SelectItem value="year">Last Year</SelectItem>
-              </SelectContent>
-            </Select>
-          </FilterSelect>
-        </div>
-      </FilterSection>
+        paymentMethodFilter={paymentMethodFilter}
+        setPaymentMethodFilter={setPaymentMethodFilter}
+        billableFilter={billableFilter}
+        setBillableFilter={setBillableFilter}
+        clientFilter={clientFilter}
+        setClientFilter={setClientFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        clients={clients}
+        categories={categories}
+      />
 
       {/* Expense Table */}
       <Card>
