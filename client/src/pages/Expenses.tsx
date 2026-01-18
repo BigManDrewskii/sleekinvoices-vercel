@@ -67,6 +67,7 @@ import ReceiptUpload from "@/components/expenses/ReceiptUpload";
 import { CategoryDialog } from "@/components/expenses/CategoryDialog";
 import { ExpenseStats } from "@/components/expenses/ExpenseStats";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
+import { ExpenseDetailsDialog } from "@/components/expenses/ExpenseDetailsDialog";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { Currency } from "@/components/ui/typography";
@@ -1252,132 +1253,11 @@ export default function Expenses() {
           )}
       </Card>
 
-      {/* Expense Details Dialog */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader className="pb-4">
-            <DialogTitle className="text-xl">Expense Details</DialogTitle>
-          </DialogHeader>
-          {selectedExpense && (
-            <div className="space-y-5 px-0">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-5 h-5 rounded-full shadow-sm"
-                  style={{
-                    backgroundColor: selectedExpense.categoryColor || "#3B82F6",
-                  }}
-                />
-                <div>
-                  <h3 className="font-semibold text-lg">
-                    {selectedExpense.description}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedExpense.categoryName}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6 text-sm">
-                <div className="space-y-2">
-                  <p className="text-muted-foreground">Date</p>
-                  <p className="font-medium">
-                    <DateDisplay date={selectedExpense.date} />
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-muted-foreground">Amount</p>
-                  <p className="font-medium">
-                    <Currency amount={parseFloat(selectedExpense.amount)} />
-                  </p>
-                </div>
-                {selectedExpense.vendor && (
-                  <div>
-                    <p className="text-muted-foreground mb-1">Vendor</p>
-                    <p className="font-medium">{selectedExpense.vendor}</p>
-                  </div>
-                )}
-                {selectedExpense.paymentMethod && (
-                  <div>
-                    <p className="text-muted-foreground mb-1">Payment Method</p>
-                    <p className="font-medium">
-                      {PAYMENT_METHOD_LABELS[selectedExpense.paymentMethod] ||
-                        selectedExpense.paymentMethod}
-                    </p>
-                  </div>
-                )}
-                {selectedExpense.taxAmount &&
-                  parseFloat(selectedExpense.taxAmount) > 0 && (
-                    <>
-                      <div>
-                        <p className="text-muted-foreground mb-1">Tax Amount</p>
-                        <p className="font-medium">
-                          <Currency
-                            amount={parseFloat(selectedExpense.taxAmount)}
-                          />
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground mb-1">
-                          Total (incl. tax)
-                        </p>
-                        <p className="font-medium">
-                          <Currency
-                            amount={
-                              parseFloat(selectedExpense.amount) +
-                              parseFloat(selectedExpense.taxAmount)
-                            }
-                          />
-                        </p>
-                      </div>
-                    </>
-                  )}
-                <div>
-                  <p className="text-muted-foreground mb-1">Billable Status</p>
-                  <p className="font-medium">
-                    {selectedExpense.isBillable ? (
-                      <Badge
-                        variant="default"
-                        className="bg-green-500/10 text-green-500"
-                      >
-                        Billable
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">Non-Billable</Badge>
-                    )}
-                  </p>
-                </div>
-                {selectedExpense.isBillable && (
-                  <div>
-                    <p className="text-muted-foreground mb-1">Billable To</p>
-                    <p className="font-medium">
-                      {selectedExpense.clientName || "Unassigned"}
-                      {selectedExpense.invoiceId && (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          (Linked to invoice)
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {selectedExpense.receiptUrl && (
-                <div className="pt-4 border-t">
-                  <a
-                    href={selectedExpense.receiptUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-primary hover:underline"
-                  >
-                    <Receipt className="w-4 h-4" />
-                    View Receipt
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ExpenseDetailsDialog
+        open={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
+        selectedExpense={selectedExpense}
+      />
     </PageLayout>
   );
 }
