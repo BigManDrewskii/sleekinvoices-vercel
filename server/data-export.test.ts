@@ -24,7 +24,7 @@ describe("GDPR Data Export", () => {
     it("should have exportAllData procedure in routers.ts", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("exportAllData");
@@ -34,7 +34,7 @@ describe("GDPR Data Export", () => {
     it("should export all required data categories", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Verify all data categories are fetched
@@ -52,7 +52,7 @@ describe("GDPR Data Export", () => {
     it("should include line items with invoices", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("getLineItemsByInvoiceId");
@@ -62,7 +62,7 @@ describe("GDPR Data Export", () => {
     it("should upload export to S3 and return URL", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("storagePut");
@@ -73,7 +73,7 @@ describe("GDPR Data Export", () => {
     it("should include export timestamp", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("exportedAt");
@@ -83,7 +83,7 @@ describe("GDPR Data Export", () => {
     it("should include user profile data in export", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check that user data is included
@@ -97,7 +97,7 @@ describe("GDPR Data Export", () => {
     it("should accept format parameter (json/csv)", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check for format enum with either single or double quotes
@@ -107,7 +107,7 @@ describe("GDPR Data Export", () => {
     it("should have CSV conversion logic", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("arrayToCSV");
@@ -118,7 +118,7 @@ describe("GDPR Data Export", () => {
     it("should create ZIP archive for CSV export", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       expect(content).toContain("archiver");
@@ -130,7 +130,7 @@ describe("GDPR Data Export", () => {
     it("should generate separate CSV files for each data category", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check for CSV file names with either single or double quotes
@@ -147,7 +147,7 @@ describe("GDPR Data Export", () => {
     it("should include README.txt in ZIP", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check for README.txt with either single or double quotes
@@ -157,7 +157,7 @@ describe("GDPR Data Export", () => {
     it("should return format in response", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check for format in response with either single or double quotes
@@ -168,7 +168,7 @@ describe("GDPR Data Export", () => {
     it("should handle CSV escaping for special characters", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(__dirname, "routers.ts");
+      const routersPath = path.join(__dirname, "routers/user.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check for proper CSV escaping - using regex to handle quote variations

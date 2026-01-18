@@ -326,3 +326,41 @@
 | User satisfaction | Unknown | >4.5/5 |
 | Mobile/tablet usage | Unknown | Track separately |
 
+
+
+---
+
+## 🔧 Server-Side Code Refactoring - Jan 18, 2026
+
+### Phase 1: Analysis
+- [ ] Analyze server/db.ts structure and identify domain boundaries
+- [ ] Analyze server/routers.ts structure and identify domain boundaries
+- [ ] Create refactoring plan with domain modules
+
+### Phase 2: Split server/db.ts
+- [ ] Create server/db/ directory structure
+- [ ] Extract invoice-related functions to server/db/invoices.ts
+- [ ] Extract client-related functions to server/db/clients.ts
+- [ ] Extract user-related functions to server/db/users.ts
+- [ ] Extract expense-related functions to server/db/expenses.ts
+- [ ] Extract payment-related functions to server/db/payments.ts
+- [ ] Extract analytics-related functions to server/db/analytics.ts
+- [ ] Create server/db/index.ts to re-export all functions
+- [ ] Update original db.ts to import from new modules
+
+### Phase 3: Split server/routers.ts
+- [ ] Create server/routers/ directory structure
+- [ ] Extract invoice routes to server/routers/invoices.ts
+- [ ] Extract client routes to server/routers/clients.ts
+- [ ] Extract user routes to server/routers/users.ts
+- [ ] Extract expense routes to server/routers/expenses.ts
+- [ ] Extract payment routes to server/routers/payments.ts
+- [ ] Extract analytics routes to server/routers/analytics.ts
+- [ ] Create server/routers/index.ts to merge all routers
+- [ ] Update original routers.ts to use new modules
+
+### Phase 4: Verification
+- [ ] Run TypeScript check (pnpm check)
+- [ ] Run full test suite (pnpm test)
+- [ ] Verify application works in browser
+| 2026-01-18 | Fix ClientTable dropdown menu actions (Edit, Delete, Portal Access) | ✅ Complete |

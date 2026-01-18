@@ -159,20 +159,20 @@ describe("Pre-Launch Fixes", () => {
   });
 
   describe("Invoice Number Uniqueness", () => {
-    it("should have getInvoiceByNumber function in db.ts", async () => {
+    it("should have getInvoiceByNumber function in db/invoices.ts", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const dbPath = path.join(process.cwd(), "server/db.ts");
+      const dbPath = path.join(process.cwd(), "server/db/invoices.ts");
       const content = fs.readFileSync(dbPath, "utf-8");
 
       expect(content).toContain("getInvoiceByNumber");
       expect(content).toContain("invoiceNumber: string");
     });
 
-    it("should check for duplicate invoice numbers in routers.ts", async () => {
+    it("should check for duplicate invoice numbers in routers/invoices.ts", async () => {
       const fs = await import("fs");
       const path = await import("path");
-      const routersPath = path.join(process.cwd(), "server/routers.ts");
+      const routersPath = path.join(process.cwd(), "server/routers/invoices.ts");
       const content = fs.readFileSync(routersPath, "utf-8");
 
       // Check that invoice creation handles invoice numbers

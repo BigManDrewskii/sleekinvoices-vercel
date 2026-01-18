@@ -138,8 +138,8 @@ describe("Sentry Server-Side Integration", () => {
     const indexPath = path.join(__dirname, "..", "server", "_core", "index.ts");
     const indexContent = fs.readFileSync(indexPath, "utf-8");
 
-    expect(indexContent).toContain("process.on('uncaughtException'");
-    expect(indexContent).toContain("process.on('unhandledRejection'");
+    expect(indexContent).toContain('process.on("uncaughtException"');
+    expect(indexContent).toContain('process.on("unhandledRejection"');
   });
 
   it("should scrub sensitive headers before sending to Sentry", () => {
@@ -156,8 +156,8 @@ describe("Sentry Server-Side Integration", () => {
     );
 
     expect(errorMonitoringContent).toContain("beforeSend");
-    expect(errorMonitoringContent).toContain("delete headers['authorization']");
-    expect(errorMonitoringContent).toContain("delete headers['cookie']");
+    expect(errorMonitoringContent).toContain('delete headers["authorization"]');
+    expect(errorMonitoringContent).toContain('delete headers["cookie"]');
   });
 
   it("should have release tracking configured", () => {

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
-import { Mail, Phone, MapPin, Key, Edit, Trash2 } from "lucide-react";
+import { Mail, Phone, MapPin, Key, Edit, Trash2, Copy } from "lucide-react";
 
 interface Client {
   id: number;
@@ -192,10 +192,10 @@ export function ClientTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
                       <DropdownMenuItem
-                        onClick={() => handleSelectOne(client.id, true)}
+                        onClick={() => onEdit(client)}
                       >
                         <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-primary/10" />
+                          <Edit className="h-3 w-3 text-muted-foreground" />
                           <span className="text-sm">Edit</span>
                         </div>
                       </DropdownMenuItem>
@@ -204,17 +204,17 @@ export function ClientTable({
                         className="text-destructive"
                       >
                         <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-destructive/10" />
+                          <Trash2 className="h-3 w-3" />
                           <span className="text-sm">Delete</span>
                         </div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
-                        onClick={() => handleSelectOne(client.id, true)}
+                        onClick={() => onPortalAccess(client)}
                       >
                         <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-primary/10" />
-                          <span className="text-sm">Duplicate</span>
+                          <Key className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-sm">Portal Access</span>
                         </div>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

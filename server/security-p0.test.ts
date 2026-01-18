@@ -112,7 +112,7 @@ describe("P0-5: NOWPayments Signature Bypass", () => {
     );
 
     // Check that production check exists
-    expect(libContent).toContain("process.env.NODE_ENV === 'production'");
+    expect(libContent).toContain('process.env.NODE_ENV === "production"');
     expect(libContent).toContain("CRITICAL");
     expect(libContent).toContain("return false");
 
@@ -153,7 +153,7 @@ describe("P0-2: Atomic Payment Transactions", () => {
     expect(nowContent).toContain("atomic transaction");
 
     // Check that transaction callback uses tx parameter
-    expect(nowContent).toContain("async (tx)");
+    expect(nowContent).toContain("async tx =>");
     // Check that updates and inserts happen inside transaction
     expect(nowContent).toContain("tx.");
   });

@@ -320,4 +320,6 @@ export async function linkExpenseToInvoice(
     .update(expenses)
     .set({ invoiceId })
     .where(eq(expenses.id, expenseId));
+
+  return { success: true };
 }
