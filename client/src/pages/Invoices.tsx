@@ -40,6 +40,7 @@ import { InvoiceActionsMenu } from "@/components/invoices/InvoiceActionsMenu";
 import { InvoiceNumberCell } from "@/components/invoices/InvoiceNumberCell";
 import { Pagination } from "@/components/shared/Pagination";
 import { InvoiceBulkActionsBar } from "@/components/invoices/InvoiceBulkActionsBar";
+import { InvoiceTable } from "@/components/invoices/InvoiceTable";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
@@ -800,6 +801,18 @@ export default function Invoices() {
           bulkSendEmail={bulkSendEmail}
           bulkCreatePaymentLinks={bulkCreatePaymentLinks}
           bulkUpdateStatus={bulkUpdateStatus}
+        />
+
+        <InvoiceTable
+          invoices={paginatedInvoices}
+          selectedIds={selectedIds}
+          allCurrentPageSelected={allCurrentPageSelected}
+          someCurrentPageSelected={someCurrentPageSelected}
+          toggleSelectAll={toggleSelectAll}
+          toggleSelect={toggleSelect}
+          sort={sort}
+          handleSort={handleSort}
+          totalItems={totalItems}
         />
 
         {/* Filters */}
