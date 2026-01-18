@@ -478,6 +478,21 @@ export function Navigation() {
             </div>
           </div>
           <DropdownMenuSeparator />
+          <div className="py-1">
+            <DropdownMenuItem asChild className="h-11 gap-3 cursor-pointer">
+              <Link href="/settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4 text-muted-foreground" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="h-11 gap-3 cursor-pointer">
+              <Link href="/subscription" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
+                <span>Subscription</span>
+              </Link>
+            </DropdownMenuItem>
+          </div>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => logout.mutate()}
             className="h-11 gap-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
@@ -641,6 +656,21 @@ export function Navigation() {
                 </p>
               </div>
             </div>
+          </div>
+          <DropdownMenuSeparator />
+          <div className="py-1">
+            <DropdownMenuItem asChild className="h-11 gap-3 cursor-pointer">
+              <Link href="/settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4 text-muted-foreground" />
+                <span>Settings</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="h-11 gap-3 cursor-pointer">
+              <Link href="/subscription" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
+                <span>Subscription</span>
+              </Link>
+            </DropdownMenuItem>
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem

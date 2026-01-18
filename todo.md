@@ -367,3 +367,4 @@
 | 2026-01-18 | Add client duplicate functionality | ✅ Complete |
 | 2026-01-18 | Add sorting indicators to ClientTable headers | ✅ Complete |
 | 2026-01-18 | Test Portal Access feature | ✅ Complete |
+| 2026-01-18 | Fix navbar avatar profile dropdown showing only one option | ✅ Complete |
