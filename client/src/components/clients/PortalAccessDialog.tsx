@@ -190,6 +190,7 @@ export function PortalAccessDialog({
                     size="icon"
                     onClick={handleCopy}
                     title="Copy to clipboard"
+                    aria-label="Copy link to clipboard"
                   >
                     {copied ? (
                       <Check className="size-4 text-green-500" />
@@ -202,6 +203,7 @@ export function PortalAccessDialog({
                     size="icon"
                     onClick={handleOpenPortal}
                     title="Open in new tab"
+                    aria-label="Open portal in new tab"
                   >
                     <ExternalLink className="size-4" />
                   </Button>
@@ -250,6 +252,7 @@ export function PortalAccessDialog({
                   onClick={() => refetch()}
                   disabled={isLoading}
                   title="Refresh"
+                  aria-label="Refresh portal access status"
                 >
                   <RefreshCw className="size-4" />
                 </Button>

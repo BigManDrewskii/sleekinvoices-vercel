@@ -161,6 +161,7 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
                 setInput("");
                 onClose?.();
               }}
+              aria-label="Close magic input"
             >
               <X className="h-4 w-4" />
             </Button>

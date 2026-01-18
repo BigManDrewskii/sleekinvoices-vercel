@@ -782,6 +782,7 @@ export default function Payments() {
                               "stripe"
                             )
                           }
+                          aria-label="Copy Stripe payment ID"
                         >
                           {copiedField === "stripe" ? (
                             <Check className="h-4 w-4 text-green-500" />
@@ -845,6 +846,7 @@ export default function Payments() {
                               "txHash"
                             )
                           }
+                          aria-label="Copy transaction hash"
                         >
                           {copiedField === "txHash" ? (
                             <Check className="h-4 w-4 text-green-500" />
@@ -865,6 +867,7 @@ export default function Payments() {
                             )}
                             target="_blank"
                             rel="noopener noreferrer"
+                            aria-label="View transaction on block explorer"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </a>
@@ -897,6 +900,7 @@ export default function Payments() {
                               "wallet"
                             )
                           }
+                          aria-label="Copy wallet address"
                         >
                           {copiedField === "wallet" ? (
                             <Check className="h-4 w-4 text-green-500" />

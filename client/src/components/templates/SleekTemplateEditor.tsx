@@ -290,6 +290,7 @@ export function SleekTemplateEditor({
               size="icon"
               onClick={onCancel}
               className="shrink-0"
+              aria-label="Go back to templates"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>

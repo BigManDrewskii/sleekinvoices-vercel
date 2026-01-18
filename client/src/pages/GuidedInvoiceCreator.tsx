@@ -577,6 +577,7 @@ export default function GuidedInvoiceCreator() {
                         dispatch({ type: "REMOVE_LINE_ITEM", id: item.id })
                       }
                       className="h-12 w-12 text-muted-foreground hover:text-destructive"
+                      aria-label={`Remove line item: ${item.description || "Item"}`}
                     >
                       <Trash2 className="h-5 w-5" />
                     </Button>

@@ -454,6 +454,7 @@ export function Navigation() {
             variant="ghost"
             size="icon"
             className="h-11 w-11 min-w-[44px] min-h-[44px] text-[var(--nav-text-color)]"
+            aria-label="Open navigation menu"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -629,6 +630,7 @@ export function Navigation() {
             variant="ghost"
             size="icon"
             className="h-11 w-11 min-w-[44px] min-h-[44px] text-[var(--nav-text-color)]"
+            aria-label="Open navigation menu"
           >
             <Menu className="h-5 w-5" />
           </Button>

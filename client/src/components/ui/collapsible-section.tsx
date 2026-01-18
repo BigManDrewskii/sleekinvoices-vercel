@@ -156,6 +156,7 @@ export function ColorInput({
             size="icon"
             onClick={handleCopy}
             className="h-8 w-8 shrink-0"
+            aria-label="Copy to clipboard"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />

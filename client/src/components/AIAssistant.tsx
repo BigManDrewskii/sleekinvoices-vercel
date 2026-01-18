@@ -358,6 +358,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
                   onClick={handleExportConversation}
                   title="Export conversation"
+                  aria-label="Export conversation"
                 >
                   <Download className="h-4 w-4 text-muted-foreground" />
                 </Button>
@@ -367,6 +368,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                   className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
                   onClick={handleClearChat}
                   title="Clear conversation"
+                  aria-label="Clear conversation"
                 >
                   <RotateCcw className="h-4 w-4 text-muted-foreground" />
                 </Button>
@@ -377,6 +379,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               size="icon"
               className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
               onClick={onClose}
+              aria-label="Close AI assistant"
             >
               <X className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -598,6 +601,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               size="icon"
               onClick={() => handleSend(input)}
               disabled={!input.trim() || !hasCredits || isTyping}
+              aria-label="Send message"
               className={cn(
                 "shrink-0 h-12 w-12 rounded-xl",
                 "bg-primary hover:bg-primary/90",

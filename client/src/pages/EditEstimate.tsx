@@ -413,7 +413,7 @@ export default function EditEstimate() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {lineItems.map(item => (
+                  {lineItems.map((item, index) => (
                     <div
                       key={item.id}
                       className="grid grid-cols-12 gap-2 items-start"
@@ -465,6 +465,7 @@ export default function EditEstimate() {
                           size="icon"
                           onClick={() => removeLineItem(item.id)}
                           disabled={lineItems.length === 1}
+                          aria-label={`Remove line item: ${item.description || "Item " + (index + 1)}`}
                         >
                           <Trash2 className="h-4 w-4 text-muted-foreground" />
                         </Button>

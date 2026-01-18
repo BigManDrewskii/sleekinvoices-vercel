@@ -309,6 +309,7 @@ export function TemplateEditor({
               size="icon"
               onClick={onCancel}
               className="h-8 w-8"
+              aria-label="Go back to templates"
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
