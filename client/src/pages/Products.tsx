@@ -64,6 +64,7 @@ import { ProductsPageSkeleton, Skeleton } from "@/components/skeletons";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
@@ -532,6 +533,7 @@ export default function Products() {
             />
           ) : (
             <>
+              <ScrollableTableWrapper minWidth={750}>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -643,6 +645,7 @@ export default function Products() {
                   ))}
                 </TableBody>
               </Table>
+              </ScrollableTableWrapper>
 
               {/* Pagination */}
               {totalPages > 1 && (

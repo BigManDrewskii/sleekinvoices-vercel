@@ -394,3 +394,6 @@
 | 2026-01-18 | Add horizontal scroll to Invoices table | ✅ Complete |
 | 2026-01-18 | Add horizontal scroll to Expenses table | ✅ Complete |
 | 2026-01-18 | Add horizontal scroll to Payments table | ✅ Complete || 2026-01-18 | Create ScrollableTableWrapper component with fade indicators | ✅ Complete | 2026-01-18 | Apply ScrollableTableWrapper to Invoices, Expenses, Clients tables | ✅ Complete |
+| 2026-01-18 | Add ScrollableTableWrapper to Products table | ✅ Complete |
+| 2026-01-18 | Add ScrollableTableWrapper to other tables (Estimates, EmailHistory) | ✅ Complete |
+| 2026-01-18 | Implement mobile touch swipe hints | ✅ Complete |

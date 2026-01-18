@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/select";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useUndoableDelete } from "@/hooks/useUndoableDelete";
 import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
@@ -461,7 +462,7 @@ export default function Estimates() {
             ) : (
               <>
                 {/* Desktop Table */}
-                <div className="hidden md:block overflow-x-auto">
+                <ScrollableTableWrapper minWidth={850} className="hidden md:block">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -635,7 +636,7 @@ export default function Estimates() {
                       ))}
                     </TableBody>
                   </Table>
-                </div>
+                </ScrollableTableWrapper>
 
                 {/* Mobile Cards */}
                 <div className="md:hidden space-y-4">

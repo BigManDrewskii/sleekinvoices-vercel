@@ -53,6 +53,7 @@ import { DateDisplay } from "@/components/ui/typography";
 import { EmptyState, EmptyStatePresets } from "@/components/EmptyState";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { useTableSort } from "@/hooks/useTableSort";
 import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
 import { DataTableLoading } from "@/components/ui/data-table-empty";
@@ -448,6 +449,7 @@ export default function EmailHistory() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
+          <ScrollableTableWrapper minWidth={800}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -536,6 +538,7 @@ export default function EmailHistory() {
               )}
             </TableBody>
           </Table>
+          </ScrollableTableWrapper>
         </CardContent>
 
         {/* Pagination */}
