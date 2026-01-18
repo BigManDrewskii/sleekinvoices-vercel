@@ -372,3 +372,13 @@
 | 2026-01-18 | Fix sidebar animation flickering when it appears | ✅ Complete |
 | 2026-01-18 | Add OG banner image for social media sharing | ✅ Complete |
 | 2026-01-18 | Replace hardcoded LD button with UserAvatar component in tablet/mobile nav | ✅ Complete |
+| 2026-01-18 | Responsive design audit (320px-1440px breakpoints) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Template editor fixed width overflow (Critical) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Template editor sidebar fixed width (Critical) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Dashboard skeleton fixed width (Critical) | ✅ Complete |
+| 2026-01-18 | Fix responsive: AI Assistant panel width (Major) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Google Font Picker popover width (Major) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Currency Selector popover width (Major) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Product Selector popover width (Major) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Tables horizontal scroll (Major) | ✅ Complete |
+| 2026-01-18 | Fix responsive: Email Template Editor select width (Major) | ✅ Complete |

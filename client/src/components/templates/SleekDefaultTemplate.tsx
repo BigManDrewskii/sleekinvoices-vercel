@@ -141,15 +141,16 @@ export function SleekDefaultTemplate({
     : "#ffffffaa";
 
   return (
-    <div
-      className="w-full"
-      style={{
-        transform: `scale(${scale})`,
-        transformOrigin: "top left",
-      }}
-    >
+    <div className="w-full overflow-x-auto">
       <div
-        className="w-[612px] min-h-[792px] p-12 shadow-lg"
+        className="w-full min-w-[612px] max-w-[612px] mx-auto"
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: "top center",
+        }}
+      >
+        <div
+          className="w-[612px] min-h-[792px] p-12 shadow-lg"
         style={{
           fontFamily: `"${settings.bodyFont}", sans-serif`,
           fontSize: `${settings.fontSize}px`,
@@ -468,6 +469,7 @@ export function SleekDefaultTemplate({
             {settings.footerText}
           </footer>
         )}
+        </div>
       </div>
     </div>
   );

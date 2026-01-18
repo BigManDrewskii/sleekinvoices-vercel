@@ -82,7 +82,8 @@ export function ClientTable({
           {filteredAndSortedClients.length !== 1 ? "s" : ""} found
         </p>
       </div>
-      <div className="px-5 pb-5">
+      <div className="px-5 pb-5 overflow-x-auto -mx-5 sm:mx-0">
+        <div className="min-w-[700px] px-5 sm:px-0">
         <Table>
           <TableHeader>
             <TableRow>
@@ -240,6 +241,7 @@ export function ClientTable({
             ))}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       <div className="px-5 pb-5 md:hidden">

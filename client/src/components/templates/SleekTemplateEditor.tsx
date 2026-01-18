@@ -342,7 +342,7 @@ export function SleekTemplateEditor({
         {/* Editor Sidebar */}
         <div
           className={cn(
-            "lg:w-[380px] xl:w-[420px] border-r bg-muted/30 transition-all duration-300",
+            "md:w-[300px] lg:w-[380px] xl:w-[420px] border-r bg-muted/30 transition-all duration-300 shrink-0",
             showSidebar ? "block" : "hidden lg:hidden"
           )}
         >

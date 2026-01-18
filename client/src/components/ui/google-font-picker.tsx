@@ -275,7 +275,7 @@ export function GoogleFontPicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[calc(100vw-2rem)] sm:w-[500px] md:w-[600px] lg:w-[700px] p-0 shadow-xl"
+          className="w-[calc(100vw-2rem)] sm:w-[min(500px,calc(100vw-2rem))] md:w-[600px] lg:w-[700px] p-0 shadow-xl"
           align="start"
           sideOffset={8}
         >

@@ -300,7 +300,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       />
 
       {/* Sidebar Panel */}
-      <div className="fixed inset-y-0 right-0 w-full sm:w-[440px] bg-gradient-to-b from-background via-background to-background/95 border-l border-border/50 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
+      <div className="fixed inset-y-0 right-0 w-full sm:max-w-[440px] bg-gradient-to-b from-background via-background to-background/95 border-l border-border/50 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300 ease-out">
         {/* Header - Manus-inspired minimal design */}
         <div className="relative flex items-center justify-between px-5 py-4 border-b border-border/40">
           {/* Subtle gradient accent */}

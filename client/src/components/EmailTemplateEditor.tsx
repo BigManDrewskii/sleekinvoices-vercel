@@ -391,7 +391,7 @@ export function EmailTemplateEditor({
           onValueChange={loadTemplate}
           disabled={disabled}
         >
-          <SelectTrigger className="w-[220px]">
+          <SelectTrigger className="w-full sm:w-[220px]">
             <SelectValue placeholder="Choose a template..." />
           </SelectTrigger>
           <SelectContent>
