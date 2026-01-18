@@ -69,6 +69,7 @@ import { ExpenseStats } from "@/components/expenses/ExpenseStats";
 import { ExpenseFilters } from "@/components/expenses/ExpenseFilters";
 import { ExpenseDetailsDialog } from "@/components/expenses/ExpenseDetailsDialog";
 import { ExpenseDialog } from "@/components/expenses/ExpenseDialog";
+import { ExpenseTable } from "@/components/expenses/ExpenseTable";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/utils";
 import { Currency } from "@/components/ui/typography";
@@ -787,233 +788,26 @@ export default function Expenses() {
         categories={categories}
       />
 
-      {/* Expense Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Expenses</CardTitle>
-          <CardDescription>
-            {filteredAndSortedExpenses.length} expense
-            {filteredAndSortedExpenses.length !== 1 ? "s" : ""} found
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <SortableTableHeader
-                  label="Description"
-                  sortKey="description"
-                  currentSort={sort}
-                  onSort={handleSort}
-                />
-                <SortableTableHeader
-                  label="Category"
-                  sortKey="categoryName"
-                  currentSort={sort}
-                  onSort={handleSort}
-                />
-                <SortableTableHeader
-                  label="Date"
-                  sortKey="date"
-                  currentSort={sort}
-                  onSort={handleSort}
-                />
-                <TableHead>Payment</TableHead>
-                <SortableTableHeader
-                  label="Amount"
-                  sortKey="amount"
-                  currentSort={sort}
-                  onSort={handleSort}
-                  align="right"
-                />
-                <TableHead>Status</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <DataTableLoading colSpan={7} rows={5} />
-              ) : !expenses || expenses.length === 0 ? (
-                <DataTableEmpty
-                  colSpan={7}
-                  preset="expenses"
-                  action={{
-                    label: "Add Your First Expense",
-                    onClick: () => setIsExpenseDialogOpen(true),
-                  }}
-                />
-              ) : filteredAndSortedExpenses.length === 0 ? (
-                <DataTableEmpty
-                  colSpan={7}
-                  title="No matching expenses"
-                  description="No expenses match your current filters"
-                  illustration="/sleeky/empty-states/search-results.png"
-                  action={{
-                    label: "Clear Filters",
-                    onClick: clearAllFilters,
-                  }}
-                />
-              ) : (
-                paginatedExpenses.map((expense: ExpenseWithDetails) => (
-                  <TableRow
-                    key={expense.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => openExpenseDetails(expense)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-3 h-3 rounded-full flex-shrink-0"
-                          style={{
-                            backgroundColor: expense.categoryColor || "#3B82F6",
-                          }}
-                        />
-                        <div>
-                          <div className="font-medium">
-                            {expense.description}
-                          </div>
-                          {expense.vendor && (
-                            <div className="text-sm text-muted-foreground">
-                              {expense.vendor}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{expense.categoryName}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DateDisplay date={expense.date} />
-                    </TableCell>
-                    <TableCell>
-                      {expense.paymentMethod ? (
-                        <span className="text-sm">
-                          {PAYMENT_METHOD_LABELS[expense.paymentMethod] ||
-                            expense.paymentMethod}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div>
-                        <Currency amount={parseFloat(expense.amount)} bold />
-                        {expense.taxAmount &&
-                          parseFloat(expense.taxAmount) > 0 && (
-                            <div className="text-xs text-muted-foreground">
-                              +
-                              <Currency
-                                amount={parseFloat(expense.taxAmount)}
-                              />{" "}
-                              tax
-                            </div>
-                          )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {expense.isBillable ? (
-                          <Badge
-                            variant="default"
-                            className="bg-green-500/10 text-green-500 hover:bg-green-500/20"
-                          >
-                            Billable
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Non-Billable</Badge>
-                        )}
-                        {expense.receiptUrl && (
-                          <Receipt className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          asChild
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={e => {
-                              e.stopPropagation();
-                              openExpenseDetails(expense);
-                            }}
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            View Details
-                          </DropdownMenuItem>
-                          {expense.receiptUrl && (
-                            <DropdownMenuItem
-                              onClick={e => {
-                                e.stopPropagation();
-                                window.open(expense.receiptUrl!, "_blank");
-                              }}
-                            >
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              View Receipt
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleEdit(expense);
-                            }}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Expense
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={e => {
-                              e.stopPropagation();
-                              handleDeleteExpense(expense.id);
-                            }}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-        {/* Pagination */}
-        {!isLoading &&
-          expenses &&
-          expenses.length > 0 &&
-          filteredAndSortedExpenses.length > 0 &&
-          totalPages > 1 && (
-            <div className="px-5 pb-4 border-t border-border/20 pt-4">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                totalItems={totalItems}
-                onPageChange={setCurrentPage}
-                onPageSizeChange={size => {
-                  setPageSize(size);
-                  setCurrentPage(1);
-                }}
-                pageSizeOptions={[10, 25, 50, 100]}
-              />
-            </div>
-          )}
-      </Card>
+      <ExpenseTable
+        isLoading={isLoading}
+        expenses={expenses}
+        filteredAndSortedExpenses={filteredAndSortedExpenses}
+        paginatedExpenses={paginatedExpenses}
+        totalItems={totalItems}
+        totalPages={totalPages}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        sort={sort}
+        handleSort={handleSort}
+        setCurrentPage={setCurrentPage}
+        setPageSize={setPageSize}
+        openExpenseDetails={openExpenseDetails}
+        handleEdit={handleEdit}
+        deleteExpenseMutation={deleteExpenseMutation}
+        hasActiveFilters={hasActiveFilters}
+        setIsExpenseDialogOpen={setIsExpenseDialogOpen}
+        clearAllFilters={clearAllFilters}
+      />
 
       <ExpenseDetailsDialog
         open={isDetailsDialogOpen}
