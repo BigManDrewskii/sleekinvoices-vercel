@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { PaymentStatusBadge } from "@/components/shared/PaymentStatusBadge";
 import { InvoiceActionsMenu } from "@/components/invoices/InvoiceActionsMenu";
@@ -106,7 +107,7 @@ export function InvoiceTable({
       </div>
       <div className="px-5 pb-5">
         {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
+        <ScrollableTableWrapper minWidth={900} className="hidden md:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -291,7 +292,7 @@ export function InvoiceTable({
               ))}
             </TableBody>
           </Table>
-        </div>
+        </ScrollableTableWrapper>
 
         {/* Mobile Card View */}
         <div className="md:hidden px-5 pb-5 space-y-4">
