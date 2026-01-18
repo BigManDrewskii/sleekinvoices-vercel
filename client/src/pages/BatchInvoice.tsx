@@ -630,7 +630,7 @@ export default function BatchInvoice() {
                         value={selectedTagId?.toString() || "none"}
                         onValueChange={handleTagSelect}
                       >
-                        <SelectTrigger className="w-[180px]">
+                        <SelectTrigger className="w-full sm:w-[180px]">
                           <Tag className="h-4 w-4 mr-2" />
                           <SelectValue placeholder="Add by tag" />
                         </SelectTrigger>

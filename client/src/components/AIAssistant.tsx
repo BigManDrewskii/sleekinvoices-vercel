@@ -355,7 +355,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+                  className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
                   onClick={handleExportConversation}
                   title="Export conversation"
                 >
@@ -364,7 +364,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+                  className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
                   onClick={handleClearChat}
                   title="Clear conversation"
                 >
@@ -375,7 +375,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-xl hover:bg-muted/80 transition-colors"
+              className="h-11 w-11 rounded-xl hover:bg-muted/80 transition-colors"
               onClick={onClose}
             >
               <X className="h-4 w-4 text-muted-foreground" />
@@ -589,7 +589,7 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               />
               {/* Character hint when typing */}
               {input.length > 0 && (
-                <span className="absolute right-3 bottom-3 text-[10px] text-muted-foreground/50">
+                <span className="absolute right-3 bottom-3 text-xs text-muted-foreground/50">
                   ⏎
                 </span>
               )}
@@ -614,13 +614,13 @@ export function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             </Button>
           </div>
 
-          <p className="text-[11px] text-muted-foreground/60 mt-2.5 text-center">
+          <p className="text-xs text-muted-foreground/60 mt-2.5 text-center">
             Press{" "}
-            <kbd className="px-2 py-1 rounded bg-muted text-[10px] font-mono">
+            <kbd className="px-2 py-1 rounded bg-muted text-xs font-mono">
               Enter
             </kbd>{" "}
             to send ·{" "}
-            <kbd className="px-2 py-1 rounded bg-muted text-[10px] font-mono">
+            <kbd className="px-2 py-1 rounded bg-muted text-xs font-mono">
               Shift+Enter
             </kbd>{" "}
             for new line
@@ -659,7 +659,7 @@ export function AIAssistantTrigger({
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
       />
       {credits && credits.remaining > 0 && (
-        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-emerald-500 text-[10px] font-bold flex items-center justify-center text-white shadow-md ring-2 ring-background z-10">
+        <span className="absolute -top-1 -right-1 h-5 min-w-5 px-1.5 rounded-full bg-emerald-500 text-xs font-bold flex items-center justify-center text-white shadow-md ring-2 ring-background z-10">
           {credits.remaining}
         </span>
       )}

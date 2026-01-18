@@ -212,11 +212,11 @@ export function MagicInput({ onExtract, onClose, className }: MagicInputProps) {
         {/* Footer */}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <kbd className="px-2 py-1 rounded bg-muted/80 text-[10px] font-mono">
+            <kbd className="px-2 py-1 rounded bg-muted/80 text-xs font-mono">
               ⌘
             </kbd>
             <span>+</span>
-            <kbd className="px-2 py-1 rounded bg-muted/80 text-[10px] font-mono">
+            <kbd className="px-2 py-1 rounded bg-muted/80 text-xs font-mono">
               Enter
             </kbd>
             <span className="ml-1">to generate</span>

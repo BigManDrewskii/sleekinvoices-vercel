@@ -382,3 +382,12 @@
 | 2026-01-18 | Fix responsive: Product Selector popover width (Major) | ✅ Complete |
 | 2026-01-18 | Fix responsive: Tables horizontal scroll (Major) | ✅ Complete |
 | 2026-01-18 | Fix responsive: Email Template Editor select width (Major) | ✅ Complete |
+| 2026-01-18 | Fix minor: Default button height touch target (Minor #10) | ✅ Complete |
+| 2026-01-18 | Fix minor: AI Assistant icon buttons under 44px (Minor #11) | ✅ Complete |
+| 2026-01-18 | Fix minor: Very small text sizes text-[10px] (Minor #12) | ✅ Complete |
+| 2026-01-18 | Fix minor: Batch Invoice select fixed width (Minor #13) | ✅ Complete |
+| 2026-01-18 | Fix minor: Estimate page select fixed widths (Minor #14) | ✅ Complete (no fixed widths found) |
+| 2026-01-18 | Fix minor: Payments page filter selects (Minor #15) | ✅ Complete |
+| 2026-01-18 | Fix minor: Navigation sheet width (Minor #16) | ✅ Complete (already has max-w-[85vw]) |
+| 2026-01-18 | Fix minor: Images without explicit dimensions (Minor #17) | ✅ Complete |
+| 2026-01-18 | Fix minor: Line length control missing (Minor #18) | ✅ Complete (prose classes already used) |

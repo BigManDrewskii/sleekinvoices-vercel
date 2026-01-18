@@ -480,7 +480,7 @@ export default function Payments() {
           {/* Payment Method Filter */}
           <FilterSelect label="Payment Method">
             <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-[160px] md:w-[180px]">
+              <SelectTrigger className="w-full sm:w-[160px] md:w-[180px]">
                 <SelectValue placeholder="All Methods" />
               </SelectTrigger>
               <SelectContent>
@@ -498,7 +498,7 @@ export default function Payments() {
           {/* Status Filter */}
           <FilterSelect label="Status">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[140px] md:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px] md:w-[160px]">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -514,7 +514,7 @@ export default function Payments() {
           {/* Date Range Filter */}
           <FilterSelect label="Date Range">
             <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[140px] md:w-[160px]">
+              <SelectTrigger className="w-full sm:w-[140px] md:w-[160px]">
                 <SelectValue placeholder="All Time" />
               </SelectTrigger>
               <SelectContent>
