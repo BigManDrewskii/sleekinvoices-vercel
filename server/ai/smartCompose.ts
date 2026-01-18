@@ -23,7 +23,7 @@ export interface SmartComposeResult {
 
 /**
  * Extract invoice data from natural language input
- * 
+ *
  * @example
  * Input: "Invoice Acme Corp for website redesign, $5000, due in 2 weeks"
  * Output: {
@@ -39,27 +39,28 @@ export async function extractInvoiceData(
   existingClients: Array<{ id: number; name: string; email?: string }> = []
 ): Promise<SmartComposeResult> {
   const startTime = Date.now();
-  
+
   // Check if user has credits
   const hasCredits = await hasAiCredits(userId, isPro);
   if (!hasCredits) {
     return {
       success: false,
-      error: isPro 
+      error: isPro
         ? "You've used all 50 AI credits this month. Credits reset on the 1st."
         : "You've used all 5 free AI credits this month. Upgrade to Pro for 50 credits/month.",
     };
   }
 
   // Build client context for better matching
-  const clientContext = existingClients.length > 0
-    ? `\n\nExisting clients (match if similar):\n${existingClients.map(c => `- ${c.name}${c.email ? ` (${c.email})` : ''}`).join('\n')}`
-    : '';
+  const clientContext =
+    existingClients.length > 0
+      ? `\n\nExisting clients (match if similar):\n${existingClients.map(c => `- ${c.name}${c.email ? ` (${c.email})` : ""}`).join("\n")}`
+      : "";
 
   const today = new Date();
   const systemPrompt = `You are an invoice data extraction assistant. Extract structured invoice data from natural language input.
 
-Today's date: ${today.toISOString().split('T')[0]}
+Today's date: ${today.toISOString().split("T")[0]}
 
 Rules:
 1. Extract client name, line items (description, quantity, rate), due date, and any notes
@@ -81,11 +82,11 @@ Respond ONLY with valid JSON matching this schema:
 }`;
 
   try {
-    console.log('[SmartCompose] Processing input:', input.substring(0, 100));
+    console.log("[SmartCompose] Processing input:", input.substring(0, 100));
     const response = await invokeLLM({
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: input }
+        { role: "user", content: input },
       ],
       response_format: {
         type: "json_schema",
@@ -95,8 +96,14 @@ Respond ONLY with valid JSON matching this schema:
           schema: {
             type: "object",
             properties: {
-              clientName: { type: "string", description: "Client name or empty string if not found" },
-              clientEmail: { type: "string", description: "Client email or empty string if not found" },
+              clientName: {
+                type: "string",
+                description: "Client name or empty string if not found",
+              },
+              clientEmail: {
+                type: "string",
+                description: "Client email or empty string if not found",
+              },
               lineItems: {
                 type: "array",
                 items: {
@@ -104,59 +111,79 @@ Respond ONLY with valid JSON matching this schema:
                   properties: {
                     description: { type: "string" },
                     quantity: { type: "number" },
-                    rate: { type: "number" }
+                    rate: { type: "number" },
                   },
                   required: ["description", "quantity", "rate"],
-                  additionalProperties: false
-                }
+                  additionalProperties: false,
+                },
               },
-              dueDate: { type: "string", description: "Due date in YYYY-MM-DD format or empty string" },
-              notes: { type: "string", description: "Additional notes or empty string" },
-              currency: { type: "string", description: "Currency code like USD, EUR, GBP or empty string" }
+              dueDate: {
+                type: "string",
+                description: "Due date in YYYY-MM-DD format or empty string",
+              },
+              notes: {
+                type: "string",
+                description: "Additional notes or empty string",
+              },
+              currency: {
+                type: "string",
+                description: "Currency code like USD, EUR, GBP or empty string",
+              },
             },
-            required: ["clientName", "clientEmail", "lineItems", "dueDate", "notes", "currency"],
-            additionalProperties: false
-          }
-        }
-      }
+            required: [
+              "clientName",
+              "clientEmail",
+              "lineItems",
+              "dueDate",
+              "notes",
+              "currency",
+            ],
+            additionalProperties: false,
+          },
+        },
+      },
     });
 
     const latencyMs = Date.now() - startTime;
-    console.log('[SmartCompose] Response received:', JSON.stringify(response, null, 2).substring(0, 500));
-    
+    console.log(
+      "[SmartCompose] Response received:",
+      JSON.stringify(response, null, 2).substring(0, 500)
+    );
+
     if (!response || !response.choices || response.choices.length === 0) {
       throw new Error("Invalid response structure from LLM");
     }
-    
+
     const content = response.choices[0]?.message?.content;
-    
+
     if (!content) {
       throw new Error("No content in response message");
     }
-    
+
     // Handle case where content might be an array (multimodal response)
-    const textContent = typeof content === 'string' 
-      ? content 
-      : Array.isArray(content) 
-        ? content.find(c => c.type === 'text')?.text 
-        : null;
-    
+    const textContent =
+      typeof content === "string"
+        ? content
+        : Array.isArray(content)
+          ? content.find(c => c.type === "text")?.text
+          : null;
+
     if (!textContent) {
       throw new Error("No text content in response");
     }
 
     const parsed = JSON.parse(textContent) as ExtractedInvoiceData;
-    
+
     // Use a credit
     await useAiCredit(userId, isPro);
-    
+
     // Log usage
     await logAiUsage({
       userId,
-      feature: 'smart_compose',
+      feature: "smart_compose",
       inputTokens: response.usage?.prompt_tokens || 0,
       outputTokens: response.usage?.completion_tokens || 0,
-      model: response.model || 'gemini-2.5-flash',
+      model: response.model || "gemini-2.5-flash",
       success: true,
       latencyMs,
     });
@@ -174,16 +201,17 @@ Respond ONLY with valid JSON matching this schema:
     };
   } catch (error) {
     const latencyMs = Date.now() - startTime;
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[SmartCompose] Error:', errorMessage, error);
-    
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("[SmartCompose] Error:", errorMessage, error);
+
     // Log failed attempt (don't consume credit on failure)
     await logAiUsage({
       userId,
-      feature: 'smart_compose',
+      feature: "smart_compose",
       inputTokens: 0,
       outputTokens: 0,
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       success: false,
       errorMessage,
       latencyMs,
@@ -191,7 +219,8 @@ Respond ONLY with valid JSON matching this schema:
 
     return {
       success: false,
-      error: "Failed to extract invoice data. Please try again or enter details manually.",
+      error:
+        "Failed to extract invoice data. Please try again or enter details manually.",
     };
   }
 }
@@ -208,17 +237,18 @@ export async function suggestLineItems(
   // Simple fuzzy matching against recent items
   // This doesn't use AI credits - it's a local operation
   const normalizedInput = partialDescription.toLowerCase().trim();
-  
+
   if (!normalizedInput || normalizedInput.length < 2) {
     return [];
   }
 
   const matches = recentLineItems
-    .filter(item => 
-      item.description.toLowerCase().includes(normalizedInput) ||
-      normalizedInput.split(' ').some(word => 
-        item.description.toLowerCase().includes(word)
-      )
+    .filter(
+      item =>
+        item.description.toLowerCase().includes(normalizedInput) ||
+        normalizedInput
+          .split(" ")
+          .some(word => item.description.toLowerCase().includes(word))
     )
     .slice(0, 5);
 

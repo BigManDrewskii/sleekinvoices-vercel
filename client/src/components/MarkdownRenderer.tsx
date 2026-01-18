@@ -23,29 +23,32 @@ function extractActions(content: string): {
   const actions = new Map<string, AIAction>();
   let counter = 0;
 
-  const processedContent = content.replace(actionRegex, (_, type, label, dataStr) => {
-    let data: Record<string, string | number | boolean> | undefined;
+  const processedContent = content.replace(
+    actionRegex,
+    (_, type, label, dataStr) => {
+      let data: Record<string, string | number | boolean> | undefined;
 
-    if (dataStr) {
-      try {
-        data = JSON.parse(dataStr);
-      } catch {
-        data = {};
-        dataStr.split(",").forEach((pair: string) => {
-          const [key, value] = pair.split("=");
-          if (key && value) {
-            data![key.trim()] = value.trim();
-          }
-        });
+      if (dataStr) {
+        try {
+          data = JSON.parse(dataStr);
+        } catch {
+          data = {};
+          dataStr.split(",").forEach((pair: string) => {
+            const [key, value] = pair.split("=");
+            if (key && value) {
+              data![key.trim()] = value.trim();
+            }
+          });
+        }
       }
+
+      const placeholder = `__ACTION_${counter}__`;
+      actions.set(placeholder, { type, label, data });
+      counter++;
+
+      return placeholder;
     }
-
-    const placeholder = `__ACTION_${counter}__`;
-    actions.set(placeholder, { type, label, data });
-    counter++;
-
-    return placeholder;
-  });
+  );
 
   return { processedContent, actions };
 }
@@ -53,7 +56,7 @@ function extractActions(content: string): {
 /**
  * Lightweight markdown renderer using react-markdown.
  * Replaces the heavy streamdown library (12MB) with a much lighter alternative (~200KB).
- * 
+ *
  * Features:
  * - GitHub Flavored Markdown (tables, strikethrough, task lists)
  * - Styled code blocks with copy button
@@ -72,7 +75,10 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   // Extract actions and create placeholders
   const { processedContent: contentWithPlaceholders, actions } = useMemo(() => {
     if (isStreaming) {
-      return { processedContent: content, actions: new Map<string, AIAction>() };
+      return {
+        processedContent: content,
+        actions: new Map<string, AIAction>(),
+      };
     }
     return extractActions(content);
   }, [content, isStreaming]);
@@ -153,7 +159,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               {children}
             </h3>
           ),
-          
+
           // Paragraphs - improved line height and spacing
           p: ({ children }) => {
             // Process children to handle action placeholders
@@ -166,8 +172,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                   )
                 )
               : typeof children === "string"
-              ? processTextWithActions(children)
-              : children;
+                ? processTextWithActions(children)
+                : children;
 
             return (
               <p className="mb-3 last:mb-0 leading-[1.7] text-foreground/90">
@@ -175,12 +181,10 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               </p>
             );
           },
-          
+
           // Lists - better visual hierarchy
           ul: ({ children }) => (
-            <ul className="mb-3 space-y-1.5 pl-0">
-              {children}
-            </ul>
+            <ul className="mb-3 space-y-1.5 pl-0">{children}</ul>
           ),
           ol: ({ children }) => (
             <ol className="mb-3 space-y-1.5 pl-0 list-decimal list-inside">
@@ -198,8 +202,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                   )
                 )
               : typeof children === "string"
-              ? processTextWithActions(children)
-              : children;
+                ? processTextWithActions(children)
+                : children;
 
             return (
               <li className="leading-[1.7] text-foreground/90 flex items-start gap-2">
@@ -208,12 +212,12 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               </li>
             );
           },
-          
+
           // Code blocks - enhanced styling with better copy button
           code: ({ className, children, ...props }) => {
             const isInline = !className;
             const codeString = String(children).replace(/\n$/, "");
-            
+
             if (isInline) {
               return (
                 <code
@@ -224,11 +228,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                 </code>
               );
             }
-            
+
             // Block code
             const language = className?.replace("language-", "") || "";
             const isCopied = copiedCode === codeString;
-            
+
             return (
               <div className="relative group my-3 rounded-lg overflow-hidden border border-border/50">
                 {/* Header with language badge */}
@@ -240,8 +244,8 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                     onClick={() => handleCopyCode(codeString)}
                     className={cn(
                       "flex items-center gap-1.5 px-2 py-1 text-xs rounded-md transition-all duration-200",
-                      isCopied 
-                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" 
+                      isCopied
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                         : "hover:bg-accent text-muted-foreground hover:text-foreground"
                     )}
                   >
@@ -260,31 +264,34 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
                 </div>
                 {/* Code content */}
                 <pre className="p-3 bg-muted/30 overflow-x-auto">
-                  <code className="text-[13px] font-mono leading-relaxed" {...props}>
+                  <code
+                    className="text-[13px] font-mono leading-relaxed"
+                    {...props}
+                  >
                     {children}
                   </code>
                 </pre>
               </div>
             );
           },
-          
+
           // Block quotes - refined styling
           blockquote: ({ children }) => (
             <blockquote className="border-l-2 border-primary/40 pl-3 my-3 text-foreground/80 italic">
               {children}
             </blockquote>
           ),
-          
+
           // Tables - improved styling
           table: ({ children }) => (
             <div className="overflow-x-auto my-3 rounded-lg border border-border/50">
-              <table className="min-w-full text-sm">
-                {children}
-              </table>
+              <table className="min-w-full text-sm">{children}</table>
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-muted/50 border-b border-border/50">{children}</thead>
+            <thead className="bg-muted/50 border-b border-border/50">
+              {children}
+            </thead>
           ),
           th: ({ children }) => (
             <th className="px-3 py-2 text-left font-medium text-foreground text-xs uppercase tracking-wide">
@@ -292,9 +299,11 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
             </th>
           ),
           td: ({ children }) => (
-            <td className="px-3 py-2 border-b border-border/30 text-foreground/90">{children}</td>
+            <td className="px-3 py-2 border-b border-border/30 text-foreground/90">
+              {children}
+            </td>
           ),
-          
+
           // Links - styled with primary color
           a: ({ href, children }) => (
             <a
@@ -306,23 +315,28 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
               {children}
             </a>
           ),
-          
+
           // Horizontal rule
           hr: () => <hr className="my-4 border-border/50" />,
-          
+
           // Strong and emphasis - more prominent styling
           strong: ({ children }) => {
             // Process children to handle action placeholders
-            const processedChildren = typeof children === "string"
-              ? processTextWithActions(children)
-              : children;
+            const processedChildren =
+              typeof children === "string"
+                ? processTextWithActions(children)
+                : children;
 
             return (
-              <strong className="font-semibold text-foreground">{processedChildren}</strong>
+              <strong className="font-semibold text-foreground">
+                {processedChildren}
+              </strong>
             );
           },
-          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
-          
+          em: ({ children }) => (
+            <em className="italic text-foreground/90">{children}</em>
+          ),
+
           // Task lists (GFM)
           input: ({ checked, ...props }) => (
             <input

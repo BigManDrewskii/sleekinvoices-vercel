@@ -29,8 +29,8 @@ export function useListState<T extends Record<string, any>>({
     if (!searchQuery || searchFields.length === 0) return data;
 
     const query = searchQuery.toLowerCase();
-    return data.filter((item) =>
-      searchFields.some((field) => {
+    return data.filter(item =>
+      searchFields.some(field => {
         const value = item[field];
         if (value === null || value === undefined) return false;
         return String(value).toLowerCase().includes(query);
@@ -57,7 +57,7 @@ export function useListState<T extends Record<string, any>>({
 
   const toggleSort = (field: keyof T) => {
     if (field === sortField) {
-      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+      setSortDirection(d => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
       setSortDirection("asc");
@@ -116,6 +116,7 @@ export function useBulkSelection(allItemIds: number[] = []) {
     getSelectedCount,
     getSelectedIds,
     hasSelection: selectedIds.size > 0,
-    isAllSelected: allItemIds.length > 0 && selectedIds.size === allItemIds.length,
+    isAllSelected:
+      allItemIds.length > 0 && selectedIds.size === allItemIds.length,
   };
 }

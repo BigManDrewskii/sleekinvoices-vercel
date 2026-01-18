@@ -25,7 +25,11 @@ import {
   ESTIMATE_STATUS_DISTRIBUTION,
   RECURRING_FREQUENCY_DISTRIBUTION,
 } from "../data/constants";
-import { INVOICE_NOTES, PAYMENT_TERMS, INVOICE_LINE_ITEMS } from "../data/realistic-data";
+import {
+  INVOICE_NOTES,
+  PAYMENT_TERMS,
+  INVOICE_LINE_ITEMS,
+} from "../data/realistic-data";
 import {
   randomInt,
   randomChoice,
@@ -70,7 +74,9 @@ export async function seedInvoices(
     const userClients = seededClients.filter(c => c.userId === user.id);
     const userProducts = seededProducts.filter(p => p.userId === user.id);
     const userTemplates = seededTemplates.filter(t => t.userId === user.id);
-    const userCustomFields = seededCustomFields.filter(f => f.userId === user.id);
+    const userCustomFields = seededCustomFields.filter(
+      f => f.userId === user.id
+    );
 
     const statusCounts = { ...INVOICE_STATUS_DISTRIBUTION };
     const dates = generateDateDistribution(SEED_CONFIG.invoicesPerUser);
@@ -196,7 +202,10 @@ export async function seedInvoices(
           await seedInvoiceCustomFieldValues(db, invoice.id, userCustomFields);
         }
       } catch (error) {
-        console.error(`Failed to create invoice ${i} for user ${user.id}:`, error);
+        console.error(
+          `Failed to create invoice ${i} for user ${user.id}:`,
+          error
+        );
       }
     }
   }
@@ -211,7 +220,9 @@ async function seedInvoiceViews(db: any, invoiceId: number): Promise<void> {
   for (let i = 0; i < viewCount; i++) {
     await db.insert(invoiceViews).values({
       invoiceId,
-      viewedAt: new Date(now.getTime() - randomInt(1, 30) * 24 * 60 * 60 * 1000),
+      viewedAt: new Date(
+        now.getTime() - randomInt(1, 30) * 24 * 60 * 60 * 1000
+      ),
       ipAddress: `192.168.${randomInt(0, 255)}.${randomInt(0, 255)}`,
       userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       isFirstView: i === 0,
@@ -224,7 +235,10 @@ async function seedInvoiceCustomFieldValues(
   invoiceId: number,
   customFields: SeededCustomField[]
 ): Promise<void> {
-  const fieldsToUse = randomChoices(customFields, Math.min(2, customFields.length));
+  const fieldsToUse = randomChoices(
+    customFields,
+    Math.min(2, customFields.length)
+  );
 
   for (const field of fieldsToUse) {
     let value = "";
@@ -325,10 +339,14 @@ async function seedInvoiceGenerationLogs(
     const success = Math.random() < 0.9;
     await db.insert(invoiceGenerationLogs).values({
       recurringInvoiceId,
-      generationDate: new Date(now.getTime() - (numLogs - i) * 7 * 24 * 60 * 60 * 1000),
+      generationDate: new Date(
+        now.getTime() - (numLogs - i) * 7 * 24 * 60 * 60 * 1000
+      ),
       status: success ? "success" : "failed",
       generatedInvoiceId: success ? randomInt(1, 100) : null,
-      errorMessage: success ? null : "Failed to generate invoice due to validation error",
+      errorMessage: success
+        ? null
+        : "Failed to generate invoice due to validation error",
     });
   }
 }
@@ -349,8 +367,12 @@ export async function seedEstimates(
       const status = getNextEstimateStatus(statusCounts);
       const client = randomChoice(userClients);
       const now = new Date();
-      const issueDate = new Date(now.getTime() - randomInt(30, 90) * 24 * 60 * 60 * 1000);
-      const expiryDate = new Date(issueDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const issueDate = new Date(
+        now.getTime() - randomInt(30, 90) * 24 * 60 * 60 * 1000
+      );
+      const expiryDate = new Date(
+        issueDate.getTime() + 30 * 24 * 60 * 60 * 1000
+      );
 
       const estimateData: InsertEstimate = {
         userId: user.id,
@@ -369,7 +391,10 @@ export async function seedEstimates(
         issueDate,
         validUntil: expiryDate,
         sentAt: status !== "draft" ? issueDate : null,
-        convertedToInvoiceId: status === "accepted" && Math.random() < 0.5 ? randomInt(1, 50) : null,
+        convertedToInvoiceId:
+          status === "accepted" && Math.random() < 0.5
+            ? randomInt(1, 50)
+            : null,
       };
 
       const result = await db.insert(estimates).values([estimateData]);
@@ -441,7 +466,9 @@ function getNextEstimateStatus(statusCounts: Record<string, number>): string {
   return "draft";
 }
 
-function getNextFrequency(frequencyCounts: Record<string, number>): "weekly" | "monthly" | "yearly" {
+function getNextFrequency(
+  frequencyCounts: Record<string, number>
+): "weekly" | "monthly" | "yearly" {
   for (const [frequency, count] of Object.entries(frequencyCounts)) {
     if (count > 0) {
       frequencyCounts[frequency]--;

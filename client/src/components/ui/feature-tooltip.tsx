@@ -1,21 +1,21 @@
-import { useState, useRef, useEffect, ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { cn } from '@/lib/utils';
-import { Info, X } from 'lucide-react';
+import { useState, useRef, useEffect, ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
+import { Info, X } from "lucide-react";
 
 interface FeatureTooltipProps {
   id: string;
   title?: string;
   content: string;
   children: ReactNode;
-  placement?: 'top' | 'bottom' | 'left' | 'right';
+  placement?: "top" | "bottom" | "left" | "right";
   showIcon?: boolean;
   dismissible?: boolean;
   delay?: number;
   className?: string;
 }
 
-const DISMISSED_KEY = 'sleek_tooltips_dismissed';
+const DISMISSED_KEY = "sleek_tooltips_dismissed";
 
 function getDismissedTooltips(): string[] {
   try {
@@ -39,7 +39,7 @@ export function FeatureTooltip({
   title,
   content,
   children,
-  placement = 'top',
+  placement = "top",
   showIcon = false,
   dismissible = false,
   delay = 300,
@@ -71,26 +71,37 @@ export function FeatureTooltip({
     let left = 0;
 
     switch (placement) {
-      case 'top':
+      case "top":
         top = triggerRect.top - tooltipRect.height - gap + window.scrollY;
         left = triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
         break;
-      case 'bottom':
+      case "bottom":
         top = triggerRect.bottom + gap + window.scrollY;
         left = triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
         break;
-      case 'left':
-        top = triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2 + window.scrollY;
+      case "left":
+        top =
+          triggerRect.top +
+          triggerRect.height / 2 -
+          tooltipRect.height / 2 +
+          window.scrollY;
         left = triggerRect.left - tooltipRect.width - gap;
         break;
-      case 'right':
-        top = triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2 + window.scrollY;
+      case "right":
+        top =
+          triggerRect.top +
+          triggerRect.height / 2 -
+          tooltipRect.height / 2 +
+          window.scrollY;
         left = triggerRect.right + gap;
         break;
     }
 
     // Keep within viewport
-    left = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
+    left = Math.max(
+      8,
+      Math.min(left, window.innerWidth - tooltipRect.width - 8)
+    );
     top = Math.max(8, top);
 
     setPosition({ top, left });
@@ -151,57 +162,67 @@ export function FeatureTooltip({
         )}
       </div>
 
-      {isVisible && !isDismissed && createPortal(
-        <div
-          ref={tooltipRef}
-          className={cn(
-            "fixed z-[9998] max-w-[280px] pointer-events-auto",
-            "bg-popover border border-border/50 rounded-xl shadow-lg",
-            "animate-in fade-in zoom-in-95 duration-200",
-            placement === 'top' && "origin-bottom",
-            placement === 'bottom' && "origin-top",
-            placement === 'left' && "origin-right",
-            placement === 'right' && "origin-left"
-          )}
-          style={{
-            top: position.top,
-            left: position.left,
-          }}
-          onMouseEnter={() => setIsVisible(true)}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Arrow */}
+      {isVisible &&
+        !isDismissed &&
+        createPortal(
           <div
+            ref={tooltipRef}
             className={cn(
-              "absolute w-2 h-2 bg-popover border-border/50 rotate-45",
-              placement === 'top' && "bottom-[-5px] left-1/2 -translate-x-1/2 border-b border-r",
-              placement === 'bottom' && "top-[-5px] left-1/2 -translate-x-1/2 border-t border-l",
-              placement === 'left' && "right-[-5px] top-1/2 -translate-y-1/2 border-t border-r",
-              placement === 'right' && "left-[-5px] top-1/2 -translate-y-1/2 border-b border-l"
+              "fixed z-[9998] max-w-[280px] pointer-events-auto",
+              "bg-popover border border-border/50 rounded-xl shadow-lg",
+              "animate-in fade-in zoom-in-95 duration-200",
+              placement === "top" && "origin-bottom",
+              placement === "bottom" && "origin-top",
+              placement === "left" && "origin-right",
+              placement === "right" && "origin-left"
             )}
-          />
+            style={{
+              top: position.top,
+              left: position.left,
+            }}
+            onMouseEnter={() => setIsVisible(true)}
+            onMouseLeave={handleMouseLeave}
+          >
+            {/* Arrow */}
+            <div
+              className={cn(
+                "absolute w-2 h-2 bg-popover border-border/50 rotate-45",
+                placement === "top" &&
+                  "bottom-[-5px] left-1/2 -translate-x-1/2 border-b border-r",
+                placement === "bottom" &&
+                  "top-[-5px] left-1/2 -translate-x-1/2 border-t border-l",
+                placement === "left" &&
+                  "right-[-5px] top-1/2 -translate-y-1/2 border-t border-r",
+                placement === "right" &&
+                  "left-[-5px] top-1/2 -translate-y-1/2 border-b border-l"
+              )}
+            />
 
-          <div className="p-3">
-            {(title || dismissible) && (
-              <div className="flex items-start justify-between gap-2 mb-1">
-                {title && (
-                  <h4 className="text-sm font-medium text-foreground">{title}</h4>
-                )}
-                {dismissible && (
-                  <button
-                    onClick={handleDismiss}
-                    className="h-5 w-5 rounded-md hover:bg-muted flex items-center justify-center flex-shrink-0"
-                  >
-                    <X className="h-3 w-3 text-muted-foreground" />
-                  </button>
-                )}
-              </div>
-            )}
-            <p className="text-xs text-muted-foreground leading-relaxed">{content}</p>
-          </div>
-        </div>,
-        document.body
-      )}
+            <div className="p-3">
+              {(title || dismissible) && (
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  {title && (
+                    <h4 className="text-sm font-medium text-foreground">
+                      {title}
+                    </h4>
+                  )}
+                  {dismissible && (
+                    <button
+                      onClick={handleDismiss}
+                      className="h-5 w-5 rounded-md hover:bg-muted flex items-center justify-center flex-shrink-0"
+                    >
+                      <X className="h-3 w-3 text-muted-foreground" />
+                    </button>
+                  )}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {content}
+              </p>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }
@@ -210,14 +231,14 @@ export function FeatureTooltip({
 interface SimpleTooltipProps {
   content: string;
   children: ReactNode;
-  placement?: 'top' | 'bottom' | 'left' | 'right';
+  placement?: "top" | "bottom" | "left" | "right";
   delay?: number;
 }
 
 export function SimpleTooltip({
   content,
   children,
-  placement = 'top',
+  placement = "top",
   delay = 200,
 }: SimpleTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -235,19 +256,19 @@ export function SimpleTooltip({
     let left = 0;
 
     switch (placement) {
-      case 'top':
+      case "top":
         top = rect.top - gap + window.scrollY;
         left = rect.left + rect.width / 2;
         break;
-      case 'bottom':
+      case "bottom":
         top = rect.bottom + gap + window.scrollY;
         left = rect.left + rect.width / 2;
         break;
-      case 'left':
+      case "left":
         top = rect.top + rect.height / 2 + window.scrollY;
         left = rect.left - gap;
         break;
-      case 'right':
+      case "right":
         top = rect.top + rect.height / 2 + window.scrollY;
         left = rect.right + gap;
         break;
@@ -281,27 +302,28 @@ export function SimpleTooltip({
         {children}
       </div>
 
-      {isVisible && createPortal(
-        <div
-          className={cn(
-            "fixed z-[9997] px-2.5 py-1.5 text-xs font-medium",
-            "bg-foreground text-background rounded-md shadow-md",
-            "animate-in fade-in zoom-in-95 duration-150",
-            "whitespace-nowrap pointer-events-none",
-            placement === 'top' && "-translate-x-1/2 -translate-y-full",
-            placement === 'bottom' && "-translate-x-1/2",
-            placement === 'left' && "-translate-x-full -translate-y-1/2",
-            placement === 'right' && "-translate-y-1/2"
-          )}
-          style={{
-            top: position.top,
-            left: position.left,
-          }}
-        >
-          {content}
-        </div>,
-        document.body
-      )}
+      {isVisible &&
+        createPortal(
+          <div
+            className={cn(
+              "fixed z-[9997] px-2.5 py-1.5 text-xs font-medium",
+              "bg-foreground text-background rounded-md shadow-md",
+              "animate-in fade-in zoom-in-95 duration-150",
+              "whitespace-nowrap pointer-events-none",
+              placement === "top" && "-translate-x-1/2 -translate-y-full",
+              placement === "bottom" && "-translate-x-1/2",
+              placement === "left" && "-translate-x-full -translate-y-1/2",
+              placement === "right" && "-translate-y-1/2"
+            )}
+            style={{
+              top: position.top,
+              left: position.left,
+            }}
+          >
+            {content}
+          </div>,
+          document.body
+        )}
     </>
   );
 }

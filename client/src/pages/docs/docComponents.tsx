@@ -41,12 +41,16 @@ export const P = ({ children }: { children: ReactNode }) => (
 
 // Unordered List
 export const UL = ({ children }: { children: ReactNode }) => (
-  <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-6">{children}</ul>
+  <ul className="list-disc list-inside space-y-2 text-muted-foreground mb-6">
+    {children}
+  </ul>
 );
 
 // Ordered List
 export const OL = ({ children }: { children: ReactNode }) => (
-  <ol className="list-decimal list-inside space-y-3 text-foreground mb-6">{children}</ol>
+  <ol className="list-decimal list-inside space-y-3 text-foreground mb-6">
+    {children}
+  </ol>
 );
 
 // List Item
@@ -61,7 +65,9 @@ export const Strong = ({ children }: { children: ReactNode }) => (
 
 // Inline Code
 export const Code = ({ children }: { children: ReactNode }) => (
-  <code className="font-mono bg-muted px-2 py-1 rounded text-sm text-foreground">{children}</code>
+  <code className="font-mono bg-muted px-2 py-1 rounded text-sm text-foreground">
+    {children}
+  </code>
 );
 
 // Code Block
@@ -102,7 +108,10 @@ export const Table = ({
       <thead className="bg-muted">
         <tr>
           {headers.map((header, i) => (
-            <th key={i} className="border border-border p-3 text-left font-semibold text-foreground">
+            <th
+              key={i}
+              className="border border-border p-3 text-left font-semibold text-foreground"
+            >
               {header}
             </th>
           ))}
@@ -112,7 +121,10 @@ export const Table = ({
         {rows.map((row, i) => (
           <tr key={i} className="hover:bg-muted/50 transition-colors">
             {row.map((cell, j) => (
-              <td key={j} className="border border-border p-3 text-muted-foreground">
+              <td
+                key={j}
+                className="border border-border p-3 text-muted-foreground"
+              >
                 {cell}
               </td>
             ))}

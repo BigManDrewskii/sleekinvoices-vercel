@@ -5,7 +5,13 @@ import type {
   InsertEstimate,
   InsertEstimateLineItem,
 } from "../../drizzle/schema.js";
-import { estimates, estimateLineItems, clients, invoices, invoiceLineItems } from "../../drizzle/schema.js";
+import {
+  estimates,
+  estimateLineItems,
+  clients,
+  invoices,
+  invoiceLineItems,
+} from "../../drizzle/schema.js";
 import { getDb } from "./connection.js";
 
 /**
@@ -239,7 +245,7 @@ export async function convertEstimateToInvoice(
   // Create line items
   if (lineItems.length > 0) {
     await db.insert(invoiceLineItems).values(
-      lineItems.map((item) => ({
+      lineItems.map(item => ({
         invoiceId,
         description: item.description,
         quantity: item.quantity,

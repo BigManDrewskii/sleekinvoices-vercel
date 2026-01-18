@@ -27,7 +27,9 @@ const mockUser = {
   updatedAt: new Date(),
 };
 
-const createMockContext = (user: typeof mockUser | null = mockUser): Context => ({
+const createMockContext = (
+  user: typeof mockUser | null = mockUser
+): Context => ({
   user,
   req: {} as any,
   res: {} as any,
@@ -162,16 +164,16 @@ describe("Payment Status Filters", () => {
       const caller = appRouter.createCaller(createMockContext());
       const invoices = await caller.invoices.list();
 
-      const testInvoices = invoices.filter((inv) => 
+      const testInvoices = invoices.filter(inv =>
         testInvoiceIds.includes(inv.id)
       );
 
       expect(testInvoices.length).toBe(3);
-      
+
       // Each invoice should have payment status
-      testInvoices.forEach((invoice) => {
+      testInvoices.forEach(invoice => {
         expect(invoice.paymentStatus).toBeDefined();
-        expect(['unpaid', 'partial', 'paid']).toContain(invoice.paymentStatus);
+        expect(["unpaid", "partial", "paid"]).toContain(invoice.paymentStatus);
       });
     });
 
@@ -179,7 +181,7 @@ describe("Payment Status Filters", () => {
       const caller = appRouter.createCaller(createMockContext());
       const invoices = await caller.invoices.list();
 
-      const unpaidInvoice = invoices.find((inv) => inv.id === unpaidInvoiceId);
+      const unpaidInvoice = invoices.find(inv => inv.id === unpaidInvoiceId);
 
       expect(unpaidInvoice).toBeDefined();
       expect(unpaidInvoice?.paymentStatus).toBe("unpaid");
@@ -191,7 +193,7 @@ describe("Payment Status Filters", () => {
       const caller = appRouter.createCaller(createMockContext());
       const invoices = await caller.invoices.list();
 
-      const partialInvoice = invoices.find((inv) => inv.id === partialInvoiceId);
+      const partialInvoice = invoices.find(inv => inv.id === partialInvoiceId);
 
       expect(partialInvoice).toBeDefined();
       expect(partialInvoice?.paymentStatus).toBe("partial");
@@ -204,7 +206,7 @@ describe("Payment Status Filters", () => {
       const caller = appRouter.createCaller(createMockContext());
       const invoices = await caller.invoices.list();
 
-      const paidInvoice = invoices.find((inv) => inv.id === paidInvoiceId);
+      const paidInvoice = invoices.find(inv => inv.id === paidInvoiceId);
 
       expect(paidInvoice).toBeDefined();
       expect(paidInvoice?.paymentStatus).toBe("paid");
@@ -218,22 +220,23 @@ describe("Payment Status Filters", () => {
       const allInvoices = await caller.invoices.list();
 
       // Filter unpaid
-      const unpaidInvoices = allInvoices.filter((inv) => 
-        testInvoiceIds.includes(inv.id) && inv.paymentStatus === "unpaid"
+      const unpaidInvoices = allInvoices.filter(
+        inv => testInvoiceIds.includes(inv.id) && inv.paymentStatus === "unpaid"
       );
       expect(unpaidInvoices.length).toBe(1);
       expect(unpaidInvoices[0].id).toBe(unpaidInvoiceId);
 
       // Filter partial
-      const partialInvoices = allInvoices.filter((inv) => 
-        testInvoiceIds.includes(inv.id) && inv.paymentStatus === "partial"
+      const partialInvoices = allInvoices.filter(
+        inv =>
+          testInvoiceIds.includes(inv.id) && inv.paymentStatus === "partial"
       );
       expect(partialInvoices.length).toBe(1);
       expect(partialInvoices[0].id).toBe(partialInvoiceId);
 
       // Filter paid
-      const paidInvoices = allInvoices.filter((inv) => 
-        testInvoiceIds.includes(inv.id) && inv.paymentStatus === "paid"
+      const paidInvoices = allInvoices.filter(
+        inv => testInvoiceIds.includes(inv.id) && inv.paymentStatus === "paid"
       );
       expect(paidInvoices.length).toBe(1);
       expect(paidInvoices[0].id).toBe(paidInvoiceId);

@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { LucideIcon } from 'lucide-react';
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { LucideIcon } from "lucide-react";
 
 interface EmptyStateProps {
   /** Icon to display (fallback if no illustration) */
@@ -25,15 +25,15 @@ interface EmptyStateProps {
   /** Additional className */
   className?: string;
   /** Size variant */
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
 /**
  * EmptyState component for displaying when there's no data
- * 
+ *
  * Supports custom mascot illustrations via the `illustration` prop.
  * Pass either a React component or an image URL.
- * 
+ *
  * @example
  * // With custom illustration component
  * <EmptyState
@@ -42,7 +42,7 @@ interface EmptyStateProps {
  *   description="Create your first invoice to get started"
  *   action={{ label: "Create Invoice", onClick: () => {} }}
  * />
- * 
+ *
  * @example
  * // With image URL
  * <EmptyState
@@ -59,29 +59,29 @@ export function EmptyState({
   action,
   secondaryAction,
   className,
-  size = 'md',
+  size = "md",
 }: EmptyStateProps) {
   const sizeClasses = {
     sm: {
-      container: 'py-8',
-      illustration: 'h-52 w-52',
-      icon: 'h-10 w-10',
-      title: 'text-base',
-      description: 'text-sm',
+      container: "py-8",
+      illustration: "h-52 w-52",
+      icon: "h-10 w-10",
+      title: "text-base",
+      description: "text-sm",
     },
     md: {
-      container: 'py-12',
-      illustration: 'h-72 w-72',
-      icon: 'h-12 w-12',
-      title: 'text-lg',
-      description: 'text-sm',
+      container: "py-12",
+      illustration: "h-72 w-72",
+      icon: "h-12 w-12",
+      title: "text-lg",
+      description: "text-sm",
     },
     lg: {
-      container: 'py-16',
-      illustration: 'h-96 w-96',
-      icon: 'h-16 w-16',
-      title: 'text-xl',
-      description: 'text-base',
+      container: "py-16",
+      illustration: "h-96 w-96",
+      icon: "h-16 w-16",
+      title: "text-xl",
+      description: "text-base",
     },
   };
 
@@ -90,7 +90,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center text-center',
+        "flex flex-col items-center justify-center text-center",
         sizes.container,
         className
       )}
@@ -98,44 +98,39 @@ export function EmptyState({
       {/* Illustration or Icon */}
       <div className="mb-6">
         {illustration ? (
-          typeof illustration === 'string' ? (
+          typeof illustration === "string" ? (
             <img
               src={illustration}
               alt=""
-              className={cn(sizes.illustration, 'object-contain opacity-95')}
+              className={cn(sizes.illustration, "object-contain opacity-95")}
             />
           ) : (
             <div className={sizes.illustration}>{illustration}</div>
           )
         ) : Icon ? (
           <div className="rounded-full bg-muted p-4">
-            <Icon className={cn(sizes.icon, 'text-muted-foreground')} />
+            <Icon className={cn(sizes.icon, "text-muted-foreground")} />
           </div>
         ) : (
           // Placeholder for mascot - shows a subtle box where illustration will go
           <div
             className={cn(
               sizes.illustration,
-              'rounded-2xl bg-muted/50 border-2 border-dashed border-muted-foreground/20',
-              'flex items-center justify-center'
+              "rounded-2xl bg-muted/50 border-2 border-dashed border-muted-foreground/20",
+              "flex items-center justify-center"
             )}
           >
-            <span className="text-xs text-muted-foreground/50">
-              Mascot
-            </span>
+            <span className="text-xs text-muted-foreground/50">Mascot</span>
           </div>
         )}
       </div>
 
       {/* Text Content */}
-      <h3 className={cn('font-semibold text-foreground mb-2', sizes.title)}>
+      <h3 className={cn("font-semibold text-foreground mb-2", sizes.title)}>
         {title}
       </h3>
       <p
-        className={cn(
-          'text-muted-foreground max-w-sm mb-6',
-          sizes.description
-        )}
+        className={cn("text-muted-foreground max-w-sm mb-6", sizes.description)}
       >
         {description}
       </p>
@@ -166,63 +161,73 @@ export function EmptyState({
  */
 export const EmptyStatePresets = {
   invoices: {
-    illustration: '/sleeky/empty-states/invoices.png',
-    title: 'No invoices yet',
-    description: 'Create your first invoice to start tracking your revenue and getting paid faster.',
+    illustration: "/sleeky/empty-states/invoices.png",
+    title: "No invoices yet",
+    description:
+      "Create your first invoice to start tracking your revenue and getting paid faster.",
   },
   clients: {
-    illustration: '/sleeky/empty-states/clients.png',
-    title: 'No clients yet',
-    description: 'Add your first client to start creating invoices and building relationships.',
+    illustration: "/sleeky/empty-states/clients.png",
+    title: "No clients yet",
+    description:
+      "Add your first client to start creating invoices and building relationships.",
   },
   expenses: {
-    illustration: '/sleeky/empty-states/expenses.png',
-    title: 'No expenses recorded',
-    description: 'Track your business expenses to get a complete picture of your finances.',
+    illustration: "/sleeky/empty-states/expenses.png",
+    title: "No expenses recorded",
+    description:
+      "Track your business expenses to get a complete picture of your finances.",
   },
   estimates: {
-    illustration: '/sleeky/empty-states/estimates.png',
-    title: 'No estimates yet',
-    description: 'Create estimates to send professional quotes to potential clients.',
+    illustration: "/sleeky/empty-states/estimates.png",
+    title: "No estimates yet",
+    description:
+      "Create estimates to send professional quotes to potential clients.",
   },
   payments: {
-    illustration: '/sleeky/empty-states/payments.png',
-    title: 'No payments recorded',
-    description: 'Payments will appear here once your clients start paying their invoices.',
+    illustration: "/sleeky/empty-states/payments.png",
+    title: "No payments recorded",
+    description:
+      "Payments will appear here once your clients start paying their invoices.",
   },
   products: {
-    illustration: '/sleeky/empty-states/products.png',
-    title: 'No products or services',
-    description: 'Add your products and services to quickly add them to invoices.',
+    illustration: "/sleeky/empty-states/products.png",
+    title: "No products or services",
+    description:
+      "Add your products and services to quickly add them to invoices.",
   },
   templates: {
-    illustration: '/sleeky/empty-states/analytics.png',
-    title: 'No custom templates',
-    description: 'Create custom invoice templates to match your brand.',
+    illustration: "/sleeky/empty-states/analytics.png",
+    title: "No custom templates",
+    description: "Create custom invoice templates to match your brand.",
   },
   recurring: {
-    illustration: '/sleeky/empty-states/invoices.png',
-    title: 'No recurring invoices',
-    description: 'Set up recurring invoices to automate billing for regular clients.',
+    illustration: "/sleeky/empty-states/invoices.png",
+    title: "No recurring invoices",
+    description:
+      "Set up recurring invoices to automate billing for regular clients.",
   },
   search: {
-    illustration: '/sleeky/empty-states/search-results.png',
-    title: 'No results found',
-    description: 'Try adjusting your search or filters to find what you\'re looking for.',
+    illustration: "/sleeky/empty-states/search-results.png",
+    title: "No results found",
+    description:
+      "Try adjusting your search or filters to find what you're looking for.",
   },
   emailHistory: {
-    illustration: '/sleeky/empty-states/email-history.png',
-    title: 'No emails sent yet',
-    description: 'Email history will appear here once you start sending invoices to clients.',
+    illustration: "/sleeky/empty-states/email-history.png",
+    title: "No emails sent yet",
+    description:
+      "Email history will appear here once you start sending invoices to clients.",
   },
   analytics: {
-    illustration: '/sleeky/empty-states/analytics.png',
-    title: 'No data yet',
-    description: 'Analytics will show once you have invoices and payments to analyze.',
+    illustration: "/sleeky/empty-states/analytics.png",
+    title: "No data yet",
+    description:
+      "Analytics will show once you have invoices and payments to analyze.",
   },
   subscriptionHistory: {
-    illustration: '/sleeky/empty-states/subscription-history.png',
-    title: 'No subscription history',
-    description: 'Your subscription and payment history will appear here.',
+    illustration: "/sleeky/empty-states/subscription-history.png",
+    title: "No subscription history",
+    description: "Your subscription and payment history will appear here.",
   },
 };

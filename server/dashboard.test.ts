@@ -27,7 +27,9 @@ const mockUser = {
   updatedAt: new Date(),
 };
 
-const createMockContext = (user: typeof mockUser | null = mockUser): Context => ({
+const createMockContext = (
+  user: typeof mockUser | null = mockUser
+): Context => ({
   user,
   req: {} as any,
   res: {} as any,
@@ -142,7 +144,7 @@ describe("Dashboard Statistics with Payment Integration", () => {
 
       expect(stats.totalRevenue).toBeGreaterThanOrEqual(500);
       expect(stats.paidInvoices).toBeGreaterThanOrEqual(1);
-      
+
       // Check invoice status was updated
       const updatedInvoice = await db.getInvoiceById(invoice.id, mockUser.id);
       expect(updatedInvoice?.status).toBe("paid");
@@ -192,12 +194,12 @@ describe("Dashboard Statistics with Payment Integration", () => {
 
       expect(stats.partiallyPaidInvoices).toBeGreaterThanOrEqual(1);
       expect(stats.totalRevenue).toBeGreaterThanOrEqual(500);
-      
+
       // Check invoice status (should still be 'sent', not 'paid')
       const updatedInvoice = await db.getInvoiceById(invoice.id, mockUser.id);
       expect(updatedInvoice?.status).toBe("sent");
       expect(Number(updatedInvoice?.amountPaid)).toBe(500);
-      
+
       // Outstanding balance should reflect partial payment
       const paymentStatus = await db.getInvoicePaymentStatus(invoice.id);
       expect(paymentStatus.status).toBe("partial");
@@ -280,9 +282,9 @@ describe("Dashboard Statistics with Payment Integration", () => {
   describe("getInvoiceStats with Mixed Statuses", () => {
     it("should correctly calculate stats with mix of paid/partial/unpaid", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       // Create 3 invoices with different payment statuses
-      
+
       // Invoice 1: Fully paid
       const invoice1 = await db.createInvoice({
         userId: mockUser.id,
@@ -306,7 +308,7 @@ describe("Dashboard Statistics with Payment Integration", () => {
         stripePaymentLinkId: null,
       });
       testInvoiceIds.push(invoice1.id);
-      
+
       const payment1 = await caller.payments.create({
         invoiceId: invoice1.id,
         amount: "200.00",
@@ -339,7 +341,7 @@ describe("Dashboard Statistics with Payment Integration", () => {
         stripePaymentLinkId: null,
       });
       testInvoiceIds.push(invoice2.id);
-      
+
       const payment2 = await caller.payments.create({
         invoiceId: invoice2.id,
         amount: "150.00",
@@ -378,12 +380,12 @@ describe("Dashboard Statistics with Payment Integration", () => {
 
       // Total revenue should be sum of all payments
       expect(stats.totalRevenue).toBeGreaterThanOrEqual(350); // 200 + 150
-      
+
       // Should have at least 1 paid, 1 partial, 1 unpaid
       expect(stats.paidInvoices).toBeGreaterThanOrEqual(1);
       expect(stats.partiallyPaidInvoices).toBeGreaterThanOrEqual(1);
       expect(stats.unpaidInvoices).toBeGreaterThanOrEqual(1);
-      
+
       // Outstanding balance should be partial + unpaid
       expect(stats.outstandingBalance).toBeGreaterThanOrEqual(850); // (400-150) + 600
     });

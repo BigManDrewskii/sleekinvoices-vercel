@@ -17,9 +17,11 @@ describe("Phase 1.1: Payment Gateways Table", () => {
     // Cleanup test data
     const db = await getDb();
     if (!db) return;
-    
+
     if (testGatewayId) {
-      await db.delete(paymentGateways).where(eq(paymentGateways.id, testGatewayId));
+      await db
+        .delete(paymentGateways)
+        .where(eq(paymentGateways.id, testGatewayId));
     }
   });
 
@@ -29,13 +31,16 @@ describe("Phase 1.1: Payment Gateways Table", () => {
       if (!db) throw new Error("Database not available");
 
       // Insert a stripe_connect gateway
-      const [stripeGateway] = await db.insert(paymentGateways).values({
-        userId: mockUserId,
-        provider: "stripe_connect",
-        config: JSON.stringify({ accountId: "acct_test123" }),
-        isEnabled: true,
-        displayName: "My Stripe Account",
-      }).$returningId();
+      const [stripeGateway] = await db
+        .insert(paymentGateways)
+        .values({
+          userId: mockUserId,
+          provider: "stripe_connect",
+          config: JSON.stringify({ accountId: "acct_test123" }),
+          isEnabled: true,
+          displayName: "My Stripe Account",
+        })
+        .$returningId();
 
       testGatewayId = stripeGateway.id;
 
@@ -55,13 +60,16 @@ describe("Phase 1.1: Payment Gateways Table", () => {
       if (!db) throw new Error("Database not available");
 
       // Insert a coinbase_commerce gateway
-      const [coinbaseGateway] = await db.insert(paymentGateways).values({
-        userId: mockUserId,
-        provider: "coinbase_commerce",
-        config: JSON.stringify({ apiKey: "encrypted_api_key_here" }),
-        isEnabled: true,
-        displayName: "My Coinbase Commerce",
-      }).$returningId();
+      const [coinbaseGateway] = await db
+        .insert(paymentGateways)
+        .values({
+          userId: mockUserId,
+          provider: "coinbase_commerce",
+          config: JSON.stringify({ apiKey: "encrypted_api_key_here" }),
+          isEnabled: true,
+          displayName: "My Coinbase Commerce",
+        })
+        .$returningId();
 
       // Verify it was created
       const [gateway] = await db
@@ -73,7 +81,9 @@ describe("Phase 1.1: Payment Gateways Table", () => {
       expect(gateway.provider).toBe("coinbase_commerce");
 
       // Cleanup
-      await db.delete(paymentGateways).where(eq(paymentGateways.id, coinbaseGateway.id));
+      await db
+        .delete(paymentGateways)
+        .where(eq(paymentGateways.id, coinbaseGateway.id));
     });
 
     it("should enforce unique constraint on userId + provider", async () => {
@@ -93,9 +103,11 @@ describe("Phase 1.1: Payment Gateways Table", () => {
       } catch (error: any) {
         errorThrown = true;
         // Expected: duplicate key error (message varies by driver)
-        expect(error.message.toLowerCase()).toMatch(/duplicate|unique|constraint/i);
+        expect(error.message.toLowerCase()).toMatch(
+          /duplicate|unique|constraint/i
+        );
       }
-      
+
       // Verify that an error was thrown
       expect(errorThrown).toBe(true);
     });
@@ -110,7 +122,7 @@ describe("Phase 1.1: Payment Gateways Table", () => {
         .where(eq(paymentGateways.id, testGatewayId));
 
       expect(gateway.config).toBeDefined();
-      
+
       // Config should be parseable JSON
       const config = JSON.parse(gateway.config);
       expect(config.accountId).toBe("acct_test123");
@@ -121,7 +133,7 @@ describe("Phase 1.1: Payment Gateways Table", () => {
       if (!db) throw new Error("Database not available");
 
       const testDate = new Date();
-      
+
       await db
         .update(paymentGateways)
         .set({ lastTestedAt: testDate })
@@ -144,7 +156,7 @@ describe("Phase 1.1: User Wallets Table", () => {
     // Cleanup test data
     const db = await getDb();
     if (!db) return;
-    
+
     for (const id of testWalletIds) {
       await db.delete(userWallets).where(eq(userWallets.id, id));
     }
@@ -155,13 +167,16 @@ describe("Phase 1.1: User Wallets Table", () => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const [wallet] = await db.insert(userWallets).values({
-        userId: mockUserId,
-        label: "My ETH Wallet",
-        address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5",
-        network: "ethereum",
-        sortOrder: 0,
-      }).$returningId();
+      const [wallet] = await db
+        .insert(userWallets)
+        .values({
+          userId: mockUserId,
+          label: "My ETH Wallet",
+          address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5",
+          network: "ethereum",
+          sortOrder: 0,
+        })
+        .$returningId();
 
       testWalletIds.push(wallet.id);
 
@@ -179,13 +194,16 @@ describe("Phase 1.1: User Wallets Table", () => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const [wallet] = await db.insert(userWallets).values({
-        userId: mockUserId,
-        label: "My BTC Wallet",
-        address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-        network: "bitcoin",
-        sortOrder: 1,
-      }).$returningId();
+      const [wallet] = await db
+        .insert(userWallets)
+        .values({
+          userId: mockUserId,
+          label: "My BTC Wallet",
+          address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+          network: "bitcoin",
+          sortOrder: 1,
+        })
+        .$returningId();
 
       testWalletIds.push(wallet.id);
 
@@ -202,13 +220,16 @@ describe("Phase 1.1: User Wallets Table", () => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const [wallet] = await db.insert(userWallets).values({
-        userId: mockUserId,
-        label: "My USDC Wallet (Polygon)",
-        address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5",
-        network: "polygon",
-        sortOrder: 2,
-      }).$returningId();
+      const [wallet] = await db
+        .insert(userWallets)
+        .values({
+          userId: mockUserId,
+          label: "My USDC Wallet (Polygon)",
+          address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb5",
+          network: "polygon",
+          sortOrder: 2,
+        })
+        .$returningId();
 
       testWalletIds.push(wallet.id);
 
@@ -225,16 +246,26 @@ describe("Phase 1.1: User Wallets Table", () => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      const networks = ["ethereum", "polygon", "bitcoin", "bsc", "arbitrum", "optimism"] as const;
-      
+      const networks = [
+        "ethereum",
+        "polygon",
+        "bitcoin",
+        "bsc",
+        "arbitrum",
+        "optimism",
+      ] as const;
+
       for (const network of networks) {
-        const [wallet] = await db.insert(userWallets).values({
-          userId: mockUserId,
-          label: `Test ${network} Wallet`,
-          address: `test_address_${network}`,
-          network: network,
-          sortOrder: 99,
-        }).$returningId();
+        const [wallet] = await db
+          .insert(userWallets)
+          .values({
+            userId: mockUserId,
+            label: `Test ${network} Wallet`,
+            address: `test_address_${network}`,
+            network: network,
+            sortOrder: 99,
+          })
+          .$returningId();
 
         testWalletIds.push(wallet.id);
 
@@ -275,7 +306,9 @@ describe("Phase 1.1: User Wallets Table", () => {
 
       // Verify wallets are returned in sortOrder
       for (let i = 0; i < wallets.length - 1; i++) {
-        expect(wallets[i].sortOrder).toBeLessThanOrEqual(wallets[i + 1].sortOrder);
+        expect(wallets[i].sortOrder).toBeLessThanOrEqual(
+          wallets[i + 1].sortOrder
+        );
       }
     });
   });

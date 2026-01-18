@@ -51,7 +51,7 @@ describe("Guided Invoice Creator - Backend Support", () => {
 
       // List clients should return the created client
       const clients = await caller.clients.list();
-      
+
       expect(clients).toBeDefined();
       expect(Array.isArray(clients)).toBe(true);
       expect(clients.some(c => c.id === client.id)).toBe(true);
@@ -95,7 +95,11 @@ describe("Guided Invoice Creator - Backend Support", () => {
         issueDate: new Date(),
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Net 30
         lineItems: [
-          { description: "Website Design and Development", quantity: 1, rate: 2500 },
+          {
+            description: "Website Design and Development",
+            quantity: 1,
+            rate: 2500,
+          },
         ],
         taxRate: 0,
         discountType: "percentage" as const,
@@ -136,7 +140,7 @@ describe("Guided Invoice Creator - Backend Support", () => {
 
       expect(invoice).toBeDefined();
       expect(invoice.id).toBeTypeOf("number");
-      
+
       // Verify calculations:
       // Subtotal: 500 + 750 + (2 * 150) = 1550
       // Tax: 1550 * 10% = 155
@@ -232,8 +236,9 @@ describe("Guided Invoice Creator - Backend Support", () => {
       expect(invoice).toBeDefined();
       // Due date should be approximately 15 days from issue date
       const diffDays = Math.round(
-        (new Date(invoice.dueDate).getTime() - new Date(invoice.issueDate).getTime()) / 
-        (24 * 60 * 60 * 1000)
+        (new Date(invoice.dueDate).getTime() -
+          new Date(invoice.issueDate).getTime()) /
+          (24 * 60 * 60 * 1000)
       );
       expect(diffDays).toBe(15);
     });
@@ -264,8 +269,9 @@ describe("Guided Invoice Creator - Backend Support", () => {
 
       expect(invoice).toBeDefined();
       const diffDays = Math.round(
-        (new Date(invoice.dueDate).getTime() - new Date(invoice.issueDate).getTime()) / 
-        (24 * 60 * 60 * 1000)
+        (new Date(invoice.dueDate).getTime() -
+          new Date(invoice.issueDate).getTime()) /
+          (24 * 60 * 60 * 1000)
       );
       expect(diffDays).toBe(30);
     });
@@ -296,8 +302,9 @@ describe("Guided Invoice Creator - Backend Support", () => {
 
       expect(invoice).toBeDefined();
       const diffDays = Math.round(
-        (new Date(invoice.dueDate).getTime() - new Date(invoice.issueDate).getTime()) / 
-        (24 * 60 * 60 * 1000)
+        (new Date(invoice.dueDate).getTime() -
+          new Date(invoice.issueDate).getTime()) /
+          (24 * 60 * 60 * 1000)
       );
       expect(diffDays).toBe(60);
     });
@@ -345,9 +352,7 @@ describe("Guided Invoice Creator - Backend Support", () => {
         status: "draft" as const,
         issueDate: new Date(),
         dueDate: new Date(),
-        lineItems: [
-          { description: "Hourly Work", quantity: 2.5, rate: 75.50 },
-        ],
+        lineItems: [{ description: "Hourly Work", quantity: 2.5, rate: 75.5 }],
         taxRate: 0,
         discountType: "percentage" as const,
         discountValue: 0,

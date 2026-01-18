@@ -1,8 +1,4 @@
-import {
-  protectedProcedure,
-  router,
-  TRPCError,
-} from "../_core/trpc";
+import { protectedProcedure, router, TRPCError } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
 import { eq, and, inArray } from "drizzle-orm";
@@ -113,9 +109,7 @@ export const clientsRouter = router({
             // Delete the client
             await tx
               .delete(clients)
-              .where(
-                and(eq(clients.id, id), eq(clients.userId, ctx.user.id))
-              );
+              .where(and(eq(clients.id, id), eq(clients.userId, ctx.user.id)));
 
             deletedCount++;
           } catch (error) {
@@ -154,10 +148,7 @@ export const clientsRouter = router({
         .filter(c => c.email)
         .map(c => c.email!.toLowerCase());
 
-      const existingClients = await db.getClientsByEmails(
-        ctx.user.id,
-        emails
-      );
+      const existingClients = await db.getClientsByEmails(ctx.user.id, emails);
       const existingEmails = new Set(
         existingClients.map(c => c.email?.toLowerCase())
       );

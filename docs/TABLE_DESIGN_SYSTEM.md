@@ -22,9 +22,11 @@ This document defines the standardized table design system used across all data 
 ### Core Components
 
 #### 1. Pagination (`@/components/shared/Pagination`)
+
 **Purpose**: Standardized pagination with page numbers and size selector
 
 **Props**:
+
 ```typescript
 {
   currentPage: number;        // 1-based page index
@@ -38,6 +40,7 @@ This document defines the standardized table design system used across all data 
 ```
 
 **Features**:
+
 - 1-based page indexing (page 1 = first page)
 - Shows up to 5 page number buttons
 - Page size selector dropdown
@@ -45,9 +48,11 @@ This document defines the standardized table design system used across all data 
 - Disabled state for first/last pages
 
 #### 2. SortableTableHeader (`@/components/shared/SortableTableHeader`)
+
 **Purpose**: Clickable table header with visual sort indicators
 
 **Props**:
+
 ```typescript
 {
   label: string;              // Column label
@@ -59,20 +64,24 @@ This document defines the standardized table design system used across all data 
 ```
 
 **Features**:
+
 - Chevron icon indicates sort direction
 - Toggles asc/desc on click
 - Hover state for better UX
 - Supports text alignment
 
 #### 3. FilterSection (`@/components/ui/filter-section`)
+
 **Purpose**: Consistent filter UI container
 
 **Components**:
+
 - `FilterSection` - Container with clear filters button
 - `FilterSelect` - Labeled filter dropdown wrapper
 - `ActiveFilters` - Visual display of active filters
 
 **Props**:
+
 ```typescript
 FilterSection: {
   hasActiveFilters: boolean;
@@ -87,9 +96,11 @@ FilterSelect: {
 ```
 
 #### 4. useTableSort Hook (`@/hooks/useTableSort`)
+
 **Purpose**: State management for sorting
 
 **Returns**:
+
 ```typescript
 {
   sort: { key: string; direction: "asc" | "desc" };
@@ -99,6 +110,7 @@ FilterSelect: {
 ```
 
 **Features**:
+
 - Handles sort state
 - Toggle direction on same column click
 - Generic sort function (strings, numbers, dates)
@@ -115,7 +127,8 @@ FilterSelect: {
   <CardHeader>
     <CardTitle>Table Title</CardTitle>
     <CardDescription>
-      {filteredAndSortedItems.length} item{filteredAndSortedItems.length !== 1 ? 's' : ''} found
+      {filteredAndSortedItems.length} item
+      {filteredAndSortedItems.length !== 1 ? "s" : ""} found
     </CardDescription>
   </CardHeader>
 
@@ -148,8 +161,11 @@ FilterSelect: {
             </td>
           </tr>
         ) : (
-          paginatedItems.map((item) => (
-            <TableRow key={item.id} className="hover:bg-muted/50 cursor-pointer">
+          paginatedItems.map(item => (
+            <TableRow
+              key={item.id}
+              className="hover:bg-muted/50 cursor-pointer"
+            >
               <TableCell className="p-2">{item.field1}</TableCell>
               <TableCell className="p-2">{item.field2}</TableCell>
               <TableCell className="p-2 text-right">
@@ -171,7 +187,7 @@ FilterSelect: {
         pageSize={pageSize}
         totalItems={totalItems}
         onPageChange={setCurrentPage}
-        onPageSizeChange={(size) => {
+        onPageSizeChange={size => {
           setPageSize(size);
           setCurrentPage(1);
         }}
@@ -191,12 +207,12 @@ FilterSelect: {
 ```typescript
 // Pagination
 const [currentPage, setCurrentPage] = useState(1);
-const [pageSize, setPageSize] = useState(25);  // Default varies by table
+const [pageSize, setPageSize] = useState(25); // Default varies by table
 
 // Sorting
 const { sort, handleSort, sortData } = useTableSort({
   defaultKey: "primaryField",
-  defaultDirection: "desc"
+  defaultDirection: "desc",
 });
 
 // Filters (example)
@@ -216,21 +232,22 @@ const filteredAndSortedItems = useMemo(() => {
   // Apply search filter
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
-    result = result.filter((item) =>
-      item.field1.toLowerCase().includes(query) ||
-      item.field2?.toLowerCase().includes(query)
+    result = result.filter(
+      item =>
+        item.field1.toLowerCase().includes(query) ||
+        item.field2?.toLowerCase().includes(query)
     );
   }
 
   // Apply category/status filters
   if (statusFilter !== "all") {
-    result = result.filter((item) => item.status === statusFilter);
+    result = result.filter(item => item.status === statusFilter);
   }
 
   // Apply date range filter
   if (dateRange !== "all") {
     const now = new Date();
-    result = result.filter((item) => {
+    result = result.filter(item => {
       const itemDate = new Date(item.date);
 
       switch (dateRange) {
@@ -243,7 +260,9 @@ const filteredAndSortedItems = useMemo(() => {
         case "90days":
           return itemDate >= new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
         case "year":
-          return itemDate >= new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+          return (
+            itemDate >= new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+          );
         default:
           return true;
       }
@@ -285,7 +304,7 @@ useEffect(() => {
       <Input
         placeholder="Search..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={e => setSearchQuery(e.target.value)}
       />
     </div>
 
@@ -323,9 +342,7 @@ const clearFilters = () => {
 };
 
 const hasActiveFilters = !!(
-  searchQuery ||
-  statusFilter !== "all" ||
-  dateRange !== "all"
+  (searchQuery || statusFilter !== "all" || dateRange !== "all")
   // ... check other filters
 );
 ```
@@ -337,16 +354,18 @@ const hasActiveFilters = !!(
 ### Table Card Styling
 
 **Card Classes**:
+
 ```
 rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm
 ```
 
 **Header Structure**:
+
 ```tsx
 <CardHeader>
   <CardTitle>Table Title</CardTitle>
   <CardDescription>
-    {count} item{count !== 1 ? 's' : ''} found
+    {count} item{count !== 1 ? "s" : ""} found
   </CardDescription>
 </CardHeader>
 ```
@@ -354,16 +373,19 @@ rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backd
 ### Row Styling
 
 **Standard Row Classes**:
+
 ```
 hover:bg-muted/50 cursor-pointer transition-colors
 ```
 
 **Cell Padding**:
+
 ```
 className="p-2"  // Standard cell padding
 ```
 
 **Text Alignment**:
+
 ```
 // Left (default)
 <TableCell>Content</TableCell>
@@ -378,6 +400,7 @@ className="p-2"  // Standard cell padding
 ### Pagination Spacing
 
 **Standard Padding**:
+
 ```tsx
 <div className="px-5 pb-4 border-t border-border/20 pt-4">
   <Pagination ... />
@@ -393,15 +416,15 @@ className="p-2"  // Standard cell padding
 
 ## Page-Specific Defaults
 
-| Page | Default Page Size | Default Sort | Sortable Columns |
-|------|-------------------|--------------|------------------|
-| **Expenses** | 25 | Date (desc) | Date, Amount, Category, Description |
-| **Payments** | 10 | Date (desc) | Date, Amount |
-| **EmailHistory** | 20 | Sent Date (desc) | Sent Date, Type, Status |
-| **Products** | 25 | Name (asc) | Name, Rate, Category |
-| **Clients** | 25 | Name (asc) | Name, Email |
-| **Invoices** | 15 | Created (desc) | 7+ columns |
-| **Estimates** | 25 | Issue Date (desc) | Estimate #, Client, Status, Valid Until, Amount |
+| Page             | Default Page Size | Default Sort      | Sortable Columns                                |
+| ---------------- | ----------------- | ----------------- | ----------------------------------------------- |
+| **Expenses**     | 25                | Date (desc)       | Date, Amount, Category, Description             |
+| **Payments**     | 10                | Date (desc)       | Date, Amount                                    |
+| **EmailHistory** | 20                | Sent Date (desc)  | Sent Date, Type, Status                         |
+| **Products**     | 25                | Name (asc)        | Name, Rate, Category                            |
+| **Clients**      | 25                | Name (asc)        | Name, Email                                     |
+| **Invoices**     | 15                | Created (desc)    | 7+ columns                                      |
+| **Estimates**    | 25                | Issue Date (desc) | Estimate #, Client, Status, Valid Until, Amount |
 
 ---
 
@@ -410,6 +433,7 @@ className="p-2"  // Standard cell padding
 ### 1. Pagination Pattern
 
 **Standard Setup**:
+
 ```typescript
 const [currentPage, setCurrentPage] = useState(1);
 const [pageSize, setPageSize] = useState(25);
@@ -427,10 +451,11 @@ const paginatedItems = filteredAndSortedItems.slice(
 ### 2. Sorting Pattern
 
 **Use useTableSort hook**:
+
 ```typescript
 const { sort, handleSort, sortData } = useTableSort({
   defaultKey: "date",
-  defaultDirection: "desc"
+  defaultDirection: "desc",
 });
 
 // In filter/sort logic:
@@ -438,6 +463,7 @@ const result = sortData(filteredItems);
 ```
 
 **In table header**:
+
 ```tsx
 <SortableTableHeader
   label="Column Name"
@@ -450,6 +476,7 @@ const result = sortData(filteredItems);
 ### 3. Date Range Filtering Pattern
 
 **Standard Options**:
+
 - All Time (default)
 - Today
 - Last 7 Days
@@ -458,10 +485,11 @@ const result = sortData(filteredItems);
 - Last Year
 
 **Standard Logic**:
+
 ```typescript
 if (dateRange !== "all") {
   const now = new Date();
-  result = result.filter((item) => {
+  result = result.filter(item => {
     const itemDate = new Date(item.dateField);
 
     switch (dateRange) {
@@ -485,6 +513,7 @@ if (dateRange !== "all") {
 ### 4. Empty State Pattern
 
 **Loading State**:
+
 ```tsx
 {isLoading ? (
   <DataTableLoading colSpan={columnCount} rows={5} />
@@ -492,6 +521,7 @@ if (dateRange !== "all") {
 ```
 
 **No Data**:
+
 ```tsx
 {!items || items.length === 0 ? (
   <tr>
@@ -510,6 +540,7 @@ if (dateRange !== "all") {
 ```
 
 **No Results (Filtered)**:
+
 ```tsx
 {filteredItems.length === 0 ? (
   <tr>
@@ -530,12 +561,14 @@ if (dateRange !== "all") {
 ### Adding Pagination to a Table
 
 **Step 1**: Add state
+
 ```typescript
 const [currentPage, setCurrentPage] = useState(1);
 const [pageSize, setPageSize] = useState(25);
 ```
 
 **Step 2**: Calculate pagination
+
 ```typescript
 const totalItems = filteredAndSortedItems.length;
 const totalPages = Math.ceil(totalItems / pageSize);
@@ -546,6 +579,7 @@ const paginatedItems = filteredAndSortedItems.slice(
 ```
 
 **Step 3**: Add reset on filter change
+
 ```typescript
 useEffect(() => {
   setCurrentPage(1);
@@ -553,6 +587,7 @@ useEffect(() => {
 ```
 
 **Step 4**: Render pagination
+
 ```tsx
 {totalPages > 1 && (
   <div className="px-5 pb-4 border-t border-border/20 pt-4">
@@ -564,16 +599,18 @@ useEffect(() => {
 ### Adding Sorting to a Table
 
 **Step 1**: Add useTableSort hook
+
 ```typescript
 import { useTableSort } from "@/hooks/useTableSort";
 
 const { sort, handleSort, sortData } = useTableSort({
   defaultKey: "date",
-  defaultDirection: "desc"
+  defaultDirection: "desc",
 });
 ```
 
 **Step 2**: Apply sorting in filter logic
+
 ```typescript
 const filteredAndSorted = useMemo(() => {
   const filtered = items.filter(...);
@@ -582,6 +619,7 @@ const filteredAndSorted = useMemo(() => {
 ```
 
 **Step 3**: Replace TableHead with SortableTableHeader
+
 ```tsx
 <SortableTableHeader
   label="Date"
@@ -594,11 +632,13 @@ const filteredAndSorted = useMemo(() => {
 ### Adding Date Range Filter
 
 **Step 1**: Add state
+
 ```typescript
 const [dateRange, setDateRange] = useState<string>("all");
 ```
 
 **Step 2**: Add to FilterSection
+
 ```tsx
 <FilterSelect label="Date Range">
   <Select value={dateRange} onValueChange={setDateRange}>
@@ -620,6 +660,7 @@ const [dateRange, setDateRange] = useState<string>("all");
 **Step 3**: Add to filter logic (see Date Range Filtering Pattern above)
 
 **Step 4**: Update clearFilters
+
 ```typescript
 const clearFilters = () => {
   // ... other resets
@@ -628,10 +669,11 @@ const clearFilters = () => {
 ```
 
 **Step 5**: Update hasActiveFilters
+
 ```typescript
 const hasActiveFilters = !!(
   // ... other filters
-  dateRange !== "all"
+  (dateRange !== "all")
 );
 ```
 
@@ -644,19 +686,21 @@ const hasActiveFilters = !!(
 Used by: Invoices, Clients, Estimates
 
 ```tsx
-{/* Desktop Table */}
+{
+  /* Desktop Table */
+}
 <div className="hidden md:block overflow-x-auto">
   <Table>...</Table>
-</div>
+</div>;
 
-{/* Mobile Cards */}
+{
+  /* Mobile Cards */
+}
 <div className="md:hidden space-y-4">
-  {paginatedItems.map((item) => (
-    <Card key={item.id}>
-      {/* Simplified card layout */}
-    </Card>
+  {paginatedItems.map(item => (
+    <Card key={item.id}>{/* Simplified card layout */}</Card>
   ))}
-</div>
+</div>;
 ```
 
 ### Single View Pattern
@@ -664,6 +708,7 @@ Used by: Invoices, Clients, Estimates
 Used by: Expenses, Payments, EmailHistory, Products
 
 Tables remain the same on mobile with responsive column hiding:
+
 ```tsx
 <TableHead className="hidden md:table-cell">Desktop Only</TableHead>
 ```
@@ -677,23 +722,36 @@ Tables remain the same on mobile with responsive column hiding:
 ```tsx
 <TableCell className="text-right">
   <DropdownMenu>
-    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+    <DropdownMenuTrigger asChild onClick={e => e.stopPropagation()}>
       <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
         <MoreHorizontal className="h-4 w-4" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
-      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleView(item); }}>
+      <DropdownMenuItem
+        onClick={e => {
+          e.stopPropagation();
+          handleView(item);
+        }}
+      >
         <Eye className="mr-2 h-4 w-4" />
         View Details
       </DropdownMenuItem>
-      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(item); }}>
+      <DropdownMenuItem
+        onClick={e => {
+          e.stopPropagation();
+          handleEdit(item);
+        }}
+      >
         <Edit className="mr-2 h-4 w-4" />
         Edit
       </DropdownMenuItem>
       <DropdownMenuSeparator />
       <DropdownMenuItem
-        onClick={(e) => { e.stopPropagation(); handleDelete(item); }}
+        onClick={e => {
+          e.stopPropagation();
+          handleDelete(item);
+        }}
         className="text-destructive"
       >
         <Trash2 className="mr-2 h-4 w-4" />
@@ -717,7 +775,8 @@ Used by: Invoices, Clients
 ```typescript
 const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-const isAllSelected = paginatedItems.length > 0 &&
+const isAllSelected =
+  paginatedItems.length > 0 &&
   paginatedItems.every(item => selectedIds.has(item.id));
 
 const isSomeSelected = selectedIds.size > 0 && !isAllSelected;
@@ -739,10 +798,10 @@ const isSomeSelected = selectedIds.size > 0 && !isAllSelected;
 ### Individual Row Checkbox
 
 ```tsx
-<TableCell onClick={(e) => e.stopPropagation()}>
+<TableCell onClick={e => e.stopPropagation()}>
   <Checkbox
     checked={selectedIds.has(item.id)}
-    onCheckedChange={(checked) => handleSelectOne(item.id, checked)}
+    onCheckedChange={checked => handleSelectOne(item.id, checked)}
     aria-label={`Select ${item.name}`}
   />
 </TableCell>
@@ -913,7 +972,7 @@ export default function MyTable() {
   // Sorting
   const { sort, handleSort, sortData } = useTableSort({
     defaultKey: "date",
-    defaultDirection: "desc"
+    defaultDirection: "desc",
   });
 
   // Data
@@ -958,7 +1017,10 @@ export default function MyTable() {
 
   return (
     <>
-      <FilterSection hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters}>
+      <FilterSection
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearFilters}
+      >
         {/* Filters here */}
       </FilterSection>
 
@@ -997,7 +1059,7 @@ export default function MyTable() {
               pageSize={pageSize}
               totalItems={totalItems}
               onPageChange={setCurrentPage}
-              onPageSizeChange={(size) => {
+              onPageSizeChange={size => {
                 setPageSize(size);
                 setCurrentPage(1);
               }}
@@ -1016,15 +1078,19 @@ export default function MyTable() {
 ## Troubleshooting
 
 ### Pagination not working after filter change
+
 **Solution**: Add useEffect to reset currentPage to 1
 
 ### Sort not updating table
+
 **Solution**: Ensure using `paginatedItems` (not `filteredItems`) in map
 
 ### Filters cleared but table not updating
+
 **Solution**: Include filter states in useMemo dependencies
 
 ### Page numbers out of range
+
 **Solution**: Verify using 1-based indexing (currentPage starts at 1, not 0)
 
 ---
@@ -1046,6 +1112,7 @@ export default function MyTable() {
 ## Version History
 
 **v1.0.0** (January 12, 2026)
+
 - Initial documentation
 - Standardized all 7 table pages
 - Defined consistent patterns for pagination, sorting, filtering

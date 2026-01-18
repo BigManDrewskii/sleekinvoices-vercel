@@ -139,7 +139,8 @@ export const CLIENTS = [
 export const PRODUCTS = [
   {
     name: "Website Design",
-    description: "Custom website design and development including responsive layout, user experience optimization, and modern UI components",
+    description:
+      "Custom website design and development including responsive layout, user experience optimization, and modern UI components",
     rate: "2500.00",
     unit: "project",
     category: "Design",
@@ -155,7 +156,8 @@ export const PRODUCTS = [
   },
   {
     name: "SEO Audit",
-    description: "Complete SEO analysis and recommendations including keyword research, technical SEO, and competitive analysis",
+    description:
+      "Complete SEO analysis and recommendations including keyword research, technical SEO, and competitive analysis",
     rate: "850.00",
     unit: "project",
     category: "Marketing",
@@ -163,7 +165,8 @@ export const PRODUCTS = [
   },
   {
     name: "Content Writing",
-    description: "Professional content writing services for blogs, articles, and web pages",
+    description:
+      "Professional content writing services for blogs, articles, and web pages",
     rate: "150.00",
     unit: "hour",
     category: "Marketing",
@@ -171,7 +174,8 @@ export const PRODUCTS = [
   },
   {
     name: "Mobile App Development",
-    description: "Native iOS and Android mobile application development with backend integration",
+    description:
+      "Native iOS and Android mobile application development with backend integration",
     rate: "5000.00",
     unit: "project",
     category: "Development",
@@ -187,7 +191,8 @@ export const PRODUCTS = [
   },
   {
     name: "Monthly Maintenance",
-    description: "Website and application maintenance including updates, security patches, and technical support",
+    description:
+      "Website and application maintenance including updates, security patches, and technical support",
     rate: "500.00",
     unit: "month",
     category: "Support",
@@ -195,7 +200,8 @@ export const PRODUCTS = [
   },
   {
     name: "Logo Design",
-    description: "Professional logo design with multiple revisions and final files in all formats",
+    description:
+      "Professional logo design with multiple revisions and final files in all formats",
     rate: "800.00",
     unit: "project",
     category: "Design",
@@ -203,7 +209,8 @@ export const PRODUCTS = [
   },
   {
     name: "Social Media Management",
-    description: "Social media content creation, posting, and engagement management across platforms",
+    description:
+      "Social media content creation, posting, and engagement management across platforms",
     rate: "1200.00",
     unit: "month",
     category: "Marketing",
@@ -211,7 +218,8 @@ export const PRODUCTS = [
   },
   {
     name: "Training Session",
-    description: "On-site or remote training sessions for software, tools, or business processes",
+    description:
+      "On-site or remote training sessions for software, tools, or business processes",
     rate: "300.00",
     unit: "day",
     category: "Training",
@@ -302,12 +310,28 @@ export const USER_COMPANIES = [
 ];
 
 export const INVOICE_LINE_ITEMS = [
-  { description: "Frontend Development - React Components", quantity: 40, rate: 150 },
-  { description: "Backend Development - API Integration", quantity: 30, rate: 175 },
+  {
+    description: "Frontend Development - React Components",
+    quantity: 40,
+    rate: 150,
+  },
+  {
+    description: "Backend Development - API Integration",
+    quantity: 30,
+    rate: 175,
+  },
   { description: "Database Design and Optimization", quantity: 20, rate: 180 },
-  { description: "UI/UX Design - Wireframes and Mockups", quantity: 15, rate: 120 },
+  {
+    description: "UI/UX Design - Wireframes and Mockups",
+    quantity: 15,
+    rate: 120,
+  },
   { description: "Quality Assurance and Testing", quantity: 25, rate: 100 },
-  { description: "Project Management and Coordination", quantity: 10, rate: 140 },
+  {
+    description: "Project Management and Coordination",
+    quantity: 10,
+    rate: 140,
+  },
   { description: "Technical Documentation", quantity: 8, rate: 110 },
   { description: "Code Review and Optimization", quantity: 12, rate: 160 },
   { description: "Deployment and Configuration", quantity: 5, rate: 150 },

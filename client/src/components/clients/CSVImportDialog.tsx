@@ -1,16 +1,43 @@
 import { useState, useCallback } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { FileText, AlertCircle, CheckCircle2, Download, X, Loader2, FileUp, Upload as LucideUpload } from "lucide-react";
+import {
+  FileText,
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  X,
+  Loader2,
+  FileUp,
+  Upload as LucideUpload,
+} from "lucide-react";
 import { Upload } from "@phosphor-icons/react";
 import { trpc } from "@/lib/trpc";
-import { parseCSV, generateSampleCSV, type ParseResult, type ParsedClient } from "../../../../shared/csv-parser";
+import {
+  parseCSV,
+  generateSampleCSV,
+  type ParseResult,
+  type ParsedClient,
+} from "../../../../shared/csv-parser";
 import { toast } from "sonner";
 
 interface CSVImportDialogProps {
@@ -21,7 +48,11 @@ interface CSVImportDialogProps {
 
 type ImportStep = "upload" | "preview" | "importing" | "complete";
 
-export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDialogProps) {
+export function CSVImportDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: CSVImportDialogProps) {
   const [step, setStep] = useState<ImportStep>("upload");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [skipDuplicates, setSkipDuplicates] = useState(true);
@@ -33,7 +64,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
   const [dragActive, setDragActive] = useState(false);
 
   const importMutation = trpc.clients.import.useMutation({
-    onSuccess: (result) => {
+    onSuccess: result => {
       setImportResult(result);
       setStep("complete");
       if (result.imported > 0) {
@@ -41,7 +72,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
         onSuccess();
       }
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Import failed: ${error.message}`);
       setStep("preview");
     },
@@ -54,7 +85,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const content = e.target?.result as string;
       const result = parseCSV(content);
       setParseResult(result);
@@ -66,15 +97,18 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
     reader.readAsText(file);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
-    
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  }, [handleFileSelect]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setDragActive(false);
+
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    },
+    [handleFileSelect]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -88,7 +122,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
 
   const handleImport = () => {
     if (!parseResult || parseResult.clients.length === 0) return;
-    
+
     setStep("importing");
     importMutation.mutate({
       clients: parseResult.clients,
@@ -133,7 +167,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
             type="file"
             accept=".csv"
             className="hidden"
-            onChange={(e) => {
+            onChange={e => {
               const file = e.target.files?.[0];
               if (file) handleFileSelect(file);
             }}
@@ -158,7 +192,8 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Your CSV should include columns: Name (required), Email, Company Name, Address, Phone, Notes, VAT Number
+          Your CSV should include columns: Name (required), Email, Company Name,
+          Address, Phone, Notes, VAT Number
         </AlertDescription>
       </Alert>
     </div>
@@ -168,7 +203,9 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
     if (!parseResult) return null;
 
     const hasErrors = parseResult.errors.length > 0;
-    const criticalErrors = parseResult.errors.filter(e => e.field === "name" || e.field === "header");
+    const criticalErrors = parseResult.errors.filter(
+      e => e.field === "name" || e.field === "header"
+    );
 
     return (
       <div className="space-y-4">
@@ -179,28 +216,41 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
             <div className="text-xs text-muted-foreground">Total Rows</div>
           </div>
           <div className="p-3 bg-green-500/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-500">{parseResult.validRows}</div>
+            <div className="text-2xl font-bold text-green-500">
+              {parseResult.validRows}
+            </div>
             <div className="text-xs text-muted-foreground">Valid</div>
           </div>
           <div className="p-3 bg-destructive/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-destructive">{parseResult.errors.length}</div>
+            <div className="text-2xl font-bold text-destructive">
+              {parseResult.errors.length}
+            </div>
             <div className="text-xs text-muted-foreground">Issues</div>
           </div>
         </div>
 
         {/* Errors */}
         {hasErrors && (
-          <Alert variant={criticalErrors.length > 0 ? "destructive" : "default"}>
+          <Alert
+            variant={criticalErrors.length > 0 ? "destructive" : "default"}
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               <div className="font-medium mb-1">
-                {criticalErrors.length > 0 ? "Critical errors found:" : "Warnings:"}
+                {criticalErrors.length > 0
+                  ? "Critical errors found:"
+                  : "Warnings:"}
               </div>
               <ul className="text-sm list-disc list-inside max-h-24 overflow-y-auto">
                 {parseResult.errors.slice(0, 5).map((error, i) => (
                   <li key={i}>
                     Row {error.row}: {error.message}
-                    {error.value && <span className="text-muted-foreground"> ({error.value})</span>}
+                    {error.value && (
+                      <span className="text-muted-foreground">
+                        {" "}
+                        ({error.value})
+                      </span>
+                    )}
                   </li>
                 ))}
                 {parseResult.errors.length > 5 && (
@@ -218,7 +268,8 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Found {parseResult.duplicates.length} duplicate email(s) in CSV file
+              Found {parseResult.duplicates.length} duplicate email(s) in CSV
+              file
             </AlertDescription>
           </Alert>
         )}
@@ -239,7 +290,9 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
                 <TableBody>
                   {parseResult.clients.slice(0, 10).map((client, i) => (
                     <TableRow key={i}>
-                      <TableCell className="font-medium">{client.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {client.name}
+                      </TableCell>
                       <TableCell>{client.email || "-"}</TableCell>
                       <TableCell>{client.companyName || "-"}</TableCell>
                       <TableCell>{client.phone || "-"}</TableCell>
@@ -261,7 +314,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
           <Checkbox
             id="skipDuplicates"
             checked={skipDuplicates}
-            onCheckedChange={(checked) => setSkipDuplicates(checked as boolean)}
+            onCheckedChange={checked => setSkipDuplicates(checked as boolean)}
           />
           <Label htmlFor="skipDuplicates" className="text-sm">
             Skip clients with emails that already exist
@@ -290,15 +343,21 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
 
         <div className="grid grid-cols-3 gap-4">
           <div className="p-3 bg-green-500/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-500">{importResult.imported}</div>
+            <div className="text-2xl font-bold text-green-500">
+              {importResult.imported}
+            </div>
             <div className="text-xs text-muted-foreground">Imported</div>
           </div>
           <div className="p-3 bg-yellow-500/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-yellow-500">{importResult.skipped}</div>
+            <div className="text-2xl font-bold text-yellow-500">
+              {importResult.skipped}
+            </div>
             <div className="text-xs text-muted-foreground">Skipped</div>
           </div>
           <div className="p-3 bg-destructive/10 rounded-lg text-center">
-            <div className="text-2xl font-bold text-destructive">{importResult.errors.length}</div>
+            <div className="text-2xl font-bold text-destructive">
+              {importResult.errors.length}
+            </div>
             <div className="text-xs text-muted-foreground">Errors</div>
           </div>
         </div>
@@ -309,7 +368,9 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
             <AlertDescription>
               <ul className="text-sm list-disc list-inside">
                 {importResult.errors.map((error, i) => (
-                  <li key={i}>Row {error.index + 1}: {error.message}</li>
+                  <li key={i}>
+                    Row {error.index + 1}: {error.message}
+                  </li>
                 ))}
               </ul>
             </AlertDescription>
@@ -348,10 +409,7 @@ export function CSVImportDialog({ open, onOpenChange, onSuccess }: CSVImportDial
         </DialogBody>
 
         {step === "upload" && (
-          <DialogActions
-            onClose={handleClose}
-            cancelText="Cancel"
-          />
+          <DialogActions onClose={handleClose} cancelText="Cancel" />
         )}
         {step === "preview" && (
           <DialogActions

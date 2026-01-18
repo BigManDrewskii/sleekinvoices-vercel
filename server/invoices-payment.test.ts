@@ -27,7 +27,9 @@ const mockUser = {
   updatedAt: new Date(),
 };
 
-const createMockContext = (user: typeof mockUser | null = mockUser): Context => ({
+const createMockContext = (
+  user: typeof mockUser | null = mockUser
+): Context => ({
   user,
   req: {} as any,
   res: {} as any,
@@ -97,7 +99,7 @@ describe("Invoice List with Payment Indicators", () => {
       const invoices = await caller.invoices.list();
 
       // Find our test invoice
-      const testInvoice = invoices.find((inv) => inv.id === invoice.id);
+      const testInvoice = invoices.find(inv => inv.id === invoice.id);
 
       expect(testInvoice).toBeDefined();
       expect(testInvoice?.paymentStatus).toBe("unpaid");
@@ -145,7 +147,7 @@ describe("Invoice List with Payment Indicators", () => {
 
       // Get invoice list
       const invoices = await caller.invoices.list();
-      const testInvoice = invoices.find((inv) => inv.id === invoice.id);
+      const testInvoice = invoices.find(inv => inv.id === invoice.id);
 
       expect(testInvoice?.paymentStatus).toBe("partial");
       expect(testInvoice?.totalPaid).toBe("400");
@@ -192,7 +194,7 @@ describe("Invoice List with Payment Indicators", () => {
 
       // Get invoice list
       const invoices = await caller.invoices.list();
-      const testInvoice = invoices.find((inv) => inv.id === invoice.id);
+      const testInvoice = invoices.find(inv => inv.id === invoice.id);
 
       expect(testInvoice?.paymentStatus).toBe("paid");
       expect(testInvoice?.totalPaid).toBe("750");
@@ -248,7 +250,7 @@ describe("Invoice List with Payment Indicators", () => {
 
       // Get invoice list
       const invoices = await caller.invoices.list();
-      const testInvoice = invoices.find((inv) => inv.id === invoice.id);
+      const testInvoice = invoices.find(inv => inv.id === invoice.id);
 
       expect(testInvoice?.paymentStatus).toBe("paid");
       expect(testInvoice?.totalPaid).toBe("1200");
@@ -295,7 +297,7 @@ describe("Invoice List with Payment Indicators", () => {
 
       // Get invoice list
       const invoices = await caller.invoices.list();
-      const testInvoice = invoices.find((inv) => inv.id === invoice.id);
+      const testInvoice = invoices.find(inv => inv.id === invoice.id);
 
       expect(testInvoice?.paymentProgress).toBe(25);
       expect(testInvoice?.paymentStatus).toBe("partial");

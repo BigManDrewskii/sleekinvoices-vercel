@@ -1,12 +1,16 @@
 /**
  * Dashboard Skeleton Components
- * 
+ *
  * Provides loading skeleton placeholders for dashboard elements
  * to improve perceived performance during data fetching.
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton, SkeletonBadge, SkeletonCircle } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonBadge,
+  SkeletonCircle,
+} from "@/components/ui/skeleton";
 
 /**
  * Skeleton for individual stat cards on the dashboard

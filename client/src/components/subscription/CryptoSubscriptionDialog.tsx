@@ -90,7 +90,7 @@ export function CryptoSubscriptionDialog({
     });
 
   const extendSubscription =
-    trpc.subscription.extendCryptoSubscription.useMutation({
+    trpc.crypto.extendCryptoSubscription.useMutation({
       onSuccess: data => {
         setPaymentData({
           paymentUrl: data.paymentUrl,

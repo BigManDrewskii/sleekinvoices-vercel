@@ -32,7 +32,7 @@ interface SaveBatchTemplateDialogProps {
   onSave: (data: {
     name: string;
     description: string;
-    frequency: 'one-time' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+    frequency: "one-time" | "weekly" | "monthly" | "quarterly" | "yearly";
   }) => Promise<void>;
   lineItems: LineItem[];
   dueInDays: number;
@@ -51,17 +51,25 @@ export function SaveBatchTemplateDialog({
 }: SaveBatchTemplateDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [frequency, setFrequency] = useState<'one-time' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'>('monthly');
+  const [frequency, setFrequency] = useState<
+    "one-time" | "weekly" | "monthly" | "quarterly" | "yearly"
+  >("monthly");
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    await onSave({ name: name.trim(), description: description.trim(), frequency });
+    await onSave({
+      name: name.trim(),
+      description: description.trim(),
+      frequency,
+    });
     setName("");
     setDescription("");
-    setFrequency('monthly');
+    setFrequency("monthly");
   };
 
-  const validLineItems = lineItems.filter(item => item.description && item.rate > 0);
+  const validLineItems = lineItems.filter(
+    item => item.description && item.rate > 0
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,7 +77,8 @@ export function SaveBatchTemplateDialog({
         <DialogHeader>
           <DialogTitle>Save as Template</DialogTitle>
           <DialogDescription>
-            Save this batch configuration as a reusable template for future invoicing.
+            Save this batch configuration as a reusable template for future
+            invoicing.
           </DialogDescription>
         </DialogHeader>
 
@@ -79,25 +88,28 @@ export function SaveBatchTemplateDialog({
             <Input
               id="template-name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="e.g., Monthly Retainer, Quarterly Consulting"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="template-description">Description (optional)</Label>
             <Textarea
               id="template-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="Brief description of what this template is for"
               rows={2}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="frequency">Billing Frequency</Label>
-            <Select value={frequency} onValueChange={(v: typeof frequency) => setFrequency(v)}>
+            <Select
+              value={frequency}
+              onValueChange={(v: typeof frequency) => setFrequency(v)}
+            >
               <SelectTrigger id="frequency">
                 <SelectValue />
               </SelectTrigger>
@@ -110,13 +122,21 @@ export function SaveBatchTemplateDialog({
               </SelectContent>
             </Select>
           </div>
-          
+
           <div className="rounded-lg border p-3 bg-muted/50">
             <p className="text-sm font-medium mb-2">Template will include:</p>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• {validLineItems.length} line item{validLineItems.length !== 1 ? 's' : ''}</li>
+              <li>
+                • {validLineItems.length} line item
+                {validLineItems.length !== 1 ? "s" : ""}
+              </li>
               <li>• Due in {dueInDays} days</li>
-              {notes && <li>• Notes: "{notes.substring(0, 50)}{notes.length > 50 ? '...' : ''}"</li>}
+              {notes && (
+                <li>
+                  • Notes: "{notes.substring(0, 50)}
+                  {notes.length > 50 ? "..." : ""}"
+                </li>
+              )}
             </ul>
           </div>
         </DialogBody>
@@ -138,7 +158,7 @@ interface BatchTemplate {
   id: number;
   name: string;
   description: string | null;
-  frequency: 'one-time' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+  frequency: "one-time" | "weekly" | "monthly" | "quarterly" | "yearly";
   dueInDays: number;
   usageCount: number;
   lastUsedAt: Date | null;
@@ -164,11 +184,11 @@ export function LoadBatchTemplateDialog({
   deletingId = null,
 }: LoadBatchTemplateDialogProps) {
   const frequencyLabels: Record<string, string> = {
-    'one-time': 'One-time',
-    'weekly': 'Weekly',
-    'monthly': 'Monthly',
-    'quarterly': 'Quarterly',
-    'yearly': 'Yearly',
+    "one-time": "One-time",
+    weekly: "Weekly",
+    monthly: "Monthly",
+    quarterly: "Quarterly",
+    yearly: "Yearly",
   };
 
   return (
@@ -189,11 +209,13 @@ export function LoadBatchTemplateDialog({
           ) : templates.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No saved templates yet.</p>
-              <p className="text-sm mt-1">Create a batch invoice and save it as a template to get started.</p>
+              <p className="text-sm mt-1">
+                Create a batch invoice and save it as a template to get started.
+              </p>
             </div>
           ) : (
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {templates.map((template) => (
+              {templates.map(template => (
                 <div
                   key={template.id}
                   className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors"
@@ -206,10 +228,14 @@ export function LoadBatchTemplateDialog({
                       </span>
                     </div>
                     {template.description && (
-                      <p className="text-sm text-muted-foreground truncate">{template.description}</p>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {template.description}
+                      </p>
                     )}
                     <p className="text-xs text-muted-foreground mt-1">
-                      Due in {template.dueInDays} days • Used {template.usageCount} time{template.usageCount !== 1 ? 's' : ''}
+                      Due in {template.dueInDays} days • Used{" "}
+                      {template.usageCount} time
+                      {template.usageCount !== 1 ? "s" : ""}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
@@ -223,7 +249,7 @@ export function LoadBatchTemplateDialog({
                       {deletingId === template.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        'Delete'
+                        "Delete"
                       )}
                     </Button>
                     <Button

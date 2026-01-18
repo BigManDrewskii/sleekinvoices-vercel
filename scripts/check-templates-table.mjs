@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-const DATABASE_URL = 'mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev';
+const DATABASE_URL =
+  "mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev";
 const url = new URL(DATABASE_URL);
 
 async function checkTemplatesTable() {
   const connection = await mysql.createConnection({
-    host: url.hostname || 'localhost',
+    host: url.hostname || "localhost",
     port: parseInt(url.port) || 3306,
     user: url.username,
     password: url.password,
@@ -13,13 +14,15 @@ async function checkTemplatesTable() {
   });
 
   try {
-    console.log('\n🔍 Checking invoiceTemplates table...\n');
+    console.log("\n🔍 Checking invoiceTemplates table...\n");
 
     // Check if table exists
-    const [tables] = await connection.query("SHOW TABLES LIKE 'invoiceTemplates'");
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'invoiceTemplates'"
+    );
     if (tables.length === 0) {
-      console.log('❌ invoiceTemplates table does not exist');
-      console.log('\n🔧 Creating invoiceTemplates table...\n');
+      console.log("❌ invoiceTemplates table does not exist");
+      console.log("\n🔧 Creating invoiceTemplates table...\n");
 
       await connection.query(`
         CREATE TABLE invoiceTemplates (
@@ -53,7 +56,7 @@ async function checkTemplatesTable() {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       `);
 
-      console.log('✅ invoiceTemplates table created\n');
+      console.log("✅ invoiceTemplates table created\n");
 
       // Insert default template
       await connection.query(`
@@ -61,24 +64,29 @@ async function checkTemplatesTable() {
         VALUES (1, 'Sleek - Default', TRUE, 'sleek')
       `);
 
-      console.log('✅ Default template created\n');
+      console.log("✅ Default template created\n");
     } else {
-      console.log('✅ invoiceTemplates table exists');
+      console.log("✅ invoiceTemplates table exists");
 
       // Check if there's a template for userId 1
-      const [templates] = await connection.query('SELECT COUNT(*) as count FROM invoiceTemplates WHERE userId = 1');
+      const [templates] = await connection.query(
+        "SELECT COUNT(*) as count FROM invoiceTemplates WHERE userId = 1"
+      );
       if (templates[0].count === 0) {
-        console.log('⚠️  No template found for userId 1, creating default...\n');
+        console.log(
+          "⚠️  No template found for userId 1, creating default...\n"
+        );
         await connection.query(`
           INSERT INTO invoiceTemplates (userId, name, isDefault, templateType)
           VALUES (1, 'Sleek - Default', TRUE, 'sleek')
         `);
-        console.log('✅ Default template created\n');
+        console.log("✅ Default template created\n");
       } else {
-        console.log(`✅ Found ${templates[0].count} template(s) for userId 1\n`);
+        console.log(
+          `✅ Found ${templates[0].count} template(s) for userId 1\n`
+        );
       }
     }
-
   } finally {
     await connection.end();
   }

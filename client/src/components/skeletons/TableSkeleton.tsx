@@ -1,11 +1,15 @@
 /**
  * Table Skeleton Components
- * 
+ *
  * Provides loading skeleton placeholders for data tables
  * with configurable columns and rows.
  */
 
-import { Skeleton, SkeletonBadge, SkeletonCircle } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonBadge,
+  SkeletonCircle,
+} from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface TableSkeletonProps {
@@ -31,12 +35,12 @@ interface ColumnConfig {
 /**
  * Generic table skeleton with configurable columns
  */
-export function TableSkeleton({ 
-  rows = 10, 
-  columns, 
+export function TableSkeleton({
+  rows = 10,
+  columns,
   showCheckbox = false,
   showActions = false,
-  className 
+  className,
 }: TableSkeletonProps) {
   return (
     <div className={cn("w-full", className)}>
@@ -44,24 +48,21 @@ export function TableSkeleton({
       <div className="flex items-center gap-4 px-4 py-3 border-b border-border">
         {showCheckbox && <Skeleton className="h-4 w-4 rounded" />}
         {columns.map((col, i) => (
-          <Skeleton 
-            key={i} 
-            className={cn("h-4", col.width || "flex-1")} 
-          />
+          <Skeleton key={i} className={cn("h-4", col.width || "flex-1")} />
         ))}
         {showActions && <Skeleton className="h-4 w-16" />}
       </div>
-      
+
       {/* Table rows skeleton */}
       <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div 
-            key={rowIndex} 
-            className="flex items-center gap-4 px-4 py-4"
-          >
+          <div key={rowIndex} className="flex items-center gap-4 px-4 py-4">
             {showCheckbox && <Skeleton className="h-4 w-4 rounded" />}
             {columns.map((col, colIndex) => (
-              <div key={colIndex} className={cn("flex-shrink-0", col.width || "flex-1")}>
+              <div
+                key={colIndex}
+                className={cn("flex-shrink-0", col.width || "flex-1")}
+              >
                 {renderColumnSkeleton(col.type)}
               </div>
             ))}
@@ -112,12 +113,12 @@ export function ClientsTableSkeleton({ rows = 10 }: { rows?: number }) {
         <Skeleton className="h-4 w-20" />
         <Skeleton className="h-4 w-16" />
       </div>
-      
+
       {/* Rows */}
       <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-4 px-4 py-4 items-center"
           >
             {/* Name */}
@@ -166,12 +167,12 @@ export function InvoicesTableSkeleton({ rows = 15 }: { rows?: number }) {
         <Skeleton className="h-4 w-14" />
         <Skeleton className="h-4 w-8" />
       </div>
-      
+
       {/* Rows */}
       <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="grid grid-cols-[auto_minmax(100px,1fr)_minmax(120px,1fr)_100px_100px_100px_80px_80px_auto] gap-4 px-4 py-4 items-center"
           >
             {/* Checkbox */}
@@ -215,12 +216,12 @@ export function ExpensesTableSkeleton({ rows = 10 }: { rows?: number }) {
         <Skeleton className="h-4 w-16" />
         <Skeleton className="h-4 w-16" />
       </div>
-      
+
       {/* Rows */}
       <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="grid grid-cols-[auto_1fr_100px_100px_100px_80px_auto] gap-4 px-4 py-4 items-center"
           >
             {/* Expand button */}

@@ -25,6 +25,7 @@ cd sleekinvoices
 ```
 
 This script will:
+
 1. Check prerequisites
 2. Create `.env.local` from template
 3. Install dependencies
@@ -88,14 +89,14 @@ VITE_APP_ID=local-dev-app
 
 Add these to enable specific features:
 
-| Feature | Variables | Where to get |
-|---------|-----------|--------------|
-| Stripe Payments | `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY` | [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) |
-| Email Sending | `RESEND_API_KEY` | [Resend](https://resend.com/api-keys) |
-| Crypto Payments | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_PUBLIC_KEY` | [NOWPayments](https://nowpayments.io/) |
-| QuickBooks | `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET` | [Intuit Developer](https://developer.intuit.com/) |
-| AI Features | `OPENROUTER_API_KEY` | [OpenRouter](https://openrouter.ai/) |
-| File Uploads | `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | AWS Console |
+| Feature         | Variables                                               | Where to get                                                  |
+| --------------- | ------------------------------------------------------- | ------------------------------------------------------------- |
+| Stripe Payments | `STRIPE_SECRET_KEY`, `VITE_STRIPE_PUBLISHABLE_KEY`      | [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) |
+| Email Sending   | `RESEND_API_KEY`                                        | [Resend](https://resend.com/api-keys)                         |
+| Crypto Payments | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_PUBLIC_KEY`         | [NOWPayments](https://nowpayments.io/)                        |
+| QuickBooks      | `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET`      | [Intuit Developer](https://developer.intuit.com/)             |
+| AI Features     | `OPENROUTER_API_KEY`                                    | [OpenRouter](https://openrouter.ai/)                          |
+| File Uploads    | `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | AWS Console                                                   |
 
 ## How Auth Bypass Works
 
@@ -200,6 +201,7 @@ pnpm preview
 ### Recommended Workflow
 
 1. **Pull latest from GitHub** before starting work:
+
    ```bash
    git pull origin main
    ```
@@ -207,12 +209,14 @@ pnpm preview
 2. **Make changes** with Claude Code
 
 3. **Test locally**:
+
    ```bash
    pnpm dev
    pnpm test
    ```
 
 4. **Commit and push**:
+
    ```bash
    git add .
    git commit -m "Description of changes"
@@ -246,11 +250,13 @@ VITE_APP_ID=local-dev-app
 ### Database Connection Failed
 
 1. Check if MySQL is running:
+
    ```bash
    docker-compose ps
    ```
 
 2. Check if the database exists:
+
    ```bash
    docker exec sleekinvoices-db mysql -u root -plocaldev123 -e "SHOW DATABASES;"
    ```
@@ -294,16 +300,16 @@ node scripts/seed-local.mjs
 
 The seed script creates:
 
-| Entity | Count | Description |
-|--------|-------|-------------|
-| User | 1 | Dev user (dev-user-local) |
-| Clients | 8 | Sample companies |
-| Products | 8 | Services and products |
-| Invoices | 25 | Various statuses (draft, sent, paid, overdue) |
-| Expenses | 20 | Categorized expenses |
-| Expense Categories | 6 | Software, Office, Travel, etc. |
-| Templates | 4 | Invoice templates |
-| Estimates | 5 | Sample quotes |
+| Entity             | Count | Description                                   |
+| ------------------ | ----- | --------------------------------------------- |
+| User               | 1     | Dev user (dev-user-local)                     |
+| Clients            | 8     | Sample companies                              |
+| Products           | 8     | Services and products                         |
+| Invoices           | 25    | Various statuses (draft, sent, paid, overdue) |
+| Expenses           | 20    | Categorized expenses                          |
+| Expense Categories | 6     | Software, Office, Travel, etc.                |
+| Templates          | 4     | Invoice templates                             |
+| Estimates          | 5     | Sample quotes                                 |
 
 ## File Structure
 

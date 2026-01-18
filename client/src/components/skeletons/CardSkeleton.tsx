@@ -1,12 +1,16 @@
 /**
  * Card Skeleton Components
- * 
+ *
  * Provides loading skeleton placeholders for various card types
  * including stat cards, content cards, and feature cards.
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton, SkeletonBadge, SkeletonButton } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonBadge,
+  SkeletonButton,
+} from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
@@ -44,11 +48,11 @@ export function StatsGridSkeleton() {
 /**
  * Skeleton for content cards with header and body
  */
-export function ContentCardSkeleton({ 
+export function ContentCardSkeleton({
   className,
   showHeader = true,
-  bodyLines = 3 
-}: { 
+  bodyLines = 3,
+}: {
   className?: string;
   showHeader?: boolean;
   bodyLines?: number;
@@ -69,9 +73,9 @@ export function ContentCardSkeleton({
       <CardContent>
         <div className="space-y-3">
           {Array.from({ length: bodyLines }).map((_, i) => (
-            <Skeleton 
-              key={i} 
-              className={cn("h-4", i === bodyLines - 1 ? "w-3/4" : "w-full")} 
+            <Skeleton
+              key={i}
+              className={cn("h-4", i === bodyLines - 1 ? "w-3/4" : "w-full")}
             />
           ))}
         </div>
@@ -162,10 +166,10 @@ export function MonthlyUsageCardSkeleton() {
 /**
  * Skeleton for analytics chart cards
  */
-export function ChartCardSkeleton({ 
+export function ChartCardSkeleton({
   className,
-  height = "h-64" 
-}: { 
+  height = "h-64",
+}: {
   className?: string;
   height?: string;
 }) {
@@ -193,27 +197,26 @@ export function ChartCardSkeleton({
             <Skeleton className="h-3 w-8" />
             <Skeleton className="h-3 w-6" />
           </div>
-          
+
           {/* Chart area */}
           <div className="ml-14 h-full flex items-end gap-2 pb-8">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div 
-                key={i} 
-                className="flex-1 flex flex-col items-center gap-2"
-              >
-                <Skeleton 
+              <div key={i} className="flex-1 flex flex-col items-center gap-2">
+                <Skeleton
                   className="w-full rounded-t"
                   style={{ height: `${Math.random() * 60 + 20}%` }}
                 />
               </div>
             ))}
           </div>
-          
+
           {/* X-axis labels */}
           <div className="absolute bottom-0 left-14 right-0 flex justify-between">
-            {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map((_, i) => (
-              <Skeleton key={i} className="h-3 w-6" />
-            ))}
+            {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map(
+              (_, i) => (
+                <Skeleton key={i} className="h-3 w-6" />
+              )
+            )}
           </div>
         </div>
       </CardContent>

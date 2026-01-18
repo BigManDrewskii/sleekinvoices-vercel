@@ -6,7 +6,7 @@ import {
   isLightColor,
   withAlpha,
   lighten,
-  darken
+  darken,
 } from "@/lib/color-contrast";
 import { useMemo, useEffect } from "react";
 import { loadGoogleFont } from "@/lib/google-fonts";
@@ -40,7 +40,7 @@ interface ClassicStyleInvoiceProps {
   taxId?: string;
   status?: string;
   logoUrl?: string;
-  logoPosition?: 'left' | 'center' | 'right';
+  logoPosition?: "left" | "center" | "right";
   logoWidth?: number;
   primaryColor?: string;
   accentColor?: string;
@@ -58,7 +58,7 @@ interface ClassicStyleInvoiceProps {
 
 /**
  * Modern Classic Style Invoice Component
- * 
+ *
  * A refined, contemporary invoice design with clean typography,
  * subtle gradients, and professional layout. Features automatic
  * contrast ratio optimization for accessibility.
@@ -100,42 +100,49 @@ export function ClassicStyleInvoice({
   showNotesField = true,
   footerText,
 }: ClassicStyleInvoiceProps) {
-
   // Load custom fonts dynamically
   useEffect(() => {
-    if (headingFont && headingFont !== 'Inter') {
-      loadGoogleFont(headingFont, ['400', '500', '600', '700']);
+    if (headingFont && headingFont !== "Inter") {
+      loadGoogleFont(headingFont, ["400", "500", "600", "700"]);
     }
-    if (bodyFont && bodyFont !== 'Inter') {
-      loadGoogleFont(bodyFont, ['400', '500', '600', '700']);
+    if (bodyFont && bodyFont !== "Inter") {
+      loadGoogleFont(bodyFont, ["400", "500", "600", "700"]);
     }
   }, [headingFont, bodyFont]);
 
   // Calculate contrast-safe colors
   const colors = useMemo(() => {
     const backgroundColor = "#ffffff";
-    
+
     // Ensure colors have good contrast against white background
-    const safePrimary = adjustColorForContrast(primaryColor, backgroundColor, 4.5);
-    const safeAccent = adjustColorForContrast(accentColor, backgroundColor, 4.5);
-    
+    const safePrimary = adjustColorForContrast(
+      primaryColor,
+      backgroundColor,
+      4.5
+    );
+    const safeAccent = adjustColorForContrast(
+      accentColor,
+      backgroundColor,
+      4.5
+    );
+
     // Text color for accent background (e.g., logo placeholder)
     const accentText = getOptimalTextColor(safeAccent);
-    
+
     // Muted colors
-    const mutedText = isLightColor(safePrimary) 
-      ? darken(safePrimary, 40) 
+    const mutedText = isLightColor(safePrimary)
+      ? darken(safePrimary, 40)
       : lighten(safePrimary, 30);
-    
+
     // Subtle background tint from accent
     const accentTint = withAlpha(safeAccent, 0.05);
     const accentBorder = withAlpha(safeAccent, 0.2);
-    
+
     // Table header background - subtle version of primary
-    const tableHeaderBg = isLightColor(safePrimary) 
+    const tableHeaderBg = isLightColor(safePrimary)
       ? withAlpha(safePrimary, 0.05)
-      : '#f9fafb';
-    
+      : "#f9fafb";
+
     return {
       primary: safePrimary,
       accent: safeAccent,
@@ -150,30 +157,30 @@ export function ClassicStyleInvoice({
 
   const getStatusStyles = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'paid':
+      case "paid":
         return {
           bg: withAlpha(colors.accent, 0.1),
           text: colors.accent,
-          dot: colors.accent
+          dot: colors.accent,
         };
-      case 'overdue':
+      case "overdue":
         return {
-          bg: '#fef2f2',
+          bg: "#fef2f2",
           text: INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue,
-          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue
+          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue,
         };
-      case 'sent':
-      case 'pending':
+      case "sent":
+      case "pending":
         return {
-          bg: '#fffbeb',
+          bg: "#fffbeb",
           text: INVOICE_TEMPLATE_DEFAULTS.statusColors.pending,
-          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.pending
+          dot: INVOICE_TEMPLATE_DEFAULTS.statusColors.pending,
         };
       default:
-        return { 
-          bg: withAlpha(colors.primary, 0.1), 
-          text: colors.muted, 
-          dot: colors.muted 
+        return {
+          bg: withAlpha(colors.primary, 0.1),
+          text: colors.muted,
+          dot: colors.muted,
         };
     }
   };
@@ -186,7 +193,7 @@ export function ClassicStyleInvoice({
       style={{
         color: colors.primary,
         fontFamily: `"${bodyFont}", system-ui, sans-serif`,
-        fontSize: `${fontSize}px`
+        fontSize: `${fontSize}px`,
       }}
     >
       {/* Header Section */}
@@ -196,8 +203,8 @@ export function ClassicStyleInvoice({
           <div
             className={cn(
               "flex-1",
-              logoPosition === 'center' && "flex flex-col items-center",
-              logoPosition === 'right' && "flex flex-col items-end"
+              logoPosition === "center" && "flex flex-col items-center",
+              logoPosition === "right" && "flex flex-col items-end"
             )}
           >
             {logoUrl ? (
@@ -207,30 +214,37 @@ export function ClassicStyleInvoice({
                 className="object-contain mb-4"
                 style={{
                   height: `${logoWidth}px`,
-                  width: 'auto'
+                  width: "auto",
                 }}
               />
             ) : (
               <div className="flex items-center gap-3 mb-4">
-                <div 
+                <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: colors.accent, color: colors.accentText }}
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.accentText,
+                  }}
                 >
-                  <svg 
-                    className="w-5 h-5" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor" 
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                     strokeWidth={2}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
                   </svg>
                 </div>
                 <span
                   className="text-xl font-semibold tracking-tight"
                   style={{ fontFamily: `"${headingFont}", sans-serif` }}
                 >
-                  {companyName || 'Your Company'}
+                  {companyName || "Your Company"}
                 </span>
               </div>
             )}
@@ -261,7 +275,7 @@ export function ClassicStyleInvoice({
               </p>
             )}
             {taxId && (
-              <p 
+              <p
                 className="text-xs mt-2 font-medium tracking-wide"
                 style={{ color: colors.muted, opacity: 0.7 }}
               >
@@ -278,20 +292,20 @@ export function ClassicStyleInvoice({
             >
               Invoice
             </h1>
-            <p 
+            <p
               className="text-lg font-mono font-medium tracking-tight"
               style={{ color: colors.muted }}
             >
               {invoiceNumber}
             </p>
-            <div 
+            <div
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium mt-3"
-              style={{ 
-                backgroundColor: statusStyles.bg, 
-                color: statusStyles.text 
+              style={{
+                backgroundColor: statusStyles.bg,
+                color: statusStyles.text,
               }}
             >
-              <span 
+              <span
                 className="w-1.5 h-1.5 rounded-full"
                 style={{ backgroundColor: statusStyles.dot }}
               />
@@ -302,10 +316,10 @@ export function ClassicStyleInvoice({
       </div>
 
       {/* Divider */}
-      <div 
+      <div
         className="mx-10 h-px"
-        style={{ 
-          background: `linear-gradient(to right, ${withAlpha(colors.primary, 0.1)}, ${withAlpha(colors.primary, 0.2)}, ${withAlpha(colors.primary, 0.1)})` 
+        style={{
+          background: `linear-gradient(to right, ${withAlpha(colors.primary, 0.1)}, ${withAlpha(colors.primary, 0.2)}, ${withAlpha(colors.primary, 0.1)})`,
         }}
       />
 
@@ -327,7 +341,7 @@ export function ClassicStyleInvoice({
               {clientName}
             </p>
             {clientAddress && (
-              <p 
+              <p
                 className="text-sm whitespace-pre-line leading-relaxed mt-1"
                 style={{ color: colors.muted }}
               >
@@ -344,11 +358,15 @@ export function ClassicStyleInvoice({
           {/* Dates */}
           <div className="sm:text-right">
             <div className="inline-grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-              <span style={{ color: colors.muted }} className="font-medium">Issue Date</span>
+              <span style={{ color: colors.muted }} className="font-medium">
+                Issue Date
+              </span>
               <span className="font-medium font-mono">
                 <DateDisplay date={issueDate} format={dateFormat} />
               </span>
-              <span style={{ color: colors.muted }} className="font-medium">Due Date</span>
+              <span style={{ color: colors.muted }} className="font-medium">
+                Due Date
+              </span>
               <span className="font-medium font-mono">
                 <DateDisplay date={dueDate} format={dateFormat} />
               </span>
@@ -359,38 +377,38 @@ export function ClassicStyleInvoice({
 
       {/* Line Items Table */}
       <div className="px-10 pb-6">
-        <div 
+        <div
           className="rounded-xl border overflow-hidden"
           style={{ borderColor: withAlpha(colors.primary, 0.15) }}
         >
           {/* Table Header */}
-          <div 
+          <div
             className="border-b"
-            style={{ 
+            style={{
               backgroundColor: colors.tableHeaderBg,
-              borderColor: withAlpha(colors.primary, 0.1)
+              borderColor: withAlpha(colors.primary, 0.1),
             }}
           >
             <div className="grid grid-cols-12 gap-4 px-5 py-3">
-              <div 
+              <div
                 className="col-span-6 text-[10px] font-semibold uppercase tracking-[0.15em]"
                 style={{ color: colors.muted }}
               >
                 Description
               </div>
-              <div 
+              <div
                 className="col-span-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-right"
                 style={{ color: colors.muted }}
               >
                 Qty
               </div>
-              <div 
+              <div
                 className="col-span-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-right"
                 style={{ color: colors.muted }}
               >
                 Rate
               </div>
-              <div 
+              <div
                 className="col-span-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-right"
                 style={{ color: colors.muted }}
               >
@@ -400,27 +418,35 @@ export function ClassicStyleInvoice({
           </div>
 
           {/* Table Body */}
-          <div className="divide-y" style={{ borderColor: withAlpha(colors.primary, 0.05) }}>
+          <div
+            className="divide-y"
+            style={{ borderColor: withAlpha(colors.primary, 0.05) }}
+          >
             {lineItems.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="grid grid-cols-12 gap-4 px-5 py-4 transition-colors"
-                style={{ 
-                  ['--hover-bg' as string]: withAlpha(colors.primary, 0.02)
+                style={{
+                  ["--hover-bg" as string]: withAlpha(colors.primary, 0.02),
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = withAlpha(colors.primary, 0.02)}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                onMouseEnter={e =>
+                  (e.currentTarget.style.backgroundColor = withAlpha(
+                    colors.primary,
+                    0.02
+                  ))
+                }
+                onMouseLeave={e =>
+                  (e.currentTarget.style.backgroundColor = "transparent")
+                }
               >
-                <div className="col-span-6 text-sm">
-                  {item.description}
-                </div>
-                <div 
+                <div className="col-span-6 text-sm">{item.description}</div>
+                <div
                   className="col-span-2 text-sm text-right font-mono"
                   style={{ color: colors.muted }}
                 >
                   {item.quantity}
                 </div>
-                <div 
+                <div
                   className="col-span-2 text-sm text-right font-mono"
                   style={{ color: colors.muted }}
                 >
@@ -445,11 +471,14 @@ export function ClassicStyleInvoice({
                 <Currency amount={subtotal} />
               </span>
             </div>
-            
+
             {showDiscountField && discountAmount > 0 && (
               <div className="flex justify-between items-center py-2 text-sm">
                 <span style={{ color: colors.accent }}>Discount</span>
-                <span className="font-mono font-medium" style={{ color: colors.accent }}>
+                <span
+                  className="font-mono font-medium"
+                  style={{ color: colors.accent }}
+                >
                   -<Currency amount={discountAmount} />
                 </span>
               </div>
@@ -465,7 +494,7 @@ export function ClassicStyleInvoice({
                 </span>
               </div>
             )}
-            
+
             <div
               className="border-t pt-3 mt-2"
               style={{ borderColor: withAlpha(colors.primary, 0.15) }}
@@ -477,7 +506,7 @@ export function ClassicStyleInvoice({
                 >
                   Total
                 </span>
-                <span 
+                <span
                   className="text-2xl font-bold font-mono"
                   style={{ color: colors.accent }}
                 >
@@ -538,7 +567,7 @@ export function ClassicStyleInvoice({
         className="px-10 py-6 border-t"
         style={{
           backgroundColor: colors.tableHeaderBg,
-          borderColor: withAlpha(colors.primary, 0.1)
+          borderColor: withAlpha(colors.primary, 0.1),
         }}
       >
         <div

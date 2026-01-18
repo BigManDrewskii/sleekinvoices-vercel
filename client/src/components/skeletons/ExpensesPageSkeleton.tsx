@@ -1,12 +1,16 @@
 /**
  * Expenses Page Skeleton
- * 
+ *
  * Provides loading skeleton for the expenses page
  * including stats cards and expenses table.
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton, SkeletonBadge, SkeletonButton } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonBadge,
+  SkeletonButton,
+} from "@/components/ui/skeleton";
 
 /**
  * Skeleton for expense stats cards
@@ -110,7 +114,7 @@ export function ExpensesTableSkeleton({ rows = 10 }: { rows?: number }) {
           <Skeleton className="h-4 w-16" />
           <Skeleton className="h-4 w-16" />
         </div>
-        
+
         {/* Table Rows */}
         <div>
           {Array.from({ length: rows }).map((_, i) => (
@@ -130,10 +134,10 @@ export function ExpensesPageSkeleton() {
     <div className="space-y-6">
       {/* Stats Grid */}
       <ExpenseStatsGridSkeleton />
-      
+
       {/* Filters */}
       <ExpenseFiltersSkeleton />
-      
+
       {/* Table */}
       <ExpensesTableSkeleton />
     </div>

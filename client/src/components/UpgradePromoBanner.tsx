@@ -1,6 +1,6 @@
 /**
  * UpgradePromoBanner Component
- * 
+ *
  * Eye-catching promotional banner to encourage Pro upgrades
  * Features gradient design, benefits list, and compelling CTA
  */
@@ -38,7 +38,8 @@ export function UpgradePromoBanner() {
                 Upgrade to Pro
               </h3>
               <p className="text-muted-foreground text-base">
-                Unlock unlimited invoicing and premium features for just $12/month
+                Unlock unlimited invoicing and premium features for just
+                $12/month
               </p>
             </div>
 
@@ -57,16 +58,16 @@ export function UpgradePromoBanner() {
 
           {/* Right side: CTA */}
           <div className="flex flex-col gap-3 w-full md:w-auto">
-            <Button 
-              asChild 
-              size="lg" 
+            <Button
+              asChild
+              size="lg"
               className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200 group"
             >
               <Link href="/subscription">
                 <span className="font-semibold">Upgrade Now</span>
               </Link>
             </Button>
-            
+
             <p className="text-xs text-center text-muted-foreground">
               Cancel anytime • No hidden fees
             </p>

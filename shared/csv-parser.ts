@@ -31,35 +31,35 @@ export interface ParseResult {
 
 // Required and optional column mappings
 const COLUMN_MAPPINGS: Record<string, keyof ParsedClient> = {
-  'name': 'name',
-  'client name': 'name',
-  'client_name': 'name',
-  'contact name': 'name',
-  'contact_name': 'name',
-  'email': 'email',
-  'email address': 'email',
-  'email_address': 'email',
-  'company': 'companyName',
-  'company name': 'companyName',
-  'company_name': 'companyName',
-  'organization': 'companyName',
-  'address': 'address',
-  'street address': 'address',
-  'street_address': 'address',
-  'full address': 'address',
-  'phone': 'phone',
-  'phone number': 'phone',
-  'phone_number': 'phone',
-  'telephone': 'phone',
-  'mobile': 'phone',
-  'notes': 'notes',
-  'note': 'notes',
-  'comments': 'notes',
-  'vat': 'vatNumber',
-  'vat number': 'vatNumber',
-  'vat_number': 'vatNumber',
-  'tax id': 'vatNumber',
-  'tax_id': 'vatNumber',
+  name: "name",
+  "client name": "name",
+  client_name: "name",
+  "contact name": "name",
+  contact_name: "name",
+  email: "email",
+  "email address": "email",
+  email_address: "email",
+  company: "companyName",
+  "company name": "companyName",
+  company_name: "companyName",
+  organization: "companyName",
+  address: "address",
+  "street address": "address",
+  street_address: "address",
+  "full address": "address",
+  phone: "phone",
+  "phone number": "phone",
+  phone_number: "phone",
+  telephone: "phone",
+  mobile: "phone",
+  notes: "notes",
+  note: "notes",
+  comments: "notes",
+  vat: "vatNumber",
+  "vat number": "vatNumber",
+  vat_number: "vatNumber",
+  "tax id": "vatNumber",
+  tax_id: "vatNumber",
 };
 
 /**
@@ -67,12 +67,12 @@ const COLUMN_MAPPINGS: Record<string, keyof ParsedClient> = {
  */
 export function parseCSV(csvContent: string): ParseResult {
   const lines = csvContent.split(/\r?\n/).filter(line => line.trim());
-  
+
   if (lines.length === 0) {
     return {
       success: false,
       clients: [],
-      errors: [{ row: 0, field: 'file', message: 'CSV file is empty' }],
+      errors: [{ row: 0, field: "file", message: "CSV file is empty" }],
       totalRows: 0,
       validRows: 0,
       duplicates: [],
@@ -82,16 +82,16 @@ export function parseCSV(csvContent: string): ParseResult {
   // Parse header row
   const headerLine = lines[0];
   const headers = parseCSVLine(headerLine).map(h => h.toLowerCase().trim());
-  
+
   // Map headers to client fields
   const columnMap: Map<number, keyof ParsedClient> = new Map();
   let hasNameColumn = false;
-  
+
   headers.forEach((header, index) => {
     const mappedField = COLUMN_MAPPINGS[header];
     if (mappedField) {
       columnMap.set(index, mappedField);
-      if (mappedField === 'name') {
+      if (mappedField === "name") {
         hasNameColumn = true;
       }
     }
@@ -101,11 +101,14 @@ export function parseCSV(csvContent: string): ParseResult {
     return {
       success: false,
       clients: [],
-      errors: [{ 
-        row: 1, 
-        field: 'header', 
-        message: 'Missing required "name" column. Expected column headers: name, email, company, address, phone, notes, vat number' 
-      }],
+      errors: [
+        {
+          row: 1,
+          field: "header",
+          message:
+            'Missing required "name" column. Expected column headers: name, email, company, address, phone, notes, vat number',
+        },
+      ],
       totalRows: lines.length - 1,
       validRows: 0,
       duplicates: [],
@@ -123,12 +126,12 @@ export function parseCSV(csvContent: string): ParseResult {
     if (!line) continue;
 
     const values = parseCSVLine(line);
-    const client: ParsedClient = { name: '' };
+    const client: ParsedClient = { name: "" };
     let hasError = false;
 
     // Map values to client fields
     columnMap.forEach((field, index) => {
-      const value = values[index]?.trim() || '';
+      const value = values[index]?.trim() || "";
       if (value) {
         (client as any)[field] = value;
       }
@@ -138,8 +141,8 @@ export function parseCSV(csvContent: string): ParseResult {
     if (!client.name) {
       errors.push({
         row: i + 1,
-        field: 'name',
-        message: 'Name is required',
+        field: "name",
+        message: "Name is required",
       });
       hasError = true;
     }
@@ -148,8 +151,8 @@ export function parseCSV(csvContent: string): ParseResult {
     if (client.email && !isValidEmail(client.email)) {
       errors.push({
         row: i + 1,
-        field: 'email',
-        message: 'Invalid email format',
+        field: "email",
+        message: "Invalid email format",
         value: client.email,
       });
       hasError = true;
@@ -162,7 +165,7 @@ export function parseCSV(csvContent: string): ParseResult {
         duplicates.push(client.email);
         errors.push({
           row: i + 1,
-          field: 'email',
+          field: "email",
           message: `Duplicate email (first seen in row ${seenEmails.get(normalizedEmail)})`,
           value: client.email,
         });
@@ -175,8 +178,8 @@ export function parseCSV(csvContent: string): ParseResult {
     if (client.phone && !isValidPhone(client.phone)) {
       errors.push({
         row: i + 1,
-        field: 'phone',
-        message: 'Invalid phone format',
+        field: "phone",
+        message: "Invalid phone format",
         value: client.phone,
       });
       // Phone errors are warnings, not blocking
@@ -186,8 +189,8 @@ export function parseCSV(csvContent: string): ParseResult {
     if (client.vatNumber && !isValidVATFormat(client.vatNumber)) {
       errors.push({
         row: i + 1,
-        field: 'vatNumber',
-        message: 'Invalid VAT number format (expected format: XX123456789)',
+        field: "vatNumber",
+        message: "Invalid VAT number format (expected format: XX123456789)",
         value: client.vatNumber,
       });
       // VAT errors are warnings, not blocking
@@ -199,7 +202,9 @@ export function parseCSV(csvContent: string): ParseResult {
   }
 
   return {
-    success: errors.filter(e => e.field === 'name' || e.field === 'email').length === 0,
+    success:
+      errors.filter(e => e.field === "name" || e.field === "email").length ===
+      0,
     clients,
     errors,
     totalRows: lines.length - 1,
@@ -213,13 +218,13 @@ export function parseCSV(csvContent: string): ParseResult {
  */
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
-  
+
   for (let i = 0; i < line.length; i++) {
     const char = line[i];
     const nextChar = line[i + 1];
-    
+
     if (char === '"') {
       if (inQuotes && nextChar === '"') {
         // Escaped quote
@@ -229,14 +234,14 @@ function parseCSVLine(line: string): string[] {
         // Toggle quote mode
         inQuotes = !inQuotes;
       }
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       result.push(current.trim());
-      current = '';
+      current = "";
     } else {
       current += char;
     }
   }
-  
+
   result.push(current.trim());
   return result;
 }
@@ -256,7 +261,7 @@ function isValidPhone(phone: string): boolean {
   // Allow digits, spaces, dashes, parentheses, and plus sign
   const phoneRegex = /^[\d\s\-\(\)\+\.]+$/;
   // Must have at least 7 digits
-  const digitsOnly = phone.replace(/\D/g, '');
+  const digitsOnly = phone.replace(/\D/g, "");
   return phoneRegex.test(phone) && digitsOnly.length >= 7;
 }
 
@@ -266,49 +271,99 @@ function isValidPhone(phone: string): boolean {
 function isValidVATFormat(vat: string): boolean {
   // EU VAT format: 2 letters followed by 8-12 characters (letters/digits)
   const vatRegex = /^[A-Z]{2}[A-Z0-9]{8,12}$/i;
-  return vatRegex.test(vat.replace(/\s/g, ''));
+  return vatRegex.test(vat.replace(/\s/g, ""));
 }
 
 /**
  * Generate a sample CSV template
  */
 export function generateSampleCSV(): string {
-  const headers = ['Name', 'Email', 'Company Name', 'Address', 'Phone', 'Notes', 'VAT Number'];
+  const headers = [
+    "Name",
+    "Email",
+    "Company Name",
+    "Address",
+    "Phone",
+    "Notes",
+    "VAT Number",
+  ];
   const sampleRows = [
-    ['John Smith', 'john@example.com', 'Acme Corp', '123 Main St, New York, NY 10001', '+1 (555) 123-4567', 'VIP client', ''],
-    ['Jane Doe', 'jane@company.com', 'Tech Solutions Ltd', '456 Oak Ave, San Francisco, CA 94102', '555-987-6543', 'Monthly retainer', 'DE123456789'],
-    ['Bob Wilson', 'bob@startup.io', 'Startup Inc', '789 Pine Rd, Austin, TX 78701', '', 'New client', ''],
+    [
+      "John Smith",
+      "john@example.com",
+      "Acme Corp",
+      "123 Main St, New York, NY 10001",
+      "+1 (555) 123-4567",
+      "VIP client",
+      "",
+    ],
+    [
+      "Jane Doe",
+      "jane@company.com",
+      "Tech Solutions Ltd",
+      "456 Oak Ave, San Francisco, CA 94102",
+      "555-987-6543",
+      "Monthly retainer",
+      "DE123456789",
+    ],
+    [
+      "Bob Wilson",
+      "bob@startup.io",
+      "Startup Inc",
+      "789 Pine Rd, Austin, TX 78701",
+      "",
+      "New client",
+      "",
+    ],
   ];
-  
+
   const csvLines = [
-    headers.join(','),
-    ...sampleRows.map(row => row.map(cell => 
-      cell.includes(',') || cell.includes('"') ? `"${cell.replace(/"/g, '""')}"` : cell
-    ).join(','))
+    headers.join(","),
+    ...sampleRows.map(row =>
+      row
+        .map(cell =>
+          cell.includes(",") || cell.includes('"')
+            ? `"${cell.replace(/"/g, '""')}"`
+            : cell
+        )
+        .join(",")
+    ),
   ];
-  
-  return csvLines.join('\n');
+
+  return csvLines.join("\n");
 }
 
 /**
  * Convert parsed clients to CSV for download
  */
 export function clientsToCSV(clients: ParsedClient[]): string {
-  const headers = ['Name', 'Email', 'Company Name', 'Address', 'Phone', 'Notes', 'VAT Number'];
-  
-  const rows = clients.map(client => [
-    client.name,
-    client.email || '',
-    client.companyName || '',
-    client.address || '',
-    client.phone || '',
-    client.notes || '',
-    client.vatNumber || '',
-  ].map(cell => 
-    cell.includes(',') || cell.includes('"') || cell.includes('\n') 
-      ? `"${cell.replace(/"/g, '""')}"` 
-      : cell
-  ).join(','));
-  
-  return [headers.join(','), ...rows].join('\n');
+  const headers = [
+    "Name",
+    "Email",
+    "Company Name",
+    "Address",
+    "Phone",
+    "Notes",
+    "VAT Number",
+  ];
+
+  const rows = clients.map(client =>
+    [
+      client.name,
+      client.email || "",
+      client.companyName || "",
+      client.address || "",
+      client.phone || "",
+      client.notes || "",
+      client.vatNumber || "",
+    ]
+      .map(cell =>
+        cell.includes(",") || cell.includes('"') || cell.includes("\n")
+          ? `"${cell.replace(/"/g, '""')}"`
+          : cell
+      )
+      .join(",")
+  );
+
+  return [headers.join(","), ...rows].join("\n");
 }

@@ -1,14 +1,18 @@
-import puppeteer, { Browser } from 'puppeteer';
+import puppeteer, { Browser } from "puppeteer";
 
 // Track active browser instances for cleanup
 let activeBrowser: Browser | null = null;
 
 // Default timeout for PDF generation (30 seconds)
 const PDF_GENERATION_TIMEOUT_MS = 30000;
-import { Invoice, Client, InvoiceLineItem, User } from '../drizzle/schema';
-import type { InvoiceTemplate } from '../drizzle/schema';
-import { createPDFColorPalette, getOptimalTextColor, withAlpha } from './color-contrast';
-import { INVOICE_TEMPLATE_DEFAULTS } from '../shared/template-presets';
+import { Invoice, Client, InvoiceLineItem, User } from "../drizzle/schema";
+import type { InvoiceTemplate } from "../drizzle/schema";
+import {
+  createPDFColorPalette,
+  getOptimalTextColor,
+  withAlpha,
+} from "./color-contrast";
+import { INVOICE_TEMPLATE_DEFAULTS } from "../shared/template-presets";
 
 interface InvoicePDFData {
   invoice: Invoice;
@@ -16,51 +20,65 @@ interface InvoicePDFData {
   lineItems: InvoiceLineItem[];
   user: User;
   template?: InvoiceTemplate | null;
-  style?: 'classic' | 'receipt';
+  style?: "classic" | "receipt";
 }
 
 function formatCurrency(amount: number | string): string {
-  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  const num = typeof amount === "string" ? parseFloat(amount) : amount;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(num);
 }
 
 function formatDate(date: Date | null): string {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
   const year = d.getFullYear();
   return `${month}/${day}/${year}`;
 }
 
 function formatLongDate(date: Date | null): string {
-  if (!date) return '';
+  if (!date) return "";
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
-    case 'paid': return '#10b981';
-    case 'overdue': return '#ef4444';
-    case 'pending': 
-    case 'sent': return '#f59e0b';
-    case 'draft': return '#71717a';
-    default: return '#71717a';
+    case "paid":
+      return "#10b981";
+    case "overdue":
+      return "#ef4444";
+    case "pending":
+    case "sent":
+      return "#f59e0b";
+    case "draft":
+      return "#71717a";
+    default:
+      return "#71717a";
   }
 }
 
 function getStatusBgColor(status: string): string {
   switch (status.toLowerCase()) {
-    case 'paid': return '#ecfdf5';
-    case 'overdue': return '#fef2f2';
-    case 'pending': 
-    case 'sent': return '#fffbeb';
-    case 'draft': return '#f4f4f5';
-    default: return '#f4f4f5';
+    case "paid":
+      return "#ecfdf5";
+    case "overdue":
+      return "#fef2f2";
+    case "pending":
+    case "sent":
+      return "#fffbeb";
+    case "draft":
+      return "#f4f4f5";
+    default:
+      return "#f4f4f5";
   }
 }
 
@@ -74,20 +92,24 @@ function getStatusLabel(status: string): string {
  */
 function generateReceiptStyleHTML(data: InvoicePDFData): string {
   const { invoice, client, lineItems, user, template } = data;
-  
+
   const logoUrl = template?.logoUrl || user.logoUrl;
-  const companyName = user.companyName || user.name || 'Your Company';
-  const companyAddress = user.companyAddress || '';
-  const companyEmail = user.email || '';
-  const companyPhone = user.companyPhone || '';
-  const taxId = user.taxId || '';
-  
+  const companyName = user.companyName || user.name || "Your Company";
+  const companyAddress = user.companyAddress || "";
+  const companyEmail = user.email || "";
+  const companyPhone = user.companyPhone || "";
+  const taxId = user.taxId || "";
+
   // Get contrast-safe colors from template or defaults
-  const primaryColor = template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
-  const accentColor = template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.accentColor;
+  const primaryColor =
+    template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
+  const accentColor =
+    template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.accentColor;
   const colors = createPDFColorPalette(primaryColor, accentColor);
-  
-  const lineItemsHTML = lineItems.map(item => `
+
+  const lineItemsHTML = lineItems
+    .map(
+      item => `
     <div style="display: grid; grid-template-columns: repeat(12, 1fr); font-size: 14px; color: ${colors.primary}; gap: 4px 0; margin-bottom: 16px;">
       <div style="grid-column: span 6; padding-right: 16px;">${item.description}</div>
       <div style="grid-column: span 2; text-align: right; font-variant-numeric: tabular-nums; color: ${colors.muted};">${item.quantity}</div>
@@ -96,7 +118,9 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
         ${item.quantity} × ${formatCurrency(item.rate)}
       </div>
     </div>
-  `).join('');
+  `
+    )
+    .join("");
 
   return `
 <!DOCTYPE html>
@@ -149,16 +173,20 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
   <div class="receipt-container">
     <!-- Header -->
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 32px;">
-      ${logoUrl ? `
+      ${
+        logoUrl
+          ? `
         <img src="${logoUrl}" alt="Logo" style="height: 32px; width: auto; object-fit: contain;">
-      ` : `
+      `
+          : `
         <div style="width: 32px; height: 32px; background: ${colors.primary}; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${colors.primaryText}" stroke-width="2.5">
             <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
         </div>
-      `}
+      `
+      }
       <span style="font-size: 14px; font-weight: 500; letter-spacing: -0.01em; color: ${colors.primary};">
         ${companyName}
       </span>
@@ -198,10 +226,10 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
       <div class="label">From</div>
       <div style="font-size: 14px; line-height: 1.7; color: #27272a;">
         <div style="font-weight: 500;">${companyName}</div>
-        ${companyAddress ? `<div style="white-space: pre-line;">${companyAddress}</div>` : ''}
-        ${companyEmail ? `<div style="color: #71717a;">${companyEmail}</div>` : ''}
-        ${companyPhone ? `<div style="color: #71717a;">${companyPhone}</div>` : ''}
-        ${taxId ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Tax ID: ${taxId}</div>` : ''}
+        ${companyAddress ? `<div style="white-space: pre-line;">${companyAddress}</div>` : ""}
+        ${companyEmail ? `<div style="color: #71717a;">${companyEmail}</div>` : ""}
+        ${companyPhone ? `<div style="color: #71717a;">${companyPhone}</div>` : ""}
+        ${taxId ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">Tax ID: ${taxId}</div>` : ""}
       </div>
     </div>
 
@@ -212,10 +240,10 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
       <div class="label">To</div>
       <div style="font-size: 14px; line-height: 1.7; color: #27272a;">
         <div style="font-weight: 500;">${client.name}</div>
-        ${client.companyName ? `<div>${client.companyName}</div>` : ''}
-        ${client.address ? `<div style="white-space: pre-line;">${client.address}</div>` : ''}
-        ${client.email ? `<div style="color: #71717a;">${client.email}</div>` : ''}
-        ${client.vatNumber ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">VAT: ${client.vatNumber}</div>` : ''}
+        ${client.companyName ? `<div>${client.companyName}</div>` : ""}
+        ${client.address ? `<div style="white-space: pre-line;">${client.address}</div>` : ""}
+        ${client.email ? `<div style="color: #71717a;">${client.email}</div>` : ""}
+        ${client.vatNumber ? `<div style="font-size: 12px; color: #a1a1aa; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">VAT: ${client.vatNumber}</div>` : ""}
       </div>
     </div>
 
@@ -242,24 +270,36 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
         <div style="color: ${colors.muted};">Subtotal</div>
         <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.subtotal)}</div>
       </div>
-      ${Number(invoice.discountAmount) > 0 ? `
+      ${
+        Number(invoice.discountAmount) > 0
+          ? `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
         <div style="color: ${colors.accent};">Discount</div>
         <div style="text-align: right; font-variant-numeric: tabular-nums; color: ${colors.accent};">-${formatCurrency(invoice.discountAmount)}</div>
       </div>
-      ` : ''}
-      ${Number(invoice.taxAmount) > 0 && !client.taxExempt ? `
+      `
+          : ""
+      }
+      ${
+        Number(invoice.taxAmount) > 0 && !client.taxExempt
+          ? `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
         <div style="color: ${colors.muted};">Tax (${invoice.taxRate}%)</div>
         <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.taxAmount)}</div>
       </div>
-      ` : ''}
-      ${client.taxExempt && client.vatNumber ? `
+      `
+          : ""
+      }
+      ${
+        client.taxExempt && client.vatNumber
+          ? `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px;">
         <div style="color: ${colors.muted}; font-size: 12px;">Reverse Charge - VAT 0%</div>
         <div style="text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(0)}</div>
       </div>
-      ` : ''}
+      `
+          : ""
+      }
       <div style="width: 100%; max-width: 240px; border-top: 1px solid ${colors.divider}; margin: 4px 0;"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 100%; max-width: 240px; font-size: 18px; font-weight: 500;">
         <div style="color: ${colors.primary};">Total</div>
@@ -271,30 +311,42 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
 
     <!-- Payment & Notes -->
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-      ${invoice.paymentTerms ? `
+      ${
+        invoice.paymentTerms
+          ? `
       <div>
         <div class="label">Payment Terms</div>
         <div style="font-size: 12px; color: ${colors.muted}; white-space: pre-wrap; line-height: 1.7;">
           ${invoice.paymentTerms}
         </div>
       </div>
-      ` : ''}
-      ${invoice.notes ? `
+      `
+          : ""
+      }
+      ${
+        invoice.notes
+          ? `
       <div>
         <div class="label">Notes</div>
         <div style="font-size: 12px; color: ${colors.muted}; line-height: 1.7; font-style: italic;">
           ${invoice.notes}
         </div>
       </div>
-      ` : ''}
+      `
+          : ""
+      }
     </div>
 
-    ${client.taxExempt && client.vatNumber ? `
+    ${
+      client.taxExempt && client.vatNumber
+        ? `
     <div style="margin-top: 32px; padding: 16px; background: ${withAlpha(colors.primary, 0.05)}; border-left: 4px solid ${colors.primary}; font-size: 12px;">
       <strong style="color: ${colors.primary};">Reverse Charge Notice:</strong><br>
       <span style="color: ${colors.muted};">VAT reverse charge applies. The customer is liable for VAT in their country of establishment under Article 196 of Council Directive 2006/112/EC.</span>
     </div>
-    ` : ''}
+    `
+        : ""
+    }
 
     <!-- Footer -->
     <div style="margin-top: 64px; font-size: 10px; color: ${withAlpha(colors.primary, 0.25)}; text-transform: uppercase; letter-spacing: 0.1em; text-align: center;">
@@ -312,28 +364,34 @@ function generateReceiptStyleHTML(data: InvoicePDFData): string {
  */
 function generateClassicStyleHTML(data: InvoicePDFData): string {
   const { invoice, client, lineItems, user, template } = data;
-  
+
   // Get contrast-safe colors from template or defaults
-  const primaryColor = template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
-  const accentColor = template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.classicAccentColor;
+  const primaryColor =
+    template?.primaryColor || INVOICE_TEMPLATE_DEFAULTS.primaryColor;
+  const accentColor =
+    template?.accentColor || INVOICE_TEMPLATE_DEFAULTS.classicAccentColor;
   const colors = createPDFColorPalette(primaryColor, accentColor);
-  
+
   const logoUrl = template?.logoUrl || user.logoUrl;
-  
-  const companyName = user.companyName || user.name || 'Your Company';
-  const companyAddress = user.companyAddress || '';
-  const companyEmail = user.email || '';
-  const companyPhone = user.companyPhone || '';
-  const taxId = user.taxId || '';
-  
-  const lineItemsHTML = lineItems.map(item => `
+
+  const companyName = user.companyName || user.name || "Your Company";
+  const companyAddress = user.companyAddress || "";
+  const companyEmail = user.email || "";
+  const companyPhone = user.companyPhone || "";
+  const taxId = user.taxId || "";
+
+  const lineItemsHTML = lineItems
+    .map(
+      item => `
     <div style="display: grid; grid-template-columns: 6fr 2fr 2fr 2fr; gap: 16px; padding: 16px 20px; border-bottom: 1px solid ${colors.divider};">
       <div style="font-size: 14px; color: ${colors.primary};">${item.description}</div>
       <div style="font-size: 14px; color: ${colors.muted}; text-align: right; font-variant-numeric: tabular-nums;">${item.quantity}</div>
       <div style="font-size: 14px; color: ${colors.muted}; text-align: right; font-variant-numeric: tabular-nums;">${formatCurrency(item.rate)}</div>
       <div style="font-size: 14px; color: ${colors.primary}; text-align: right; font-weight: 500; font-variant-numeric: tabular-nums;">${formatCurrency(item.amount)}</div>
     </div>
-  `).join('');
+  `
+    )
+    .join("");
 
   return `
 <!DOCTYPE html>
@@ -374,9 +432,12 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
       <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <!-- Company Info -->
         <div style="flex: 1;">
-          ${logoUrl ? `
+          ${
+            logoUrl
+              ? `
             <img src="${logoUrl}" alt="Logo" style="height: 40px; width: auto; object-fit: contain; margin-bottom: 16px;">
-          ` : `
+          `
+              : `
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
               <div style="width: 40px; height: 40px; background: ${colors.accent}; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${colors.accentText}" stroke-width="2">
@@ -385,12 +446,13 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
               </div>
               <span style="font-size: 20px; font-weight: 600; color: ${colors.primary}; letter-spacing: -0.02em;">${companyName}</span>
             </div>
-          `}
-          ${logoUrl ? `<p style="font-size: 16px; font-weight: 600; color: ${colors.primary}; margin-bottom: 4px;">${companyName}</p>` : ''}
-          ${companyAddress ? `<p style="font-size: 13px; color: ${colors.muted}; white-space: pre-line; line-height: 1.6;">${companyAddress}</p>` : ''}
-          ${companyEmail ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 4px;">${companyEmail}</p>` : ''}
-          ${companyPhone ? `<p style="font-size: 13px; color: ${colors.muted};">${companyPhone}</p>` : ''}
-          ${taxId ? `<p style="font-size: 11px; color: ${colors.muted}; margin-top: 8px; font-weight: 500; letter-spacing: 0.05em; opacity: 0.7;">TAX ID: ${taxId}</p>` : ''}
+          `
+          }
+          ${logoUrl ? `<p style="font-size: 16px; font-weight: 600; color: ${colors.primary}; margin-bottom: 4px;">${companyName}</p>` : ""}
+          ${companyAddress ? `<p style="font-size: 13px; color: ${colors.muted}; white-space: pre-line; line-height: 1.6;">${companyAddress}</p>` : ""}
+          ${companyEmail ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 4px;">${companyEmail}</p>` : ""}
+          ${companyPhone ? `<p style="font-size: 13px; color: ${colors.muted};">${companyPhone}</p>` : ""}
+          ${taxId ? `<p style="font-size: 11px; color: ${colors.muted}; margin-top: 8px; font-weight: 500; letter-spacing: 0.05em; opacity: 0.7;">TAX ID: ${taxId}</p>` : ""}
         </div>
 
         <!-- Invoice Title & Number -->
@@ -415,10 +477,10 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
         <div>
           <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: ${colors.muted}; margin-bottom: 8px;">Bill To</p>
           <p style="font-size: 16px; font-weight: 600; color: ${colors.primary};">${client.name}</p>
-          ${client.companyName ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 2px;">${client.companyName}</p>` : ''}
-          ${client.address ? `<p style="font-size: 13px; color: ${colors.muted}; white-space: pre-line; line-height: 1.6; margin-top: 4px;">${client.address}</p>` : ''}
-          ${client.email ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 4px;">${client.email}</p>` : ''}
-          ${client.vatNumber ? `<p style="font-size: 11px; color: ${colors.muted}; margin-top: 8px; font-weight: 500; letter-spacing: 0.05em; opacity: 0.7;">VAT: ${client.vatNumber}</p>` : ''}
+          ${client.companyName ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 2px;">${client.companyName}</p>` : ""}
+          ${client.address ? `<p style="font-size: 13px; color: ${colors.muted}; white-space: pre-line; line-height: 1.6; margin-top: 4px;">${client.address}</p>` : ""}
+          ${client.email ? `<p style="font-size: 13px; color: ${colors.muted}; margin-top: 4px;">${client.email}</p>` : ""}
+          ${client.vatNumber ? `<p style="font-size: 11px; color: ${colors.muted}; margin-top: 8px; font-weight: 500; letter-spacing: 0.05em; opacity: 0.7;">VAT: ${client.vatNumber}</p>` : ""}
         </div>
 
         <!-- Dates -->
@@ -458,24 +520,36 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
             <span style="color: ${colors.muted};">Subtotal</span>
             <span style="color: ${colors.primary}; font-weight: 500; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.subtotal)}</span>
           </div>
-          ${Number(invoice.discountAmount) > 0 ? `
+          ${
+            Number(invoice.discountAmount) > 0
+              ? `
           <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px;">
             <span style="color: ${colors.accent};">Discount</span>
             <span style="color: ${colors.accent}; font-weight: 500; font-variant-numeric: tabular-nums;">-${formatCurrency(invoice.discountAmount)}</span>
           </div>
-          ` : ''}
-          ${Number(invoice.taxAmount) > 0 && !client.taxExempt ? `
+          `
+              : ""
+          }
+          ${
+            Number(invoice.taxAmount) > 0 && !client.taxExempt
+              ? `
           <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px;">
             <span style="color: ${colors.muted};">Tax (${invoice.taxRate}%)</span>
             <span style="color: ${colors.primary}; font-weight: 500; font-variant-numeric: tabular-nums;">${formatCurrency(invoice.taxAmount)}</span>
           </div>
-          ` : ''}
-          ${client.taxExempt && client.vatNumber ? `
+          `
+              : ""
+          }
+          ${
+            client.taxExempt && client.vatNumber
+              ? `
           <div style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 12px;">
             <span style="color: ${colors.muted};">Reverse Charge - VAT 0%</span>
             <span style="color: ${colors.primary}; font-weight: 500; font-variant-numeric: tabular-nums;">${formatCurrency(0)}</span>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
           <div style="border-top: 1px solid ${colors.divider}; margin-top: 8px; padding-top: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 16px; font-weight: 600; color: ${colors.primary};">Total</span>
@@ -487,30 +561,46 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
     </div>
 
     <!-- Notes & Payment Terms -->
-    ${(invoice.notes || invoice.paymentTerms) ? `
+    ${
+      invoice.notes || invoice.paymentTerms
+        ? `
     <div style="margin: 0 40px; border-top: 1px solid ${colors.divider};"></div>
     <div style="padding: 32px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
-      ${invoice.notes ? `
+      ${
+        invoice.notes
+          ? `
       <div>
         <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: ${colors.muted}; margin-bottom: 8px;">Notes</p>
         <p style="font-size: 13px; color: ${colors.muted}; line-height: 1.7; white-space: pre-line;">${invoice.notes}</p>
       </div>
-      ` : ''}
-      ${invoice.paymentTerms ? `
+      `
+          : ""
+      }
+      ${
+        invoice.paymentTerms
+          ? `
       <div>
         <p style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: ${colors.muted}; margin-bottom: 8px;">Payment Terms</p>
         <p style="font-size: 13px; color: ${colors.muted}; line-height: 1.7;">${invoice.paymentTerms}</p>
       </div>
-      ` : ''}
+      `
+          : ""
+      }
     </div>
-    ` : ''}
+    `
+        : ""
+    }
 
-    ${client.taxExempt && client.vatNumber ? `
+    ${
+      client.taxExempt && client.vatNumber
+        ? `
     <div style="margin: 0 40px 24px; padding: 16px; background: ${withAlpha(colors.primary, 0.03)}; border-left: 4px solid ${colors.primary}; border-radius: 0 8px 8px 0;">
       <p style="font-size: 12px; color: ${colors.primary}; font-weight: 600; margin-bottom: 4px;">Reverse Charge Notice</p>
       <p style="font-size: 12px; color: ${colors.muted}; line-height: 1.6;">VAT reverse charge applies. The customer is liable for VAT in their country of establishment under Article 196 of Council Directive 2006/112/EC.</p>
     </div>
-    ` : ''}
+    `
+        : ""
+    }
 
     <!-- Footer -->
     <div style="padding: 24px 40px; background: ${withAlpha(colors.primary, 0.03)}; border-top: 1px solid ${colors.divider};">
@@ -529,12 +619,12 @@ function generateClassicStyleHTML(data: InvoicePDFData): string {
  * Generate Invoice HTML based on style
  */
 function generateInvoiceHTML(data: InvoicePDFData): string {
-  const style = data.style || 'receipt'; // Default to receipt style
-  
-  if (style === 'receipt') {
+  const style = data.style || "receipt"; // Default to receipt style
+
+  if (style === "receipt") {
     return generateReceiptStyleHTML(data);
   }
-  
+
   return generateClassicStyleHTML(data);
 }
 
@@ -561,46 +651,46 @@ export async function generateInvoicePDF(
   timeoutMs: number = PDF_GENERATION_TIMEOUT_MS
 ): Promise<Buffer> {
   const html = generateInvoiceHTML(data);
-  
+
   // Create timeout promise
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
       reject(new Error(`PDF generation timeout after ${timeoutMs}ms`));
     }, timeoutMs);
   });
-  
+
   // Create PDF generation promise
   const pdfPromise = async (): Promise<Buffer> => {
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-    
+
     // Track browser for cleanup
     activeBrowser = browser;
-    
+
     try {
       const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: 'networkidle0' });
-      
+      await page.setContent(html, { waitUntil: "networkidle0" });
+
       const pdf = await page.pdf({
-        format: 'A4',
+        format: "A4",
         printBackground: true,
         margin: {
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          left: '20px',
+          top: "20px",
+          right: "20px",
+          bottom: "20px",
+          left: "20px",
         },
       });
-      
+
       return Buffer.from(pdf);
     } finally {
       await browser.close();
       activeBrowser = null;
     }
   };
-  
+
   try {
     // Race between PDF generation and timeout
     return await Promise.race([pdfPromise(), timeoutPromise]);

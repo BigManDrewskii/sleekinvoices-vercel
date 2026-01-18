@@ -1,5 +1,12 @@
 import { ReactNode } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 export interface Step {
@@ -37,7 +44,7 @@ export function MultiStepDialog<T extends string>({
   showProgress = true,
   maxWidth = "sm:max-w-md",
 }: MultiStepDialogProps<T>) {
-  const currentStepIndex = steps.findIndex((s) => s.id === currentStep);
+  const currentStepIndex = steps.findIndex(s => s.id === currentStep);
   const currentStepConfig = steps[currentStepIndex];
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === steps.length - 1;
@@ -63,7 +70,9 @@ export function MultiStepDialog<T extends string>({
         <DialogHeader>
           <DialogTitle>{currentStepConfig.title}</DialogTitle>
           {currentStepConfig.description && (
-            <DialogDescription>{currentStepConfig.description}</DialogDescription>
+            <DialogDescription>
+              {currentStepConfig.description}
+            </DialogDescription>
           )}
         </DialogHeader>
 

@@ -18,7 +18,9 @@ export function InvoiceNumberCell({
   maxLength = 20,
 }: InvoiceNumberCellProps) {
   const isLong = invoiceNumber.length > maxLength;
-  const displayText = isLong ? `${invoiceNumber.substring(0, maxLength)}...` : invoiceNumber;
+  const displayText = isLong
+    ? `${invoiceNumber.substring(0, maxLength)}...`
+    : invoiceNumber;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(invoiceNumber);
@@ -47,7 +49,9 @@ export function InvoiceNumberCell({
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-2 cursor-help">
-            <span className="font-numeric-bold text-muted-foreground">{displayText}</span>
+            <span className="font-numeric-bold text-muted-foreground">
+              {displayText}
+            </span>
             <Button
               variant="ghost"
               size="sm"

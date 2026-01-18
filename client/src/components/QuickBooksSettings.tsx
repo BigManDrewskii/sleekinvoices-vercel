@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -8,11 +14,26 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { 
-  RefreshCw, Link2, Unlink, Cloud, CheckCircle2, AlertCircle, 
-  History, Building2, Settings2, Download, DollarSign 
+import {
+  RefreshCw,
+  Link2,
+  Unlink,
+  Cloud,
+  CheckCircle2,
+  AlertCircle,
+  History,
+  Building2,
+  Settings2,
+  Download,
+  DollarSign,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -33,10 +54,22 @@ export function QuickBooksSettings() {
   const [minInvoiceAmount, setMinInvoiceAmount] = useState("");
   const [syncDraftInvoices, setSyncDraftInvoices] = useState(false);
 
-  const { data: status, isLoading, refetch } = trpc.quickbooks.getStatus.useQuery();
-  const { data: authData } = trpc.quickbooks.getAuthUrl.useQuery(undefined, { enabled: status?.configured && !status?.connected });
-  const { data: syncHistory } = trpc.quickbooks.getSyncHistory.useQuery({ limit: 50 }, { enabled: showHistory && status?.connected });
-  const { data: syncSettings, refetch: refetchSettings } = trpc.quickbooks.getSyncSettings.useQuery(undefined, { enabled: status?.connected });
+  const {
+    data: status,
+    isLoading,
+    refetch,
+  } = trpc.quickbooks.getStatus.useQuery();
+  const { data: authData } = trpc.quickbooks.getAuthUrl.useQuery(undefined, {
+    enabled: status?.configured && !status?.connected,
+  });
+  const { data: syncHistory } = trpc.quickbooks.getSyncHistory.useQuery(
+    { limit: 50 },
+    { enabled: showHistory && status?.connected }
+  );
+  const { data: syncSettings, refetch: refetchSettings } =
+    trpc.quickbooks.getSyncSettings.useQuery(undefined, {
+      enabled: status?.connected,
+    });
 
   // Update local state when settings are loaded
   useEffect(() => {
@@ -50,22 +83,32 @@ export function QuickBooksSettings() {
   }, [syncSettings]);
 
   const disconnectMutation = trpc.quickbooks.disconnect.useMutation({
-    onSuccess: () => { toast.success("Disconnected from QuickBooks"); refetch(); setShowDisconnectDialog(false); },
-    onError: (error) => toast.error(error.message),
+    onSuccess: () => {
+      toast.success("Disconnected from QuickBooks");
+      refetch();
+      setShowDisconnectDialog(false);
+    },
+    onError: error => toast.error(error.message),
   });
 
   const syncAllClientsMutation = trpc.quickbooks.syncAllClients.useMutation({
-    onSuccess: (data) => toast.success(`Synced ${data.synced} clients${data.failed > 0 ? `, ${data.failed} failed` : ""}`),
-    onError: (error) => toast.error(error.message),
+    onSuccess: data =>
+      toast.success(
+        `Synced ${data.synced} clients${data.failed > 0 ? `, ${data.failed} failed` : ""}`
+      ),
+    onError: error => toast.error(error.message),
   });
 
   const syncAllInvoicesMutation = trpc.quickbooks.syncAllInvoices.useMutation({
-    onSuccess: (data) => toast.success(`Synced ${data.synced} invoices${data.failed > 0 ? `, ${data.failed} failed` : ""}`),
-    onError: (error) => toast.error(error.message),
+    onSuccess: data =>
+      toast.success(
+        `Synced ${data.synced} invoices${data.failed > 0 ? `, ${data.failed} failed` : ""}`
+      ),
+    onError: error => toast.error(error.message),
   });
 
   const pollPaymentsMutation = trpc.quickbooks.pollPayments.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       if (data.synced > 0) {
         toast.success(`Imported ${data.synced} payments from QuickBooks`);
       } else {
@@ -77,16 +120,18 @@ export function QuickBooksSettings() {
         }
       }
     },
-    onError: (error) => toast.error(error.message),
+    onError: error => toast.error(error.message),
   });
 
-  const updateSettingsMutation = trpc.quickbooks.updateSyncSettings.useMutation({
-    onSuccess: () => {
-      toast.success("Sync settings updated");
-      refetchSettings();
-    },
-    onError: (error) => toast.error(error.message),
-  });
+  const updateSettingsMutation = trpc.quickbooks.updateSyncSettings.useMutation(
+    {
+      onSuccess: () => {
+        toast.success("Sync settings updated");
+        refetchSettings();
+      },
+      onError: error => toast.error(error.message),
+    }
+  );
 
   const handleConnect = () => {
     if (authData?.url) {
@@ -108,8 +153,15 @@ export function QuickBooksSettings() {
   if (isLoading) {
     return (
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2"><Cloud className="h-5 w-5" />QuickBooks Integration</CardTitle></CardHeader>
-        <CardContent><div className="animate-pulse h-20 bg-muted rounded" /></CardContent>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Cloud className="h-5 w-5" />
+            QuickBooks Integration
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse h-20 bg-muted rounded" />
+        </CardContent>
       </Card>
     );
   }
@@ -118,13 +170,21 @@ export function QuickBooksSettings() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Cloud className="h-5 w-5" />QuickBooks Integration</CardTitle>
-          <CardDescription>Connect your QuickBooks account to sync invoices and customers</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Cloud className="h-5 w-5" />
+            QuickBooks Integration
+          </CardTitle>
+          <CardDescription>
+            Connect your QuickBooks account to sync invoices and customers
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
             <AlertCircle className="h-5 w-5 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">QuickBooks integration requires configuration. Please contact support to enable this feature.</p>
+            <p className="text-sm text-muted-foreground">
+              QuickBooks integration requires configuration. Please contact
+              support to enable this feature.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -137,42 +197,106 @@ export function QuickBooksSettings() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2"><Cloud className="h-5 w-5" />QuickBooks Integration</CardTitle>
-              <CardDescription>Sync your invoices and customers with QuickBooks Online</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Cloud className="h-5 w-5" />
+                QuickBooks Integration
+              </CardTitle>
+              <CardDescription>
+                Sync your invoices and customers with QuickBooks Online
+              </CardDescription>
             </div>
-            {status.connected && <Badge variant="outline" className="text-green-600 border-green-600"><CheckCircle2 className="h-3 w-3 mr-1" />Connected</Badge>}
+            {status.connected && (
+              <Badge
+                variant="outline"
+                className="text-green-600 border-green-600"
+              >
+                <CheckCircle2 className="h-3 w-3 mr-1" />
+                Connected
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {status.connected ? (
             <>
               <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
-                <div><p className="text-sm text-muted-foreground">Company</p><p className="font-medium flex items-center gap-1"><Building2 className="h-4 w-4" />{status.companyName || "Unknown"}</p></div>
-                <div><p className="text-sm text-muted-foreground">Environment</p><Badge variant="secondary">{status.environment}</Badge></div>
-                <div><p className="text-sm text-muted-foreground">Realm ID</p><p className="font-mono text-sm">{status.realmId}</p></div>
-                <div><p className="text-sm text-muted-foreground">Last Sync</p><p className="text-sm">{status.lastSyncAt ? new Date(status.lastSyncAt).toLocaleString() : "Never"}</p></div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Company</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Building2 className="h-4 w-4" />
+                    {status.companyName || "Unknown"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Environment</p>
+                  <Badge variant="secondary">{status.environment}</Badge>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Realm ID</p>
+                  <p className="font-mono text-sm">{status.realmId}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Last Sync</p>
+                  <p className="text-sm">
+                    {status.lastSyncAt
+                      ? new Date(status.lastSyncAt).toLocaleString()
+                      : "Never"}
+                  </p>
+                </div>
               </div>
 
               {/* Sync Actions */}
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => syncAllClientsMutation.mutate()} disabled={syncAllClientsMutation.isPending}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${syncAllClientsMutation.isPending ? "animate-spin" : ""}`} />Sync All Clients
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => syncAllClientsMutation.mutate()}
+                  disabled={syncAllClientsMutation.isPending}
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${syncAllClientsMutation.isPending ? "animate-spin" : ""}`}
+                  />
+                  Sync All Clients
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => syncAllInvoicesMutation.mutate()} disabled={syncAllInvoicesMutation.isPending}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${syncAllInvoicesMutation.isPending ? "animate-spin" : ""}`} />Sync All Invoices
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => syncAllInvoicesMutation.mutate()}
+                  disabled={syncAllInvoicesMutation.isPending}
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${syncAllInvoicesMutation.isPending ? "animate-spin" : ""}`}
+                  />
+                  Sync All Invoices
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => pollPaymentsMutation.mutate()} disabled={pollPaymentsMutation.isPending}>
-                  <Download className={`h-4 w-4 mr-2 ${pollPaymentsMutation.isPending ? "animate-spin" : ""}`} />Pull Payments
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => pollPaymentsMutation.mutate()}
+                  disabled={pollPaymentsMutation.isPending}
+                >
+                  <Download
+                    className={`h-4 w-4 mr-2 ${pollPaymentsMutation.isPending ? "animate-spin" : ""}`}
+                  />
+                  Pull Payments
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setShowHistory(true)}>
-                  <History className="h-4 w-4 mr-2" />View History
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowHistory(true)}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  View History
                 </Button>
               </div>
 
               <Separator />
 
               {/* Sync Settings */}
-              <Collapsible open={showSyncSettings} onOpenChange={setShowSyncSettings}>
+              <Collapsible
+                open={showSyncSettings}
+                onOpenChange={setShowSyncSettings}
+              >
                 <CollapsibleTrigger asChild>
                   <Button variant="ghost" className="w-full justify-between">
                     <span className="flex items-center gap-2">
@@ -189,8 +313,12 @@ export function QuickBooksSettings() {
                     {/* Auto-sync Invoices */}
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="auto-sync-invoices">Auto-sync Invoices</Label>
-                        <p className="text-xs text-muted-foreground">Automatically sync invoices when sent</p>
+                        <Label htmlFor="auto-sync-invoices">
+                          Auto-sync Invoices
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Automatically sync invoices when sent
+                        </p>
                       </div>
                       <Switch
                         id="auto-sync-invoices"
@@ -202,8 +330,12 @@ export function QuickBooksSettings() {
                     {/* Auto-sync Payments */}
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="auto-sync-payments">Auto-sync Payments</Label>
-                        <p className="text-xs text-muted-foreground">Sync payments to QuickBooks when recorded</p>
+                        <Label htmlFor="auto-sync-payments">
+                          Auto-sync Payments
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Sync payments to QuickBooks when recorded
+                        </p>
                       </div>
                       <Switch
                         id="auto-sync-payments"
@@ -215,8 +347,12 @@ export function QuickBooksSettings() {
                     {/* Two-way Payment Sync */}
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label htmlFor="sync-from-qb">Two-way Payment Sync</Label>
-                        <p className="text-xs text-muted-foreground">Import payments recorded in QuickBooks</p>
+                        <Label htmlFor="sync-from-qb">
+                          Two-way Payment Sync
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Import payments recorded in QuickBooks
+                        </p>
                       </div>
                       <Switch
                         id="sync-from-qb"
@@ -228,7 +364,10 @@ export function QuickBooksSettings() {
                     {/* Minimum Invoice Amount */}
                     <div className="space-y-2">
                       <Label htmlFor="min-amount">Minimum Invoice Amount</Label>
-                      <p className="text-xs text-muted-foreground">Only sync invoices above this amount (leave empty to sync all)</p>
+                      <p className="text-xs text-muted-foreground">
+                        Only sync invoices above this amount (leave empty to
+                        sync all)
+                      </p>
                       <div className="relative">
                         <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -238,7 +377,7 @@ export function QuickBooksSettings() {
                           min="0"
                           placeholder="0.00"
                           value={minInvoiceAmount}
-                          onChange={(e) => setMinInvoiceAmount(e.target.value)}
+                          onChange={e => setMinInvoiceAmount(e.target.value)}
                           className="pl-9"
                         />
                       </div>
@@ -248,7 +387,9 @@ export function QuickBooksSettings() {
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
                         <Label htmlFor="sync-drafts">Sync Draft Invoices</Label>
-                        <p className="text-xs text-muted-foreground">Include draft invoices in sync (not recommended)</p>
+                        <p className="text-xs text-muted-foreground">
+                          Include draft invoices in sync (not recommended)
+                        </p>
                       </div>
                       <Switch
                         id="sync-drafts"
@@ -257,8 +398,8 @@ export function QuickBooksSettings() {
                       />
                     </div>
 
-                    <Button 
-                      onClick={handleSaveSettings} 
+                    <Button
+                      onClick={handleSaveSettings}
                       disabled={updateSettingsMutation.isPending}
                       className="w-full"
                     >
@@ -276,26 +417,43 @@ export function QuickBooksSettings() {
               <Separator />
 
               {/* Disconnect */}
-              <Button variant="destructive" size="sm" onClick={() => setShowDisconnectDialog(true)}>
-                <Unlink className="h-4 w-4 mr-2" />Disconnect QuickBooks
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setShowDisconnectDialog(true)}
+              >
+                <Unlink className="h-4 w-4 mr-2" />
+                Disconnect QuickBooks
               </Button>
             </>
           ) : (
             <div className="text-center py-6">
               <Cloud className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="font-medium mb-2">Connect to QuickBooks</h3>
-              <p className="text-sm text-muted-foreground mb-4">Automatically sync your invoices and customers with QuickBooks Online</p>
-              <Button onClick={handleConnect} disabled={!authData?.url}><Link2 className="h-4 w-4 mr-2" />Connect QuickBooks</Button>
+              <p className="text-sm text-muted-foreground mb-4">
+                Automatically sync your invoices and customers with QuickBooks
+                Online
+              </p>
+              <Button onClick={handleConnect} disabled={!authData?.url}>
+                <Link2 className="h-4 w-4 mr-2" />
+                Connect QuickBooks
+              </Button>
             </div>
           )}
         </CardContent>
       </Card>
 
-      <Dialog open={showDisconnectDialog} onOpenChange={setShowDisconnectDialog}>
+      <Dialog
+        open={showDisconnectDialog}
+        onOpenChange={setShowDisconnectDialog}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Disconnect QuickBooks?</DialogTitle>
-            <DialogDescription>This will stop syncing data with QuickBooks. Your existing data in QuickBooks will not be affected.</DialogDescription>
+            <DialogDescription>
+              This will stop syncing data with QuickBooks. Your existing data in
+              QuickBooks will not be affected.
+            </DialogDescription>
           </DialogHeader>
           <DialogActions
             onClose={() => setShowDisconnectDialog(false)}
@@ -312,29 +470,50 @@ export function QuickBooksSettings() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Sync History</DialogTitle>
-            <DialogDescription>Recent synchronization activity with QuickBooks</DialogDescription>
+            <DialogDescription>
+              Recent synchronization activity with QuickBooks
+            </DialogDescription>
           </DialogHeader>
           <DialogBody>
-          <ScrollArea className="h-[400px]">
-            {syncHistory && syncHistory.length > 0 ? (
-              <div className="space-y-2">
-                {syncHistory.map((log: any) => (
-                  <div key={log.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      {log.status === "success" ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <AlertCircle className="h-4 w-4 text-destructive" />}
-                      <div>
-                        <p className="font-medium capitalize">{log.action} {log.entityType}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(log.syncedAt).toLocaleString()}</p>
+            <ScrollArea className="h-[400px]">
+              {syncHistory && syncHistory.length > 0 ? (
+                <div className="space-y-2">
+                  {syncHistory.map((log: any) => (
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        {log.status === "success" ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-destructive" />
+                        )}
+                        <div>
+                          <p className="font-medium capitalize">
+                            {log.action} {log.entityType}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(log.syncedAt).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
+                      <Badge
+                        variant={
+                          log.status === "success" ? "outline" : "destructive"
+                        }
+                      >
+                        {log.status}
+                      </Badge>
                     </div>
-                    <Badge variant={log.status === "success" ? "outline" : "destructive"}>{log.status}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">No sync history yet</div>
-            )}
-          </ScrollArea>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  No sync history yet
+                </div>
+              )}
+            </ScrollArea>
           </DialogBody>
         </DialogContent>
       </Dialog>

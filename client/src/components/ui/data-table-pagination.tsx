@@ -1,6 +1,11 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DataTablePaginationProps {
@@ -34,13 +39,18 @@ export function DataTablePagination({
   const endItem = Math.min((currentPage + 1) * itemsPerPage, totalItems);
 
   return (
-    <div className={cn("flex items-center justify-between px-4 py-3 border-t", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between px-4 py-3 border-t",
+        className
+      )}
+    >
       {showItemCount && (
         <p className="text-sm text-muted-foreground">
           Showing {startItem} to {endItem} of {totalItems}
         </p>
       )}
-      
+
       <div className="flex gap-2">
         {showFirstLast && (
           <Button
@@ -52,7 +62,7 @@ export function DataTablePagination({
             <ChevronsLeft className="h-4 w-4" />
           </Button>
         )}
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -61,16 +71,18 @@ export function DataTablePagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onPageChange(Math.min(totalPages - 1, currentPage + 1))}
+          onClick={() =>
+            onPageChange(Math.min(totalPages - 1, currentPage + 1))
+          }
           disabled={currentPage >= totalPages - 1}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
-        
+
         {showFirstLast && (
           <Button
             variant="outline"

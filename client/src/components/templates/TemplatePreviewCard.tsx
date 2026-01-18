@@ -20,28 +20,28 @@ interface TemplatePreviewCardProps {
  * Minimal template preview card showing colors and typography
  * Displays key colors as swatches and "Aa" to demonstrate typography
  */
-export function TemplatePreviewCard({ 
-  template, 
+export function TemplatePreviewCard({
+  template,
   size = "md",
-  onClick 
+  onClick,
 }: TemplatePreviewCardProps) {
   const bgColor = template.backgroundColor || "#ffffff";
   const headingWeight = template.headingFontWeight || "600";
   const bodyWeight = template.bodyFontWeight || "400";
-  
+
   // Load Google Font for preview
   useEffect(() => {
     const fonts = [template.headingFont, template.bodyFont].filter(Boolean);
     const uniqueFonts = Array.from(new Set(fonts));
-    
+
     uniqueFonts.forEach(font => {
-      const fontFamily = font.replace(/\s+/g, '+');
+      const fontFamily = font.replace(/\s+/g, "+");
       const linkId = `font-${fontFamily}`;
-      
+
       if (!document.getElementById(linkId)) {
-        const link = document.createElement('link');
+        const link = document.createElement("link");
         link.id = linkId;
-        link.rel = 'stylesheet';
+        link.rel = "stylesheet";
         link.href = `https://fonts.googleapis.com/css2?family=${fontFamily}:wght@300;400;500;600;700&display=swap`;
         document.head.appendChild(link);
       }
@@ -51,13 +51,13 @@ export function TemplatePreviewCard({
   const sizeClasses = {
     sm: "h-32 w-full",
     md: "h-48 w-full",
-    lg: "h-64 w-full"
+    lg: "h-64 w-full",
   };
 
   const typographySizes = {
     sm: { heading: "text-3xl", body: "text-xs" },
     md: { heading: "text-5xl", body: "text-sm" },
-    lg: { heading: "text-6xl", body: "text-base" }
+    lg: { heading: "text-6xl", body: "text-base" },
   };
 
   return (
@@ -75,7 +75,7 @@ export function TemplatePreviewCard({
             style={{
               fontFamily: `"${template.headingFont}", sans-serif`,
               fontWeight: headingWeight,
-              color: template.primaryColor
+              color: template.primaryColor,
             }}
           >
             Aa
@@ -122,22 +122,22 @@ export function TemplatePreviewCard({
  * Compact template preview for grid layouts
  * Shows colors and typography in a condensed format
  */
-export function CompactTemplatePreview({ 
+export function CompactTemplatePreview({
   template,
-  onClick 
+  onClick,
 }: TemplatePreviewCardProps) {
   const bgColor = template.backgroundColor || "#ffffff";
   const headingWeight = template.headingFontWeight || "600";
-  
+
   // Load Google Font for preview
   useEffect(() => {
-    const fontFamily = template.headingFont.replace(/\s+/g, '+');
+    const fontFamily = template.headingFont.replace(/\s+/g, "+");
     const linkId = `font-${fontFamily}`;
-    
+
     if (!document.getElementById(linkId)) {
-      const link = document.createElement('link');
+      const link = document.createElement("link");
       link.id = linkId;
-      link.rel = 'stylesheet';
+      link.rel = "stylesheet";
       link.href = `https://fonts.googleapis.com/css2?family=${fontFamily}:wght@300;400;500;600;700&display=swap`;
       document.head.appendChild(link);
     }
@@ -156,7 +156,7 @@ export function CompactTemplatePreview({
           style={{
             fontFamily: `"${template.headingFont}", sans-serif`,
             fontWeight: headingWeight,
-            color: template.primaryColor
+            color: template.primaryColor,
           }}
         >
           Aa

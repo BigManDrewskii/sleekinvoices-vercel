@@ -1,5 +1,11 @@
 import type { MySql2Database } from "drizzle-orm/mysql2";
-import { emailLog, reminderLogs, aiUsageLogs, auditLog, type InsertEmailLog } from "../../../drizzle/schema";
+import {
+  emailLog,
+  reminderLogs,
+  aiUsageLogs,
+  auditLog,
+  type InsertEmailLog,
+} from "../../../drizzle/schema";
 import type { SeededInvoice } from "./invoices";
 import type { SeededUser } from "./users";
 import type { SeededClient } from "./clients";
@@ -28,7 +34,9 @@ export async function seedEmails(
     if (!client) continue;
 
     const now = new Date();
-    const sentAt = new Date(now.getTime() - randomInt(10, 60) * 24 * 60 * 60 * 1000);
+    const sentAt = new Date(
+      now.getTime() - randomInt(10, 60) * 24 * 60 * 60 * 1000
+    );
 
     const deliveryStatus = weightedChoice(
       ["sent", "delivered", "opened", "clicked", "bounced", "failed"] as const,
@@ -50,7 +58,8 @@ export async function seedEmails(
       emailType: "invoice",
       sentAt,
       success: deliveryStatus !== "failed",
-      errorMessage: deliveryStatus === "failed" ? "SMTP connection timeout" : null,
+      errorMessage:
+        deliveryStatus === "failed" ? "SMTP connection timeout" : null,
       messageId: `msg_seed_${randomInt(100000, 999999)}`,
       deliveryStatus,
       deliveredAt:
@@ -61,14 +70,22 @@ export async function seedEmails(
         deliveryStatus === "opened" || deliveryStatus === "clicked"
           ? new Date(sentAt.getTime() + randomInt(1, 24) * 60 * 60 * 1000)
           : null,
-      openCount: deliveryStatus === "opened" || deliveryStatus === "clicked" ? randomInt(1, 5) : 0,
+      openCount:
+        deliveryStatus === "opened" || deliveryStatus === "clicked"
+          ? randomInt(1, 5)
+          : 0,
       clickedAt:
         deliveryStatus === "clicked"
           ? new Date(sentAt.getTime() + randomInt(1, 48) * 60 * 60 * 1000)
           : null,
       clickCount: deliveryStatus === "clicked" ? randomInt(1, 3) : 0,
       bouncedAt: deliveryStatus === "bounced" ? sentAt : null,
-      bounceType: deliveryStatus === "bounced" ? (Math.random() < 0.7 ? "soft" : "hard") : null,
+      bounceType:
+        deliveryStatus === "bounced"
+          ? Math.random() < 0.7
+            ? "soft"
+            : "hard"
+          : null,
     };
 
     await db.insert(emailLog).values([emailData]);
@@ -97,7 +114,10 @@ async function seedReminderLog(
   });
 }
 
-export async function seedAiLogs(db: any, seededUsers: SeededUser[]): Promise<void> {
+export async function seedAiLogs(
+  db: any,
+  seededUsers: SeededUser[]
+): Promise<void> {
   for (const user of seededUsers) {
     const numLogs = randomInt(10, SEED_CONFIG.aiLogsPerUser);
 
@@ -114,7 +134,9 @@ export async function seedAiLogs(db: any, seededUsers: SeededUser[]): Promise<vo
         latencyMs: randomInt(500, 3000),
         success: Math.random() < 0.95,
         errorMessage: Math.random() < 0.05 ? "Rate limit exceeded" : null,
-        createdAt: new Date(now.getTime() - randomInt(1, 60) * 24 * 60 * 60 * 1000),
+        createdAt: new Date(
+          now.getTime() - randomInt(1, 60) * 24 * 60 * 60 * 1000
+        ),
       });
     }
   }
@@ -145,7 +167,9 @@ export async function seedAuditLogs(
           oldValue: "draft",
           newValue: "sent",
         }),
-        createdAt: new Date(now.getTime() - randomInt(1, 90) * 24 * 60 * 60 * 1000),
+        createdAt: new Date(
+          now.getTime() - randomInt(1, 90) * 24 * 60 * 60 * 1000
+        ),
       });
     }
   }

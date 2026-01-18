@@ -6,8 +6,12 @@ import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
-
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
+const plugins = [
+  react(),
+  tailwindcss(),
+  jsxLocPlugin(),
+  vitePluginManusRuntime(),
+];
 
 export default defineConfig({
   plugins,
@@ -29,61 +33,72 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Manual chunks for better caching and parallel loading
-        manualChunks: (id) => {
+        manualChunks: id => {
           // React core - rarely changes, cache separately
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'vendor-react';
+          if (
+            id.includes("node_modules/react/") ||
+            id.includes("node_modules/react-dom/")
+          ) {
+            return "vendor-react";
           }
-          
+
           // Radix UI components - group together for caching
-          if (id.includes('node_modules/@radix-ui/')) {
-            return 'vendor-radix';
+          if (id.includes("node_modules/@radix-ui/")) {
+            return "vendor-radix";
           }
-          
+
           // Form handling libraries
-          if (id.includes('node_modules/react-hook-form/') || 
-              id.includes('node_modules/@hookform/') ||
-              id.includes('node_modules/zod/')) {
-            return 'vendor-forms';
+          if (
+            id.includes("node_modules/react-hook-form/") ||
+            id.includes("node_modules/@hookform/") ||
+            id.includes("node_modules/zod/")
+          ) {
+            return "vendor-forms";
           }
-          
+
           // Charts - recharts and all d3 dependencies must stay together
           // to avoid circular reference initialization errors
           // Don't split these - let them bundle naturally with their consumers
           // if (id.includes('node_modules/recharts/') || id.includes('node_modules/d3-')) {
           //   return 'vendor-charts';
           // }
-          
+
           // Streamdown and its heavy dependencies (mermaid, shiki, cytoscape)
           // These will be lazy loaded with AIAssistant
-          if (id.includes('node_modules/streamdown/') ||
-              id.includes('node_modules/mermaid/') ||
-              id.includes('node_modules/cytoscape/') ||
-              id.includes('node_modules/shiki/') ||
-              id.includes('node_modules/@shikijs/')) {
-            return 'vendor-ai-markdown';
+          if (
+            id.includes("node_modules/streamdown/") ||
+            id.includes("node_modules/mermaid/") ||
+            id.includes("node_modules/cytoscape/") ||
+            id.includes("node_modules/shiki/") ||
+            id.includes("node_modules/@shikijs/")
+          ) {
+            return "vendor-ai-markdown";
           }
-          
+
           // Date utilities
-          if (id.includes('node_modules/date-fns/')) {
-            return 'vendor-date';
+          if (id.includes("node_modules/date-fns/")) {
+            return "vendor-date";
           }
-          
+
           // tRPC and React Query
-          if (id.includes('node_modules/@trpc/') || 
-              id.includes('node_modules/@tanstack/react-query')) {
-            return 'vendor-data';
+          if (
+            id.includes("node_modules/@trpc/") ||
+            id.includes("node_modules/@tanstack/react-query")
+          ) {
+            return "vendor-data";
           }
-          
+
           // Stripe
-          if (id.includes('node_modules/@stripe/') || 
-              id.includes('node_modules/stripe/')) {
-            return 'vendor-stripe';
+          if (
+            id.includes("node_modules/@stripe/") ||
+            id.includes("node_modules/stripe/")
+          ) {
+            return "vendor-stripe";
           }
-          
+
           // Lucide icons
-          if (id.includes('node_modules/lucide-react/')) {
-            return 'vendor-icons';
+          if (id.includes("node_modules/lucide-react/")) {
+            return "vendor-icons";
           }
         },
       },

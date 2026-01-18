@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-const DATABASE_URL = 'mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev';
+const DATABASE_URL =
+  "mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev";
 const url = new URL(DATABASE_URL);
 
 async function seedAllEmailTypes() {
   const connection = await mysql.createConnection({
-    host: url.hostname || 'localhost',
+    host: url.hostname || "localhost",
     port: parseInt(url.port) || 3306,
     user: url.username,
     password: url.password,
@@ -13,19 +14,19 @@ async function seedAllEmailTypes() {
   });
 
   try {
-    console.log('\n📧 Adding reminder and receipt emails...\n');
+    console.log("\n📧 Adding reminder and receipt emails...\n");
 
     const userId = 1;
     const now = new Date();
 
     // Get some invoices and clients
     const [invoices] = await connection.query(
-      'SELECT id, invoiceNumber, createdAt FROM invoices WHERE userId = ? LIMIT 50',
+      "SELECT id, invoiceNumber, createdAt FROM invoices WHERE userId = ? LIMIT 50",
       [userId]
     );
 
     const [clients] = await connection.query(
-      'SELECT email FROM clients WHERE userId = ?',
+      "SELECT email FROM clients WHERE userId = ?",
       [userId]
     );
 
@@ -40,7 +41,9 @@ async function seedAllEmailTypes() {
 
       // Create reminders at various intervals (7, 14, 21, 30 days after invoice)
       const reminderDays = [7, 14, 21, 30][Math.floor(Math.random() * 4)];
-      const reminderDate = new Date(invoiceDate.getTime() + reminderDays * 24 * 60 * 60 * 1000);
+      const reminderDate = new Date(
+        invoiceDate.getTime() + reminderDays * 24 * 60 * 60 * 1000
+      );
 
       // Only add if reminder date is in the past
       if (reminderDate < now) {
@@ -59,7 +62,7 @@ async function seedAllEmailTypes() {
             invoice.id,
             client.email,
             subjects[Math.floor(Math.random() * subjects.length)],
-            'reminder',
+            "reminder",
             reminderDate,
             Math.random() > 0.08, // 92% success rate
             null,
@@ -79,7 +82,9 @@ async function seedAllEmailTypes() {
 
       // Create receipts at various intervals (1-45 days after invoice)
       const paymentDays = Math.floor(Math.random() * 45) + 1;
-      const paymentDate = new Date(invoiceDate.getTime() + paymentDays * 24 * 60 * 60 * 1000);
+      const paymentDate = new Date(
+        invoiceDate.getTime() + paymentDays * 24 * 60 * 60 * 1000
+      );
 
       // Only add if payment date is in the past
       if (paymentDate < now) {
@@ -98,7 +103,7 @@ async function seedAllEmailTypes() {
             invoice.id,
             client.email,
             subjects[Math.floor(Math.random() * subjects.length)],
-            'receipt',
+            "receipt",
             paymentDate,
             Math.random() > 0.02, // 98% success rate
             null,
@@ -112,30 +117,32 @@ async function seedAllEmailTypes() {
 
     // Get total count and breakdown
     const [total] = await connection.query(
-      'SELECT COUNT(*) as count FROM emailLog WHERE userId = ?',
+      "SELECT COUNT(*) as count FROM emailLog WHERE userId = ?",
       [userId]
     );
 
     console.log(`\n✅ Total emails in database: ${total[0].count}\n`);
 
-    const [stats] = await connection.query(`
+    const [stats] = await connection.query(
+      `
       SELECT emailType, success, COUNT(*) as count
       FROM emailLog
       WHERE userId = ?
       GROUP BY emailType, success
       ORDER BY emailType, success
-    `, [userId]);
+    `,
+      [userId]
+    );
 
-    console.log('📊 Email Statistics:\n');
-    console.log('Type        | Status    | Count');
-    console.log('------------|-----------|------');
+    console.log("📊 Email Statistics:\n");
+    console.log("Type        | Status    | Count");
+    console.log("------------|-----------|------");
     for (const stat of stats) {
       const type = stat.emailType.padEnd(11);
-      const status = (stat.success ? 'Success' : 'Failed').padEnd(10);
+      const status = (stat.success ? "Success" : "Failed").padEnd(10);
       console.log(`${type} | ${status} | ${stat.count}`);
     }
-    console.log('');
-
+    console.log("");
   } finally {
     await connection.end();
   }

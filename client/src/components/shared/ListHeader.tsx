@@ -49,7 +49,7 @@ export function ListHeader({
             type="text"
             placeholder={searchPlaceholder}
             value={searchValue}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={e => onSearchChange(e.target.value)}
             className="pl-9"
           />
         </div>

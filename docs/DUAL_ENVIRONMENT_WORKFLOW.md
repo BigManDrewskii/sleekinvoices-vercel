@@ -6,10 +6,10 @@ This guide explains how to work on SleekInvoices using both **Manus** (cloud-bas
 
 SleekInvoices supports a hybrid development workflow where you can seamlessly switch between:
 
-| Environment | Purpose | Auth Mode | Database |
-|-------------|---------|-----------|----------|
-| **Manus** | Production, staging, AI-assisted development | Full OAuth | Production MySQL |
-| **Claude Code (Local)** | Feature development, debugging, testing | Bypass (dev user) | Local MySQL |
+| Environment             | Purpose                                      | Auth Mode         | Database         |
+| ----------------------- | -------------------------------------------- | ----------------- | ---------------- |
+| **Manus**               | Production, staging, AI-assisted development | Full OAuth        | Production MySQL |
+| **Claude Code (Local)** | Feature development, debugging, testing      | Bypass (dev user) | Local MySQL      |
 
 Both environments sync through GitHub, ensuring your work is never lost and can be continued from either platform.
 
@@ -158,22 +158,22 @@ The bypass is implemented in:
 
 ### Required for Local Development
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `SKIP_AUTH` | Enable auth bypass | `true` |
-| `VITE_SKIP_AUTH` | Frontend auth bypass | `true` |
-| `DATABASE_URL` | MySQL connection | `mysql://root:pass@localhost:3306/db` |
-| `JWT_SECRET` | Session signing key | Any random string |
+| Variable         | Description          | Example                               |
+| ---------------- | -------------------- | ------------------------------------- |
+| `SKIP_AUTH`      | Enable auth bypass   | `true`                                |
+| `VITE_SKIP_AUTH` | Frontend auth bypass | `true`                                |
+| `DATABASE_URL`   | MySQL connection     | `mysql://root:pass@localhost:3306/db` |
+| `JWT_SECRET`     | Session signing key  | Any random string                     |
 
 ### Optional (Feature-Specific)
 
-| Variable | Feature | Where to Get |
-|----------|---------|--------------|
-| `STRIPE_SECRET_KEY` | Payments | [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) |
-| `RESEND_API_KEY` | Email sending | [Resend](https://resend.com/api-keys) |
-| `NOWPAYMENTS_API_KEY` | Crypto payments | [NOWPayments](https://nowpayments.io/) |
-| `QUICKBOOKS_CLIENT_ID` | Accounting sync | [Intuit Developer](https://developer.intuit.com/) |
-| `OPENROUTER_API_KEY` | AI features | [OpenRouter](https://openrouter.ai/) |
+| Variable               | Feature         | Where to Get                                                  |
+| ---------------------- | --------------- | ------------------------------------------------------------- |
+| `STRIPE_SECRET_KEY`    | Payments        | [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys) |
+| `RESEND_API_KEY`       | Email sending   | [Resend](https://resend.com/api-keys)                         |
+| `NOWPAYMENTS_API_KEY`  | Crypto payments | [NOWPayments](https://nowpayments.io/)                        |
+| `QUICKBOOKS_CLIENT_ID` | Accounting sync | [Intuit Developer](https://developer.intuit.com/)             |
+| `OPENROUTER_API_KEY`   | AI features     | [OpenRouter](https://openrouter.ai/)                          |
 
 ## Best Practices
 
@@ -237,4 +237,4 @@ sd-invoice-generator/
 
 ---
 
-*Last updated: January 2026*
+_Last updated: January 2026_

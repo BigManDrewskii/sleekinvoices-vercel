@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { trpc } from "@/lib/trpc";
-import { UNAUTHED_ERR_MSG } from '@shared/const';
+import { UNAUTHED_ERR_MSG } from "@shared/const";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
@@ -22,7 +22,9 @@ Sentry.init({
   environment: import.meta.env.MODE,
   // Release tracking - associates errors with specific deployments
   // Format: sleekinvoices@version+git-commit-hash (set by build process)
-  release: import.meta.env.VITE_SENTRY_RELEASE || `sleekinvoices@${import.meta.env.VITE_APP_VERSION || '1.0.0'}`,
+  release:
+    import.meta.env.VITE_SENTRY_RELEASE ||
+    `sleekinvoices@${import.meta.env.VITE_APP_VERSION || "1.0.0"}`,
   // Capture 100% of transactions for performance monitoring
   tracesSampleRate: 1.0,
 });
@@ -31,12 +33,15 @@ Sentry.init({
 // These occur when components resize faster than the observer can process
 // and don't affect functionality
 const resizeObserverErrHandler = (e: ErrorEvent) => {
-  if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+  if (
+    e.message ===
+    "ResizeObserver loop completed with undelivered notifications."
+  ) {
     e.stopImmediatePropagation();
     return true;
   }
 };
-window.addEventListener('error', resizeObserverErrHandler);
+window.addEventListener("error", resizeObserverErrHandler);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,7 +111,13 @@ const trpcClient = trpc.createClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <Sentry.ErrorBoundary fallback={<div className="flex items-center justify-center min-h-screen"><p>An error occurred. Please refresh the page.</p></div>}>
+  <Sentry.ErrorBoundary
+    fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <p>An error occurred. Please refresh the page.</p>
+      </div>
+    }
+  >
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <KeyboardShortcutsProvider>

@@ -64,17 +64,13 @@
       "compositePrimaryKeys": {
         "clientPortalAccess_id": {
           "name": "clientPortalAccess_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "clientPortalAccess_accessToken_unique": {
           "name": "clientPortalAccess_accessToken_unique",
-          "columns": [
-            "accessToken"
-          ]
+          "columns": ["accessToken"]
         }
       },
       "checkConstraint": {}
@@ -161,9 +157,7 @@
       "compositePrimaryKeys": {
         "clients_id": {
           "name": "clients_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -229,17 +223,13 @@
       "compositePrimaryKeys": {
         "currencies_id": {
           "name": "currencies_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "currencies_code_unique": {
           "name": "currencies_code_unique",
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         }
       },
       "checkConstraint": {}
@@ -318,9 +308,7 @@
       "compositePrimaryKeys": {
         "emailLog_id": {
           "name": "emailLog_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -380,9 +368,7 @@
       "compositePrimaryKeys": {
         "expenseCategories_id": {
           "name": "expenseCategories_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -500,9 +486,7 @@
       "compositePrimaryKeys": {
         "expenses_id": {
           "name": "expenses_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -568,9 +552,7 @@
       "compositePrimaryKeys": {
         "invoiceGenerationLogs_id": {
           "name": "invoiceGenerationLogs_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -643,9 +625,7 @@
       "compositePrimaryKeys": {
         "invoiceLineItems_id": {
           "name": "invoiceLineItems_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -777,9 +757,7 @@
       "compositePrimaryKeys": {
         "invoiceTemplates_id": {
           "name": "invoiceTemplates_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -980,9 +958,7 @@
       "compositePrimaryKeys": {
         "invoices_id": {
           "name": "invoices_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1093,9 +1069,7 @@
       "compositePrimaryKeys": {
         "payments_id": {
           "name": "payments_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1161,9 +1135,7 @@
       "compositePrimaryKeys": {
         "recurringInvoiceLineItems_id": {
           "name": "recurringInvoiceLineItems_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1304,9 +1276,7 @@
       "compositePrimaryKeys": {
         "recurringInvoices_id": {
           "name": "recurringInvoices_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -1372,17 +1342,13 @@
       "compositePrimaryKeys": {
         "stripeWebhookEvents_id": {
           "name": "stripeWebhookEvents_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "stripeWebhookEvents_eventId_unique": {
           "name": "stripeWebhookEvents_eventId_unique",
-          "columns": [
-            "eventId"
-          ]
+          "columns": ["eventId"]
         }
       },
       "checkConstraint": {}
@@ -1529,17 +1495,13 @@
       "compositePrimaryKeys": {
         "users_id": {
           "name": "users_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "users_openId_unique": {
           "name": "users_openId_unique",
-          "columns": [
-            "openId"
-          ]
+          "columns": ["openId"]
         }
       },
       "checkConstraint": {}

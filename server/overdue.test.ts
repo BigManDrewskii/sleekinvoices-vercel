@@ -33,7 +33,9 @@ const mockAdmin = {
   role: "admin" as const,
 };
 
-const createMockContext = (user: typeof mockUser | typeof mockAdmin | null = mockUser): Context => ({
+const createMockContext = (
+  user: typeof mockUser | typeof mockAdmin | null = mockUser
+): Context => ({
   user,
   req: {} as any,
   res: {} as any,
@@ -328,7 +330,9 @@ describe("Overdue Invoice Detection", () => {
     it("should deny non-admin users from triggering", async () => {
       const caller = appRouter.createCaller(createMockContext(mockUser));
 
-      await expect(caller.system.detectOverdueInvoices()).rejects.toThrow("You do not have required permission");
+      await expect(caller.system.detectOverdueInvoices()).rejects.toThrow(
+        "You do not have required permission"
+      );
     });
   });
 });

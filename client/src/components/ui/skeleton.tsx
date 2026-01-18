@@ -23,20 +23,20 @@ function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
 /**
  * Skeleton text line - for simulating text content
  */
-function SkeletonText({ 
-  className, 
+function SkeletonText({
+  className,
   lines = 1,
-  ...props 
+  ...props
 }: React.ComponentProps<"div"> & { lines?: number }) {
   return (
     <div className={cn("space-y-2", className)} {...props}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton 
-          key={i} 
+        <Skeleton
+          key={i}
           className={cn(
             "h-4",
             i === lines - 1 && lines > 1 ? "w-3/4" : "w-full"
-          )} 
+          )}
         />
       ))}
     </div>
@@ -46,21 +46,21 @@ function SkeletonText({
 /**
  * Skeleton circle - for avatars, icons
  */
-function SkeletonCircle({ 
-  className, 
+function SkeletonCircle({
+  className,
   size = "md",
-  ...props 
+  ...props
 }: React.ComponentProps<"div"> & { size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
     sm: "h-8 w-8",
     md: "h-10 w-10",
-    lg: "h-12 w-12"
+    lg: "h-12 w-12",
   };
-  
+
   return (
-    <Skeleton 
-      className={cn("rounded-full", sizeClasses[size], className)} 
-      {...props} 
+    <Skeleton
+      className={cn("rounded-full", sizeClasses[size], className)}
+      {...props}
     />
   );
 }
@@ -68,21 +68,21 @@ function SkeletonCircle({
 /**
  * Skeleton button - for action buttons
  */
-function SkeletonButton({ 
-  className, 
+function SkeletonButton({
+  className,
   size = "default",
-  ...props 
+  ...props
 }: React.ComponentProps<"div"> & { size?: "sm" | "default" | "lg" }) {
   const sizeClasses = {
     sm: "h-8 w-20",
     default: "h-10 w-24",
-    lg: "h-11 w-32"
+    lg: "h-11 w-32",
   };
-  
+
   return (
-    <Skeleton 
-      className={cn("rounded-lg", sizeClasses[size], className)} 
-      {...props} 
+    <Skeleton
+      className={cn("rounded-lg", sizeClasses[size], className)}
+      {...props}
     />
   );
 }
@@ -92,17 +92,14 @@ function SkeletonButton({
  */
 function SkeletonBadge({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <Skeleton 
-      className={cn("h-5 w-16 rounded-full", className)} 
-      {...props} 
-    />
+    <Skeleton className={cn("h-5 w-16 rounded-full", className)} {...props} />
   );
 }
 
-export { 
-  Skeleton, 
-  SkeletonText, 
-  SkeletonCircle, 
-  SkeletonButton, 
-  SkeletonBadge 
+export {
+  Skeleton,
+  SkeletonText,
+  SkeletonCircle,
+  SkeletonButton,
+  SkeletonBadge,
 };

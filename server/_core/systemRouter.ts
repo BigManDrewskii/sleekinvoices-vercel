@@ -26,18 +26,20 @@ export const systemRouter = router({
         success: delivered,
       } as const;
     }),
-  
-  detectOverdueInvoices: adminProcedure
-    .mutation(async () => {
-      const { detectAndMarkOverdueInvoices } = await import('../jobs/detectOverdueInvoices');
-      const result = await detectAndMarkOverdueInvoices();
-      return result;
-    }),
-  
-  sendReminders: adminProcedure
-    .mutation(async () => {
-      const { sendOverdueReminders } = await import('../jobs/sendOverdueReminders');
-      await sendOverdueReminders();
-      return { success: true };
-    }),
+
+  detectOverdueInvoices: adminProcedure.mutation(async () => {
+    const { detectAndMarkOverdueInvoices } = await import(
+      "../jobs/detectOverdueInvoices"
+    );
+    const result = await detectAndMarkOverdueInvoices();
+    return result;
+  }),
+
+  sendReminders: adminProcedure.mutation(async () => {
+    const { sendOverdueReminders } = await import(
+      "../jobs/sendOverdueReminders"
+    );
+    await sendOverdueReminders();
+    return { success: true };
+  }),
 });

@@ -27,7 +27,9 @@ const mockUser = {
   updatedAt: new Date(),
 };
 
-const createMockContext = (user: typeof mockUser | null = mockUser): Context => ({
+const createMockContext = (
+  user: typeof mockUser | null = mockUser
+): Context => ({
   user,
   req: {} as any,
   res: {} as any,
@@ -92,7 +94,7 @@ describe("Payment Reconciliation", () => {
   describe("Payment Creation", () => {
     it("should create a manual payment record", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payment = await caller.payments.create({
         invoiceId: testInvoiceId,
         amount: "500.00",
@@ -107,13 +109,13 @@ describe("Payment Reconciliation", () => {
       expect(payment.amount).toBe("500.00000000");
       expect(payment.paymentMethod).toBe("manual");
       expect(payment.status).toBe("completed");
-      
+
       testPaymentId = payment.id;
     });
 
     it("should create a bank transfer payment", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payment = await caller.payments.create({
         invoiceId: testInvoiceId,
         amount: "250.00",
@@ -126,14 +128,14 @@ describe("Payment Reconciliation", () => {
       expect(payment).toBeDefined();
       expect(payment.paymentMethod).toBe("bank_transfer");
       expect(payment.amount).toBe("250.00000000");
-      
+
       // Cleanup this test payment
       await db.deletePayment(payment.id);
     });
 
     it("should create a check payment", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payment = await caller.payments.create({
         invoiceId: testInvoiceId,
         amount: "100.00",
@@ -145,7 +147,7 @@ describe("Payment Reconciliation", () => {
 
       expect(payment).toBeDefined();
       expect(payment.paymentMethod).toBe("check");
-      
+
       // Cleanup
       await db.deletePayment(payment.id);
     });
@@ -154,9 +156,9 @@ describe("Payment Reconciliation", () => {
   describe("Payment Queries", () => {
     it("should list all payments for a user", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payments = await caller.payments.list({});
-      
+
       expect(Array.isArray(payments)).toBe(true);
       expect(payments.length).toBeGreaterThan(0);
       expect(payments[0]).toHaveProperty("id");
@@ -166,11 +168,11 @@ describe("Payment Reconciliation", () => {
 
     it("should get payments for a specific invoice", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payments = await caller.payments.getByInvoice({
         invoiceId: testInvoiceId,
       });
-      
+
       expect(Array.isArray(payments)).toBe(true);
       expect(payments.length).toBeGreaterThan(0);
       expect(payments[0].invoiceId).toBe(testInvoiceId);
@@ -178,11 +180,11 @@ describe("Payment Reconciliation", () => {
 
     it("should filter payments by status", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payments = await caller.payments.list({
         status: "completed",
       });
-      
+
       expect(Array.isArray(payments)).toBe(true);
       payments.forEach(payment => {
         expect(payment.status).toBe("completed");
@@ -191,11 +193,11 @@ describe("Payment Reconciliation", () => {
 
     it("should filter payments by payment method", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const payments = await caller.payments.list({
         paymentMethod: "manual",
       });
-      
+
       expect(Array.isArray(payments)).toBe(true);
       payments.forEach(payment => {
         expect(payment.paymentMethod).toBe("manual");
@@ -204,9 +206,9 @@ describe("Payment Reconciliation", () => {
 
     it("should get payment statistics", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       const stats = await caller.payments.getStats();
-      
+
       expect(stats).toBeDefined();
       expect(stats).toHaveProperty("totalAmount");
       expect(stats).toHaveProperty("totalCount");
@@ -220,14 +222,14 @@ describe("Payment Reconciliation", () => {
   describe("Payment Calculations", () => {
     it("should calculate total paid for an invoice", async () => {
       const totalPaid = await db.getTotalPaidForInvoice(testInvoiceId);
-      
+
       expect(typeof totalPaid).toBe("number");
       expect(totalPaid).toBeGreaterThanOrEqual(0);
     });
 
     it("should track multiple payments for same invoice", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       // Create two partial payments
       const payment1 = await caller.payments.create({
         invoiceId: testInvoiceId,
@@ -257,7 +259,7 @@ describe("Payment Reconciliation", () => {
   describe("Payment Deletion", () => {
     it("should delete a payment record", async () => {
       const caller = appRouter.createCaller(createMockContext());
-      
+
       // Create a payment to delete
       const payment = await caller.payments.create({
         invoiceId: testInvoiceId,
@@ -303,7 +305,7 @@ describe("Payment Reconciliation", () => {
 
     it("should prevent duplicate webhook processing", async () => {
       const eventId = "evt_duplicate_test_" + Date.now();
-      
+
       await db.logStripeWebhookEvent(eventId, "payment_intent.succeeded", {});
       await db.markWebhookEventProcessed(eventId);
 
@@ -315,7 +317,7 @@ describe("Payment Reconciliation", () => {
   describe("Payment Authorization", () => {
     it("should not allow unauthenticated payment creation", async () => {
       const caller = appRouter.createCaller(createMockContext(null));
-      
+
       await expect(
         caller.payments.create({
           invoiceId: testInvoiceId,
@@ -329,7 +331,7 @@ describe("Payment Reconciliation", () => {
 
     it("should not allow unauthenticated payment listing", async () => {
       const caller = appRouter.createCaller(createMockContext(null));
-      
+
       await expect(caller.payments.list({})).rejects.toThrow();
     });
   });

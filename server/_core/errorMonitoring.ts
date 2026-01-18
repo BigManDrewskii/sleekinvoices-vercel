@@ -1,9 +1,9 @@
 /**
  * Error Monitoring Module
- * 
+ *
  * Provides centralized error tracking and reporting.
  * Can be integrated with external services like Sentry when configured.
- * 
+ *
  * To enable Sentry:
  * 1. Install: pnpm add @sentry/node
  * 2. Set SENTRY_DSN environment variable
@@ -22,7 +22,8 @@ let sentryInitialized = false;
 let Sentry: any = null;
 
 // Hardcoded Sentry DSN for server-side monitoring
-const SENTRY_DSN = 'https://8b4b2baee3c20047bad87165533e755f@o4510235027636224.ingest.de.sentry.io/4510235029798992';
+const SENTRY_DSN =
+  "https://8b4b2baee3c20047bad87165533e755f@o4510235027636224.ingest.de.sentry.io/4510235029798992";
 
 /**
  * Initialize error monitoring
@@ -30,82 +31,99 @@ const SENTRY_DSN = 'https://8b4b2baee3c20047bad87165533e755f@o4510235027636224.i
  */
 export async function initializeErrorMonitoring(): Promise<void> {
   const dsn = process.env.SENTRY_DSN || SENTRY_DSN;
-  
+
   if (!dsn) {
-    console.log('[ErrorMonitoring] No SENTRY_DSN configured - using console logging only');
+    console.log(
+      "[ErrorMonitoring] No SENTRY_DSN configured - using console logging only"
+    );
     return;
   }
-  
+
   try {
     // Dynamically import Sentry only if DSN is configured
     // @ts-ignore - @sentry/node is optional dependency
-    Sentry = await import('@sentry/node').catch(() => null);
-    
+    Sentry = await import("@sentry/node").catch(() => null);
+
     if (!Sentry) {
-      console.warn('[ErrorMonitoring] @sentry/node not installed - run: pnpm add @sentry/node');
+      console.warn(
+        "[ErrorMonitoring] @sentry/node not installed - run: pnpm add @sentry/node"
+      );
       return;
     }
-    
+
     // Get release version from environment or package.json
-    const release = process.env.SENTRY_RELEASE || `sleekinvoices@${process.env.npm_package_version || '1.0.0'}`;
-    
+    const release =
+      process.env.SENTRY_RELEASE ||
+      `sleekinvoices@${process.env.npm_package_version || "1.0.0"}`;
+
     Sentry.init({
       dsn,
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || "development",
       // Release tracking - associates errors with specific deployments
       release,
       // Capture 100% of errors in production
-      tracesSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0.1,
+      tracesSampleRate: process.env.NODE_ENV === "production" ? 1.0 : 0.1,
       // Don't send errors in development unless explicitly enabled
-      enabled: process.env.NODE_ENV === 'production' || process.env.SENTRY_ENABLED === 'true',
+      enabled:
+        process.env.NODE_ENV === "production" ||
+        process.env.SENTRY_ENABLED === "true",
       beforeSend(event: Record<string, unknown>) {
         // Scrub sensitive data
         const request = event.request as Record<string, unknown> | undefined;
         if (request?.headers) {
           const headers = request.headers as Record<string, unknown>;
-          delete headers['authorization'];
-          delete headers['cookie'];
+          delete headers["authorization"];
+          delete headers["cookie"];
         }
         return event;
       },
     });
-    
+
     console.log(`[ErrorMonitoring] Sentry release: ${release}`);
-    
+
     sentryInitialized = true;
-    console.log('[ErrorMonitoring] Sentry initialized successfully');
+    console.log("[ErrorMonitoring] Sentry initialized successfully");
   } catch (error) {
-    console.warn('[ErrorMonitoring] Failed to initialize Sentry:', error);
-    console.log('[ErrorMonitoring] Falling back to console logging');
+    console.warn("[ErrorMonitoring] Failed to initialize Sentry:", error);
+    console.log("[ErrorMonitoring] Falling back to console logging");
   }
 }
 
 /**
  * Capture and report an exception
  */
-export function captureException(error: Error | unknown, context?: ErrorContext): void {
+export function captureException(
+  error: Error | unknown,
+  context?: ErrorContext
+): void {
   // Always log to console
-  console.error('[ERROR]', error, context ? JSON.stringify(context) : '');
-  
+  console.error("[ERROR]", error, context ? JSON.stringify(context) : "");
+
   // Send to Sentry if available
   if (sentryInitialized && Sentry) {
-    Sentry.withScope((scope: { setUser: (user: { id: string } | null) => void; setTag: (key: string, value: string) => void; setExtras: (extras: Record<string, unknown>) => void }) => {
-      if (context?.userId) {
-        scope.setUser({ id: String(context.userId) });
+    Sentry.withScope(
+      (scope: {
+        setUser: (user: { id: string } | null) => void;
+        setTag: (key: string, value: string) => void;
+        setExtras: (extras: Record<string, unknown>) => void;
+      }) => {
+        if (context?.userId) {
+          scope.setUser({ id: String(context.userId) });
+        }
+        if (context?.action) {
+          scope.setTag("action", context.action);
+        }
+        if (context?.metadata) {
+          scope.setExtras(context.metadata);
+        }
+
+        if (error instanceof Error) {
+          Sentry.captureException(error);
+        } else {
+          Sentry.captureMessage(String(error), "error");
+        }
       }
-      if (context?.action) {
-        scope.setTag('action', context.action);
-      }
-      if (context?.metadata) {
-        scope.setExtras(context.metadata);
-      }
-      
-      if (error instanceof Error) {
-        Sentry.captureException(error);
-      } else {
-        Sentry.captureMessage(String(error), 'error');
-      }
-    });
+    );
   }
 }
 
@@ -113,29 +131,44 @@ export function captureException(error: Error | unknown, context?: ErrorContext)
  * Capture a message (non-error event)
  */
 export function captureMessage(
-  message: string, 
-  level: 'info' | 'warning' | 'error' = 'info',
+  message: string,
+  level: "info" | "warning" | "error" = "info",
   context?: ErrorContext
 ): void {
   // Log to console
-  const logFn = level === 'error' ? console.error : level === 'warning' ? console.warn : console.log;
-  logFn(`[${level.toUpperCase()}]`, message, context ? JSON.stringify(context) : '');
-  
+  const logFn =
+    level === "error"
+      ? console.error
+      : level === "warning"
+        ? console.warn
+        : console.log;
+  logFn(
+    `[${level.toUpperCase()}]`,
+    message,
+    context ? JSON.stringify(context) : ""
+  );
+
   // Send to Sentry if available
   if (sentryInitialized && Sentry) {
-    Sentry.withScope((scope: { setUser: (user: { id: string } | null) => void; setTag: (key: string, value: string) => void; setExtras: (extras: Record<string, unknown>) => void }) => {
-      if (context?.userId) {
-        scope.setUser({ id: String(context.userId) });
+    Sentry.withScope(
+      (scope: {
+        setUser: (user: { id: string } | null) => void;
+        setTag: (key: string, value: string) => void;
+        setExtras: (extras: Record<string, unknown>) => void;
+      }) => {
+        if (context?.userId) {
+          scope.setUser({ id: String(context.userId) });
+        }
+        if (context?.action) {
+          scope.setTag("action", context.action);
+        }
+        if (context?.metadata) {
+          scope.setExtras(context.metadata);
+        }
+
+        Sentry.captureMessage(message, level);
       }
-      if (context?.action) {
-        scope.setTag('action', context.action);
-      }
-      if (context?.metadata) {
-        scope.setExtras(context.metadata);
-      }
-      
-      Sentry.captureMessage(message, level);
-    });
+    );
   }
 }
 
@@ -161,7 +194,9 @@ export function clearUserContext(): void {
  * Flush pending events before shutdown
  * Call this before process.exit()
  */
-export async function flushErrorMonitoring(timeout: number = 2000): Promise<void> {
+export async function flushErrorMonitoring(
+  timeout: number = 2000
+): Promise<void> {
   if (sentryInitialized && Sentry) {
     await Sentry.close(timeout);
   }

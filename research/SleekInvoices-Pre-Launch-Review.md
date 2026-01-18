@@ -18,13 +18,13 @@ The findings are organized by priority level and include specific recommendation
 
 The following issues significantly impact user experience or functionality and should be addressed immediately.
 
-| Issue | Location | Impact | Recommendation |
-|-------|----------|--------|----------------|
-| Settings page infinite loading | `/settings` direct URL | Users cannot access settings via direct link | Fix routing to load settings page from direct URL, not just user menu |
-| 404 page theme mismatch | All 404 pages | Jarring visual experience | Update 404 page to use dark theme consistent with rest of app |
-| Excessive test data | Clients page (479 clients) | Performance issues, confusing for demos | Clean up test data before launch, implement data seeding for demos |
-| No pagination on clients | Clients page | Page renders 25,000+ pixels, performance issue | Add pagination (20-50 clients per page) or virtual scrolling |
-| Duplicate invoice numbers | Invoices list | Data integrity concern | Verify uniqueness validation on invoice numbers |
+| Issue                          | Location                   | Impact                                         | Recommendation                                                        |
+| ------------------------------ | -------------------------- | ---------------------------------------------- | --------------------------------------------------------------------- |
+| Settings page infinite loading | `/settings` direct URL     | Users cannot access settings via direct link   | Fix routing to load settings page from direct URL, not just user menu |
+| 404 page theme mismatch        | All 404 pages              | Jarring visual experience                      | Update 404 page to use dark theme consistent with rest of app         |
+| Excessive test data            | Clients page (479 clients) | Performance issues, confusing for demos        | Clean up test data before launch, implement data seeding for demos    |
+| No pagination on clients       | Clients page               | Page renders 25,000+ pixels, performance issue | Add pagination (20-50 clients per page) or virtual scrolling          |
+| Duplicate invoice numbers      | Invoices list              | Data integrity concern                         | Verify uniqueness validation on invoice numbers                       |
 
 ---
 
@@ -56,14 +56,14 @@ Many empty fields display "—" (em dash) which, while functional, could be impr
 
 The settings page extends over 4,000 pixels vertically, requiring significant scrolling. Consider reorganizing into tabbed sections:
 
-| Tab | Contents |
-|-----|----------|
-| Profile | Personal information, email, avatar |
-| Company | Company name, address, logo, VAT/Tax ID |
-| Invoicing | Default templates, payment terms, numbering |
-| Reminders | Email reminder settings and templates |
-| Integrations | QuickBooks, Stripe, crypto payments |
-| Account | Subscription, logout, danger zone |
+| Tab          | Contents                                    |
+| ------------ | ------------------------------------------- |
+| Profile      | Personal information, email, avatar         |
+| Company      | Company name, address, logo, VAT/Tax ID     |
+| Invoicing    | Default templates, payment terms, numbering |
+| Reminders    | Email reminder settings and templates       |
+| Integrations | QuickBooks, Stripe, crypto payments         |
+| Account      | Subscription, logout, danger zone           |
 
 ### Email Template Editor
 
@@ -93,21 +93,21 @@ The following features would significantly enhance the product before launch.
 
 ### Landing Page Additions
 
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| Testimonials section | High | Add 2-3 customer quotes with photos between features and pricing |
-| Product demo | High | Add animated GIF or video showing invoice creation flow |
-| Contact page | Medium | Create dedicated contact page linked from footer |
-| Privacy/Terms pages | Medium | Ensure legal pages exist and are accessible |
+| Feature              | Priority | Description                                                      |
+| -------------------- | -------- | ---------------------------------------------------------------- |
+| Testimonials section | High     | Add 2-3 customer quotes with photos between features and pricing |
+| Product demo         | High     | Add animated GIF or video showing invoice creation flow          |
+| Contact page         | Medium   | Create dedicated contact page linked from footer                 |
+| Privacy/Terms pages  | Medium   | Ensure legal pages exist and are accessible                      |
 
 ### Application Features
 
-| Feature | Priority | Description |
-|---------|----------|-------------|
-| Sleeky mascot illustrations | Medium | Add mascot to empty states, 404 page, and onboarding |
-| Client portal improvements | Medium | Add portal access indicators to client list |
-| Mobile command palette alternative | Medium | Provide touch-friendly search on mobile devices |
-| Stripe settings visibility | Low | Ensure payment settings are accessible in settings page |
+| Feature                            | Priority | Description                                             |
+| ---------------------------------- | -------- | ------------------------------------------------------- |
+| Sleeky mascot illustrations        | Medium   | Add mascot to empty states, 404 page, and onboarding    |
+| Client portal improvements         | Medium   | Add portal access indicators to client list             |
+| Mobile command palette alternative | Medium   | Provide touch-friendly search on mobile devices         |
+| Stripe settings visibility         | Low      | Ensure payment settings are accessible in settings page |
 
 ---
 
@@ -176,4 +176,4 @@ With the recommended fixes implemented, SleekInvoices will be well-positioned fo
 
 ---
 
-*This report was generated as part of a comprehensive pre-launch review. For questions or clarification on any findings, please refer to the detailed notes in `/research/app-review-findings.md`.*
+_This report was generated as part of a comprehensive pre-launch review. For questions or clarification on any findings, please refer to the detailed notes in `/research/app-review-findings.md`._

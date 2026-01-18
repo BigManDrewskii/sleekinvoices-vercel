@@ -18,9 +18,13 @@ interface ClientSelectorProps {
   error?: string;
 }
 
-export function ClientSelector({ value, onChange, error }: ClientSelectorProps) {
+export function ClientSelector({
+  value,
+  onChange,
+  error,
+}: ClientSelectorProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  
+
   const { data: clients, isLoading } = trpc.clients.list.useQuery();
 
   const handleClientCreated = (clientId?: number) => {
@@ -38,7 +42,7 @@ export function ClientSelector({ value, onChange, error }: ClientSelectorProps) 
       <div className="flex gap-2">
         <Select
           value={value?.toString() || "none"}
-          onValueChange={(val) => val !== "none" && onChange(parseInt(val))}
+          onValueChange={val => val !== "none" && onChange(parseInt(val))}
         >
           <SelectTrigger className={error ? "border-destructive" : ""}>
             <SelectValue placeholder="Select a client" />
@@ -53,7 +57,7 @@ export function ClientSelector({ value, onChange, error }: ClientSelectorProps) 
                 No clients yet
               </SelectItem>
             ) : (
-              clients.map((client) => (
+              clients.map(client => (
                 <SelectItem key={client.id} value={client.id.toString()}>
                   {client.name}
                   {client.email && ` (${client.email})`}

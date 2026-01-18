@@ -1,6 +1,12 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
@@ -9,17 +15,15 @@ import { SubscriptionPageSkeleton } from "@/components/skeletons";
 export default function SubscriptionSuccess() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
 
-  const { data: subscriptionStatus, isLoading } = trpc.subscription.getStatus.useQuery(
-    undefined,
-    { 
+  const { data: subscriptionStatus, isLoading } =
+    trpc.subscription.getStatus.useQuery(undefined, {
       enabled: isAuthenticated,
       // Poll every 2 seconds, but stop after subscription is active
-      refetchInterval: (query) => {
-        return query.state.data?.status === 'active' ? false : 2000;
+      refetchInterval: query => {
+        return query.state.data?.status === "active" ? false : 2000;
       },
       refetchIntervalInBackground: false,
-    }
-  );
+    });
 
   // Show loading while auth or subscription data is loading
   if (authLoading || isLoading) {
@@ -37,9 +41,9 @@ export default function SubscriptionSuccess() {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
             <div className="relative">
-              <img 
-                src="/sleeky/success-states/subscription-upgraded.png" 
-                alt="Sleeky celebrating your Pro upgrade!" 
+              <img
+                src="/sleeky/success-states/subscription-upgraded.png"
+                alt="Sleeky celebrating your Pro upgrade!"
                 className="h-40 w-40 object-contain animate-bounce-subtle"
               />
             </div>
@@ -48,12 +52,12 @@ export default function SubscriptionSuccess() {
             {isActive ? "Welcome to Pro!" : "Payment Successful!"}
           </CardTitle>
           <CardDescription className="text-lg">
-            {isActive 
+            {isActive
               ? "Your subscription is now active and you have unlimited access to all Pro features."
               : "Your payment was successful. Your subscription is being activated..."}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           {isActive ? (
             <>
@@ -71,7 +75,9 @@ export default function SubscriptionSuccess() {
                   </div>
                   {currentPeriodEnd && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Next billing date:</span>
+                      <span className="text-muted-foreground">
+                        Next billing date:
+                      </span>
                       <span className="font-medium">{currentPeriodEnd}</span>
                     </div>
                   )}
@@ -122,9 +128,7 @@ export default function SubscriptionSuccess() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="flex-1">
-                  <Link href="/invoices">
-                    Create Invoice
-                  </Link>
+                  <Link href="/invoices">Create Invoice</Link>
                 </Button>
               </div>
             </>
@@ -134,14 +138,13 @@ export default function SubscriptionSuccess() {
               <div className="bg-muted/50 rounded-lg p-6 text-center space-y-3">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-sm text-muted-foreground">
-                  Activating your Pro subscription... This usually takes a few seconds.
+                  Activating your Pro subscription... This usually takes a few
+                  seconds.
                 </p>
               </div>
-              
+
               <Button asChild className="w-full">
-                <Link href="/dashboard">
-                  Go to Dashboard
-                </Link>
+                <Link href="/dashboard">Go to Dashboard</Link>
               </Button>
             </>
           )}

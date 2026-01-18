@@ -1,13 +1,15 @@
 /**
  * Server-side Color Contrast Utilities
- * 
+ *
  * WCAG 2.1 compliant contrast ratio calculations for PDF generation
  */
 
 /**
  * Parse a hex color to RGB values
  */
-export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+export function hexToRgb(
+  hex: string
+): { r: number; g: number; b: number } | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
@@ -22,10 +24,15 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
  * Convert RGB to hex
  */
 export function rgbToHex(r: number, g: number, b: number): string {
-  return '#' + [r, g, b].map(x => {
-    const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
+  return (
+    "#" +
+    [r, g, b]
+      .map(x => {
+        const hex = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
 }
 
 /**
@@ -65,7 +72,7 @@ export function isLightColor(hex: string): boolean {
  * Get optimal text color (black or white) for a given background
  */
 export function getOptimalTextColor(backgroundColor: string): string {
-  return isLightColor(backgroundColor) ? '#18181b' : '#ffffff';
+  return isLightColor(backgroundColor) ? "#18181b" : "#ffffff";
 }
 
 /**
@@ -84,12 +91,15 @@ export function adjustColorForContrast(
 
   const bgIsLight = isLightColor(backgroundColor);
   const step = bgIsLight ? -10 : 10;
-  
+
   let { r, g, b } = rgb;
   let iterations = 0;
   const maxIterations = 50;
 
-  while (getContrastRatio(rgbToHex(r, g, b), backgroundColor) < targetRatio && iterations < maxIterations) {
+  while (
+    getContrastRatio(rgbToHex(r, g, b), backgroundColor) < targetRatio &&
+    iterations < maxIterations
+  ) {
     r = Math.max(0, Math.min(255, r + step));
     g = Math.max(0, Math.min(255, g + step));
     b = Math.max(0, Math.min(255, b + step));
@@ -105,7 +115,7 @@ export function adjustColorForContrast(
 export function lighten(hex: string, percent: number): string {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
-  
+
   const amount = Math.round(255 * (percent / 100));
   return rgbToHex(
     Math.min(255, rgb.r + amount),
@@ -120,7 +130,7 @@ export function lighten(hex: string, percent: number): string {
 export function darken(hex: string, percent: number): string {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
-  
+
   const amount = Math.round(255 * (percent / 100));
   return rgbToHex(
     Math.max(0, rgb.r - amount),
@@ -151,23 +161,27 @@ export interface PDFColorPalette {
 }
 
 export function createPDFColorPalette(
-  primaryColor: string = '#18181b',
-  accentColor: string = '#5f6fff'
+  primaryColor: string = "#18181b",
+  accentColor: string = "#5f6fff"
 ): PDFColorPalette {
-  const backgroundColor = '#ffffff';
-  
-  const safePrimary = adjustColorForContrast(primaryColor, backgroundColor, 4.5);
+  const backgroundColor = "#ffffff";
+
+  const safePrimary = adjustColorForContrast(
+    primaryColor,
+    backgroundColor,
+    4.5
+  );
   const safeAccent = adjustColorForContrast(accentColor, backgroundColor, 4.5);
-  
+
   const primaryText = getOptimalTextColor(safePrimary);
   const accentText = getOptimalTextColor(safeAccent);
-  
-  const muted = isLightColor(safePrimary) 
-    ? darken(safePrimary, 30) 
+
+  const muted = isLightColor(safePrimary)
+    ? darken(safePrimary, 30)
     : lighten(safePrimary, 40);
-  
+
   const divider = withAlpha(safePrimary, 0.15);
-  
+
   return {
     primary: safePrimary,
     primaryText,

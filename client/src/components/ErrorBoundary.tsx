@@ -33,9 +33,12 @@ class ErrorBoundary extends Component<Props, State> {
               className="h-48 w-48 object-contain mb-6 animate-bounce-subtle"
             />
 
-            <h2 className="text-2xl font-semibold mb-2">Oops! Something went wrong</h2>
+            <h2 className="text-2xl font-semibold mb-2">
+              Oops! Something went wrong
+            </h2>
             <p className="text-muted-foreground mb-6">
-              Don't worry, Sleeky is on it! Try refreshing the page or going back to the dashboard.
+              Don't worry, Sleeky is on it! Try refreshing the page or going
+              back to the dashboard.
             </p>
 
             {/* Error details (collapsed by default in production) */}
@@ -60,7 +63,7 @@ class ErrorBoundary extends Component<Props, State> {
                 Reload Page
               </button>
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => (window.location.href = "/dashboard")}
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-lg",
                   "bg-muted text-foreground",

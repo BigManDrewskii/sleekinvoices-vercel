@@ -1,6 +1,6 @@
 /**
  * Skeleton Components Index
- * 
+ *
  * Central export for all loading skeleton components.
  * Import from this file for cleaner imports across the app.
  */

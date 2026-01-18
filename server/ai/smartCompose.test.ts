@@ -30,22 +30,26 @@ describe("Smart Compose - Invoice Extraction", () => {
       id: "test-id",
       created: Date.now(),
       model: "gemini-2.5-flash",
-      choices: [{
-        index: 0,
-        message: {
-          role: "assistant",
-          content: JSON.stringify({
-            clientName: "John",
-            clientEmail: null,
-            lineItems: [{ description: "Consulting", quantity: 10, rate: 150 }],
-            dueDate: null,
-            notes: null,
-            currency: "USD"
-          })
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: JSON.stringify({
+              clientName: "John",
+              clientEmail: null,
+              lineItems: [
+                { description: "Consulting", quantity: 10, rate: 150 },
+              ],
+              dueDate: null,
+              notes: null,
+              currency: "USD",
+            }),
+          },
+          finish_reason: "stop",
         },
-        finish_reason: "stop"
-      }],
-      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 }
+      ],
+      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
     });
 
     const result = await extractInvoiceData(
@@ -102,27 +106,31 @@ describe("Smart Compose - Invoice Extraction", () => {
       id: "test-id",
       created: Date.now(),
       model: "gemini-2.5-flash",
-      choices: [{
-        index: 0,
-        message: {
-          role: "assistant",
-          content: JSON.stringify({
-            clientName: "Acme Corporation",
-            clientEmail: "billing@acme.com",
-            lineItems: [{ description: "Website Redesign", quantity: 1, rate: 5000 }],
-            dueDate: "2026-01-21",
-            notes: null,
-            currency: "USD"
-          })
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: JSON.stringify({
+              clientName: "Acme Corporation",
+              clientEmail: "billing@acme.com",
+              lineItems: [
+                { description: "Website Redesign", quantity: 1, rate: 5000 },
+              ],
+              dueDate: "2026-01-21",
+              notes: null,
+              currency: "USD",
+            }),
+          },
+          finish_reason: "stop",
         },
-        finish_reason: "stop"
-      }],
-      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 }
+      ],
+      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
     });
 
     const existingClients = [
       { id: 1, name: "Acme Corporation", email: "billing@acme.com" },
-      { id: 2, name: "Tech Startup Inc", email: "hello@techstartup.com" }
+      { id: 2, name: "Tech Startup Inc", email: "hello@techstartup.com" },
     ];
 
     const result = await extractInvoiceData(
@@ -135,16 +143,16 @@ describe("Smart Compose - Invoice Extraction", () => {
     expect(result.success).toBe(true);
     expect(result.data?.clientName).toBe("Acme Corporation");
     expect(result.data?.clientEmail).toBe("billing@acme.com");
-    
+
     // Verify the LLM was called with client context
     expect(invokeLLM).toHaveBeenCalledWith(
       expect.objectContaining({
         messages: expect.arrayContaining([
           expect.objectContaining({
             role: "system",
-            content: expect.stringContaining("Acme Corporation")
-          })
-        ])
+            content: expect.stringContaining("Acme Corporation"),
+          }),
+        ]),
       })
     );
   });
@@ -152,7 +160,9 @@ describe("Smart Compose - Invoice Extraction", () => {
   it("should handle LLM errors gracefully", async () => {
     vi.mocked(hasAiCredits).mockResolvedValue(true);
     vi.mocked(logAiUsage).mockResolvedValue(undefined);
-    vi.mocked(invokeLLM).mockRejectedValue(new Error("API rate limit exceeded"));
+    vi.mocked(invokeLLM).mockRejectedValue(
+      new Error("API rate limit exceeded")
+    );
 
     const result = await extractInvoiceData(
       "Invoice John for consulting",
@@ -162,16 +172,18 @@ describe("Smart Compose - Invoice Extraction", () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toBe("Failed to extract invoice data. Please try again or enter details manually.");
-    
+    expect(result.error).toBe(
+      "Failed to extract invoice data. Please try again or enter details manually."
+    );
+
     // Should not consume credit on failure
     expect(useAiCredit).not.toHaveBeenCalled();
-    
+
     // Should log the failure
     expect(logAiUsage).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        errorMessage: "API rate limit exceeded"
+        errorMessage: "API rate limit exceeded",
       })
     );
   });
@@ -183,15 +195,17 @@ describe("Smart Compose - Invoice Extraction", () => {
       id: "test-id",
       created: Date.now(),
       model: "gemini-2.5-flash",
-      choices: [{
-        index: 0,
-        message: {
-          role: "assistant",
-          content: "This is not valid JSON"
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: "This is not valid JSON",
+          },
+          finish_reason: "stop",
         },
-        finish_reason: "stop"
-      }],
-      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 }
+      ],
+      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
     });
 
     const result = await extractInvoiceData(
@@ -213,26 +227,28 @@ describe("Smart Compose - Invoice Extraction", () => {
       id: "test-id",
       created: Date.now(),
       model: "gemini-2.5-flash",
-      choices: [{
-        index: 0,
-        message: {
-          role: "assistant",
-          content: JSON.stringify({
-            clientName: "Tech Startup Inc",
-            clientEmail: null,
-            lineItems: [
-              { description: "Homepage", quantity: 1, rate: 800 },
-              { description: "About Page", quantity: 1, rate: 800 },
-              { description: "Contact Page", quantity: 1, rate: 800 }
-            ],
-            dueDate: null,
-            notes: null,
-            currency: "USD"
-          })
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: JSON.stringify({
+              clientName: "Tech Startup Inc",
+              clientEmail: null,
+              lineItems: [
+                { description: "Homepage", quantity: 1, rate: 800 },
+                { description: "About Page", quantity: 1, rate: 800 },
+                { description: "Contact Page", quantity: 1, rate: 800 },
+              ],
+              dueDate: null,
+              notes: null,
+              currency: "USD",
+            }),
+          },
+          finish_reason: "stop",
         },
-        finish_reason: "stop"
-      }],
-      usage: { prompt_tokens: 100, completion_tokens: 80, total_tokens: 180 }
+      ],
+      usage: { prompt_tokens: 100, completion_tokens: 80, total_tokens: 180 },
     });
 
     const result = await extractInvoiceData(
@@ -244,6 +260,11 @@ describe("Smart Compose - Invoice Extraction", () => {
 
     expect(result.success).toBe(true);
     expect(result.data?.lineItems).toHaveLength(3);
-    expect(result.data?.lineItems.reduce((sum, item) => sum + item.rate * item.quantity, 0)).toBe(2400);
+    expect(
+      result.data?.lineItems.reduce(
+        (sum, item) => sum + item.rate * item.quantity,
+        0
+      )
+    ).toBe(2400);
   });
 });

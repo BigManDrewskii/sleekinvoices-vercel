@@ -18,6 +18,7 @@ Your local environment is **fully configured and working**:
 ### How It Works
 
 **Local Development (Your Machine)**
+
 - Uses **Docker MySQL** on `localhost:3306`
 - Database: `sleekinvoices_dev` (separate from production)
 - Auth: **BYPASSED** with `SKIP_AUTH=true` (auto-login as dev user)
@@ -25,6 +26,7 @@ Your local environment is **fully configured and working**:
 - Data: **Completely isolated** from production
 
 **Production (Live Server)**
+
 - Uses **TiDB/PlanetScale** (remote database)
 - Database: `sleekinvoices_prod` (different database entirely)
 - Auth: **Real OAuth** with Manus
@@ -34,6 +36,7 @@ Your local environment is **fully configured and working**:
 ### Why Pushing to GitHub Is Safe
 
 When you push code to GitHub:
+
 - ✅ **Code changes** go to the repo (Landing.tsx, Docs.tsx, etc.)
 - ✅ **Schema definitions** go to the repo (drizzle/schema.ts)
 - ❌ **Environment variables** (.env.local) are IGNORED by `.gitignore`
@@ -41,6 +44,7 @@ When you push code to GitHub:
 - ❌ **Production database** is NOT touched (different DATABASE_URL)
 
 **What happens on production deployment:**
+
 1. Code is pulled from GitHub
 2. Production uses its own `.env` file (with production DATABASE_URL)
 3. Schema migrations run on production database (if needed)
@@ -58,6 +62,7 @@ When you push code to GitHub:
 ```
 
 This script:
+
 - ✅ Starts Docker MySQL
 - ✅ Waits for database to be healthy
 - ✅ Loads .env.local variables
@@ -88,12 +93,14 @@ pnpm dev
 ### Navigating Freely Without Issues
 
 Since `SKIP_AUTH=true` is set, you automatically login as:
+
 - **Email:** `dev@localhost.test`
 - **User ID:** `4`
 - **Name:** Local Dev User
 - **Tier:** Pro (unlimited features)
 
 **You can freely:**
+
 - ✅ Navigate to `/dashboard`, `/invoices`, `/clients`, etc.
 - ✅ Create invoices, clients, estimates
 - ✅ Use AI features (if OPENROUTER_API_KEY is set)
@@ -123,6 +130,7 @@ pnpm seed              # Seeds test data
 ### 1. Environment Variables (.gitignore)
 
 Your `.gitignore` **already protects**:
+
 ```
 .env
 .env.local
@@ -132,6 +140,7 @@ Your `.gitignore` **already protects**:
 ```
 
 **This means:**
+
 - Your local DATABASE_URL never goes to GitHub
 - API keys (STRIPE_SECRET_KEY, OPENROUTER_API_KEY) stay local
 - OAuth secrets stay private
@@ -146,10 +155,11 @@ Your `.gitignore` **already protects**:
 ### 3. Auth Bypass Protection
 
 The server checks for production mode:
+
 ```typescript
 // In server/_core/auth.ts (example)
-if (process.env.SKIP_AUTH === 'true' && process.env.NODE_ENV === 'production') {
-  throw new Error('SKIP_AUTH cannot be enabled in production!');
+if (process.env.SKIP_AUTH === "true" && process.env.NODE_ENV === "production") {
+  throw new Error("SKIP_AUTH cannot be enabled in production!");
 }
 ```
 
@@ -162,18 +172,21 @@ if (process.env.SKIP_AUTH === 'true' && process.env.NODE_ENV === 'production') {
 ### Safe Testing Practices
 
 **1. Use Test Credentials**
+
 - Stripe: Use `sk_test_...` keys (not `sk_live_...`)
 - NOWPayments: Use sandbox mode
 - QuickBooks: Use `sandbox` environment
 
 **2. Local Database Only**
 Your Docker database is isolated. You can:
+
 - Delete all invoices → `docker exec sleekinvoices-db mysql -usleekinvoices -plocaldev123 sleekinvoices_dev -e "DELETE FROM invoices;"`
 - Truncate tables → `docker exec sleekinvoices-db mysql -usleekinvoices -plocaldev123 sleekinvoices_dev -e "TRUNCATE clients;"`
 - Drop and recreate → `docker-compose down -v && docker-compose up -d`
 
 **3. Branch-Based Development**
 Create feature branches for experimentation:
+
 ```bash
 git checkout -b feature/new-landing-design
 # Make changes, test locally
@@ -190,6 +203,7 @@ git push origin feature/new-landing-design
 **Status:** Healthy, fully synced
 
 **Test Users Available:**
+
 - `free@sleek-invoices.test` - Free plan user
 - `pro@sleek-invoices.test` - Pro plan user
 - `pastdue@sleek-invoices.test` - Subscription past due
@@ -242,6 +256,7 @@ docker-compose restart
 **Cause:** Database not started or connection failed
 
 **Fix:**
+
 ```bash
 docker-compose up -d
 docker-compose ps  # Verify mysql is healthy
@@ -253,12 +268,14 @@ docker-compose ps  # Verify mysql is healthy
 
 **Fix:**
 Check `.env.local` has:
+
 ```
 SKIP_AUTH=true
 VITE_SKIP_AUTH=true
 ```
 
 Restart dev server:
+
 ```bash
 # Ctrl+C to stop, then:
 pnpm dev
@@ -269,6 +286,7 @@ pnpm dev
 **Cause:** Browser cached old auth state or wrong port
 
 **Fix:**
+
 1. **Make sure you're on the correct port:** http://localhost:3000/ (NOT 5173!)
 2. **Clear browser storage:**
    - Open DevTools (F12 or Cmd+Option+I)
@@ -292,6 +310,7 @@ pnpm dev
 **Cause:** Browser cache or HMR issue
 
 **Fix:**
+
 1. Hard refresh: Cmd+Shift+R
 2. Clear browser cache
 3. Restart dev server if HMR not working

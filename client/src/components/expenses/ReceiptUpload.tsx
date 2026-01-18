@@ -25,16 +25,22 @@ const ALLOWED_TYPES = [
   "application/pdf",
 ];
 
-export default function ReceiptUpload({ value, onChange, disabled }: ReceiptUploadProps) {
+export default function ReceiptUpload({
+  value,
+  onChange,
+  disabled,
+}: ReceiptUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const uploadMutation = trpc.expenses.uploadReceipt.useMutation();
 
   const validateFile = (file: File): boolean => {
     if (!ALLOWED_TYPES.includes(file.type)) {
-      toast.error("Invalid file type. Please upload an image (JPG, PNG, GIF, WebP) or PDF.");
+      toast.error(
+        "Invalid file type. Please upload an image (JPG, PNG, GIF, WebP) or PDF."
+      );
       return false;
     }
 
@@ -54,7 +60,7 @@ export default function ReceiptUpload({ value, onChange, disabled }: ReceiptUplo
     try {
       // Convert file to base64
       const reader = new FileReader();
-      reader.onload = async (e) => {
+      reader.onload = async e => {
         const base64 = e.target?.result as string;
         const base64Data = base64.split(",")[1]; // Remove data:image/jpeg;base64, prefix
 
@@ -223,7 +229,9 @@ export default function ReceiptUpload({ value, onChange, disabled }: ReceiptUplo
         {isUploading ? (
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="w-10 h-10 text-primary animate-spin" />
-            <p className="text-sm text-muted-foreground">Uploading receipt...</p>
+            <p className="text-sm text-muted-foreground">
+              Uploading receipt...
+            </p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3">

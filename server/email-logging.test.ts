@@ -1,14 +1,14 @@
 /**
  * Email Logging Tests
- * 
+ *
  * Tests for email delivery tracking system that logs all sent emails
  * to the emailLog table with Resend message IDs for tracking.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock the database module
-vi.mock('./db', () => ({
+vi.mock("./db", () => ({
   logEmail: vi.fn().mockResolvedValue(undefined),
   getEmailLogByInvoiceId: vi.fn().mockResolvedValue([]),
   getEmailLogByMessageId: vi.fn().mockResolvedValue(null),
@@ -17,40 +17,40 @@ vi.mock('./db', () => ({
 }));
 
 // Mock Resend
-vi.mock('resend', () => ({
+vi.mock("resend", () => ({
   Resend: vi.fn().mockImplementation(() => ({
     emails: {
       send: vi.fn().mockResolvedValue({
-        data: { id: 'test-message-id-123' },
+        data: { id: "test-message-id-123" },
         error: null,
       }),
     },
   })),
 }));
 
-import * as db from './db';
-import { Resend } from 'resend';
+import * as db from "./db";
+import { Resend } from "resend";
 
-describe('Email Logging System', () => {
+describe("Email Logging System", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.RESEND_API_KEY = 'test-api-key';
+    process.env.RESEND_API_KEY = "test-api-key";
   });
 
   afterEach(() => {
     delete process.env.RESEND_API_KEY;
   });
 
-  describe('logEmail function', () => {
-    it('should log email with all required fields', async () => {
+  describe("logEmail function", () => {
+    it("should log email with all required fields", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Invoice INV-2026-0001 from Test Company',
-        emailType: 'invoice' as const,
+        recipientEmail: "client@example.com",
+        subject: "Invoice INV-2026-0001 from Test Company",
+        emailType: "invoice" as const,
         success: true,
-        messageId: 'resend-msg-123',
+        messageId: "resend-msg-123",
       };
 
       await db.logEmail(emailData);
@@ -58,15 +58,15 @@ describe('Email Logging System', () => {
       expect(db.logEmail).toHaveBeenCalledWith(emailData);
     });
 
-    it('should log failed email with error message', async () => {
+    it("should log failed email with error message", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Invoice INV-2026-0001 from Test Company',
-        emailType: 'invoice' as const,
+        recipientEmail: "client@example.com",
+        subject: "Invoice INV-2026-0001 from Test Company",
+        emailType: "invoice" as const,
         success: false,
-        errorMessage: 'Invalid email address',
+        errorMessage: "Invalid email address",
       };
 
       await db.logEmail(emailData);
@@ -74,71 +74,71 @@ describe('Email Logging System', () => {
       expect(db.logEmail).toHaveBeenCalledWith(emailData);
     });
 
-    it('should log reminder email type', async () => {
+    it("should log reminder email type", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Payment Reminder: Invoice INV-2026-0001 is 5 days overdue',
-        emailType: 'reminder' as const,
+        recipientEmail: "client@example.com",
+        subject: "Payment Reminder: Invoice INV-2026-0001 is 5 days overdue",
+        emailType: "reminder" as const,
         success: true,
-        messageId: 'resend-msg-456',
+        messageId: "resend-msg-456",
       };
 
       await db.logEmail(emailData);
 
       expect(db.logEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          emailType: 'reminder',
+          emailType: "reminder",
         })
       );
     });
 
-    it('should log receipt email type for payment confirmations', async () => {
+    it("should log receipt email type for payment confirmations", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Payment Received for Invoice INV-2026-0001',
-        emailType: 'receipt' as const,
+        recipientEmail: "client@example.com",
+        subject: "Payment Received for Invoice INV-2026-0001",
+        emailType: "receipt" as const,
         success: true,
-        messageId: 'resend-msg-789',
+        messageId: "resend-msg-789",
       };
 
       await db.logEmail(emailData);
 
       expect(db.logEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          emailType: 'receipt',
+          emailType: "receipt",
         })
       );
     });
   });
 
-  describe('Email Log Retrieval', () => {
-    it('should retrieve email logs by invoice ID', async () => {
+  describe("Email Log Retrieval", () => {
+    it("should retrieve email logs by invoice ID", async () => {
       const mockLogs = [
         {
           id: 1,
           userId: 1,
           invoiceId: 100,
-          recipientEmail: 'client@example.com',
-          subject: 'Invoice INV-2026-0001',
-          emailType: 'invoice',
+          recipientEmail: "client@example.com",
+          subject: "Invoice INV-2026-0001",
+          emailType: "invoice",
           sentAt: new Date(),
           success: true,
-          messageId: 'msg-1',
+          messageId: "msg-1",
         },
         {
           id: 2,
           userId: 1,
           invoiceId: 100,
-          recipientEmail: 'client@example.com',
-          subject: 'Payment Reminder',
-          emailType: 'reminder',
+          recipientEmail: "client@example.com",
+          subject: "Payment Reminder",
+          emailType: "reminder",
           sentAt: new Date(),
           success: true,
-          messageId: 'msg-2',
+          messageId: "msg-2",
         },
       ];
 
@@ -147,51 +147,51 @@ describe('Email Logging System', () => {
       const result = await db.getEmailLogByInvoiceId(100);
 
       expect(result).toHaveLength(2);
-      expect(result[0].emailType).toBe('invoice');
-      expect(result[1].emailType).toBe('reminder');
+      expect(result[0].emailType).toBe("invoice");
+      expect(result[1].emailType).toBe("reminder");
     });
 
-    it('should retrieve email log by Resend message ID', async () => {
+    it("should retrieve email log by Resend message ID", async () => {
       const mockLog = {
         id: 1,
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Invoice INV-2026-0001',
-        emailType: 'invoice',
+        recipientEmail: "client@example.com",
+        subject: "Invoice INV-2026-0001",
+        emailType: "invoice",
         sentAt: new Date(),
         success: true,
-        messageId: 'resend-msg-123',
-        deliveryStatus: 'sent',
+        messageId: "resend-msg-123",
+        deliveryStatus: "sent",
       };
 
       vi.mocked(db.getEmailLogByMessageId).mockResolvedValue(mockLog);
 
-      const result = await db.getEmailLogByMessageId('resend-msg-123');
+      const result = await db.getEmailLogByMessageId("resend-msg-123");
 
       expect(result).not.toBeNull();
-      expect(result?.messageId).toBe('resend-msg-123');
+      expect(result?.messageId).toBe("resend-msg-123");
     });
   });
 
-  describe('Email Delivery Status Updates', () => {
-    it('should update delivery status to delivered', async () => {
+  describe("Email Delivery Status Updates", () => {
+    it("should update delivery status to delivered", async () => {
       await db.updateEmailLogDelivery(1, {
-        deliveryStatus: 'delivered',
+        deliveryStatus: "delivered",
         deliveredAt: new Date(),
       });
 
       expect(db.updateEmailLogDelivery).toHaveBeenCalledWith(
         1,
         expect.objectContaining({
-          deliveryStatus: 'delivered',
+          deliveryStatus: "delivered",
         })
       );
     });
 
-    it('should update delivery status to opened with count', async () => {
+    it("should update delivery status to opened with count", async () => {
       await db.updateEmailLogDelivery(1, {
-        deliveryStatus: 'opened',
+        deliveryStatus: "opened",
         openedAt: new Date(),
         openCount: 1,
       });
@@ -199,46 +199,46 @@ describe('Email Logging System', () => {
       expect(db.updateEmailLogDelivery).toHaveBeenCalledWith(
         1,
         expect.objectContaining({
-          deliveryStatus: 'opened',
+          deliveryStatus: "opened",
           openCount: 1,
         })
       );
     });
 
-    it('should update delivery status to bounced with type', async () => {
+    it("should update delivery status to bounced with type", async () => {
       await db.updateEmailLogDelivery(1, {
-        deliveryStatus: 'bounced',
+        deliveryStatus: "bounced",
         bouncedAt: new Date(),
-        bounceType: 'hard',
+        bounceType: "hard",
       });
 
       expect(db.updateEmailLogDelivery).toHaveBeenCalledWith(
         1,
         expect.objectContaining({
-          deliveryStatus: 'bounced',
-          bounceType: 'hard',
+          deliveryStatus: "bounced",
+          bounceType: "hard",
         })
       );
     });
 
-    it('should update message ID after sending', async () => {
-      await db.updateEmailLogMessageId(1, 'new-resend-msg-id');
+    it("should update message ID after sending", async () => {
+      await db.updateEmailLogMessageId(1, "new-resend-msg-id");
 
       expect(db.updateEmailLogMessageId).toHaveBeenCalledWith(
         1,
-        'new-resend-msg-id'
+        "new-resend-msg-id"
       );
     });
   });
 
-  describe('Email Types', () => {
-    it('should support invoice email type', async () => {
+  describe("Email Types", () => {
+    it("should support invoice email type", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Invoice',
-        emailType: 'invoice' as const,
+        recipientEmail: "client@example.com",
+        subject: "Invoice",
+        emailType: "invoice" as const,
         success: true,
       };
 
@@ -246,13 +246,13 @@ describe('Email Logging System', () => {
       expect(db.logEmail).toHaveBeenCalled();
     });
 
-    it('should support reminder email type', async () => {
+    it("should support reminder email type", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Reminder',
-        emailType: 'reminder' as const,
+        recipientEmail: "client@example.com",
+        subject: "Reminder",
+        emailType: "reminder" as const,
         success: true,
       };
 
@@ -260,13 +260,13 @@ describe('Email Logging System', () => {
       expect(db.logEmail).toHaveBeenCalled();
     });
 
-    it('should support receipt email type', async () => {
+    it("should support receipt email type", async () => {
       const emailData = {
         userId: 1,
         invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Receipt',
-        emailType: 'receipt' as const,
+        recipientEmail: "client@example.com",
+        subject: "Receipt",
+        emailType: "receipt" as const,
         success: true,
       };
 
@@ -275,10 +275,18 @@ describe('Email Logging System', () => {
     });
   });
 
-  describe('Delivery Status Types', () => {
-    const statuses = ['sent', 'delivered', 'opened', 'clicked', 'bounced', 'complained', 'failed'] as const;
+  describe("Delivery Status Types", () => {
+    const statuses = [
+      "sent",
+      "delivered",
+      "opened",
+      "clicked",
+      "bounced",
+      "complained",
+      "failed",
+    ] as const;
 
-    statuses.forEach((status) => {
+    statuses.forEach(status => {
       it(`should support ${status} delivery status`, async () => {
         await db.updateEmailLogDelivery(1, {
           deliveryStatus: status,
@@ -294,21 +302,23 @@ describe('Email Logging System', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle database errors gracefully', async () => {
-      vi.mocked(db.logEmail).mockRejectedValueOnce(new Error('Database error'));
+  describe("Error Handling", () => {
+    it("should handle database errors gracefully", async () => {
+      vi.mocked(db.logEmail).mockRejectedValueOnce(new Error("Database error"));
 
-      await expect(db.logEmail({
-        userId: 1,
-        invoiceId: 100,
-        recipientEmail: 'client@example.com',
-        subject: 'Test',
-        emailType: 'invoice',
-        success: true,
-      })).rejects.toThrow('Database error');
+      await expect(
+        db.logEmail({
+          userId: 1,
+          invoiceId: 100,
+          recipientEmail: "client@example.com",
+          subject: "Test",
+          emailType: "invoice",
+          success: true,
+        })
+      ).rejects.toThrow("Database error");
     });
 
-    it('should return empty array when no logs found', async () => {
+    it("should return empty array when no logs found", async () => {
       vi.mocked(db.getEmailLogByInvoiceId).mockResolvedValue([]);
 
       const result = await db.getEmailLogByInvoiceId(999);
@@ -316,28 +326,28 @@ describe('Email Logging System', () => {
       expect(result).toEqual([]);
     });
 
-    it('should return null when message ID not found', async () => {
+    it("should return null when message ID not found", async () => {
       vi.mocked(db.getEmailLogByMessageId).mockResolvedValue(null);
 
-      const result = await db.getEmailLogByMessageId('non-existent-id');
+      const result = await db.getEmailLogByMessageId("non-existent-id");
 
       expect(result).toBeNull();
     });
   });
 });
 
-describe('Crypto Payment Confirmation Email', () => {
-  it('should include crypto payment details in email', () => {
+describe("Crypto Payment Confirmation Email", () => {
+  it("should include crypto payment details in email", () => {
     // Test that the payment method includes crypto currency
     const paymentMethod = `Crypto (BTC)`;
-    expect(paymentMethod).toContain('Crypto');
-    expect(paymentMethod).toContain('BTC');
+    expect(paymentMethod).toContain("Crypto");
+    expect(paymentMethod).toContain("BTC");
   });
 
-  it('should format crypto payment method correctly', () => {
-    const currencies = ['BTC', 'ETH', 'USDT', 'USDC', 'LTC'];
-    
-    currencies.forEach((currency) => {
+  it("should format crypto payment method correctly", () => {
+    const currencies = ["BTC", "ETH", "USDT", "USDC", "LTC"];
+
+    currencies.forEach(currency => {
       const paymentMethod = `Crypto (${currency.toUpperCase()})`;
       expect(paymentMethod).toMatch(/^Crypto \([A-Z]+\)$/);
     });

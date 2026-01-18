@@ -37,7 +37,7 @@ export function AnalyticsDateRangeFilter({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {DATE_RANGES.map((range) => (
+            {DATE_RANGES.map(range => (
               <SelectItem key={range.value} value={range.value}>
                 {range.label}
               </SelectItem>
@@ -48,7 +48,7 @@ export function AnalyticsDateRangeFilter({
 
       {/* Desktop: Button group */}
       <div className="hidden md:flex items-center gap-2 bg-muted p-1 rounded-lg">
-        {DATE_RANGES.map((range) => (
+        {DATE_RANGES.map(range => (
           <Button
             key={range.value}
             variant={value === range.value ? "default" : "ghost"}

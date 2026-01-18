@@ -1,6 +1,6 @@
 /**
  * Invoice List Skeleton
- * 
+ *
  * Provides loading skeleton for the invoices table/list view
  * with both desktop table and mobile card layouts.
  */
@@ -31,12 +31,12 @@ function InvoiceTableSkeleton({ rows = 15 }: InvoiceListSkeletonProps) {
         <Skeleton className="h-4 w-14" />
         <Skeleton className="h-4 w-8" />
       </div>
-      
+
       {/* Table Rows */}
       <div className="divide-y divide-border">
         {Array.from({ length: rows }).map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={i}
             className="grid grid-cols-[auto_minmax(100px,1fr)_minmax(120px,1fr)_100px_100px_100px_80px_80px_auto] gap-4 px-4 py-4 items-center"
           >
             {/* Checkbox */}
@@ -101,7 +101,7 @@ export function InvoiceListSkeleton({ rows = 15 }: InvoiceListSkeletonProps) {
       <div className="hidden md:block">
         <InvoiceTableSkeleton rows={rows} />
       </div>
-      
+
       {/* Mobile Card View */}
       <div className="md:hidden space-y-3">
         {Array.from({ length: Math.min(rows, 8) }).map((_, i) => (

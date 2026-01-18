@@ -389,7 +389,10 @@ export default function InvoiceTemplates() {
                                 setIsEditing(true);
                               }}
                             >
-                              <Edit className="h-3 w-3 mr-1" aria-hidden="true" />
+                              <Edit
+                                className="h-3 w-3 mr-1"
+                                aria-hidden="true"
+                              />
                               Edit
                             </Button>
                             {!template.isDefault && (
@@ -401,7 +404,10 @@ export default function InvoiceTemplates() {
                                   onClick={() => handleSetDefault(template.id)}
                                   aria-label={`Set ${template.name} as default`}
                                 >
-                                  <Star className="h-3 w-3" aria-hidden="true" />
+                                  <Star
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
                                 </Button>
                                 <Button
                                   size="sm"
@@ -412,7 +418,10 @@ export default function InvoiceTemplates() {
                                   }
                                   aria-label={`Delete ${template.name}`}
                                 >
-                                  <Trash2 className="h-3 w-3" aria-hidden="true" />
+                                  <Trash2
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
                                 </Button>
                               </>
                             )}

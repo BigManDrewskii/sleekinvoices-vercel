@@ -27,7 +27,7 @@ describe("Brand Asset System", () => {
 
     it("should have SVG fallback for all variants", () => {
       const variants = ["wide", "compact", "monogram"];
-      variants.forEach((variant) => {
+      variants.forEach(variant => {
         expect(variant).toBeDefined();
       });
     });
@@ -136,7 +136,7 @@ describe("Brand Asset System", () => {
     it("should use monogram for mobile (< 900px)", () => {
       const mobileBreakpoint = 900;
       const screenWidth = 320;
-      
+
       const variant = screenWidth < mobileBreakpoint ? "monogram" : "wide";
       expect(variant).toBe("monogram");
     });
@@ -144,7 +144,7 @@ describe("Brand Asset System", () => {
     it("should use monogram for tablet (< 900px)", () => {
       const tabletBreakpoint = 900;
       const screenWidth = 860;
-      
+
       const variant = screenWidth < tabletBreakpoint ? "monogram" : "wide";
       expect(variant).toBe("monogram");
     });
@@ -152,7 +152,7 @@ describe("Brand Asset System", () => {
     it("should use wide for desktop (>= 900px)", () => {
       const desktopBreakpoint = 900;
       const screenWidth = 1280;
-      
+
       const variant = screenWidth >= desktopBreakpoint ? "wide" : "monogram";
       expect(variant).toBe("wide");
     });
@@ -160,27 +160,23 @@ describe("Brand Asset System", () => {
     it("should handle edge case at breakpoint (899px)", () => {
       const screenWidth = 899;
       const variant = screenWidth < 900 ? "monogram" : "wide";
-      
+
       expect(variant).toBe("monogram");
     });
 
     it("should handle edge case at breakpoint (900px)", () => {
       const screenWidth = 900;
       const variant = screenWidth < 900 ? "monogram" : "wide";
-      
+
       expect(variant).toBe("wide");
     });
   });
 
   describe("Logo Path Structure", () => {
     it("should organize logos in subdirectories", () => {
-      const paths = [
-        "/logos/wide/",
-        "/logos/compact/",
-        "/logos/monogram/",
-      ];
-      
-      paths.forEach((path) => {
+      const paths = ["/logos/wide/", "/logos/compact/", "/logos/monogram/"];
+
+      paths.forEach(path => {
         expect(path).toContain("/logos/");
       });
     });
@@ -189,7 +185,7 @@ describe("Brand Asset System", () => {
       const wideLogoName = "SleekInvoices-Logo-Wide";
       const compactLogoName = "SleekInvoices-Logo-Compact";
       const monogramLogoName = "SleekInvoices-Monogram-White";
-      
+
       expect(wideLogoName).toContain("SleekInvoices");
       expect(compactLogoName).toContain("SleekInvoices");
       expect(monogramLogoName).toContain("SleekInvoices");
@@ -197,16 +193,16 @@ describe("Brand Asset System", () => {
 
     it("should use @2x and @3x naming for high-DPI variants", () => {
       const variants = ["@2x", "@3x"];
-      
-      variants.forEach((variant) => {
+
+      variants.forEach(variant => {
         expect(variant).toMatch(/@\dx/);
       });
     });
 
     it("should support SVG and PNG formats", () => {
       const formats = [".svg", ".png"];
-      
-      formats.forEach((format) => {
+
+      formats.forEach(format => {
         expect([".svg", ".png"]).toContain(format);
       });
     });
@@ -219,7 +215,7 @@ describe("Brand Asset System", () => {
         /logos/wide/SleekInvoices-Logo-Wide@2x.png 2x,
         /logos/wide/SleekInvoices-Logo-Wide@3x.png 3x
       `.trim();
-      
+
       expect(srcset).toContain("1x");
       expect(srcset).toContain("2x");
       expect(srcset).toContain("3x");
@@ -228,8 +224,8 @@ describe("Brand Asset System", () => {
     it("should include all pixel density variants", () => {
       const densities = ["1x", "2x", "3x"];
       const srcset = "1x, 2x, 3x";
-      
-      densities.forEach((density) => {
+
+      densities.forEach(density => {
         expect(srcset).toContain(density);
       });
     });
@@ -237,7 +233,7 @@ describe("Brand Asset System", () => {
     it("should have correct format for srcset", () => {
       const srcset = "/image.png 1x, /image@2x.png 2x";
       const parts = srcset.split(",");
-      
+
       expect(parts).toHaveLength(2);
     });
   });
@@ -277,8 +273,8 @@ describe("Brand Asset System", () => {
 
     it("should include Android icons in manifest", () => {
       const androidIcons = ["192x192", "512x512"];
-      
-      androidIcons.forEach((size) => {
+
+      androidIcons.forEach(size => {
         expect(size).toMatch(/\d+x\d+/);
       });
     });
@@ -289,7 +285,12 @@ describe("Brand Asset System", () => {
     });
 
     it("should support display mode", () => {
-      const displayModes = ["standalone", "fullscreen", "minimal-ui", "browser"];
+      const displayModes = [
+        "standalone",
+        "fullscreen",
+        "minimal-ui",
+        "browser",
+      ];
       expect(displayModes).toContain("standalone");
     });
   });
@@ -335,9 +336,10 @@ describe("Brand Asset System", () => {
     it("should update variant on screen width change", () => {
       const screenWidths = [320, 768, 1280];
       const expectedVariants = ["monogram", "compact", "wide"];
-      
+
       screenWidths.forEach((width, index) => {
-        const variant = width < 640 ? "monogram" : width < 1024 ? "compact" : "wide";
+        const variant =
+          width < 640 ? "monogram" : width < 1024 ? "compact" : "wide";
         expect(variant).toBe(expectedVariants[index]);
       });
     });
@@ -350,7 +352,7 @@ describe("Brand Asset System", () => {
     it("should display brand name on desktop with wide logo", () => {
       const showBrand = true;
       const variant = "wide";
-      
+
       const shouldShow = showBrand && variant === "wide";
       expect(shouldShow).toBe(true);
     });
@@ -359,14 +361,14 @@ describe("Brand Asset System", () => {
   describe("Brand Consistency", () => {
     it("should use consistent brand name across all assets", () => {
       const brandName = "SleekInvoices";
-      
+
       const assets = [
         "SleekInvoices-Logo-Wide",
         "SleekInvoices-Logo-Compact",
         "SleekInvoices-Monogram-White",
       ];
-      
-      assets.forEach((asset) => {
+
+      assets.forEach(asset => {
         expect(asset).toContain(brandName);
       });
     });

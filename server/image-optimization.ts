@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+import sharp from "sharp";
 
 /**
  * Image optimization configuration
@@ -6,18 +6,18 @@ import sharp from 'sharp';
 export const IMAGE_OPTIMIZATION_CONFIG = {
   // Maximum file size in bytes (5MB)
   MAX_FILE_SIZE: 5 * 1024 * 1024,
-  
+
   // Logo dimensions
   MAX_WIDTH: 2000,
   MAX_HEIGHT: 2000,
-  
+
   // Quality settings for different formats
   WEBP_QUALITY: 80,
   JPEG_QUALITY: 85,
   PNG_COMPRESSION: 9,
-  
+
   // Supported formats
-  SUPPORTED_FORMATS: ['png', 'jpg', 'jpeg', 'webp', 'svg'],
+  SUPPORTED_FORMATS: ["png", "jpg", "jpeg", "webp", "svg"],
 };
 
 /**
@@ -25,32 +25,45 @@ export const IMAGE_OPTIMIZATION_CONFIG = {
  */
 export function detectImageFormat(buffer: Buffer): string | null {
   // Check for PNG signature
-  if (buffer.length >= 8 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47) {
-    return 'png';
+  if (
+    buffer.length >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return "png";
   }
-  
+
   // Check for JPEG signature
   if (buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xd8) {
-    return 'jpeg';
+    return "jpeg";
   }
-  
+
   // Check for WebP signature
-  if (buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP') {
-    return 'webp';
+  if (
+    buffer.length >= 12 &&
+    buffer.toString("ascii", 0, 4) === "RIFF" &&
+    buffer.toString("ascii", 8, 12) === "WEBP"
+  ) {
+    return "webp";
   }
-  
+
   // Check for SVG signature (text-based)
-  if (buffer.toString('utf-8', 0, 100).includes('<svg')) {
-    return 'svg';
+  if (buffer.toString("utf-8", 0, 100).includes("<svg")) {
+    return "svg";
   }
-  
+
   return null;
 }
 
 /**
  * Validates image file
  */
-export function validateImageFile(buffer: Buffer, filename: string): { valid: boolean; error?: string } {
+export function validateImageFile(
+  buffer: Buffer,
+  filename: string
+): { valid: boolean; error?: string } {
   // Check file size
   if (buffer.length > IMAGE_OPTIMIZATION_CONFIG.MAX_FILE_SIZE) {
     return {
@@ -58,25 +71,25 @@ export function validateImageFile(buffer: Buffer, filename: string): { valid: bo
       error: `File size exceeds maximum of ${IMAGE_OPTIMIZATION_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB`,
     };
   }
-  
+
   // Detect format
   const format = detectImageFormat(buffer);
   if (!format) {
     return {
       valid: false,
-      error: 'Unsupported image format. Please use PNG, JPG, WebP, or SVG.',
+      error: "Unsupported image format. Please use PNG, JPG, WebP, or SVG.",
     };
   }
-  
+
   // Check file extension matches detected format
-  const ext = filename.split('.').pop()?.toLowerCase();
+  const ext = filename.split(".").pop()?.toLowerCase();
   if (ext && !IMAGE_OPTIMIZATION_CONFIG.SUPPORTED_FORMATS.includes(ext)) {
     return {
       valid: false,
       error: `Unsupported file extension. Please use PNG, JPG, WebP, or SVG.`,
     };
   }
-  
+
   return { valid: true };
 }
 
@@ -86,12 +99,12 @@ export function validateImageFile(buffer: Buffer, filename: string): { valid: bo
 export async function optimizePNG(buffer: Buffer): Promise<Buffer> {
   try {
     return await sharp(buffer)
-      .png({ 
+      .png({
         compressionLevel: IMAGE_OPTIMIZATION_CONFIG.PNG_COMPRESSION,
       })
       .toBuffer();
   } catch (error) {
-    console.error('[Image Optimization] PNG optimization failed:', error);
+    console.error("[Image Optimization] PNG optimization failed:", error);
     // Return original buffer if optimization fails
     return buffer;
   }
@@ -103,14 +116,14 @@ export async function optimizePNG(buffer: Buffer): Promise<Buffer> {
 export async function optimizeJPEG(buffer: Buffer): Promise<Buffer> {
   try {
     return await sharp(buffer)
-      .jpeg({ 
+      .jpeg({
         quality: IMAGE_OPTIMIZATION_CONFIG.JPEG_QUALITY,
         progressive: true,
         mozjpeg: true,
       })
       .toBuffer();
   } catch (error) {
-    console.error('[Image Optimization] JPEG optimization failed:', error);
+    console.error("[Image Optimization] JPEG optimization failed:", error);
     // Return original buffer if optimization fails
     return buffer;
   }
@@ -125,7 +138,7 @@ export async function convertToWebP(buffer: Buffer): Promise<Buffer> {
       .webp({ quality: IMAGE_OPTIMIZATION_CONFIG.WEBP_QUALITY })
       .toBuffer();
   } catch (error) {
-    console.error('[Image Optimization] WebP conversion failed:', error);
+    console.error("[Image Optimization] WebP conversion failed:", error);
     // Return original buffer if conversion fails
     return buffer;
   }
@@ -143,7 +156,10 @@ export async function optimizeSVG(buffer: Buffer): Promise<Buffer> {
  * Main image optimization function
  * Optimizes image based on format and returns optimized buffer
  */
-export async function optimizeImage(buffer: Buffer, filename: string): Promise<{
+export async function optimizeImage(
+  buffer: Buffer,
+  filename: string
+): Promise<{
   buffer: Buffer;
   format: string;
   originalSize: number;
@@ -153,40 +169,40 @@ export async function optimizeImage(buffer: Buffer, filename: string): Promise<{
   // Validate file
   const validation = validateImageFile(buffer, filename);
   if (!validation.valid) {
-    throw new Error(validation.error || 'Invalid image file');
+    throw new Error(validation.error || "Invalid image file");
   }
-  
+
   const format = detectImageFormat(buffer);
   if (!format) {
-    throw new Error('Could not detect image format');
+    throw new Error("Could not detect image format");
   }
-  
+
   const originalSize = buffer.length;
   let optimizedBuffer: Buffer;
-  
+
   // Optimize based on format
   switch (format.toLowerCase()) {
-    case 'png':
+    case "png":
       optimizedBuffer = await optimizePNG(buffer);
       break;
-    case 'jpeg':
-    case 'jpg':
+    case "jpeg":
+    case "jpg":
       optimizedBuffer = await optimizeJPEG(buffer);
       break;
-    case 'webp':
+    case "webp":
       // WebP is already optimized, return as-is
       optimizedBuffer = buffer;
       break;
-    case 'svg':
+    case "svg":
       optimizedBuffer = await optimizeSVG(buffer);
       break;
     default:
       throw new Error(`Unsupported format: ${format}`);
   }
-  
+
   const optimizedSize = optimizedBuffer.length;
   const compressionRatio = (1 - optimizedSize / originalSize) * 100;
-  
+
   return {
     buffer: optimizedBuffer,
     format,
@@ -199,10 +215,13 @@ export async function optimizeImage(buffer: Buffer, filename: string): Promise<{
 /**
  * Generates optimized versions of an image (WebP primary, original as fallback)
  */
-export async function generateOptimizedVersions(buffer: Buffer, filename: string): Promise<{
+export async function generateOptimizedVersions(
+  buffer: Buffer,
+  filename: string
+): Promise<{
   primary: {
     buffer: Buffer;
-    format: 'webp';
+    format: "webp";
     size: number;
   };
   fallback: {
@@ -215,25 +234,28 @@ export async function generateOptimizedVersions(buffer: Buffer, filename: string
 }> {
   // Validate and optimize original
   const optimized = await optimizeImage(buffer, filename);
-  
+
   // Generate WebP version
   let webpBuffer: Buffer;
   try {
     webpBuffer = await convertToWebP(optimized.buffer);
   } catch (error) {
-    console.error('[Image Optimization] Failed to generate WebP version:', error);
+    console.error(
+      "[Image Optimization] Failed to generate WebP version:",
+      error
+    );
     webpBuffer = optimized.buffer;
   }
-  
+
   const originalSize = buffer.length;
   const webpSize = webpBuffer.length;
   const fallbackSize = optimized.buffer.length;
   const totalSavings = originalSize - Math.min(webpSize, fallbackSize);
-  
+
   return {
     primary: {
       buffer: webpBuffer,
-      format: 'webp',
+      format: "webp",
       size: webpSize,
     },
     fallback: {
@@ -251,16 +273,16 @@ export async function generateOptimizedVersions(buffer: Buffer, filename: string
  */
 export function getFileExtension(format: string): string {
   switch (format.toLowerCase()) {
-    case 'jpeg':
-    case 'jpg':
-      return 'jpg';
-    case 'png':
-      return 'png';
-    case 'webp':
-      return 'webp';
-    case 'svg':
-      return 'svg';
+    case "jpeg":
+    case "jpg":
+      return "jpg";
+    case "png":
+      return "png";
+    case "webp":
+      return "webp";
+    case "svg":
+      return "svg";
     default:
-      return 'png';
+      return "png";
   }
 }

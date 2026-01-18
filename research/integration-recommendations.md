@@ -17,11 +17,11 @@ SleekInvoices currently integrates with Stripe, which provides a solid foundatio
 
 ### 1.1 Merchant of Record Solutions
 
-| Platform | Key Features | Pricing | Best For |
-|----------|-------------|---------|----------|
-| **Paddle** | Tax compliance, fraud protection, subscription management, global payments | 5% + $0.50 per transaction | SaaS businesses selling globally |
-| **Lemon Squeezy** | 21+ payment methods, PayPal subscriptions, affiliate system, MoR | 5% + $0.50 per transaction | Digital products and lightweight SaaS |
-| **FastSpring** | Global tax handling, localized checkout, subscription billing | Custom pricing | Software and digital goods |
+| Platform          | Key Features                                                               | Pricing                    | Best For                              |
+| ----------------- | -------------------------------------------------------------------------- | -------------------------- | ------------------------------------- |
+| **Paddle**        | Tax compliance, fraud protection, subscription management, global payments | 5% + $0.50 per transaction | SaaS businesses selling globally      |
+| **Lemon Squeezy** | 21+ payment methods, PayPal subscriptions, affiliate system, MoR           | 5% + $0.50 per transaction | Digital products and lightweight SaaS |
+| **FastSpring**    | Global tax handling, localized checkout, subscription billing              | Custom pricing             | Software and digital goods            |
 
 **Paddle** stands out as a particularly strong option for businesses that want to offload tax compliance entirely. As a Merchant of Record, Paddle handles all sales tax calculation, collection, and remittance globally—a significant operational burden lifted from SleekInvoices users [1]. The platform has processed over 122 million transactions and remitted $89 million in sales taxes [2].
 
@@ -31,12 +31,12 @@ SleekInvoices currently integrates with Stripe, which provides a solid foundatio
 
 The cryptocurrency payment market is projected to reach $2.4 billion by 2033 [4], making this an increasingly relevant integration:
 
-| Provider | Supported Coins | Settlement Options | Integration Complexity |
-|----------|----------------|-------------------|----------------------|
-| **NOWPayments** | 300+ cryptocurrencies | Crypto or fiat | Low (API + widgets) |
-| **BitPay** | BTC, ETH, major stablecoins | USD, EUR, or crypto | Medium |
-| **CoinGate** | 70+ cryptocurrencies | Fiat or crypto | Low |
-| **Triple-A** | Major crypto + stablecoins | Local currencies | Medium |
+| Provider        | Supported Coins             | Settlement Options  | Integration Complexity |
+| --------------- | --------------------------- | ------------------- | ---------------------- |
+| **NOWPayments** | 300+ cryptocurrencies       | Crypto or fiat      | Low (API + widgets)    |
+| **BitPay**      | BTC, ETH, major stablecoins | USD, EUR, or crypto | Medium                 |
+| **CoinGate**    | 70+ cryptocurrencies        | Fiat or crypto      | Low                    |
+| **Triple-A**    | Major crypto + stablecoins  | Local currencies    | Medium                 |
 
 **Recommendation:** NOWPayments (already in your environment variables) offers the broadest cryptocurrency support with straightforward API integration. This positions SleekInvoices for the growing segment of crypto-native businesses and international clients who prefer stablecoin payments.
 
@@ -67,18 +67,19 @@ Whop has emerged as a leading platform for digital businesses, with over $2.3 bi
 3. **Community Features** - Create a SleekInvoices community on Whop where freelancers share invoicing tips, templates, and best practices.
 
 **Technical Integration:** Whop provides a comprehensive API and developer documentation [6] that would allow deep integration with SleekInvoices, including:
+
 - Webhook notifications for purchases
 - User authentication via OAuth
 - Product and subscription management
 
 ### 2.2 Affiliate and Referral Program Platforms
 
-| Platform | Focus | Key Features | Pricing |
-|----------|-------|--------------|---------|
-| **PartnerStack** | B2B SaaS | Marketplace, fraud detection, automated payouts | Custom |
-| **GrowSurf** | Product-led growth | In-app referrals, viral loops | From $200/mo |
-| **ReferralCandy** | E-commerce | Automated rewards, integrations | From $59/mo |
-| **Viral Loops** | Startups | Pre-launch campaigns, milestone rewards | From $49/mo |
+| Platform          | Focus              | Key Features                                    | Pricing      |
+| ----------------- | ------------------ | ----------------------------------------------- | ------------ |
+| **PartnerStack**  | B2B SaaS           | Marketplace, fraud detection, automated payouts | Custom       |
+| **GrowSurf**      | Product-led growth | In-app referrals, viral loops                   | From $200/mo |
+| **ReferralCandy** | E-commerce         | Automated rewards, integrations                 | From $59/mo  |
+| **Viral Loops**   | Startups           | Pre-launch campaigns, milestone rewards         | From $49/mo  |
 
 **PartnerStack** is particularly well-suited for SaaS applications like SleekInvoices. Their marketplace connects you with established affiliates, and their fraud detection helps maintain program integrity [7].
 
@@ -90,14 +91,15 @@ Connecting SleekInvoices to popular accounting platforms would significantly enh
 
 ### 3.1 Priority Integrations
 
-| Platform | Market Share | API Quality | Integration Value |
-|----------|-------------|-------------|-------------------|
-| **QuickBooks Online** | 80%+ of small business accounting | Excellent REST API | Very High |
-| **Xero** | Strong in UK, Australia, NZ | Modern API, webhooks | High |
-| **FreshBooks** | Popular with freelancers | Good API | Medium-High |
-| **Wave** | Free tier users | Limited API | Medium |
+| Platform              | Market Share                      | API Quality          | Integration Value |
+| --------------------- | --------------------------------- | -------------------- | ----------------- |
+| **QuickBooks Online** | 80%+ of small business accounting | Excellent REST API   | Very High         |
+| **Xero**              | Strong in UK, Australia, NZ       | Modern API, webhooks | High              |
+| **FreshBooks**        | Popular with freelancers          | Good API             | Medium-High       |
+| **Wave**              | Free tier users                   | Limited API          | Medium            |
 
 **QuickBooks Online** should be the first priority. The API allows creating invoices, syncing customers, and reconciling payments [8]. This integration would enable:
+
 - Automatic invoice sync to QuickBooks
 - Customer data import
 - Payment reconciliation
@@ -123,12 +125,12 @@ The invoice automation market is rapidly evolving with AI capabilities. Key tren
 
 ### 4.1 AI-Powered Features
 
-| Feature | Description | Implementation |
-|---------|-------------|----------------|
-| **Smart Data Extraction** | OCR + NLP for parsing received invoices | OpenAI Vision API or specialized services |
-| **Predictive Analytics** | Payment timing predictions, cash flow forecasting | Custom ML models |
-| **Automated Follow-ups** | AI-generated payment reminder sequences | LLM integration (already available) |
-| **Fraud Detection** | Anomaly detection in invoice patterns | Rule-based + ML hybrid |
+| Feature                   | Description                                       | Implementation                            |
+| ------------------------- | ------------------------------------------------- | ----------------------------------------- |
+| **Smart Data Extraction** | OCR + NLP for parsing received invoices           | OpenAI Vision API or specialized services |
+| **Predictive Analytics**  | Payment timing predictions, cash flow forecasting | Custom ML models                          |
+| **Automated Follow-ups**  | AI-generated payment reminder sequences           | LLM integration (already available)       |
+| **Fraud Detection**       | Anomaly detection in invoice patterns             | Rule-based + ML hybrid                    |
 
 AI-driven invoice automation achieves 99% accuracy in data extraction and significantly reduces processing time [10]. SleekInvoices already has AI capabilities through the Magic Invoice feature—expanding this to include smart categorization, expense tracking suggestions, and automated bookkeeping recommendations would further differentiate the platform.
 
@@ -141,6 +143,7 @@ Integration with automation platforms extends SleekInvoices' capabilities:
 - **n8n** - Self-hosted automation option
 
 These integrations allow users to create custom workflows like:
+
 - Auto-create invoices from CRM deals
 - Sync paid invoices to project management tools
 - Trigger notifications in Slack/Teams
@@ -153,14 +156,15 @@ Combining invoicing with e-signatures creates a powerful workflow for service bu
 
 ### 5.1 E-Signature Providers
 
-| Provider | Pricing | API Quality | Invoice Integration |
-|----------|---------|-------------|-------------------|
-| **DocuSign** | From $10/mo | Enterprise-grade | Native billing API |
-| **PandaDoc** | From $19/mo | Modern, well-documented | Built-in payments |
-| **HelloSign** | From $15/mo | Simple, developer-friendly | Basic |
-| **SignNow** | From $8/mo | Good | Basic |
+| Provider      | Pricing     | API Quality                | Invoice Integration |
+| ------------- | ----------- | -------------------------- | ------------------- |
+| **DocuSign**  | From $10/mo | Enterprise-grade           | Native billing API  |
+| **PandaDoc**  | From $19/mo | Modern, well-documented    | Built-in payments   |
+| **HelloSign** | From $15/mo | Simple, developer-friendly | Basic               |
+| **SignNow**   | From $8/mo  | Good                       | Basic               |
 
 **PandaDoc** offers a particularly compelling integration opportunity as it already combines document signing with payment collection via Stripe [11]. This could enable a workflow where:
+
 1. User creates a proposal/contract in PandaDoc
 2. Client signs the document
 3. Invoice is automatically generated in SleekInvoices
@@ -174,27 +178,27 @@ Based on market alignment, implementation complexity, and user value, here is a 
 
 ### Phase 1: High-Impact, Lower Complexity (Q1 2026)
 
-| Integration | Effort | Impact | Priority |
-|-------------|--------|--------|----------|
-| QuickBooks Online | Medium | Very High | 1 |
-| Zapier | Low | High | 2 |
-| Cryptocurrency (NOWPayments) | Low | Medium | 3 |
+| Integration                  | Effort | Impact    | Priority |
+| ---------------------------- | ------ | --------- | -------- |
+| QuickBooks Online            | Medium | Very High | 1        |
+| Zapier                       | Low    | High      | 2        |
+| Cryptocurrency (NOWPayments) | Low    | Medium    | 3        |
 
 ### Phase 2: Strategic Differentiators (Q2 2026)
 
-| Integration | Effort | Impact | Priority |
-|-------------|--------|--------|----------|
-| Xero | Medium | High | 4 |
-| PartnerStack Affiliate Program | Medium | High | 5 |
-| Paddle (alternative MoR) | Medium | Medium-High | 6 |
+| Integration                    | Effort | Impact      | Priority |
+| ------------------------------ | ------ | ----------- | -------- |
+| Xero                           | Medium | High        | 4        |
+| PartnerStack Affiliate Program | Medium | High        | 5        |
+| Paddle (alternative MoR)       | Medium | Medium-High | 6        |
 
 ### Phase 3: Advanced Features (Q3-Q4 2026)
 
-| Integration | Effort | Impact | Priority |
-|-------------|--------|--------|----------|
-| Whop Marketplace | High | Medium-High | 7 |
-| PandaDoc E-Signatures | Medium | Medium | 8 |
-| B2B BNPL (Resolve) | High | Medium | 9 |
+| Integration           | Effort | Impact      | Priority |
+| --------------------- | ------ | ----------- | -------- |
+| Whop Marketplace      | High   | Medium-High | 7        |
+| PandaDoc E-Signatures | Medium | Medium      | 8        |
+| B2B BNPL (Resolve)    | High   | Medium      | 9        |
 
 ---
 

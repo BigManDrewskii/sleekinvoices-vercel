@@ -85,7 +85,11 @@ export default function Docs() {
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="gap-2"
           >
-            {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            {sidebarOpen ? (
+              <X className="h-4 w-4" />
+            ) : (
+              <Menu className="h-4 w-4" />
+            )}
             {sidebarOpen ? "Close" : "Browse"} Docs
           </Button>
           <span className="text-sm text-muted-foreground">
@@ -108,7 +112,7 @@ export default function Docs() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                 Documentation
               </p>
-              {sections.map((section) => {
+              {sections.map(section => {
                 const Icon = section.icon;
                 const isActive = section.id === activeSectionId;
                 return (
@@ -151,11 +155,13 @@ export default function Docs() {
             {/* Navigation between sections */}
             <div className="flex items-center justify-between mt-12 pt-6 border-t border-border">
               <div>
-                {sections.findIndex((s) => s.id === activeSectionId) > 0 && (
+                {sections.findIndex(s => s.id === activeSectionId) > 0 && (
                   <Button
                     variant="ghost"
                     onClick={() => {
-                      const currentIndex = sections.findIndex((s) => s.id === activeSectionId);
+                      const currentIndex = sections.findIndex(
+                        s => s.id === activeSectionId
+                      );
                       handleSectionClick(sections[currentIndex - 1].id);
                     }}
                   >
@@ -164,10 +170,13 @@ export default function Docs() {
                 )}
               </div>
               <div>
-                {sections.findIndex((s) => s.id === activeSectionId) < sections.length - 1 && (
+                {sections.findIndex(s => s.id === activeSectionId) <
+                  sections.length - 1 && (
                   <Button
                     onClick={() => {
-                      const currentIndex = sections.findIndex((s) => s.id === activeSectionId);
+                      const currentIndex = sections.findIndex(
+                        s => s.id === activeSectionId
+                      );
                       handleSectionClick(sections[currentIndex + 1].id);
                     }}
                   >

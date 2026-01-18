@@ -44,7 +44,14 @@ export const INVOICE_TEMPLATE_DEFAULTS = {
 
 export interface TemplatePreset {
   name: string;
-  templateType: "sleek" | "modern" | "classic" | "minimal" | "bold" | "professional" | "creative";
+  templateType:
+    | "sleek"
+    | "modern"
+    | "classic"
+    | "minimal"
+    | "bold"
+    | "professional"
+    | "creative";
   description: string;
   primaryColor: string;
   secondaryColor: string;
@@ -77,7 +84,8 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
   {
     name: "Sleek - Default",
     templateType: "sleek",
-    description: "A minimalist, professional invoice template that matches the SleekInvoices brand identity. Fully customizable with Google Fonts and brand colors.",
+    description:
+      "A minimalist, professional invoice template that matches the SleekInvoices brand identity. Fully customizable with Google Fonts and brand colors.",
     primaryColor: "#5f6fff",
     secondaryColor: "#1e293b",
     accentColor: "#10b981",

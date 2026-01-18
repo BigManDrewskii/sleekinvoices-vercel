@@ -28,7 +28,11 @@ type ProductSelectorProps = {
   className?: string;
 };
 
-export function ProductSelector({ onSelect, trigger, className }: ProductSelectorProps) {
+export function ProductSelector({
+  onSelect,
+  trigger,
+  className,
+}: ProductSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,7 +45,7 @@ export function ProductSelector({ onSelect, trigger, className }: ProductSelecto
   const incrementUsage = trpc.products.incrementUsage.useMutation();
 
   // Filter products by search query
-  const filteredProducts = products?.filter((product) => {
+  const filteredProducts = products?.filter(product => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -52,7 +56,9 @@ export function ProductSelector({ onSelect, trigger, className }: ProductSelecto
   });
 
   // Sort by usage count (most used first)
-  const sortedProducts = filteredProducts?.sort((a, b) => b.usageCount - a.usageCount);
+  const sortedProducts = filteredProducts?.sort(
+    (a, b) => b.usageCount - a.usageCount
+  );
 
   // Get top 3 most used products for quick access
   const frequentProducts = products?.slice(0, 3);
@@ -93,7 +99,7 @@ export function ProductSelector({ onSelect, trigger, className }: ProductSelecto
               ref={inputRef}
               placeholder="Search products..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               className="pl-9"
             />
           </div>
@@ -107,29 +113,31 @@ export function ProductSelector({ onSelect, trigger, className }: ProductSelecto
           ) : sortedProducts && sortedProducts.length > 0 ? (
             <div className="p-2">
               {/* Frequent products section */}
-              {!searchQuery && frequentProducts && frequentProducts.length > 0 && (
-                <div className="mb-2">
-                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground flex items-center gap-1">
-                    <Star className="h-3 w-3" />
-                    Frequently Used
+              {!searchQuery &&
+                frequentProducts &&
+                frequentProducts.length > 0 && (
+                  <div className="mb-2">
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground flex items-center gap-1">
+                      <Star className="h-3 w-3" />
+                      Frequently Used
+                    </div>
+                    {frequentProducts.map(product => (
+                      <ProductItem
+                        key={`frequent-${product.id}`}
+                        product={product}
+                        onSelect={handleSelect}
+                        highlight
+                      />
+                    ))}
+                    <div className="my-2 border-t" />
                   </div>
-                  {frequentProducts.map((product) => (
-                    <ProductItem
-                      key={`frequent-${product.id}`}
-                      product={product}
-                      onSelect={handleSelect}
-                      highlight
-                    />
-                  ))}
-                  <div className="my-2 border-t" />
-                </div>
-              )}
+                )}
 
               {/* All products */}
               <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                 {searchQuery ? "Search Results" : "All Products"}
               </div>
-              {sortedProducts.map((product) => (
+              {sortedProducts.map(product => (
                 <ProductItem
                   key={product.id}
                   product={product}

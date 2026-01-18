@@ -1,11 +1,4 @@
-import {
-  eq,
-  and,
-  desc,
-  sql,
-  gte,
-  inArray,
-} from "drizzle-orm";
+import { eq, and, desc, sql, gte, inArray } from "drizzle-orm";
 import type { InsertInvoice, Invoice } from "../../drizzle/schema";
 import {
   invoices,
@@ -231,9 +224,7 @@ export async function getNextInvoiceNumber(userId: number): Promise<string> {
 // PAYMENT HELPERS
 // ============================================================================
 
-async function getTotalPaidForInvoice(
-  invoiceId: number
-): Promise<number> {
+async function getTotalPaidForInvoice(invoiceId: number): Promise<number> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 

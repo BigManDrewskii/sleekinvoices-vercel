@@ -48,9 +48,10 @@ export async function chatWithAssistant(
   const systemPrompt = buildSystemPrompt(context);
 
   // Build messages array with conversation history
-  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
-    { role: "system", content: systemPrompt },
-  ];
+  const messages: Array<{
+    role: "system" | "user" | "assistant";
+    content: string;
+  }> = [{ role: "system", content: systemPrompt }];
 
   // Add conversation history (last 10 messages for context)
   if (context?.conversationHistory) {
@@ -90,8 +91,8 @@ export async function chatWithAssistant(
       typeof content === "string"
         ? content
         : Array.isArray(content)
-        ? content.find((c) => c.type === "text")?.text
-        : null;
+          ? content.find(c => c.type === "text")?.text
+          : null;
 
     if (!textContent) {
       throw new Error("No text content in response");
@@ -117,7 +118,8 @@ export async function chatWithAssistant(
     };
   } catch (error) {
     const latencyMs = Date.now() - startTime;
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     console.error("[AIAssistant] Error:", errorMessage, error);
 
     // Log failed attempt
@@ -135,7 +137,8 @@ export async function chatWithAssistant(
     return {
       success: false,
       content: "",
-      error: "I encountered an error processing your request. Please try again.",
+      error:
+        "I encountered an error processing your request. Please try again.",
     };
   }
 }
@@ -145,7 +148,7 @@ export async function chatWithAssistant(
  */
 function buildSystemPrompt(context?: ChatContext): string {
   const today = new Date().toISOString().split("T")[0];
-  
+
   let prompt = `You are a helpful AI assistant for SleekInvoices, a professional invoicing platform. Today's date is ${today}.
 
 Your role is to help users with:
@@ -189,7 +192,8 @@ IMPORTANT:
   // Add page context
   if (context?.currentPage) {
     const pageContextMap: Record<string, string> = {
-      "/dashboard": "The user is on the Dashboard, which shows an overview of their invoicing activity.",
+      "/dashboard":
+        "The user is on the Dashboard, which shows an overview of their invoicing activity.",
       "/invoices": "The user is viewing their Invoices list.",
       "/invoices/new": "The user is creating a new invoice.",
       "/clients": "The user is managing their Clients.",
@@ -197,17 +201,19 @@ IMPORTANT:
       "/expenses": "The user is managing Expenses.",
       "/settings": "The user is in Settings.",
     };
-    
-    const pageContext = pageContextMap[context.currentPage] || 
+
+    const pageContext =
+      pageContextMap[context.currentPage] ||
       `The user is on the ${context.currentPage} page.`;
-    
+
     prompt += `\n\nCurrent context: ${pageContext}`;
   }
 
   // Add business stats if available
   if (context?.stats) {
-    const { totalRevenue, outstandingBalance, totalInvoices, paidInvoices } = context.stats;
-    
+    const { totalRevenue, outstandingBalance, totalInvoices, paidInvoices } =
+      context.stats;
+
     prompt += `\n\nUser's business snapshot:`;
     if (totalRevenue !== undefined) {
       prompt += `\n- Total revenue: $${totalRevenue.toLocaleString()}`;

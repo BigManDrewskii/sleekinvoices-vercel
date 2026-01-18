@@ -7,7 +7,8 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   // Capitalize first letter only (not all uppercase)
-  const displayStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  const displayStatus =
+    status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 
   return (
     <span

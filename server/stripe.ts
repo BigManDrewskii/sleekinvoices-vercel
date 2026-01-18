@@ -1,14 +1,14 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
 let _stripe: Stripe | null = null;
 
 function getStripe(): Stripe {
   if (!_stripe) {
     if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+      throw new Error("STRIPE_SECRET_KEY is not set in environment variables");
     }
     _stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-12-15.clover',
+      apiVersion: "2025-12-15.clover",
       typescript: true,
     });
   }
@@ -18,13 +18,16 @@ function getStripe(): Stripe {
 /**
  * Create a Stripe customer for a user
  */
-export async function createStripeCustomer(email: string, name?: string): Promise<string> {
+export async function createStripeCustomer(
+  email: string,
+  name?: string
+): Promise<string> {
   const stripe = getStripe();
   const customer = await stripe.customers.create({
     email,
     name: name || undefined,
   });
-  
+
   return customer.id;
 }
 
@@ -37,10 +40,10 @@ export async function createPaymentLink(params: {
   description: string;
   metadata?: Record<string, string>;
 }): Promise<{ paymentLinkId: string; url: string }> {
-  const { amount, currency = 'usd', description, metadata } = params;
-  
+  const { amount, currency = "usd", description, metadata } = params;
+
   const stripe = getStripe();
-  
+
   // Create a price
   const price = await stripe.prices.create({
     unit_amount: Math.round(amount * 100), // Convert to cents
@@ -49,7 +52,7 @@ export async function createPaymentLink(params: {
       name: description,
     },
   });
-  
+
   // Create payment link
   const paymentLink = await stripe.paymentLinks.create({
     line_items: [
@@ -60,13 +63,14 @@ export async function createPaymentLink(params: {
     ],
     metadata: metadata || {},
     after_completion: {
-      type: 'hosted_confirmation',
+      type: "hosted_confirmation",
       hosted_confirmation: {
-        custom_message: 'Thank you for your payment! Your invoice has been marked as paid.',
+        custom_message:
+          "Thank you for your payment! Your invoice has been marked as paid.",
       },
     },
   });
-  
+
   return {
     paymentLinkId: paymentLink.id,
     url: paymentLink.url,
@@ -85,7 +89,7 @@ export async function createSubscriptionCheckout(params: {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
     customer: params.customerId,
-    mode: 'subscription',
+    mode: "subscription",
     line_items: [
       {
         price: params.priceId,
@@ -96,7 +100,7 @@ export async function createSubscriptionCheckout(params: {
     cancel_url: params.cancelUrl,
     allow_promotion_codes: true,
   });
-  
+
   return {
     sessionId: session.id,
     url: session.url!,
@@ -113,30 +117,32 @@ export async function createSubscriptionPrice(params: {
 }): Promise<string> {
   const { amount, productName, productDescription } = params;
   const stripe = getStripe();
-  
+
   // Create product
   const product = await stripe.products.create({
     name: productName,
     description: productDescription,
   });
-  
+
   // Create price
   const price = await stripe.prices.create({
     unit_amount: Math.round(amount * 100), // Convert to cents
-    currency: 'usd',
+    currency: "usd",
     recurring: {
-      interval: 'month',
+      interval: "month",
     },
     product: product.id,
   });
-  
+
   return price.id;
 }
 
 /**
  * Cancel a subscription
  */
-export async function cancelSubscription(subscriptionId: string): Promise<void> {
+export async function cancelSubscription(
+  subscriptionId: string
+): Promise<void> {
   const stripe = getStripe();
   await stripe.subscriptions.cancel(subscriptionId);
 }
@@ -144,7 +150,9 @@ export async function cancelSubscription(subscriptionId: string): Promise<void> 
 /**
  * Get subscription details
  */
-export async function getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+export async function getSubscription(
+  subscriptionId: string
+): Promise<Stripe.Subscription> {
   const stripe = getStripe();
   return await stripe.subscriptions.retrieve(subscriptionId);
 }
@@ -161,7 +169,7 @@ export async function createCustomerPortalSession(params: {
     customer: params.customerId,
     return_url: params.returnUrl,
   });
-  
+
   return session.url;
 }
 
@@ -182,20 +190,20 @@ export const CREDIT_PACKS = {
   starter: {
     credits: 25,
     price: 299, // $2.99 in cents
-    name: 'Starter Pack',
-    description: '25 AI credits',
+    name: "Starter Pack",
+    description: "25 AI credits",
   },
   standard: {
     credits: 100,
     price: 999, // $9.99 in cents
-    name: 'Standard Pack',
-    description: '100 AI credits',
+    name: "Standard Pack",
+    description: "100 AI credits",
   },
   pro_pack: {
     credits: 500,
     price: 3999, // $39.99 in cents
-    name: 'Pro Pack',
-    description: '500 AI credits',
+    name: "Pro Pack",
+    description: "500 AI credits",
   },
 } as const;
 
@@ -213,18 +221,18 @@ export async function createCreditPurchaseCheckout(params: {
 }): Promise<{ sessionId: string; url: string }> {
   const stripe = getStripe();
   const pack = CREDIT_PACKS[params.packType];
-  
+
   if (!pack) {
     throw new Error(`Invalid credit pack type: ${params.packType}`);
   }
-  
+
   const session = await stripe.checkout.sessions.create({
     customer: params.customerId,
-    mode: 'payment',
+    mode: "payment",
     line_items: [
       {
         price_data: {
-          currency: 'usd',
+          currency: "usd",
           unit_amount: pack.price,
           product_data: {
             name: pack.name,
@@ -235,7 +243,7 @@ export async function createCreditPurchaseCheckout(params: {
       },
     ],
     metadata: {
-      type: 'credit_purchase',
+      type: "credit_purchase",
       userId: params.userId.toString(),
       packType: params.packType,
       creditsAmount: pack.credits.toString(),
@@ -243,7 +251,7 @@ export async function createCreditPurchaseCheckout(params: {
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
   });
-  
+
   return {
     sessionId: session.id,
     url: session.url!,
@@ -254,46 +262,50 @@ export async function createCreditPurchaseCheckout(params: {
  * Sync user's subscription status from Stripe
  * Useful for manual sync when webhooks fail or for testing
  */
-export async function syncSubscriptionStatus(stripeCustomerId: string): Promise<{
-  status: 'free' | 'active' | 'canceled' | 'past_due';
+export async function syncSubscriptionStatus(
+  stripeCustomerId: string
+): Promise<{
+  status: "free" | "active" | "canceled" | "past_due";
   subscriptionId: string | null;
   currentPeriodEnd: Date | null;
 }> {
   const stripe = getStripe();
-  
+
   // Get all subscriptions for this customer
   const subscriptions = await stripe.subscriptions.list({
     customer: stripeCustomerId,
     limit: 1,
-    status: 'all',
+    status: "all",
   });
-  
+
   // If no subscriptions, return free status
   if (subscriptions.data.length === 0) {
     return {
-      status: 'free',
+      status: "free",
       subscriptionId: null,
       currentPeriodEnd: null,
     };
   }
-  
+
   // Get the most recent subscription
   const subscription = subscriptions.data[0];
-  
+
   // Map Stripe status to our status
-  let status: 'free' | 'active' | 'canceled' | 'past_due' = 'free';
-  
-  if (subscription.status === 'active') {
-    status = 'active';
-  } else if (subscription.status === 'canceled') {
-    status = 'canceled';
-  } else if (subscription.status === 'past_due') {
-    status = 'past_due';
+  let status: "free" | "active" | "canceled" | "past_due" = "free";
+
+  if (subscription.status === "active") {
+    status = "active";
+  } else if (subscription.status === "canceled") {
+    status = "canceled";
+  } else if (subscription.status === "past_due") {
+    status = "past_due";
   }
-  
+
   return {
     status,
     subscriptionId: subscription.id,
-    currentPeriodEnd: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : null,
+    currentPeriodEnd: (subscription as any).current_period_end
+      ? new Date((subscription as any).current_period_end * 1000)
+      : null,
   };
 }

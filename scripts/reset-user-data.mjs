@@ -2,9 +2,9 @@
  * User Data Reset Script
  * Clears all user-generated data while preserving the user account
  * Used for testing empty-state UI/UX behavior
- * 
+ *
  * Usage: node scripts/reset-user-data.mjs [--user-id=N] [--confirm]
- * 
+ *
  * WARNING: This will permanently delete:
  * - All invoices and line items
  * - All estimates and line items
@@ -15,20 +15,20 @@
  * - All email logs
  * - All recurring invoices
  * - All templates (except system defaults)
- * 
+ *
  * User account and subscription data will be preserved.
  */
 
-import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import readline from 'readline';
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import readline from "readline";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({ path: join(__dirname, '..', '.env') });
+dotenv.config({ path: join(__dirname, "..", ".env") });
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -36,10 +36,10 @@ let targetUserId = null;
 let confirmed = false;
 
 for (const arg of args) {
-  if (arg.startsWith('--user-id=')) {
-    targetUserId = parseInt(arg.split('=')[1], 10);
+  if (arg.startsWith("--user-id=")) {
+    targetUserId = parseInt(arg.split("=")[1], 10);
   }
-  if (arg === '--confirm') {
+  if (arg === "--confirm") {
     confirmed = true;
   }
 }
@@ -47,30 +47,32 @@ for (const arg of args) {
 async function promptConfirmation(message) {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
-  return new Promise((resolve) => {
-    rl.question(message, (answer) => {
+  return new Promise(resolve => {
+    rl.question(message, answer => {
       rl.close();
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
+      resolve(answer.toLowerCase() === "y" || answer.toLowerCase() === "yes");
     });
   });
 }
 
 async function resetUserData() {
   const connection = await mysql.createConnection(process.env.DATABASE_URL);
-  
-  console.log('🗑️  User Data Reset Script\n');
-  console.log('=' .repeat(60));
+
+  console.log("🗑️  User Data Reset Script\n");
+  console.log("=".repeat(60));
 
   try {
     // Get user ID
     let userId = targetUserId;
     if (!userId) {
-      const [users] = await connection.execute('SELECT id, name, email FROM users ORDER BY id LIMIT 1');
+      const [users] = await connection.execute(
+        "SELECT id, name, email FROM users ORDER BY id LIMIT 1"
+      );
       if (users.length === 0) {
-        console.log('❌ No users found in database.');
+        console.log("❌ No users found in database.");
         return;
       }
       userId = users[0].id;
@@ -81,24 +83,44 @@ async function resetUserData() {
     // Count existing data
     const counts = {};
     const tables = [
-      { name: 'invoices', label: 'Invoices' },
-      { name: 'invoiceLineItems', label: 'Invoice Line Items', join: 'invoices', joinCol: 'invoiceId' },
-      { name: 'estimates', label: 'Estimates' },
-      { name: 'estimateLineItems', label: 'Estimate Line Items', join: 'estimates', joinCol: 'estimateId' },
-      { name: 'clients', label: 'Clients' },
-      { name: 'products', label: 'Products' },
-      { name: 'expenses', label: 'Expenses' },
-      { name: 'expenseCategories', label: 'Expense Categories' },
-      { name: 'payments', label: 'Payments' },
-      { name: 'emailLog', label: 'Email Logs' },
-      { name: 'reminderLogs', label: 'Reminder Logs' },
-      { name: 'recurringInvoices', label: 'Recurring Invoices' },
-      { name: 'recurringInvoiceLineItems', label: 'Recurring Invoice Line Items', join: 'recurringInvoices', joinCol: 'recurringInvoiceId' },
-      { name: 'invoiceTemplates', label: 'Invoice Templates' },
-      { name: 'invoiceViews', label: 'Invoice Views', join: 'invoices', joinCol: 'invoiceId' },
+      { name: "invoices", label: "Invoices" },
+      {
+        name: "invoiceLineItems",
+        label: "Invoice Line Items",
+        join: "invoices",
+        joinCol: "invoiceId",
+      },
+      { name: "estimates", label: "Estimates" },
+      {
+        name: "estimateLineItems",
+        label: "Estimate Line Items",
+        join: "estimates",
+        joinCol: "estimateId",
+      },
+      { name: "clients", label: "Clients" },
+      { name: "products", label: "Products" },
+      { name: "expenses", label: "Expenses" },
+      { name: "expenseCategories", label: "Expense Categories" },
+      { name: "payments", label: "Payments" },
+      { name: "emailLog", label: "Email Logs" },
+      { name: "reminderLogs", label: "Reminder Logs" },
+      { name: "recurringInvoices", label: "Recurring Invoices" },
+      {
+        name: "recurringInvoiceLineItems",
+        label: "Recurring Invoice Line Items",
+        join: "recurringInvoices",
+        joinCol: "recurringInvoiceId",
+      },
+      { name: "invoiceTemplates", label: "Invoice Templates" },
+      {
+        name: "invoiceViews",
+        label: "Invoice Views",
+        join: "invoices",
+        joinCol: "invoiceId",
+      },
     ];
 
-    console.log('📊 Current data counts:');
+    console.log("📊 Current data counts:");
     for (const table of tables) {
       try {
         let query;
@@ -124,48 +146,62 @@ async function resetUserData() {
     console.log(`\n   Total records to delete: ${totalRecords}`);
 
     if (totalRecords === 0) {
-      console.log('\n✅ No data to delete. User data is already empty.');
+      console.log("\n✅ No data to delete. User data is already empty.");
       return;
     }
 
     // Confirmation
     if (!confirmed) {
-      console.log('\n⚠️  WARNING: This action cannot be undone!');
-      const proceed = await promptConfirmation('\nAre you sure you want to delete all user data? (y/N): ');
+      console.log("\n⚠️  WARNING: This action cannot be undone!");
+      const proceed = await promptConfirmation(
+        "\nAre you sure you want to delete all user data? (y/N): "
+      );
       if (!proceed) {
-        console.log('\n❌ Operation cancelled.');
+        console.log("\n❌ Operation cancelled.");
         return;
       }
     }
 
-    console.log('\n🗑️  Deleting data...');
+    console.log("\n🗑️  Deleting data...");
 
     // Delete in correct order (child tables first due to foreign key constraints)
     const deleteOrder = [
       // Line items first
-      { table: 'invoiceLineItems', join: 'invoices', joinCol: 'invoiceId' },
-      { table: 'estimateLineItems', join: 'estimates', joinCol: 'estimateId' },
-      { table: 'recurringInvoiceLineItems', join: 'recurringInvoices', joinCol: 'recurringInvoiceId' },
-      { table: 'invoiceViews', join: 'invoices', joinCol: 'invoiceId' },
-      { table: 'invoiceCustomFieldValues', join: 'invoices', joinCol: 'invoiceId' },
-      
+      { table: "invoiceLineItems", join: "invoices", joinCol: "invoiceId" },
+      { table: "estimateLineItems", join: "estimates", joinCol: "estimateId" },
+      {
+        table: "recurringInvoiceLineItems",
+        join: "recurringInvoices",
+        joinCol: "recurringInvoiceId",
+      },
+      { table: "invoiceViews", join: "invoices", joinCol: "invoiceId" },
+      {
+        table: "invoiceCustomFieldValues",
+        join: "invoices",
+        joinCol: "invoiceId",
+      },
+
       // Logs and tracking
-      { table: 'emailLog', direct: true },
-      { table: 'reminderLogs', direct: true },
-      { table: 'payments', direct: true },
-      { table: 'invoiceGenerationLogs', join: 'recurringInvoices', joinCol: 'recurringInvoiceId' },
-      
+      { table: "emailLog", direct: true },
+      { table: "reminderLogs", direct: true },
+      { table: "payments", direct: true },
+      {
+        table: "invoiceGenerationLogs",
+        join: "recurringInvoices",
+        joinCol: "recurringInvoiceId",
+      },
+
       // Main entities
-      { table: 'invoices', direct: true },
-      { table: 'estimates', direct: true },
-      { table: 'recurringInvoices', direct: true },
-      { table: 'expenses', direct: true },
-      { table: 'expenseCategories', direct: true },
-      { table: 'products', direct: true },
-      { table: 'clients', direct: true },
-      { table: 'invoiceTemplates', direct: true },
-      { table: 'customFields', direct: true },
-      
+      { table: "invoices", direct: true },
+      { table: "estimates", direct: true },
+      { table: "recurringInvoices", direct: true },
+      { table: "expenses", direct: true },
+      { table: "expenseCategories", direct: true },
+      { table: "products", direct: true },
+      { table: "clients", direct: true },
+      { table: "invoiceTemplates", direct: true },
+      { table: "customFields", direct: true },
+
       // Settings (optional - keep user preferences)
       // { table: 'reminderSettings', direct: true },
     ];
@@ -196,26 +232,29 @@ async function resetUserData() {
 
     // Reset usage tracking
     try {
-      await connection.execute('DELETE FROM usageTracking WHERE userId = ?', [userId]);
-      console.log('   ✅ usageTracking: reset');
+      await connection.execute("DELETE FROM usageTracking WHERE userId = ?", [
+        userId,
+      ]);
+      console.log("   ✅ usageTracking: reset");
     } catch (e) {}
 
     // Reset AI credits
     try {
-      await connection.execute('DELETE FROM aiCredits WHERE userId = ?', [userId]);
-      console.log('   ✅ aiCredits: reset');
+      await connection.execute("DELETE FROM aiCredits WHERE userId = ?", [
+        userId,
+      ]);
+      console.log("   ✅ aiCredits: reset");
     } catch (e) {}
 
-    console.log('\n' + '=' .repeat(60));
+    console.log("\n" + "=".repeat(60));
     console.log(`\n✅ User data reset complete!`);
     console.log(`   Total records deleted: ${deletedTotal}`);
-    console.log('\n📝 Preserved:');
-    console.log('   • User account and profile');
-    console.log('   • Subscription status');
-    console.log('   • Reminder settings (preferences)');
-
+    console.log("\n📝 Preserved:");
+    console.log("   • User account and profile");
+    console.log("   • Subscription status");
+    console.log("   • Reminder settings (preferences)");
   } catch (error) {
-    console.error('\n❌ Error:', error.message);
+    console.error("\n❌ Error:", error.message);
     throw error;
   } finally {
     await connection.end();

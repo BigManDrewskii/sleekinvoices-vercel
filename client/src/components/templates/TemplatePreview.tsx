@@ -26,34 +26,42 @@ interface TemplatePreviewProps {
 export function TemplatePreview({ template }: TemplatePreviewProps) {
   const formatDate = (date: Date) => {
     const d = new Date(date);
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
     const year = d.getFullYear();
-    
+
     switch (template.dateFormat) {
       case "DD/MM/YYYY":
         return `${day}/${month}/${year}`;
       case "YYYY-MM-DD":
         return `${year}-${month}-${day}`;
       case "MMM DD, YYYY":
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return d.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
       default: // MM/DD/YYYY
         return `${month}/${day}/${year}`;
     }
   };
 
-  const headerAlignClass = 
-    template.headerLayout === "centered" ? "text-center" :
-    template.headerLayout === "split" ? "flex justify-between items-start" :
-    ""; // standard
+  const headerAlignClass =
+    template.headerLayout === "centered"
+      ? "text-center"
+      : template.headerLayout === "split"
+        ? "flex justify-between items-start"
+        : ""; // standard
 
   const logoAlignClass =
-    template.logoPosition === "center" ? "mx-auto" :
-    template.logoPosition === "right" ? "ml-auto" :
-    ""; // left
+    template.logoPosition === "center"
+      ? "mx-auto"
+      : template.logoPosition === "right"
+        ? "ml-auto"
+        : ""; // left
 
   return (
-    <div 
+    <div
       className="bg-white border rounded-lg shadow-sm p-8 space-y-6"
       style={{
         fontFamily: template.bodyFont,
@@ -67,14 +75,19 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
           <>
             <div>
               {template.logoUrl ? (
-                <img 
-                  src={template.logoUrl} 
-                  alt="Company Logo" 
+                <img
+                  src={template.logoUrl}
+                  alt="Company Logo"
                   className="rounded"
-                  style={{ width: `${template.logoWidth}px`, height: 'auto', maxHeight: '60px', objectFit: 'contain' }}
+                  style={{
+                    width: `${template.logoWidth}px`,
+                    height: "auto",
+                    maxHeight: "60px",
+                    objectFit: "contain",
+                  }}
                 />
               ) : (
-                <div 
+                <div
                   className="h-12 w-32 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500"
                   style={{ width: `${template.logoWidth}px` }}
                 >
@@ -83,11 +96,11 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
               )}
             </div>
             <div className="text-right">
-              <h1 
+              <h1
                 className="text-3xl font-bold mb-2"
-                style={{ 
+                style={{
                   fontFamily: template.headingFont,
-                  color: template.primaryColor 
+                  color: template.primaryColor,
                 }}
               >
                 INVOICE
@@ -96,7 +109,8 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
                 <span className="font-semibold">Invoice #:</span> INV-001
               </p>
               <p className="text-sm">
-                <span className="font-semibold">Date:</span> {formatDate(new Date())}
+                <span className="font-semibold">Date:</span>{" "}
+                {formatDate(new Date())}
               </p>
             </div>
           </>
@@ -104,14 +118,19 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
           <>
             <div className={logoAlignClass}>
               {template.logoUrl ? (
-                <img 
-                  src={template.logoUrl} 
-                  alt="Company Logo" 
+                <img
+                  src={template.logoUrl}
+                  alt="Company Logo"
                   className="rounded mb-4"
-                  style={{ width: `${template.logoWidth}px`, height: 'auto', maxHeight: '60px', objectFit: 'contain' }}
+                  style={{
+                    width: `${template.logoWidth}px`,
+                    height: "auto",
+                    maxHeight: "60px",
+                    objectFit: "contain",
+                  }}
                 />
               ) : (
-                <div 
+                <div
                   className="h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 mb-4"
                   style={{ width: `${template.logoWidth}px` }}
                 >
@@ -119,11 +138,11 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
                 </div>
               )}
             </div>
-            <h1 
+            <h1
               className="text-3xl font-bold mb-4"
-              style={{ 
+              style={{
                 fontFamily: template.headingFont,
-                color: template.primaryColor 
+                color: template.primaryColor,
               }}
             >
               INVOICE
@@ -143,13 +162,16 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
       </div>
 
       {/* Company & Client Info */}
-      <div className="grid grid-cols-2 gap-6 pt-4 border-t" style={{ borderColor: template.primaryColor + '20' }}>
+      <div
+        className="grid grid-cols-2 gap-6 pt-4 border-t"
+        style={{ borderColor: template.primaryColor + "20" }}
+      >
         <div>
-          <h3 
+          <h3
             className="font-bold mb-2"
-            style={{ 
+            style={{
               fontFamily: template.headingFont,
-              color: template.primaryColor 
+              color: template.primaryColor,
             }}
           >
             From
@@ -163,11 +185,11 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
           )}
         </div>
         <div>
-          <h3 
+          <h3
             className="font-bold mb-2"
-            style={{ 
+            style={{
               fontFamily: template.headingFont,
-              color: template.primaryColor 
+              color: template.primaryColor,
             }}
           >
             Bill To
@@ -182,9 +204,9 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
       <div className="pt-4">
         <table className="w-full text-sm">
           <thead>
-            <tr 
+            <tr
               className="border-b-2"
-              style={{ 
+              style={{
                 borderColor: template.primaryColor,
                 color: template.primaryColor,
                 fontFamily: template.headingFont,
@@ -221,7 +243,10 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
             <span>$200.00</span>
           </div>
           {template.showDiscountField && (
-            <div className="flex justify-between" style={{ color: template.accentColor }}>
+            <div
+              className="flex justify-between"
+              style={{ color: template.accentColor }}
+            >
               <span>Discount (10%):</span>
               <span>-$20.00</span>
             </div>
@@ -232,9 +257,9 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
               <span>$14.40</span>
             </div>
           )}
-          <div 
+          <div
             className="flex justify-between font-bold text-lg pt-2 border-t-2"
-            style={{ 
+            style={{
               borderColor: template.primaryColor,
               color: template.primaryColor,
               fontFamily: template.headingFont,
@@ -248,15 +273,15 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
 
       {/* Payment Terms */}
       {template.showPaymentTerms && (
-        <div 
+        <div
           className="pt-4 border-t text-sm"
-          style={{ borderColor: template.primaryColor + '20' }}
+          style={{ borderColor: template.primaryColor + "20" }}
         >
-          <h3 
+          <h3
             className="font-bold mb-2"
-            style={{ 
+            style={{
               fontFamily: template.headingFont,
-              color: template.primaryColor 
+              color: template.primaryColor,
             }}
           >
             Payment Terms
@@ -267,15 +292,15 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
 
       {/* Notes */}
       {template.showNotesField && (
-        <div 
+        <div
           className="pt-4 border-t text-sm"
-          style={{ borderColor: template.primaryColor + '20' }}
+          style={{ borderColor: template.primaryColor + "20" }}
         >
-          <h3 
+          <h3
             className="font-bold mb-2"
-            style={{ 
+            style={{
               fontFamily: template.headingFont,
-              color: template.primaryColor 
+              color: template.primaryColor,
             }}
           >
             Notes
@@ -286,19 +311,21 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
 
       {/* Footer */}
       {template.footerText && (
-        <div 
+        <div
           className={`pt-6 border-t text-center text-sm ${
             template.footerLayout === "minimal" ? "text-xs" : ""
           }`}
-          style={{ 
-            borderColor: template.primaryColor + '20',
-            color: template.secondaryColor + 'cc',
+          style={{
+            borderColor: template.primaryColor + "20",
+            color: template.secondaryColor + "cc",
           }}
         >
           {template.footerLayout === "detailed" ? (
             <div className="space-y-2">
               <p className="font-semibold">{template.footerText}</p>
-              <p className="text-xs">For questions, contact us at support@example.com</p>
+              <p className="text-xs">
+                For questions, contact us at support@example.com
+              </p>
             </div>
           ) : (
             <p>{template.footerText}</p>

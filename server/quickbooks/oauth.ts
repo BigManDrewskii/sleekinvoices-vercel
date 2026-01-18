@@ -9,12 +9,10 @@ import { eq } from "drizzle-orm";
 const QUICKBOOKS_CLIENT_ID = process.env.QUICKBOOKS_CLIENT_ID || "";
 const QUICKBOOKS_CLIENT_SECRET = process.env.QUICKBOOKS_CLIENT_SECRET || "";
 const QUICKBOOKS_REDIRECT_URI = process.env.QUICKBOOKS_REDIRECT_URI || "";
-const QUICKBOOKS_ENVIRONMENT = (process.env.QUICKBOOKS_ENVIRONMENT || "sandbox") as "sandbox" | "production";
+const QUICKBOOKS_ENVIRONMENT = (process.env.QUICKBOOKS_ENVIRONMENT ||
+  "sandbox") as "sandbox" | "production";
 
-const QUICKBOOKS_SCOPES = [
-  "com.intuit.quickbooks.accounting",
-  "openid",
-];
+const QUICKBOOKS_SCOPES = ["com.intuit.quickbooks.accounting", "openid"];
 
 export function createOAuthClient(): OAuthClient {
   if (!QUICKBOOKS_CLIENT_ID || !QUICKBOOKS_CLIENT_SECRET) {
@@ -52,13 +50,19 @@ export async function exchangeCodeForTokens(
     const tokenData = authResponse.getJson();
 
     const tokenExpiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
-    const refreshTokenExpiresAt = new Date(Date.now() + tokenData.x_refresh_token_expires_in * 1000);
+    const refreshTokenExpiresAt = new Date(
+      Date.now() + tokenData.x_refresh_token_expires_in * 1000
+    );
 
-    const existing = await db.select().from(quickbooksConnections)
-      .where(eq(quickbooksConnections.userId, userId)).limit(1);
+    const existing = await db
+      .select()
+      .from(quickbooksConnections)
+      .where(eq(quickbooksConnections.userId, userId))
+      .limit(1);
 
     if (existing.length > 0) {
-      await db.update(quickbooksConnections)
+      await db
+        .update(quickbooksConnections)
         .set({
           realmId,
           accessToken: tokenData.access_token,
@@ -88,17 +92,25 @@ export async function exchangeCodeForTokens(
     return { success: true };
   } catch (error: any) {
     console.error("QuickBooks token exchange error:", error);
-    return { success: false, error: error.message || "Failed to exchange code for tokens" };
+    return {
+      success: false,
+      error: error.message || "Failed to exchange code for tokens",
+    };
   }
 }
 
-export async function refreshAccessToken(userId: number): Promise<{ success: boolean; token?: string; error?: string }> {
+export async function refreshAccessToken(
+  userId: number
+): Promise<{ success: boolean; token?: string; error?: string }> {
   const db = await getDb();
   if (!db) return { success: false, error: "Database not available" };
 
   try {
-    const connections = await db.select().from(quickbooksConnections)
-      .where(eq(quickbooksConnections.userId, userId)).limit(1);
+    const connections = await db
+      .select()
+      .from(quickbooksConnections)
+      .where(eq(quickbooksConnections.userId, userId))
+      .limit(1);
 
     if (connections.length === 0) {
       return { success: false, error: "No QuickBooks connection found" };
@@ -119,9 +131,12 @@ export async function refreshAccessToken(userId: number): Promise<{ success: boo
     const tokenData = authResponse.getJson();
 
     const tokenExpiresAt = new Date(Date.now() + tokenData.expires_in * 1000);
-    const refreshTokenExpiresAt = new Date(Date.now() + tokenData.x_refresh_token_expires_in * 1000);
+    const refreshTokenExpiresAt = new Date(
+      Date.now() + tokenData.x_refresh_token_expires_in * 1000
+    );
 
-    await db.update(quickbooksConnections)
+    await db
+      .update(quickbooksConnections)
       .set({
         accessToken: tokenData.access_token,
         refreshToken: tokenData.refresh_token,
@@ -134,18 +149,31 @@ export async function refreshAccessToken(userId: number): Promise<{ success: boo
     return { success: true, token: tokenData.access_token };
   } catch (error: any) {
     console.error("QuickBooks token refresh error:", error);
-    return { success: false, error: error.message || "Failed to refresh token" };
+    return {
+      success: false,
+      error: error.message || "Failed to refresh token",
+    };
   }
 }
 
-export async function getValidAccessToken(userId: number): Promise<{ token: string; realmId: string } | null> {
+export async function getValidAccessToken(
+  userId: number
+): Promise<{ token: string; realmId: string } | null> {
   const db = await getDb();
   if (!db) return null;
 
-  const connections = await db.select().from(quickbooksConnections)
-    .where(eq(quickbooksConnections.userId, userId)).limit(1);
+  const connections = await db
+    .select()
+    .from(quickbooksConnections)
+    .where(eq(quickbooksConnections.userId, userId))
+    .limit(1);
 
-  if (!connections || connections.length === 0 || !connections[0] || !connections[0].isActive) {
+  if (
+    !connections ||
+    connections.length === 0 ||
+    !connections[0] ||
+    !connections[0].isActive
+  ) {
     return null;
   }
 
@@ -157,7 +185,8 @@ export async function getValidAccessToken(userId: number): Promise<{ token: stri
   }
 
   if (connection.refreshTokenExpiresAt <= now) {
-    await db.update(quickbooksConnections)
+    await db
+      .update(quickbooksConnections)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(quickbooksConnections.userId, userId));
     return null;
@@ -180,14 +209,29 @@ export async function getConnectionStatus(userId: number): Promise<{
 }> {
   const db = await getDb();
   if (!db) {
-    return { connected: false, companyName: null, realmId: null, environment: null, lastSyncAt: null };
+    return {
+      connected: false,
+      companyName: null,
+      realmId: null,
+      environment: null,
+      lastSyncAt: null,
+    };
   }
 
-  const connections = await db.select().from(quickbooksConnections)
-    .where(eq(quickbooksConnections.userId, userId)).limit(1);
+  const connections = await db
+    .select()
+    .from(quickbooksConnections)
+    .where(eq(quickbooksConnections.userId, userId))
+    .limit(1);
 
   if (connections.length === 0 || !connections[0].isActive) {
-    return { connected: false, companyName: null, realmId: null, environment: null, lastSyncAt: null };
+    return {
+      connected: false,
+      companyName: null,
+      realmId: null,
+      environment: null,
+      lastSyncAt: null,
+    };
   }
 
   const connection = connections[0];
@@ -200,12 +244,15 @@ export async function getConnectionStatus(userId: number): Promise<{
   };
 }
 
-export async function disconnectQuickBooks(userId: number): Promise<{ success: boolean; error?: string }> {
+export async function disconnectQuickBooks(
+  userId: number
+): Promise<{ success: boolean; error?: string }> {
   const db = await getDb();
   if (!db) return { success: false, error: "Database not available" };
 
   try {
-    await db.update(quickbooksConnections)
+    await db
+      .update(quickbooksConnections)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(quickbooksConnections.userId, userId));
     return { success: true };
@@ -218,11 +265,16 @@ export async function updateLastSyncTime(userId: number): Promise<void> {
   const db = await getDb();
   if (!db) return;
 
-  await db.update(quickbooksConnections)
+  await db
+    .update(quickbooksConnections)
     .set({ lastSyncAt: new Date(), updatedAt: new Date() })
     .where(eq(quickbooksConnections.userId, userId));
 }
 
 export function isQuickBooksConfigured(): boolean {
-  return !!(QUICKBOOKS_CLIENT_ID && QUICKBOOKS_CLIENT_SECRET && QUICKBOOKS_REDIRECT_URI);
+  return !!(
+    QUICKBOOKS_CLIENT_ID &&
+    QUICKBOOKS_CLIENT_SECRET &&
+    QUICKBOOKS_REDIRECT_URI
+  );
 }

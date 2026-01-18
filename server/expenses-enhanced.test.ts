@@ -3,7 +3,7 @@ import { z } from "zod";
 
 /**
  * Enhanced Expense Tracking Tests
- * 
+ *
  * These tests validate the expense tracking feature implementation
  * without requiring a database connection. They focus on:
  * - Schema validation
@@ -13,7 +13,14 @@ import { z } from "zod";
  */
 
 // Payment method enum for validation
-const paymentMethodSchema = z.enum(['cash', 'credit_card', 'debit_card', 'bank_transfer', 'check', 'other']);
+const paymentMethodSchema = z.enum([
+  "cash",
+  "credit_card",
+  "debit_card",
+  "bank_transfer",
+  "check",
+  "other",
+]);
 
 // Expense creation schema
 const createExpenseSchema = z.object({
@@ -62,36 +69,38 @@ const linkToInvoiceSchema = z.object({
 });
 
 // Get billable unlinked schema
-const getBillableUnlinkedSchema = z.object({
-  clientId: z.number().optional(),
-}).optional();
+const getBillableUnlinkedSchema = z
+  .object({
+    clientId: z.number().optional(),
+  })
+  .optional();
 
 describe("Test 1: Create expense with all new fields - Schema Validation", () => {
   it("should validate expense with vendor, paymentMethod, and taxAmount", () => {
     const validExpense = {
       categoryId: 1,
-      amount: 250.00,
+      amount: 250.0,
       date: new Date(),
       description: "Complete expense with all fields",
       vendor: "Test Vendor Inc",
       paymentMethod: "credit_card" as const,
-      taxAmount: 25.00,
+      taxAmount: 25.0,
     };
 
     const result = createExpenseSchema.safeParse(validExpense);
     expect(result.success).toBe(true);
-    
+
     if (result.success) {
       expect(result.data.vendor).toBe("Test Vendor Inc");
       expect(result.data.paymentMethod).toBe("credit_card");
-      expect(result.data.taxAmount).toBe(25.00);
+      expect(result.data.taxAmount).toBe(25.0);
     }
   });
 
   it("should allow expense without optional fields", () => {
     const minimalExpense = {
       categoryId: 1,
-      amount: 100.00,
+      amount: 100.0,
       date: new Date(),
       description: "Minimal expense",
     };
@@ -102,7 +111,7 @@ describe("Test 1: Create expense with all new fields - Schema Validation", () =>
 
   it("should reject expense without required fields", () => {
     const invalidExpense = {
-      amount: 100.00,
+      amount: 100.0,
       description: "Missing categoryId",
     };
 
@@ -115,7 +124,7 @@ describe("Test 2: Create expense with receipt - Schema Validation", () => {
   it("should validate expense with receipt URL and key", () => {
     const expenseWithReceipt = {
       categoryId: 1,
-      amount: 100.00,
+      amount: 100.0,
       date: new Date(),
       description: "Expense with receipt",
       receiptUrl: "https://example.com/receipt.pdf",
@@ -124,7 +133,7 @@ describe("Test 2: Create expense with receipt - Schema Validation", () => {
 
     const result = createExpenseSchema.safeParse(expenseWithReceipt);
     expect(result.success).toBe(true);
-    
+
     if (result.success) {
       expect(result.data.receiptUrl).toBe("https://example.com/receipt.pdf");
       expect(result.data.receiptKey).toBe("receipts/test-receipt-key.pdf");
@@ -159,16 +168,16 @@ describe("Test 3: Update expense with new fields - Schema Validation", () => {
       id: 1,
       vendor: "Updated Vendor",
       paymentMethod: "bank_transfer" as const,
-      taxAmount: 7.50,
+      taxAmount: 7.5,
     };
 
     const result = updateExpenseSchema.safeParse(updateData);
     expect(result.success).toBe(true);
-    
+
     if (result.success) {
       expect(result.data.vendor).toBe("Updated Vendor");
       expect(result.data.paymentMethod).toBe("bank_transfer");
-      expect(result.data.taxAmount).toBe(7.50);
+      expect(result.data.taxAmount).toBe(7.5);
     }
   });
 
@@ -210,8 +219,8 @@ describe("Test 5: Create billable expense - Schema Validation", () => {
   it("should validate billable expense with client", () => {
     const billableExpense = {
       categoryId: 1,
-      amount: 500.00,
-      taxAmount: 50.00,
+      amount: 500.0,
+      taxAmount: 50.0,
       date: new Date(),
       description: "Billable consulting expense",
       vendor: "Consulting Firm",
@@ -221,7 +230,7 @@ describe("Test 5: Create billable expense - Schema Validation", () => {
 
     const result = createExpenseSchema.safeParse(billableExpense);
     expect(result.success).toBe(true);
-    
+
     if (result.success) {
       expect(result.data.isBillable).toBe(true);
       expect(result.data.clientId).toBe(1);
@@ -231,7 +240,7 @@ describe("Test 5: Create billable expense - Schema Validation", () => {
   it("should allow non-billable expense without client", () => {
     const nonBillableExpense = {
       categoryId: 1,
-      amount: 100.00,
+      amount: 100.0,
       date: new Date(),
       description: "Non-billable expense",
       isBillable: false,
@@ -293,8 +302,15 @@ describe("Test 7: Link expense to invoice - Schema Validation", () => {
 
 describe("Test 8: Filter expenses by payment method - Business Logic", () => {
   it("should validate all payment method types", () => {
-    const paymentMethods = ["cash", "credit_card", "debit_card", "bank_transfer", "check", "other"];
-    
+    const paymentMethods = [
+      "cash",
+      "credit_card",
+      "debit_card",
+      "bank_transfer",
+      "check",
+      "other",
+    ];
+
     paymentMethods.forEach(method => {
       const result = paymentMethodSchema.safeParse(method);
       expect(result.success).toBe(true);
@@ -329,19 +345,35 @@ describe("Test 9: Receipt upload validation - Business Logic", () => {
   });
 
   it("should validate file types", () => {
-    const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const validImageTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
     const validDocTypes = ["application/pdf"];
     const allValidTypes = [...validImageTypes, ...validDocTypes];
 
     allValidTypes.forEach(type => {
-      const isValid = validImageTypes.includes(type) || validDocTypes.includes(type);
+      const isValid =
+        validImageTypes.includes(type) || validDocTypes.includes(type);
       expect(isValid).toBe(true);
     });
   });
 
   it("should reject invalid file types", () => {
-    const invalidTypes = ["application/exe", "text/html", "application/javascript"];
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
+    const invalidTypes = [
+      "application/exe",
+      "text/html",
+      "application/javascript",
+    ];
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf",
+    ];
 
     invalidTypes.forEach(type => {
       const isValid = validTypes.includes(type);
@@ -351,7 +383,7 @@ describe("Test 9: Receipt upload validation - Business Logic", () => {
 
   it("should validate file size limit (5MB)", () => {
     const maxSizeBytes = 5 * 1024 * 1024; // 5MB
-    
+
     const validSize = 4 * 1024 * 1024; // 4MB
     const invalidSize = 6 * 1024 * 1024; // 6MB
 
@@ -368,8 +400,14 @@ describe("Test 10: Expense stats with new fields - Business Logic", () => {
       { amount: "150.00", taxAmount: null },
     ];
 
-    const totalAmount = expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
-    const totalTax = expenses.reduce((sum, exp) => sum + parseFloat(exp.taxAmount || "0"), 0);
+    const totalAmount = expenses.reduce(
+      (sum, exp) => sum + parseFloat(exp.amount),
+      0
+    );
+    const totalTax = expenses.reduce(
+      (sum, exp) => sum + parseFloat(exp.taxAmount || "0"),
+      0
+    );
     const totalWithTax = totalAmount + totalTax;
 
     expect(totalAmount).toBe(450);
@@ -388,7 +426,7 @@ describe("Test 10: Expense stats with new fields - Business Logic", () => {
     const billableTotal = expenses
       .filter(e => e.isBillable)
       .reduce((sum, e) => sum + parseFloat(e.amount), 0);
-    
+
     const nonBillableTotal = expenses
       .filter(e => !e.isBillable)
       .reduce((sum, e) => sum + parseFloat(e.amount), 0);
@@ -408,7 +446,8 @@ describe("Test 10: Expense stats with new fields - Business Logic", () => {
     const byPaymentMethod: Record<string, number> = {};
     expenses.forEach(exp => {
       const method = exp.paymentMethod;
-      byPaymentMethod[method] = (byPaymentMethod[method] || 0) + parseFloat(exp.amount);
+      byPaymentMethod[method] =
+        (byPaymentMethod[method] || 0) + parseFloat(exp.amount);
     });
 
     expect(byPaymentMethod["cash"]).toBe(250);
@@ -440,11 +479,46 @@ describe("Test 10: Expense stats with new fields - Business Logic", () => {
 
 describe("Expense Filtering Logic", () => {
   const mockExpenses = [
-    { id: 1, paymentMethod: "cash", isBillable: true, clientId: 1, categoryId: 1, amount: "100" },
-    { id: 2, paymentMethod: "credit_card", isBillable: false, clientId: null, categoryId: 2, amount: "200" },
-    { id: 3, paymentMethod: "cash", isBillable: true, clientId: 2, categoryId: 1, amount: "150" },
-    { id: 4, paymentMethod: "bank_transfer", isBillable: true, clientId: 1, categoryId: 3, amount: "300" },
-    { id: 5, paymentMethod: "credit_card", isBillable: false, clientId: null, categoryId: 2, amount: "250" },
+    {
+      id: 1,
+      paymentMethod: "cash",
+      isBillable: true,
+      clientId: 1,
+      categoryId: 1,
+      amount: "100",
+    },
+    {
+      id: 2,
+      paymentMethod: "credit_card",
+      isBillable: false,
+      clientId: null,
+      categoryId: 2,
+      amount: "200",
+    },
+    {
+      id: 3,
+      paymentMethod: "cash",
+      isBillable: true,
+      clientId: 2,
+      categoryId: 1,
+      amount: "150",
+    },
+    {
+      id: 4,
+      paymentMethod: "bank_transfer",
+      isBillable: true,
+      clientId: 1,
+      categoryId: 3,
+      amount: "300",
+    },
+    {
+      id: 5,
+      paymentMethod: "credit_card",
+      isBillable: false,
+      clientId: null,
+      categoryId: 2,
+      amount: "250",
+    },
   ];
 
   it("should filter by payment method", () => {
@@ -456,7 +530,7 @@ describe("Expense Filtering Logic", () => {
   it("should filter by billable status", () => {
     const billable = mockExpenses.filter(e => e.isBillable);
     const nonBillable = mockExpenses.filter(e => !e.isBillable);
-    
+
     expect(billable.length).toBe(3);
     expect(nonBillable.length).toBe(2);
   });
@@ -473,21 +547,18 @@ describe("Expense Filtering Logic", () => {
   });
 
   it("should apply multiple filters", () => {
-    const filtered = mockExpenses.filter(e => 
-      e.paymentMethod === "cash" && 
-      e.isBillable === true &&
-      e.clientId === 1
+    const filtered = mockExpenses.filter(
+      e =>
+        e.paymentMethod === "cash" && e.isBillable === true && e.clientId === 1
     );
-    
+
     expect(filtered.length).toBe(1);
     expect(filtered[0].id).toBe(1);
   });
 
   it("should return empty array when no matches", () => {
-    const filtered = mockExpenses.filter(e => 
-      e.paymentMethod === "check"
-    );
-    
+    const filtered = mockExpenses.filter(e => e.paymentMethod === "check");
+
     expect(filtered.length).toBe(0);
   });
 });
@@ -501,7 +572,9 @@ describe("Billable Expense Workflow Logic", () => {
       { id: 4, isBillable: true, invoiceId: null },
     ];
 
-    const unbilledExpenses = expenses.filter(e => e.isBillable && e.invoiceId === null);
+    const unbilledExpenses = expenses.filter(
+      e => e.isBillable && e.invoiceId === null
+    );
     expect(unbilledExpenses.length).toBe(2);
     expect(unbilledExpenses.map(e => e.id)).toEqual([1, 4]);
   });
@@ -534,7 +607,7 @@ describe("Billable Expense Workflow Logic", () => {
     };
 
     const lineItem = {
-      description: `${expense.description} (${expense.vendor || 'Expense'})`,
+      description: `${expense.description} (${expense.vendor || "Expense"})`,
       quantity: 1,
       rate: parseFloat(expense.amount) + parseFloat(expense.taxAmount || "0"),
     };

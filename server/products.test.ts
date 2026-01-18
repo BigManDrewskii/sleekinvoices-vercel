@@ -28,7 +28,7 @@ describe("Products Data Structure", () => {
   it("should have valid rate format", () => {
     const rate = "150.00";
     const parsedRate = parseFloat(rate);
-    
+
     expect(parsedRate).toBeGreaterThan(0);
     expect(parsedRate).toBe(150);
   });
@@ -50,10 +50,16 @@ describe("Products Data Structure", () => {
 
 // Test product categories
 describe("Product Categories", () => {
-  const validCategories = ["Development", "Design", "Consulting", "Support", "Other"];
+  const validCategories = [
+    "Development",
+    "Design",
+    "Consulting",
+    "Support",
+    "Other",
+  ];
 
   it("should accept valid categories", () => {
-    validCategories.forEach((category) => {
+    validCategories.forEach(category => {
       expect(typeof category).toBe("string");
       expect(category.length).toBeGreaterThan(0);
     });
@@ -73,7 +79,7 @@ describe("Product Units", () => {
   const validUnits = ["hour", "day", "project", "unit", "month"];
 
   it("should accept valid units", () => {
-    validUnits.forEach((unit) => {
+    validUnits.forEach(unit => {
       expect(typeof unit).toBe("string");
     });
   });
@@ -92,18 +98,36 @@ describe("Product Units", () => {
 // Test product filtering
 describe("Product Filtering", () => {
   const products = [
-    { id: 1, name: "Web Dev", category: "Development", isActive: true, usageCount: 10 },
-    { id: 2, name: "Design", category: "Design", isActive: true, usageCount: 5 },
-    { id: 3, name: "Old Service", category: "Other", isActive: false, usageCount: 0 },
+    {
+      id: 1,
+      name: "Web Dev",
+      category: "Development",
+      isActive: true,
+      usageCount: 10,
+    },
+    {
+      id: 2,
+      name: "Design",
+      category: "Design",
+      isActive: true,
+      usageCount: 5,
+    },
+    {
+      id: 3,
+      name: "Old Service",
+      category: "Other",
+      isActive: false,
+      usageCount: 0,
+    },
   ];
 
   it("should filter active products only", () => {
-    const activeProducts = products.filter((p) => p.isActive);
+    const activeProducts = products.filter(p => p.isActive);
     expect(activeProducts).toHaveLength(2);
   });
 
   it("should filter by category", () => {
-    const devProducts = products.filter((p) => p.category === "Development");
+    const devProducts = products.filter(p => p.category === "Development");
     expect(devProducts).toHaveLength(1);
     expect(devProducts[0].name).toBe("Web Dev");
   });
@@ -116,7 +140,7 @@ describe("Product Filtering", () => {
 
   it("should search by name", () => {
     const searchQuery = "web";
-    const results = products.filter((p) =>
+    const results = products.filter(p =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     expect(results).toHaveLength(1);
@@ -143,7 +167,9 @@ describe("Product to Line Item Conversion", () => {
       rate: parseFloat(product.rate),
     };
 
-    expect(lineItem.description).toBe("Consulting - Business consulting services");
+    expect(lineItem.description).toBe(
+      "Consulting - Business consulting services"
+    );
     expect(lineItem.quantity).toBe(1);
     expect(lineItem.rate).toBe(200);
   });

@@ -2,11 +2,14 @@ import { CheckCircle2, Circle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PaymentStatusBadgeProps {
-  status: 'unpaid' | 'partial' | 'paid';
+  status: "unpaid" | "partial" | "paid";
   className?: string;
 }
 
-export function PaymentStatusBadge({ status, className }: PaymentStatusBadgeProps) {
+export function PaymentStatusBadge({
+  status,
+  className,
+}: PaymentStatusBadgeProps) {
   const config = {
     unpaid: {
       label: "Unpaid",
@@ -31,12 +34,14 @@ export function PaymentStatusBadge({ status, className }: PaymentStatusBadgeProp
   const { label, bgClass, textClass, icon: Icon } = config[status];
 
   return (
-    <span className={cn(
-      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-      bgClass,
-      textClass,
-      className
-    )}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+        bgClass,
+        textClass,
+        className
+      )}
+    >
       <Icon className="w-3 h-3" />
       {label}
     </span>

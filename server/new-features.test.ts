@@ -73,7 +73,7 @@ describe("Expenses", () => {
     if (categoryId) {
       const result = await caller.expenses.create({
         categoryId,
-        amount: 150.50,
+        amount: 150.5,
         date: new Date(),
         description: "Flight to conference",
       });

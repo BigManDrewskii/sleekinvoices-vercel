@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-const DATABASE_URL = 'mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev';
+const DATABASE_URL =
+  "mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev";
 const url = new URL(DATABASE_URL);
 
 async function seedHistoricalEmails() {
   const connection = await mysql.createConnection({
-    host: url.hostname || 'localhost',
+    host: url.hostname || "localhost",
     port: parseInt(url.port) || 3306,
     user: url.username,
     password: url.password,
@@ -13,18 +14,18 @@ async function seedHistoricalEmails() {
   });
 
   try {
-    console.log('\n📧 Adding historical reminder and receipt emails...\n');
+    console.log("\n📧 Adding historical reminder and receipt emails...\n");
 
     const userId = 1;
 
     // Get invoices and clients
     const [invoices] = await connection.query(
-      'SELECT id, invoiceNumber FROM invoices WHERE userId = ?',
+      "SELECT id, invoiceNumber FROM invoices WHERE userId = ?",
       [userId]
     );
 
     const [clients] = await connection.query(
-      'SELECT email FROM clients WHERE userId = ?',
+      "SELECT email FROM clients WHERE userId = ?",
       [userId]
     );
 
@@ -33,7 +34,9 @@ async function seedHistoricalEmails() {
 
     // Helper to generate random dates in the past 6 months
     function randomDate(start, end) {
-      return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+      return new Date(
+        start.getTime() + Math.random() * (end.getTime() - start.getTime())
+      );
     }
 
     const sixMonthsAgo = new Date();
@@ -61,7 +64,7 @@ async function seedHistoricalEmails() {
           invoice.id,
           client.email,
           subjects[Math.floor(Math.random() * subjects.length)],
-          'reminder',
+          "reminder",
           reminderDate,
           Math.random() > 0.08, // 92% success rate
           null,
@@ -97,7 +100,7 @@ async function seedHistoricalEmails() {
           invoice.id,
           client.email,
           subjects[Math.floor(Math.random() * subjects.length)],
-          'receipt',
+          "receipt",
           paymentDate,
           Math.random() > 0.02, // 98% success rate
           null,
@@ -114,30 +117,32 @@ async function seedHistoricalEmails() {
 
     // Get total count and breakdown
     const [total] = await connection.query(
-      'SELECT COUNT(*) as count FROM emailLog WHERE userId = ?',
+      "SELECT COUNT(*) as count FROM emailLog WHERE userId = ?",
       [userId]
     );
 
     console.log(`\n✅ Total emails in database: ${total[0].count}\n`);
 
-    const [stats] = await connection.query(`
+    const [stats] = await connection.query(
+      `
       SELECT emailType, success, COUNT(*) as count
       FROM emailLog
       WHERE userId = ?
       GROUP BY emailType, success
       ORDER BY emailType, success
-    `, [userId]);
+    `,
+      [userId]
+    );
 
-    console.log('📊 Email Statistics:\n');
-    console.log('Type        | Status    | Count');
-    console.log('------------|-----------|------');
+    console.log("📊 Email Statistics:\n");
+    console.log("Type        | Status    | Count");
+    console.log("------------|-----------|------");
     for (const stat of stats) {
       const type = stat.emailType.padEnd(11);
-      const status = (stat.success ? 'Success' : 'Failed').padEnd(10);
+      const status = (stat.success ? "Success" : "Failed").padEnd(10);
       console.log(`${type} | ${status} | ${stat.count}`);
     }
-    console.log('');
-
+    console.log("");
   } finally {
     await connection.end();
   }

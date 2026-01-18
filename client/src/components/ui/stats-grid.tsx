@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
@@ -13,7 +19,11 @@ interface StatsGridProps {
  * Standardized grid container for stats cards
  * Default is 4 columns on large screens
  */
-export function StatsGrid({ children, columns = 4, className }: StatsGridProps) {
+export function StatsGrid({
+  children,
+  columns = 4,
+  className,
+}: StatsGridProps) {
   const gridCols = {
     2: "grid-cols-1 md:grid-cols-2",
     3: "grid-cols-1 md:grid-cols-3",
@@ -60,7 +70,9 @@ export function StatCard({
   return (
     <Card className={cn(variantStyles[variant], className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardDescription className="text-sm font-medium">{title}</CardDescription>
+        <CardDescription className="text-sm font-medium">
+          {title}
+        </CardDescription>
         {Icon && <Icon className={cn("h-4 w-4", iconColor)} />}
       </CardHeader>
       <CardContent>

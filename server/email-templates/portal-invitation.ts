@@ -14,17 +14,24 @@ interface PortalInvitationEmailParams {
  * Escape HTML special characters to prevent XSS in emails
  */
 function escapeHtml(text: string): string {
-  if (!text) return '';
+  if (!text) return "";
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-export function generatePortalInvitationEmail(params: PortalInvitationEmailParams): { subject: string; html: string; text: string } {
-  const { clientName, portalUrl, companyName = "SleekInvoices", expiresInDays } = params;
+export function generatePortalInvitationEmail(
+  params: PortalInvitationEmailParams
+): { subject: string; html: string; text: string } {
+  const {
+    clientName,
+    portalUrl,
+    companyName = "SleekInvoices",
+    expiresInDays,
+  } = params;
 
   const subject = `Access Your Invoices - ${companyName}`;
 

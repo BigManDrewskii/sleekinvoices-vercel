@@ -180,10 +180,7 @@ export function Navigation() {
           variant="outline"
           className="h-11 min-w-[44px] w-11 lg:w-auto rounded-[8.4px] px-3 lg:px-4 gap-2 text-[var(--nav-text-color)] border-[var(--nav-button-border)] hover:bg-accent/30 transition-all"
         >
-          <Plus
-            weight="bold"
-            className="h-4 w-4 flex-shrink-0"
-          />
+          <Plus weight="bold" className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm font-medium hidden lg:inline">New</span>
           <ChevronDown className="h-3 w-3 opacity-60 hidden lg:inline" />
         </Button>
@@ -496,166 +493,166 @@ export function Navigation() {
   // Mobile Layout (<768px): Hamburger + Search + New + User (logo in main nav, nav links in hamburger)
   const MobileNav = () => (
     <div className="flex items-center gap-2">
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-11 w-11 min-w-[44px] min-h-[44px] text-[var(--nav-text-color)]"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="w-80 max-w-[85vw] p-0"
-              hideCloseButton
-            >
-              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <div className="flex flex-col h-full">
-                <Accordion type="single" collapsible className="border-0">
-                  <AccordionItem value="billing">
-                    <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText className="h-5 w-5" />
-                        <span className="font-medium text-[var(--nav-text-color)]">
-                          Billing
-                        </span>
-                        <ChevronDown className="h-4 w-4 opacity-60" />
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
-                      <div className="space-y-1 px-4 py-2">
-                        {navigationConfig.billing.items.map(item => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <NavigationIcon
-                              icon={item.icon}
-                              isActive={isActive(item.href)}
-                              className="h-4 w-4"
-                            />
-                            <span>{item.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <AccordionItem value="finances">
-                    <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <BarChart3 className="h-5 w-5" />
-                        <span className="font-medium text-[var(--nav-text-color)]">
-                          Finances
-                        </span>
-                        <ChevronDown className="h-4 w-4 opacity-60" />
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
-                      <div className="space-y-1 px-4 py-2">
-                        {navigationConfig.finances.items.map(item => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <NavigationIcon
-                              icon={item.icon}
-                              isActive={isActive(item.href)}
-                              className="h-4 w-4"
-                            />
-                            <span>{item.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-
-                  <Link
-                    href="/clients"
-                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Users className="h-5 w-5" />
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] text-[var(--nav-text-color)]"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent
+          side="right"
+          className="w-80 max-w-[85vw] p-0"
+          hideCloseButton
+        >
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <div className="flex flex-col h-full">
+            <Accordion type="single" collapsible className="border-0">
+              <AccordionItem value="billing">
+                <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5" />
                     <span className="font-medium text-[var(--nav-text-color)]">
-                      Clients
+                      Billing
                     </span>
-                  </Link>
-
-                  <Link
-                    href="/templates"
-                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutTemplate className="h-5 w-5" />
-                    <span className="font-medium text-[var(--nav-text-color)]">
-                      Templates
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/docs"
-                    className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <BookOpen className="h-5 w-5" />
-                    <span className="font-medium text-[var(--nav-text-color)]">
-                      Docs
-                    </span>
-                  </Link>
-                </Accordion>
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          <SearchButton />
-
-          <QuickActionsMenu />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[14.4px] border-[var(--nav-button-border)] transition-all duration-200"
-              >
-                <div className="relative">
-                  <span className="text-[#94a3b8] font-semibold text-lg leading-6">
-                    LD
-                  </span>
-                </div>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
-              <div className="px-3 py-3 border-b border-[rgba(36,38,40,0.5)]">
-                <div className="flex items-center gap-3">
-                  {user && <UserAvatar user={user} size="md" bordered />}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate text-[#94a3b8]">
-                      {user?.name || "-"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {user?.email || "-"}
-                    </p>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
                   </div>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => logout.mutate()}
-                className="h-11 gap-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+                </AccordionTrigger>
+                <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
+                  <div className="space-y-1 px-4 py-2">
+                    {navigationConfig.billing.items.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <NavigationIcon
+                          icon={item.icon}
+                          isActive={isActive(item.href)}
+                          className="h-4 w-4"
+                        />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="finances">
+                <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="h-5 w-5" />
+                    <span className="font-medium text-[var(--nav-text-color)]">
+                      Finances
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
+                  <div className="space-y-1 px-4 py-2">
+                    {navigationConfig.finances.items.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <NavigationIcon
+                          icon={item.icon}
+                          isActive={isActive(item.href)}
+                          className="h-4 w-4"
+                        />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <Link
+                href="/clients"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
               >
-                <LogOut className="h-4 w-4" />
-                <span>Log Out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+                <Users className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Clients
+                </span>
+              </Link>
+
+              <Link
+                href="/templates"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <LayoutTemplate className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Templates
+                </span>
+              </Link>
+
+              <Link
+                href="/docs"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <BookOpen className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Docs
+                </span>
+              </Link>
+            </Accordion>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <SearchButton />
+
+      <QuickActionsMenu />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[14.4px] border-[var(--nav-button-border)] transition-all duration-200"
+          >
+            <div className="relative">
+              <span className="text-[#94a3b8] font-semibold text-lg leading-6">
+                LD
+              </span>
+            </div>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
+          <div className="px-3 py-3 border-b border-[rgba(36,38,40,0.5)]">
+            <div className="flex items-center gap-3">
+              {user && <UserAvatar user={user} size="md" bordered />}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate text-[#94a3b8]">
+                  {user?.name || "-"}
+                </p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.email || "-"}
+                </p>
+              </div>
+            </div>
+          </div>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => logout.mutate()}
+            className="h-11 gap-3 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            <span>Log Out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 
   return (

@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-const DATABASE_URL = 'mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev';
+const DATABASE_URL =
+  "mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev";
 const url = new URL(DATABASE_URL);
 
 async function verifyEmailHistory() {
   const connection = await mysql.createConnection({
-    host: url.hostname || 'localhost',
+    host: url.hostname || "localhost",
     port: parseInt(url.port) || 3306,
     user: url.username,
     password: url.password,
@@ -29,26 +30,25 @@ async function verifyEmailHistory() {
       LIMIT 10
     `);
 
-    console.log('\n📧 Recent Email History (Sample):\n');
-    emails.forEach((email) => {
+    console.log("\n📧 Recent Email History (Sample):\n");
+    emails.forEach(email => {
       console.log(`ID: ${email.id}`);
       console.log(`  Invoice: ${email.invoiceId}`);
       console.log(`  To: ${email.recipientEmail}`);
       console.log(`  Subject: ${email.subject}`);
       console.log(`  Type: ${email.emailType}`);
       console.log(`  Sent: ${email.sentAt.toISOString()}`);
-      console.log(`  Status: ${email.success ? '✓ Success' : '✗ Failed'}`);
+      console.log(`  Status: ${email.success ? "✓ Success" : "✗ Failed"}`);
       if (email.errorMessage) {
         console.log(`  Error: ${email.errorMessage}`);
       }
-      console.log('');
+      console.log("");
     });
 
     const [total] = await connection.query(
-      'SELECT COUNT(*) as count FROM emailLog WHERE userId = 1'
+      "SELECT COUNT(*) as count FROM emailLog WHERE userId = 1"
     );
     console.log(`Total emails in database: ${total[0].count}\n`);
-
   } finally {
     await connection.end();
   }

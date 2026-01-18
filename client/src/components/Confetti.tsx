@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react';
-import confetti from 'canvas-confetti';
+import { useCallback, useEffect } from "react";
+import confetti from "canvas-confetti";
 
 interface ConfettiOptions {
   particleCount?: number;
@@ -19,7 +19,7 @@ export function useConfetti() {
       decay: 0.95,
       scalar: 1,
       origin: { y: 0.6 },
-      colors: ['#5f6fff', '#a855f7', '#22c55e', '#eab308', '#ef4444'],
+      colors: ["#5f6fff", "#a855f7", "#22c55e", "#eab308", "#ef4444"],
       ...options,
     };
 
@@ -30,7 +30,12 @@ export function useConfetti() {
   const fireworks = useCallback(() => {
     const duration = 3000;
     const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+    const defaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 9999,
+    };
 
     const interval = setInterval(() => {
       const timeLeft = animationEnd - Date.now();
@@ -46,7 +51,7 @@ export function useConfetti() {
         ...defaults,
         particleCount,
         origin: { x: Math.random() * 0.2, y: Math.random() - 0.2 },
-        colors: ['#5f6fff', '#a855f7', '#22c55e'],
+        colors: ["#5f6fff", "#a855f7", "#22c55e"],
       });
 
       // Confetti from right
@@ -54,7 +59,7 @@ export function useConfetti() {
         ...defaults,
         particleCount,
         origin: { x: Math.random() * 0.2 + 0.8, y: Math.random() - 0.2 },
-        colors: ['#5f6fff', '#a855f7', '#22c55e'],
+        colors: ["#5f6fff", "#a855f7", "#22c55e"],
       });
     }, 250);
 
@@ -67,7 +72,7 @@ export function useConfetti() {
       particleCount: 50,
       spread: 60,
       origin: { y: 0.7 },
-      colors: ['#5f6fff', '#a855f7'],
+      colors: ["#5f6fff", "#a855f7"],
       scalar: 0.8,
     });
   }, []);
@@ -91,29 +96,29 @@ export function useConfetti() {
     fire(0.25, {
       spread: 26,
       startVelocity: 55,
-      colors: ['#5f6fff'],
+      colors: ["#5f6fff"],
     });
     fire(0.2, {
       spread: 60,
-      colors: ['#a855f7'],
+      colors: ["#a855f7"],
     });
     fire(0.35, {
       spread: 100,
       decay: 0.91,
       scalar: 0.8,
-      colors: ['#22c55e'],
+      colors: ["#22c55e"],
     });
     fire(0.1, {
       spread: 120,
       startVelocity: 25,
       decay: 0.92,
       scalar: 1.2,
-      colors: ['#eab308'],
+      colors: ["#eab308"],
     });
     fire(0.1, {
       spread: 120,
       startVelocity: 45,
-      colors: ['#5f6fff', '#a855f7'],
+      colors: ["#5f6fff", "#a855f7"],
     });
   }, []);
 
@@ -134,8 +139,8 @@ export function useConfetti() {
         angle: 90,
         spread: 55,
         origin: { x: Math.random(), y: -0.1 },
-        colors: ['#22c55e', '#16a34a', '#15803d'],
-        shapes: ['circle'],
+        colors: ["#22c55e", "#16a34a", "#15803d"],
+        shapes: ["circle"],
         gravity: 1.2,
         scalar: 1.5,
         drift: 0,
@@ -164,14 +169,14 @@ export function ConfettiTrigger() {
     const handlePaymentReceived = () => moneyRain();
     const handleMilestone = () => bigCelebration();
 
-    window.addEventListener('invoice-sent', handleInvoiceSent);
-    window.addEventListener('payment-received', handlePaymentReceived);
-    window.addEventListener('milestone-reached', handleMilestone);
+    window.addEventListener("invoice-sent", handleInvoiceSent);
+    window.addEventListener("payment-received", handlePaymentReceived);
+    window.addEventListener("milestone-reached", handleMilestone);
 
     return () => {
-      window.removeEventListener('invoice-sent', handleInvoiceSent);
-      window.removeEventListener('payment-received', handlePaymentReceived);
-      window.removeEventListener('milestone-reached', handleMilestone);
+      window.removeEventListener("invoice-sent", handleInvoiceSent);
+      window.removeEventListener("payment-received", handlePaymentReceived);
+      window.removeEventListener("milestone-reached", handleMilestone);
     };
   }, [celebrate, bigCelebration, moneyRain]);
 
@@ -180,7 +185,8 @@ export function ConfettiTrigger() {
 
 // Helper function to trigger confetti from anywhere
 export const triggerConfetti = {
-  invoiceSent: () => window.dispatchEvent(new CustomEvent('invoice-sent')),
-  paymentReceived: () => window.dispatchEvent(new CustomEvent('payment-received')),
-  milestone: () => window.dispatchEvent(new CustomEvent('milestone-reached')),
+  invoiceSent: () => window.dispatchEvent(new CustomEvent("invoice-sent")),
+  paymentReceived: () =>
+    window.dispatchEvent(new CustomEvent("payment-received")),
+  milestone: () => window.dispatchEvent(new CustomEvent("milestone-reached")),
 };

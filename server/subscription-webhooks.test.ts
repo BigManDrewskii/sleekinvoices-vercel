@@ -7,7 +7,7 @@ describe("Subscription Webhook Handlers", () => {
 
   beforeEach(async () => {
     testCustomerId = `cus_test_${Date.now()}`;
-    
+
     // Set Stripe customer ID for test user
     const db = await getDb();
     if (!db) throw new Error("Database not available");
@@ -89,7 +89,10 @@ describe("Subscription Webhook Handlers", () => {
 
       const user = userResult[0];
       expect(user.subscriptionId).toBe(subscriptionId);
-      expect(user.currentPeriodEnd?.getTime()).toBeCloseTo(periodEnd * 1000, -3);
+      expect(user.currentPeriodEnd?.getTime()).toBeCloseTo(
+        periodEnd * 1000,
+        -3
+      );
     });
   });
 
@@ -130,7 +133,10 @@ describe("Subscription Webhook Handlers", () => {
 
       const user = userResult[0];
       expect(user.subscriptionStatus).toBe("active");
-      expect(user.currentPeriodEnd?.getTime()).toBeCloseTo(newPeriodEnd * 1000, -3);
+      expect(user.currentPeriodEnd?.getTime()).toBeCloseTo(
+        newPeriodEnd * 1000,
+        -3
+      );
     });
 
     it("should handle past_due status", async () => {

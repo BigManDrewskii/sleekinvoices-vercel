@@ -5,7 +5,7 @@ import {
   isLightColor,
   withAlpha,
   darken,
-  lighten
+  lighten,
 } from "@/lib/color-contrast";
 import { useMemo, useEffect } from "react";
 import { loadGoogleFont } from "@/lib/google-fonts";
@@ -40,7 +40,7 @@ interface ReceiptStyleInvoiceProps {
   taxId?: string;
   status?: string;
   logoUrl?: string;
-  logoPosition?: 'left' | 'center' | 'right';
+  logoPosition?: "left" | "center" | "right";
   logoWidth?: number;
   // Template customization
   primaryColor?: string;
@@ -59,7 +59,7 @@ interface ReceiptStyleInvoiceProps {
 
 /**
  * Receipt Style Invoice Component
- * 
+ *
  * A clean, minimalist receipt-style invoice inspired by thermal receipts.
  * Features:
  * - Monospace typography for financial data
@@ -105,36 +105,43 @@ export function ReceiptStyleInvoice({
   showNotesField = true,
   footerText,
 }: ReceiptStyleInvoiceProps) {
-
   // Load custom fonts dynamically
   useEffect(() => {
-    if (headingFont && headingFont !== 'IBM Plex Mono') {
-      loadGoogleFont(headingFont, ['400', '500', '600', '700']);
+    if (headingFont && headingFont !== "IBM Plex Mono") {
+      loadGoogleFont(headingFont, ["400", "500", "600", "700"]);
     }
-    if (bodyFont && bodyFont !== 'IBM Plex Mono') {
-      loadGoogleFont(bodyFont, ['400', '500', '600', '700']);
+    if (bodyFont && bodyFont !== "IBM Plex Mono") {
+      loadGoogleFont(bodyFont, ["400", "500", "600", "700"]);
     }
   }, [headingFont, bodyFont]);
 
   // Calculate contrast-safe colors
   const colors = useMemo(() => {
     const backgroundColor = "#ffffff";
-    
+
     // Ensure primary color has good contrast against white background
-    const safePrimary = adjustColorForContrast(primaryColor, backgroundColor, 4.5);
-    const safeAccent = adjustColorForContrast(accentColor, backgroundColor, 4.5);
-    
+    const safePrimary = adjustColorForContrast(
+      primaryColor,
+      backgroundColor,
+      4.5
+    );
+    const safeAccent = adjustColorForContrast(
+      accentColor,
+      backgroundColor,
+      4.5
+    );
+
     // Text color for primary background (e.g., logo placeholder)
     const primaryText = getOptimalTextColor(safePrimary);
-    
+
     // Muted colors derived from primary
-    const mutedText = isLightColor(safePrimary) 
-      ? darken(safePrimary, 30) 
+    const mutedText = isLightColor(safePrimary)
+      ? darken(safePrimary, 30)
       : lighten(safePrimary, 40);
-    
+
     // Divider color - subtle version of primary
     const dividerColor = withAlpha(safePrimary, 0.15);
-    
+
     return {
       primary: safePrimary,
       primaryText,
@@ -147,12 +154,17 @@ export function ReceiptStyleInvoice({
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'paid': return colors.accent;
-      case 'overdue': return INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue;
-      case 'pending':
-      case 'sent': return INVOICE_TEMPLATE_DEFAULTS.statusColors.pending;
-      case 'draft': return colors.muted;
-      default: return colors.muted;
+      case "paid":
+        return colors.accent;
+      case "overdue":
+        return INVOICE_TEMPLATE_DEFAULTS.statusColors.overdue;
+      case "pending":
+      case "sent":
+        return INVOICE_TEMPLATE_DEFAULTS.statusColors.pending;
+      case "draft":
+        return colors.muted;
+      default:
+        return colors.muted;
     }
   };
 
@@ -166,15 +178,15 @@ export function ReceiptStyleInvoice({
       style={{
         color: colors.primary,
         fontFamily: `"${bodyFont}", monospace`,
-        fontSize: `${fontSize}px`
+        fontSize: `${fontSize}px`,
       }}
     >
       {/* Header - Logo & Brand */}
       <div
         className={cn(
           "flex items-center gap-3 mb-8",
-          logoPosition === 'center' && "justify-center",
-          logoPosition === 'right' && "justify-end"
+          logoPosition === "center" && "justify-center",
+          logoPosition === "right" && "justify-end"
         )}
       >
         {logoUrl ? (
@@ -184,15 +196,25 @@ export function ReceiptStyleInvoice({
             className="object-contain"
             style={{
               height: `${logoWidth}px`,
-              width: 'auto'
+              width: "auto",
             }}
           />
         ) : (
           <div
             className="w-8 h-8 rounded flex items-center justify-center"
-            style={{ backgroundColor: colors.primary, color: colors.primaryText }}
+            style={{
+              backgroundColor: colors.primary,
+              color: colors.primaryText,
+            }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" />
               <polyline points="14 2 14 8 20 8" />
             </svg>
@@ -200,32 +222,37 @@ export function ReceiptStyleInvoice({
         )}
         <span
           className="text-sm font-medium tracking-tight"
-          style={{ color: colors.primary, fontFamily: `"${headingFont}", monospace` }}
+          style={{
+            color: colors.primary,
+            fontFamily: `"${headingFont}", monospace`,
+          }}
         >
           {companyName || "SleekInvoices"}
         </span>
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 
       {/* Meta Info */}
       <div className="grid grid-cols-1 gap-4 mb-2">
         <div>
-          <div 
+          <div
             className="text-[10px] uppercase tracking-widest font-medium leading-none mb-1"
             style={{ color: colors.muted }}
           >
             Invoice #
           </div>
-          <div className="text-sm font-medium tabular-nums">{invoiceNumber}</div>
+          <div className="text-sm font-medium tabular-nums">
+            {invoiceNumber}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <div 
+            <div
               className="text-[10px] uppercase tracking-widest font-medium leading-none mb-1"
               style={{ color: colors.muted }}
             >
@@ -248,13 +275,13 @@ export function ReceiptStyleInvoice({
           </div>
         </div>
         <div>
-          <div 
+          <div
             className="text-[10px] uppercase tracking-widest font-medium leading-none mb-1"
             style={{ color: colors.muted }}
           >
             Status
           </div>
-          <div 
+          <div
             className="text-sm flex items-center gap-1.5"
             style={{ color: getStatusColor(status) }}
           >
@@ -265,8 +292,8 @@ export function ReceiptStyleInvoice({
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 
@@ -308,14 +335,14 @@ export function ReceiptStyleInvoice({
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 
       {/* To */}
       <div className="mb-6">
-        <div 
+        <div
           className="text-[10px] uppercase tracking-widest font-medium leading-none mb-1"
           style={{ color: colors.muted }}
         >
@@ -340,14 +367,14 @@ export function ReceiptStyleInvoice({
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 
       {/* Items */}
       <div className="mb-6">
-        <div 
+        <div
           className="text-[10px] uppercase tracking-widest font-medium leading-none mb-1"
           style={{ color: colors.muted }}
         >
@@ -355,7 +382,7 @@ export function ReceiptStyleInvoice({
         </div>
         <div className="mt-4 space-y-4">
           {/* Header */}
-          <div 
+          <div
             className="grid grid-cols-12 text-[10px] uppercase tracking-widest font-medium mb-2 pb-2"
             style={{ color: colors.muted }}
           >
@@ -367,7 +394,7 @@ export function ReceiptStyleInvoice({
           {lineItems.map((item, index) => (
             <div key={index} className="grid grid-cols-12 text-sm gap-y-1">
               <div className="col-span-6 pr-4">{item.description}</div>
-              <div 
+              <div
                 className="col-span-2 text-right tabular-nums"
                 style={{ color: colors.muted }}
               >
@@ -376,7 +403,7 @@ export function ReceiptStyleInvoice({
               <div className="col-span-4 text-right tabular-nums">
                 <Currency amount={item.quantity * item.rate} />
               </div>
-              <div 
+              <div
                 className="col-span-12 text-[10px] tabular-nums"
                 style={{ color: colors.muted }}
               >
@@ -388,8 +415,8 @@ export function ReceiptStyleInvoice({
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 
@@ -404,7 +431,10 @@ export function ReceiptStyleInvoice({
         {showDiscountField && discountAmount > 0 && (
           <div className="grid grid-cols-2 gap-8 w-full max-w-[240px]">
             <div style={{ color: colors.accent }}>Discount</div>
-            <div className="text-right tabular-nums" style={{ color: colors.accent }}>
+            <div
+              className="text-right tabular-nums"
+              style={{ color: colors.accent }}
+            >
               -<Currency amount={discountAmount} />
             </div>
           </div>
@@ -423,15 +453,18 @@ export function ReceiptStyleInvoice({
         />
         <div className="grid grid-cols-2 gap-8 w-full max-w-[240px] text-lg font-medium">
           <div style={{ fontFamily: `"${headingFont}", monospace` }}>Total</div>
-          <div className="text-right tabular-nums" style={{ color: colors.accent }}>
+          <div
+            className="text-right tabular-nums"
+            style={{ color: colors.accent }}
+          >
             <Currency amount={total} />
           </div>
         </div>
       </div>
 
       {/* Divider */}
-      <div 
-        className="my-6 border-t border-dashed w-full" 
+      <div
+        className="my-6 border-t border-dashed w-full"
         style={{ borderColor: colors.divider }}
       />
 

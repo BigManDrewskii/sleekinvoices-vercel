@@ -1,12 +1,16 @@
 /**
  * Templates Page Skeleton
- * 
+ *
  * Provides loading skeleton for the templates page
  * including template cards and preview areas.
  */
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton, SkeletonBadge, SkeletonButton } from "@/components/ui/skeleton";
+import {
+  Skeleton,
+  SkeletonBadge,
+  SkeletonButton,
+} from "@/components/ui/skeleton";
 
 /**
  * Skeleton for template preview card
@@ -96,7 +100,7 @@ export function TemplatesPageSkeleton() {
     <div className="space-y-8">
       {/* Main template showcase */}
       <MainTemplateShowcaseSkeleton />
-      
+
       {/* Custom templates section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">

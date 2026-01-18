@@ -1,20 +1,20 @@
 /**
  * Decimal Precision Utilities
- * 
+ *
  * Provides precise decimal arithmetic for financial calculations,
  * especially important for cryptocurrency amounts with up to 18 decimal places.
- * 
+ *
  * Uses decimal.js to avoid JavaScript floating-point precision issues.
  */
 
-import Decimal from 'decimal.js';
+import Decimal from "decimal.js";
 
 // Configure Decimal.js for high precision
 Decimal.set({
-  precision: 30,      // 30 significant digits
+  precision: 30, // 30 significant digits
   rounding: Decimal.ROUND_HALF_UP,
-  toExpNeg: -30,      // Don't use exponential notation for small numbers
-  toExpPos: 30,       // Don't use exponential notation for large numbers
+  toExpNeg: -30, // Don't use exponential notation for small numbers
+  toExpPos: 30, // Don't use exponential notation for large numbers
 });
 
 /**
@@ -22,38 +22,50 @@ Decimal.set({
  */
 export function toDecimal(value: string | number | Decimal): Decimal {
   if (value instanceof Decimal) return value;
-  if (typeof value === 'string' && value.trim() === '') return new Decimal(0);
+  if (typeof value === "string" && value.trim() === "") return new Decimal(0);
   return new Decimal(value);
 }
 
 /**
  * Add two decimal values
  */
-export function add(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function add(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   return toDecimal(a).plus(toDecimal(b));
 }
 
 /**
  * Subtract b from a
  */
-export function subtract(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function subtract(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   return toDecimal(a).minus(toDecimal(b));
 }
 
 /**
  * Multiply two decimal values
  */
-export function multiply(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function multiply(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   return toDecimal(a).times(toDecimal(b));
 }
 
 /**
  * Divide a by b
  */
-export function divide(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function divide(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   const divisor = toDecimal(b);
   if (divisor.isZero()) {
-    throw new Error('Division by zero');
+    throw new Error("Division by zero");
   }
   return toDecimal(a).dividedBy(divisor);
 }
@@ -63,7 +75,10 @@ export function divide(a: string | number | Decimal, b: string | number | Decima
  * @param value - The base value
  * @param percentage - The percentage (e.g., 10 for 10%)
  */
-export function percentage(value: string | number | Decimal, pct: string | number | Decimal): Decimal {
+export function percentage(
+  value: string | number | Decimal,
+  pct: string | number | Decimal
+): Decimal {
   return multiply(value, divide(pct, 100));
 }
 
@@ -91,20 +106,20 @@ export function formatDecimal(
 ): string {
   const decimal = toDecimal(value);
   const formatted = decimal.toFixed(decimals);
-  
+
   if (trimTrailingZeros) {
     // Remove trailing zeros but keep at least 2 decimal places for fiat
     const minDecimals = decimals >= 2 ? 2 : decimals;
-    const parts = formatted.split('.');
+    const parts = formatted.split(".");
     if (parts.length === 2) {
-      let decimalPart = parts[1].replace(/0+$/, '');
+      let decimalPart = parts[1].replace(/0+$/, "");
       if (decimalPart.length < minDecimals) {
-        decimalPart = decimalPart.padEnd(minDecimals, '0');
+        decimalPart = decimalPart.padEnd(minDecimals, "0");
       }
       return decimalPart.length > 0 ? `${parts[0]}.${decimalPart}` : parts[0];
     }
   }
-  
+
   return formatted;
 }
 
@@ -116,25 +131,36 @@ export function formatDecimal(
  */
 export function formatCurrency(
   value: string | number | Decimal,
-  currency: string = 'USD',
-  locale: string = 'en-US'
+  currency: string = "USD",
+  locale: string = "en-US"
 ): string {
   const decimal = toDecimal(value);
-  
+
   // Crypto currencies need more decimal places
-  const cryptoCurrencies = ['BTC', 'ETH', 'USDT', 'USDC', 'SOL', 'XRP', 'ADA', 'DOT', 'MATIC', 'AVAX'];
+  const cryptoCurrencies = [
+    "BTC",
+    "ETH",
+    "USDT",
+    "USDC",
+    "SOL",
+    "XRP",
+    "ADA",
+    "DOT",
+    "MATIC",
+    "AVAX",
+  ];
   const isCrypto = cryptoCurrencies.includes(currency.toUpperCase());
-  
+
   if (isCrypto) {
     // For crypto, show up to 8 decimal places, trimming trailing zeros
     const formatted = formatDecimal(decimal, 8, true);
     return `${formatted} ${currency.toUpperCase()}`;
   }
-  
+
   // For fiat currencies, use Intl.NumberFormat
   try {
     return new Intl.NumberFormat(locale, {
-      style: 'currency',
+      style: "currency",
       currency: currency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -149,7 +175,10 @@ export function formatCurrency(
  * Compare two decimal values
  * @returns -1 if a < b, 0 if a === b, 1 if a > b
  */
-export function compare(a: string | number | Decimal, b: string | number | Decimal): -1 | 0 | 1 {
+export function compare(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): -1 | 0 | 1 {
   const result = toDecimal(a).comparedTo(toDecimal(b));
   return result as -1 | 0 | 1;
 }
@@ -178,21 +207,30 @@ export function isNegative(value: string | number | Decimal): boolean {
 /**
  * Get the minimum of two values
  */
-export function min(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function min(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   return Decimal.min(toDecimal(a), toDecimal(b));
 }
 
 /**
  * Get the maximum of two values
  */
-export function max(a: string | number | Decimal, b: string | number | Decimal): Decimal {
+export function max(
+  a: string | number | Decimal,
+  b: string | number | Decimal
+): Decimal {
   return Decimal.max(toDecimal(a), toDecimal(b));
 }
 
 /**
  * Round a value to specified decimal places
  */
-export function round(value: string | number | Decimal, decimals: number = 2): Decimal {
+export function round(
+  value: string | number | Decimal,
+  decimals: number = 2
+): Decimal {
   return toDecimal(value).toDecimalPlaces(decimals, Decimal.ROUND_HALF_UP);
 }
 
@@ -212,7 +250,9 @@ export function calculateLineItemAmount(
 export function calculateSubtotal(
   lineItems: Array<{ quantity: string | number; rate: string | number }>
 ): Decimal {
-  return sum(lineItems.map(item => calculateLineItemAmount(item.quantity, item.rate)));
+  return sum(
+    lineItems.map(item => calculateLineItemAmount(item.quantity, item.rate))
+  );
 }
 
 /**
@@ -234,9 +274,9 @@ export function calculateTax(
 export function calculateDiscount(
   subtotal: string | number | Decimal,
   discountValue: string | number | Decimal,
-  discountType: 'percentage' | 'fixed'
+  discountType: "percentage" | "fixed"
 ): Decimal {
-  if (discountType === 'percentage') {
+  if (discountType === "percentage") {
     return percentage(subtotal, discountValue);
   }
   return toDecimal(discountValue);
@@ -272,7 +312,7 @@ export function calculatePaymentProgress(
 ): number {
   const totalDecimal = toDecimal(total);
   if (totalDecimal.isZero()) return 100;
-  
+
   const progress = divide(amountPaid, total).times(100);
   return Math.min(100, Math.max(0, progress.toNumber()));
 }

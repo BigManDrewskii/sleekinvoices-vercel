@@ -8,12 +8,14 @@ import * as db from "./db";
 export async function fetchExchangeRates(): Promise<Record<string, number>> {
   try {
     // Free API endpoint (no key required for basic usage)
-    const response = await axios.get("https://api.exchangerate-api.com/v4/latest/USD");
-    
+    const response = await axios.get(
+      "https://api.exchangerate-api.com/v4/latest/USD"
+    );
+
     if (response.data && response.data.rates) {
       return response.data.rates as Record<string, number>;
     }
-    
+
     throw new Error("Invalid response from exchange rate API");
   } catch (error) {
     console.error("[Currency] Failed to fetch exchange rates:", error);
@@ -28,10 +30,10 @@ export async function updateExchangeRates(): Promise<void> {
   try {
     console.log("[Currency] Fetching latest exchange rates...");
     const rates = await fetchExchangeRates();
-    
+
     console.log("[Currency] Updating database with new rates...");
     await db.updateExchangeRates(rates);
-    
+
     console.log("[Currency] Exchange rates updated successfully");
   } catch (error) {
     console.error("[Currency] Failed to update exchange rates:", error);
@@ -44,17 +46,17 @@ export async function updateExchangeRates(): Promise<void> {
  */
 export async function initializeDefaultCurrencies(): Promise<void> {
   const currencies = await db.getAllCurrencies();
-  
+
   if (currencies.length > 0) {
     console.log("[Currency] Currencies already initialized");
     return;
   }
-  
+
   console.log("[Currency] Initializing default currencies...");
-  
+
   // Fetch current rates
   const rates = await fetchExchangeRates();
-  
+
   // Common currencies to initialize
   const defaultCurrencies = [
     { code: "USD", name: "US Dollar", symbol: "$" },
@@ -67,10 +69,10 @@ export async function initializeDefaultCurrencies(): Promise<void> {
     { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
     { code: "INR", name: "Indian Rupee", symbol: "₹" },
   ];
-  
+
   for (const currency of defaultCurrencies) {
     const rate = rates[currency.code] || 1;
-    
+
     await db.createCurrency({
       code: currency.code,
       name: currency.name,
@@ -79,6 +81,6 @@ export async function initializeDefaultCurrencies(): Promise<void> {
       isActive: 1,
     });
   }
-  
+
   console.log("[Currency] Default currencies initialized");
 }

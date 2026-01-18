@@ -6,7 +6,7 @@ import { useCallback, useRef } from "react";
  * Improves perceived performance by loading data before navigation
  */
 
-type PrefetchableRoutes = 
+type PrefetchableRoutes =
   | "clients"
   | "invoices"
   | "expenses"
@@ -24,7 +24,7 @@ export function usePrefetch() {
   const prefetch = useCallback(
     (route: PrefetchableRoutes, id?: number) => {
       const cacheKey = id ? `${route}-${id}` : route;
-      
+
       // Don't prefetch if already prefetched recently
       if (prefetchedRef.current.has(cacheKey)) {
         return;
@@ -103,7 +103,7 @@ export function usePrefetchInvoice() {
   const prefetchInvoice = useCallback(
     (id: number) => {
       if (prefetchedRef.current.has(id)) return;
-      
+
       prefetchedRef.current.add(id);
       utils.invoices.get.prefetch({ id });
 
@@ -127,7 +127,7 @@ export function usePrefetchClient() {
   const prefetchClient = useCallback(
     (id: number) => {
       if (prefetchedRef.current.has(id)) return;
-      
+
       prefetchedRef.current.add(id);
       utils.clients.get.prefetch({ id });
 

@@ -10,7 +10,15 @@ import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/utils";
-import { Loader2, ExternalLink, Bitcoin, Copy, Check, Coins, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  ExternalLink,
+  Bitcoin,
+  Copy,
+  Check,
+  Coins,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface CryptoPaymentDialogProps {
@@ -35,12 +43,14 @@ export function CryptoPaymentDialog({
 
   // Create payment mutation - no crypto currency specified, customer chooses on NOWPayments
   const createPayment = trpc.crypto.createPayment.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setPaymentUrl(data.invoiceUrl);
-      toast.success("Payment link created! Choose your preferred cryptocurrency on the checkout page.");
+      toast.success(
+        "Payment link created! Choose your preferred cryptocurrency on the checkout page."
+      );
       onPaymentCreated?.();
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(error.message || "Failed to create crypto payment");
     },
   });
@@ -99,23 +109,31 @@ export function CryptoPaymentDialog({
               <div className="rounded-lg bg-[hsl(var(--color-bitcoin))]/5 border border-[hsl(var(--color-bitcoin))]/20 p-4 space-y-3">
                 <div className="flex items-center gap-2 text-[hsl(var(--color-bitcoin))]">
                   <Coins className="h-5 w-5" />
-                  <span className="font-medium">300+ Cryptocurrencies Supported</span>
+                  <span className="font-medium">
+                    300+ Cryptocurrencies Supported
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Click the button below to create a payment link. You'll be able to choose from Bitcoin, Ethereum, USDT, USDC, and 300+ other cryptocurrencies on the secure checkout page.
+                  Click the button below to create a payment link. You'll be
+                  able to choose from Bitcoin, Ethereum, USDT, USDC, and 300+
+                  other cryptocurrencies on the secure checkout page.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-1">
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                    <span className="text-[hsl(var(--color-bitcoin))]">₿</span> BTC
+                    <span className="text-[hsl(var(--color-bitcoin))]">₿</span>{" "}
+                    BTC
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                    <span className="text-[hsl(var(--color-ethereum))]">Ξ</span> ETH
+                    <span className="text-[hsl(var(--color-ethereum))]">Ξ</span>{" "}
+                    ETH
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                    <span className="text-[hsl(var(--color-usdt))]">₮</span> USDT
+                    <span className="text-[hsl(var(--color-usdt))]">₮</span>{" "}
+                    USDT
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium">
-                    <span className="text-[hsl(var(--color-usdc))]">$</span> USDC
+                    <span className="text-[hsl(var(--color-usdc))]">$</span>{" "}
+                    USDC
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-background text-xs font-medium text-muted-foreground">
                     +300 more
@@ -125,7 +143,9 @@ export function CryptoPaymentDialog({
 
               {/* Amount Display */}
               <div className="rounded-lg border p-4 space-y-1">
-                <div className="text-sm text-muted-foreground">Amount to Pay</div>
+                <div className="text-sm text-muted-foreground">
+                  Amount to Pay
+                </div>
                 <div className="text-2xl font-bold">
                   {formatCurrency(amount)} {currency}
                 </div>
@@ -141,25 +161,41 @@ export function CryptoPaymentDialog({
                         Small Amount Notice
                       </h4>
                       <p className="text-xs text-amber-800 dark:text-amber-200 mb-3 leading-relaxed">
-                        Cryptocurrency payments include network fees that vary by currency.
-                        For amounts under $10, we recommend:
+                        Cryptocurrency payments include network fees that vary
+                        by currency. For amounts under $10, we recommend:
                       </p>
                       <ul className="text-xs text-amber-700 dark:text-amber-300 space-y-1.5">
                         <li className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                          <span><strong className="font-semibold">Litecoin (LTC)</strong> — Fast, low fees</span>
+                          <span>
+                            <strong className="font-semibold">
+                              Litecoin (LTC)
+                            </strong>{" "}
+                            — Fast, low fees
+                          </span>
                         </li>
                         <li className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                          <span><strong className="font-semibold">Stellar (XLM)</strong> — Near-instant, minimal fees</span>
+                          <span>
+                            <strong className="font-semibold">
+                              Stellar (XLM)
+                            </strong>{" "}
+                            — Near-instant, minimal fees
+                          </span>
                         </li>
                         <li className="flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                          <span><strong className="font-semibold">USDT on Tron</strong> — Stablecoin, low fees</span>
+                          <span>
+                            <strong className="font-semibold">
+                              USDT on Tron
+                            </strong>{" "}
+                            — Stablecoin, low fees
+                          </span>
                         </li>
                       </ul>
                       <p className="text-xs text-amber-700 dark:text-amber-300 mt-3">
-                        You'll select your currency on the NOWPayments checkout page.
+                        You'll select your currency on the NOWPayments checkout
+                        page.
                       </p>
                     </div>
                   </div>
@@ -196,17 +232,28 @@ export function CryptoPaymentDialog({
                   <span className="font-medium">Payment Link Created!</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Click the button below to choose your preferred cryptocurrency and complete your payment on the NOWPayments secure checkout page.
+                  Click the button below to choose your preferred cryptocurrency
+                  and complete your payment on the NOWPayments secure checkout
+                  page.
                 </p>
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-2">
-                <Button variant="crypto" size="lg" onClick={handleOpenPayment} className="w-full">
+                <Button
+                  variant="crypto"
+                  size="lg"
+                  onClick={handleOpenPayment}
+                  className="w-full"
+                >
                   <ExternalLink className="size-4" />
                   Choose Crypto & Pay
                 </Button>
-                <Button variant="outline" onClick={handleCopyLink} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={handleCopyLink}
+                  className="w-full"
+                >
                   {copied ? (
                     <>
                       <Check className="size-4" />

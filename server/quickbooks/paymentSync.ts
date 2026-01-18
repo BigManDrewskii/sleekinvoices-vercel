@@ -3,7 +3,14 @@
  * Handles two-way payment synchronization between SleekInvoices and QuickBooks
  */
 import { getDb } from "../db";
-import { payments, invoices, quickbooksPaymentMapping, quickbooksInvoiceMapping, quickbooksSyncLog, quickbooksSyncSettings } from "../../drizzle/schema";
+import {
+  payments,
+  invoices,
+  quickbooksPaymentMapping,
+  quickbooksInvoiceMapping,
+  quickbooksSyncLog,
+  quickbooksSyncSettings,
+} from "../../drizzle/schema";
 import { eq, and, desc, gt, isNull, or } from "drizzle-orm";
 import { queryQB, createQBEntity, getQBEntity } from "./client";
 import { updateLastSyncTime } from "./oauth";
@@ -302,7 +309,10 @@ export async function syncPaymentToQB(
       invoiceMapping.qbInvoiceId
     );
     if (!qbInvoice.success || !qbInvoice.data) {
-      return { success: false, error: "Failed to fetch invoice from QuickBooks" };
+      return {
+        success: false,
+        error: "Failed to fetch invoice from QuickBooks",
+      };
     }
 
     qbPaymentData.CustomerRef = qbInvoice.data.CustomerRef;
@@ -378,7 +388,8 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
   errors: string[];
 }> {
   const db = await getDb();
-  if (!db) return { success: false, synced: 0, errors: ["Database not available"] };
+  if (!db)
+    return { success: false, synced: 0, errors: ["Database not available"] };
 
   const settings = await getSyncSettings(userId);
   if (!settings.syncPaymentsFromQB) {
@@ -390,7 +401,8 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
 
   try {
     // Get the last poll time
-    const lastPoll = settings.lastPaymentPollAt || new Date(Date.now() - 24 * 60 * 60 * 1000); // Default to 24 hours ago
+    const lastPoll =
+      settings.lastPaymentPollAt || new Date(Date.now() - 24 * 60 * 60 * 1000); // Default to 24 hours ago
     const lastPollStr = lastPoll.toISOString().replace("T", " ").split(".")[0];
 
     // Query QuickBooks for payments updated since last poll
@@ -398,7 +410,11 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
     const result = await queryQB<QBPayment>(userId, query);
 
     if (!result.success) {
-      return { success: false, synced: 0, errors: [result.error || "Failed to query payments"] };
+      return {
+        success: false,
+        synced: 0,
+        errors: [result.error || "Failed to query payments"],
+      };
     }
 
     const qbPayments = result.data || [];
@@ -406,7 +422,10 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
     for (const qbPayment of qbPayments) {
       try {
         // Check if this payment is already mapped
-        const existingMapping = await getPaymentMappingByQBId(userId, qbPayment.Id);
+        const existingMapping = await getPaymentMappingByQBId(
+          userId,
+          qbPayment.Id
+        );
         if (existingMapping) {
           // Payment already exists, skip
           continue;
@@ -418,9 +437,9 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
         }
 
         const linkedInvoice = qbPayment.Line.find(
-          (line) =>
+          line =>
             line.LinkedTxn &&
-            line.LinkedTxn.some((txn) => txn.TxnType === "Invoice")
+            line.LinkedTxn.some(txn => txn.TxnType === "Invoice")
         );
 
         if (!linkedInvoice) {
@@ -428,7 +447,7 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
         }
 
         const qbInvoiceId = linkedInvoice.LinkedTxn.find(
-          (txn) => txn.TxnType === "Invoice"
+          txn => txn.TxnType === "Invoice"
         )?.TxnId;
 
         if (!qbInvoiceId) {
@@ -469,18 +488,23 @@ export async function pollPaymentsFromQB(userId: number): Promise<{
 
         // Create a payment record in SleekInvoices
         const paymentDate = new Date(qbPayment.TxnDate);
-        const [newPayment] = await db.insert(payments).values({
-          invoiceId: invoice.id,
-          userId,
-          amount: String(linkedInvoice.Amount),
-          currency: invoice.currency,
-          paymentMethod: "bank_transfer", // Default, QB doesn't always provide this
-          paymentDate,
-          status: "completed",
-          notes: qbPayment.PrivateNote || `Synced from QuickBooks (ID: ${qbPayment.Id})`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }).$returningId();
+        const [newPayment] = await db
+          .insert(payments)
+          .values({
+            invoiceId: invoice.id,
+            userId,
+            amount: String(linkedInvoice.Amount),
+            currency: invoice.currency,
+            paymentMethod: "bank_transfer", // Default, QB doesn't always provide this
+            paymentDate,
+            status: "completed",
+            notes:
+              qbPayment.PrivateNote ||
+              `Synced from QuickBooks (ID: ${qbPayment.Id})`,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .$returningId();
 
         const paymentId = newPayment!.id;
 

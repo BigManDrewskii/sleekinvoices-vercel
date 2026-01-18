@@ -1,10 +1,31 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Sparkles, Zap, Crown, Check, Loader2, Plus, History } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Sparkles,
+  Zap,
+  Crown,
+  Check,
+  Loader2,
+  Plus,
+  History,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -17,16 +38,17 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
   const [open, setOpen] = useState(false);
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
 
-  const { data: credits, refetch: refetchCredits } = trpc.ai.getCredits.useQuery();
+  const { data: credits, refetch: refetchCredits } =
+    trpc.ai.getCredits.useQuery();
   const { data: packs } = trpc.ai.getCreditPacks.useQuery();
   const { data: purchaseHistory } = trpc.ai.getPurchaseHistory.useQuery();
 
   const purchaseMutation = trpc.ai.createCreditPurchase.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Redirect to Stripe checkout
       window.location.href = data.url;
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(error.message || "Failed to create checkout session");
       setSelectedPack(null);
     },
@@ -34,7 +56,9 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
 
   const handlePurchase = (packType: string) => {
     setSelectedPack(packType);
-    purchaseMutation.mutate({ packType: packType as 'starter' | 'standard' | 'pro_pack' });
+    purchaseMutation.mutate({
+      packType: packType as "starter" | "standard" | "pro_pack",
+    });
   };
 
   const packIcons: Record<string, typeof Sparkles> = {
@@ -58,9 +82,7 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || defaultTrigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger || defaultTrigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -68,7 +90,8 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
             Get More AI Credits
           </DialogTitle>
           <DialogDescription>
-            Purchase additional credits to continue using AI features. Credits are added to your current month's balance.
+            Purchase additional credits to continue using AI features. Credits
+            are added to your current month's balance.
           </DialogDescription>
         </DialogHeader>
 
@@ -81,18 +104,21 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
             </div>
             <div className="text-right text-sm text-muted-foreground">
               <p>{credits.used} used this month</p>
-              <p>{credits.limit} base + {credits.purchased} purchased</p>
+              <p>
+                {credits.limit} base + {credits.purchased} purchased
+              </p>
             </div>
           </div>
         )}
 
         {/* Credit Packs */}
         <div className="grid gap-4 py-4">
-          {packs?.map((pack) => {
+          {packs?.map(pack => {
             const Icon = packIcons[pack.id] || Sparkles;
             const colorClass = packColors[pack.id] || packColors.starter;
-            const isPopular = pack.id === 'standard';
-            const isPurchasing = selectedPack === pack.id && purchaseMutation.isPending;
+            const isPopular = pack.id === "standard";
+            const isPurchasing =
+              selectedPack === pack.id && purchaseMutation.isPending;
 
             return (
               <Card
@@ -103,7 +129,9 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
                   colorClass,
                   selectedPack === pack.id && "ring-2 ring-primary"
                 )}
-                onClick={() => !purchaseMutation.isPending && handlePurchase(pack.id)}
+                onClick={() =>
+                  !purchaseMutation.isPending && handlePurchase(pack.id)
+                }
               >
                 {isPopular && (
                   <Badge className="absolute -top-2 right-4 bg-primary">
@@ -118,12 +146,15 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
                     <div>
                       <h3 className="font-semibold text-lg">{pack.name}</h3>
                       <p className="text-sm text-muted-foreground">
-                        {pack.credits} credits • ${(pack.pricePerCredit * 100).toFixed(1)}¢ each
+                        {pack.credits} credits • $
+                        {(pack.pricePerCredit * 100).toFixed(1)}¢ each
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold">${pack.price.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">
+                      ${pack.price.toFixed(2)}
+                    </p>
                     <Button
                       size="sm"
                       className="mt-2"
@@ -169,18 +200,24 @@ export function CreditTopUp({ trigger, onSuccess }: CreditTopUpProps) {
               <span className="text-sm font-medium">Recent Purchases</span>
             </div>
             <div className="space-y-2 max-h-32 overflow-y-auto">
-              {purchaseHistory.slice(0, 3).map((purchase) => (
+              {purchaseHistory.slice(0, 3).map(purchase => (
                 <div
                   key={purchase.id}
                   className="flex items-center justify-between text-sm p-2 rounded bg-muted/30"
                 >
                   <div>
-                    <span className="font-medium">{purchase.creditsAmount} credits</span>
+                    <span className="font-medium">
+                      {purchase.creditsAmount} credits
+                    </span>
                     <span className="text-muted-foreground ml-2">
                       {new Date(purchase.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <Badge variant={purchase.status === 'completed' ? 'default' : 'secondary'}>
+                  <Badge
+                    variant={
+                      purchase.status === "completed" ? "default" : "secondary"
+                    }
+                  >
                     {purchase.status}
                   </Badge>
                 </div>
@@ -202,22 +239,28 @@ export function LowCreditsPrompt({ className }: { className?: string }) {
   if (!credits || credits.remaining > 3) return null;
 
   return (
-    <div className={cn(
-      "flex items-center justify-between p-3 rounded-lg",
-      "bg-amber-500/10 border border-amber-500/30",
-      className
-    )}>
+    <div
+      className={cn(
+        "flex items-center justify-between p-3 rounded-lg",
+        "bg-amber-500/10 border border-amber-500/30",
+        className
+      )}
+    >
       <div className="flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-amber-500" />
         <span className="text-sm">
-          {credits.remaining === 0 
-            ? "You're out of AI credits" 
+          {credits.remaining === 0
+            ? "You're out of AI credits"
             : `Only ${credits.remaining} credits left`}
         </span>
       </div>
       <CreditTopUp
         trigger={
-          <Button size="sm" variant="outline" className="gap-1.5 border-amber-500/50 hover:bg-amber-500/10">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 border-amber-500/50 hover:bg-amber-500/10"
+          >
             <Plus className="h-3.5 w-3.5" />
             Top Up
           </Button>

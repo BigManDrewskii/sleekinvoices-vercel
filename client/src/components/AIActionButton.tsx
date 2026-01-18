@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { 
-  FileText, 
-  User, 
-  Mail, 
-  ExternalLink, 
+import {
+  FileText,
+  User,
+  Mail,
+  ExternalLink,
   Plus,
   Send,
   Eye,
@@ -14,7 +14,7 @@ import {
   Calendar,
   DollarSign,
   Users,
-  BarChart3
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ import { trpc } from "@/lib/trpc";
 /**
  * Action types that the AI can suggest
  */
-export type AIActionType = 
+export type AIActionType =
   | "create_invoice"
   | "view_invoice"
   | "view_client"
@@ -54,11 +54,11 @@ export function parseAIResponse(content: string): {
 } {
   const actionRegex = /\[\[action:(\w+)\|([^|]+)(?:\|([^\]]+))?\]\]/g;
   const actions: AIAction[] = [];
-  
+
   // Extract actions and replace with empty string
   const text = content.replace(actionRegex, (_, type, label, dataStr) => {
     let data: Record<string, string | number | boolean> | undefined;
-    
+
     if (dataStr) {
       try {
         data = JSON.parse(dataStr);
@@ -73,16 +73,16 @@ export function parseAIResponse(content: string): {
         });
       }
     }
-    
+
     actions.push({
       type: type as AIActionType,
       label,
       data,
     });
-    
+
     return ""; // Remove the action marker from displayed text
   });
-  
+
   return { text: text.trim(), actions };
 }
 
@@ -117,7 +117,9 @@ function getActionIcon(type: AIActionType) {
 /**
  * Get action button variant based on type
  */
-function getActionVariant(type: AIActionType): "default" | "secondary" | "outline" {
+function getActionVariant(
+  type: AIActionType
+): "default" | "secondary" | "outline" {
   switch (type) {
     case "create_invoice":
     case "create_client":
@@ -138,20 +140,24 @@ interface AIActionButtonProps {
 /**
  * Renders a single action button that executes the specified action
  */
-export function AIActionButton({ action, onComplete, className }: AIActionButtonProps) {
+export function AIActionButton({
+  action,
+  onComplete,
+  className,
+}: AIActionButtonProps) {
   const [, navigate] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [copied, setCopied] = useState(false);
-  
+
   const sendReminderMutation = trpc.invoices.sendReminder.useMutation();
-  
+
   const Icon = getActionIcon(action.type);
   const variant = getActionVariant(action.type);
-  
+
   const handleClick = async () => {
     setIsLoading(true);
-    
+
     try {
       switch (action.type) {
         case "create_invoice":
@@ -163,9 +169,11 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
           if (action.data?.clientName) {
             invoiceParams.set("clientName", String(action.data.clientName));
           }
-          navigate(`/invoices/create${invoiceParams.toString() ? `?${invoiceParams}` : ""}`);
+          navigate(
+            `/invoices/create${invoiceParams.toString() ? `?${invoiceParams}` : ""}`
+          );
           break;
-          
+
         case "view_invoice":
           if (action.data?.invoiceId) {
             navigate(`/invoices/${action.data.invoiceId}`);
@@ -173,7 +181,7 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
             navigate("/invoices");
           }
           break;
-          
+
         case "view_client":
           if (action.data?.clientId) {
             navigate(`/clients/${action.data.clientId}`);
@@ -181,11 +189,11 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
             navigate("/clients");
           }
           break;
-          
+
         case "create_client":
           navigate("/clients/new");
           break;
-          
+
         case "send_reminder":
           if (action.data?.invoiceId) {
             await sendReminderMutation.mutateAsync({
@@ -194,13 +202,13 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
             setIsComplete(true);
           }
           break;
-          
+
         case "navigate":
           if (action.data?.path) {
             navigate(String(action.data.path));
           }
           break;
-          
+
         case "copy_text":
           if (action.data?.text) {
             await navigator.clipboard.writeText(String(action.data.text));
@@ -208,11 +216,11 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
             setTimeout(() => setCopied(false), 2000);
           }
           break;
-          
+
         case "view_analytics":
           navigate("/analytics");
           break;
-          
+
         case "schedule_reminder":
           // Navigate to settings reminders tab
           navigate("/settings?tab=reminders");
@@ -233,7 +241,7 @@ export function AIActionButton({ action, onComplete, className }: AIActionButton
       setIsLoading(false);
     }
   };
-  
+
   return (
     <Button
       variant={variant}
@@ -269,11 +277,20 @@ interface AIActionButtonGroupProps {
 /**
  * Renders a group of action buttons
  */
-export function AIActionButtonGroup({ actions, onActionComplete, className }: AIActionButtonGroupProps) {
+export function AIActionButtonGroup({
+  actions,
+  onActionComplete,
+  className,
+}: AIActionButtonGroupProps) {
   if (actions.length === 0) return null;
-  
+
   return (
-    <div className={cn("flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/50", className)}>
+    <div
+      className={cn(
+        "flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/50",
+        className
+      )}
+    >
       {actions.map((action, index) => (
         <AIActionButton
           key={`${action.type}-${index}`}
@@ -294,21 +311,28 @@ interface AIMessageContentProps {
   onActionComplete?: () => void;
 }
 
-export function AIMessageContent({ content, isStreaming, onActionComplete }: AIMessageContentProps) {
+export function AIMessageContent({
+  content,
+  isStreaming,
+  onActionComplete,
+}: AIMessageContentProps) {
   // Don't parse actions while streaming
   if (isStreaming) {
     return <span>{content}</span>;
   }
-  
+
   const { text, actions } = parseAIResponse(content);
-  
+
   return (
     <div>
       <div className="prose prose-sm dark:prose-invert max-w-none">
         {/* Use Streamdown for markdown rendering */}
         {text}
       </div>
-      <AIActionButtonGroup actions={actions} onActionComplete={onActionComplete} />
+      <AIActionButtonGroup
+        actions={actions}
+        onActionComplete={onActionComplete}
+      />
     </div>
   );
 }

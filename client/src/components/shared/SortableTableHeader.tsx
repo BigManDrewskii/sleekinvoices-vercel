@@ -29,12 +29,7 @@ export function SortableTableHeader({
   }[align];
 
   return (
-    <TableHead
-      className={cn(
-        alignClass,
-        className
-      )}
-    >
+    <TableHead className={cn(alignClass, className)}>
       <button
         type="button"
         onClick={() => onSort(sortKey)}
@@ -44,7 +39,7 @@ export function SortableTableHeader({
           "flex items-center gap-2",
           "-mx-3 px-3 md:-mx-4 md:px-4"
         )}
-        aria-label={`Sort by ${label}${isActive ? (isAscending ? ', currently ascending' : ', currently descending') : ''}`}
+        aria-label={`Sort by ${label}${isActive ? (isAscending ? ", currently ascending" : ", currently descending") : ""}`}
       >
         <span>{label}</span>
         {isActive && (

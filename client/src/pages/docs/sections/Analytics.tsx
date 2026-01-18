@@ -14,7 +14,8 @@ export const Analytics = () => (
 
     <SubsectionHeading>Dashboard Analytics</SubsectionHeading>
     <P>
-      The <Strong>Analytics</Strong> page provides comprehensive business insights:
+      The <Strong>Analytics</Strong> page provides comprehensive business
+      insights:
     </P>
 
     <P>
@@ -28,15 +29,18 @@ export const Analytics = () => (
     </UL>
 
     <P>
-      <Strong>Revenue Trend</Strong>: Interactive line chart showing monthly revenue over the past 12 months. Hover to see exact amounts.
+      <Strong>Revenue Trend</Strong>: Interactive line chart showing monthly
+      revenue over the past 12 months. Hover to see exact amounts.
     </P>
 
     <P>
-      <Strong>Invoice Status</Strong>: Pie chart showing breakdown of invoices by status (Draft, Sent, Paid, Overdue, Canceled).
+      <Strong>Invoice Status</Strong>: Pie chart showing breakdown of invoices
+      by status (Draft, Sent, Paid, Overdue, Canceled).
     </P>
 
     <P>
-      <Strong>Receivables Aging</Strong>: Shows how long invoices have been outstanding:
+      <Strong>Receivables Aging</Strong>: Shows how long invoices have been
+      outstanding:
     </P>
     <UL>
       <LI>Current (not yet due)</LI>
@@ -47,26 +51,34 @@ export const Analytics = () => (
     </UL>
 
     <P>
-      <Strong>Top Clients</Strong>: List of your most profitable clients by revenue.
+      <Strong>Top Clients</Strong>: List of your most profitable clients by
+      revenue.
     </P>
 
     <P>
-      <Strong>Email Performance</Strong>: Open and click rates for invoice emails and payment reminders.
+      <Strong>Email Performance</Strong>: Open and click rates for invoice
+      emails and payment reminders.
     </P>
 
     <SubsectionHeading>Exporting Reports</SubsectionHeading>
-    <P>
-      Export your data for accounting or analysis:
-    </P>
+    <P>Export your data for accounting or analysis:</P>
 
     <OL>
-      <LI>Go to <Strong>Invoices</Strong> or <Strong>Expenses</Strong></LI>
-      <LI>Click <Strong>Export</Strong> button</LI>
+      <LI>
+        Go to <Strong>Invoices</Strong> or <Strong>Expenses</Strong>
+      </LI>
+      <LI>
+        Click <Strong>Export</Strong> button
+      </LI>
       <LI>
         Choose format:
         <UL>
-          <LI><Strong>CSV</Strong> (for Excel/spreadsheets)</LI>
-          <LI><Strong>PDF</Strong> (for printing/sharing)</LI>
+          <LI>
+            <Strong>CSV</Strong> (for Excel/spreadsheets)
+          </LI>
+          <LI>
+            <Strong>PDF</Strong> (for printing/sharing)
+          </LI>
         </UL>
       </LI>
       <LI>Select date range and filters</LI>

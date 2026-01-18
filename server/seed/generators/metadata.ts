@@ -12,7 +12,11 @@ import {
 } from "../../../drizzle/schema";
 import type { SeededUser } from "./users";
 import type { SeededClient } from "./clients";
-import { CLIENT_TAGS, EXPENSE_CATEGORIES, INVOICE_LINE_ITEMS } from "../data/realistic-data";
+import {
+  CLIENT_TAGS,
+  EXPENSE_CATEGORIES,
+  INVOICE_LINE_ITEMS,
+} from "../data/realistic-data";
 import { SEED_CONFIG, CUSTOM_FIELD_TYPES } from "../data/constants";
 import { randomChoice, randomChoices, randomInt } from "../utils";
 import { DEFAULT_REMINDER_TEMPLATE } from "../../email";
@@ -106,7 +110,10 @@ async function seedClientTagAssignments(
     const numTags = Math.random() < 0.5 ? randomInt(1, 2) : 0;
 
     if (numTags > 0 && userTags.length > 0) {
-      const selectedTags = randomChoices(userTags, Math.min(numTags, userTags.length));
+      const selectedTags = randomChoices(
+        userTags,
+        Math.min(numTags, userTags.length)
+      );
       for (const tag of selectedTags) {
         assignments.push({
           clientId: client.id,
@@ -178,7 +185,10 @@ async function seedUsageTracking(
       trackingData.push({
         userId: user.id,
         month: monthStr,
-        invoicesCreated: user.subscriptionStatus === "free" ? randomInt(0, 3) : randomInt(10, 40),
+        invoicesCreated:
+          user.subscriptionStatus === "free"
+            ? randomInt(0, 3)
+            : randomInt(10, 40),
       });
     }
   }
@@ -197,7 +207,10 @@ async function seedAiCredits(
 
   for (const user of seededUsers) {
     const creditsLimit = user.subscriptionStatus === "free" ? 5 : 50;
-    const creditsUsed = randomInt(Math.floor(creditsLimit * 0.3), Math.floor(creditsLimit * 0.7));
+    const creditsUsed = randomInt(
+      Math.floor(creditsLimit * 0.3),
+      Math.floor(creditsLimit * 0.7)
+    );
 
     creditsData.push({
       userId: user.id,
@@ -231,7 +244,13 @@ async function seedCustomFields(
 ): Promise<SeededCustomField[]> {
   const allFields = [];
 
-  const fieldNames = ["Project Code", "Purchase Order", "Department", "Delivery Date", "Payment Method"];
+  const fieldNames = [
+    "Project Code",
+    "Purchase Order",
+    "Department",
+    "Delivery Date",
+    "Payment Method",
+  ];
 
   for (const user of seededUsers) {
     for (let i = 0; i < SEED_CONFIG.customFieldsPerUser; i++) {

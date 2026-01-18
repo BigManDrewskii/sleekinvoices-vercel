@@ -1,6 +1,9 @@
 import type { MySql2Database } from "drizzle-orm/mysql2";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { invoiceTemplates, type InsertInvoiceTemplate } from "../../../drizzle/schema";
+import {
+  invoiceTemplates,
+  type InsertInvoiceTemplate,
+} from "../../../drizzle/schema";
 import type { SeededUser } from "./users";
 import { TEMPLATE_PRESETS } from "../data/constants";
 

@@ -1,7 +1,7 @@
-import { AlertTriangle, Clock, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'wouter';
-import { useState } from 'react';
+import { AlertTriangle, Clock, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { useState } from "react";
 
 interface ExpirationWarningBannerProps {
   daysRemaining: number;
@@ -22,17 +22,19 @@ export function ExpirationWarningBanner({
   }
 
   const formattedDate = effectiveEndDate
-    ? new Date(effectiveEndDate).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
+    ? new Date(effectiveEndDate).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
       })
-    : 'soon';
+    : "soon";
 
   const isUrgent = daysRemaining <= 3;
-  const bgColor = isUrgent ? 'bg-destructive/10 border-destructive/30' : 'bg-amber-500/10 border-amber-500/30';
-  const textColor = isUrgent ? 'text-destructive' : 'text-amber-400';
-  const iconColor = isUrgent ? 'text-destructive' : 'text-amber-500';
+  const bgColor = isUrgent
+    ? "bg-destructive/10 border-destructive/30"
+    : "bg-amber-500/10 border-amber-500/30";
+  const textColor = isUrgent ? "text-destructive" : "text-amber-400";
+  const iconColor = isUrgent ? "text-destructive" : "text-amber-500";
 
   return (
     <div className={`relative rounded-lg border ${bgColor} p-4 mb-6`}>
@@ -40,22 +42,25 @@ export function ExpirationWarningBanner({
         <div className={`flex-shrink-0 ${iconColor}`}>
           <AlertTriangle className="h-5 w-5" />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className={`text-sm font-semibold ${textColor}`}>
-            {isUrgent ? 'Subscription Expiring Soon!' : 'Subscription Expiring'}
+            {isUrgent ? "Subscription Expiring Soon!" : "Subscription Expiring"}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your Pro subscription will expire on <span className="font-medium text-foreground">{formattedDate}</span>.
-            {' '}
-            <span className={`font-medium ${textColor}`}>
-              {timeRemaining}
-            </span>
+            Your Pro subscription will expire on{" "}
+            <span className="font-medium text-foreground">{formattedDate}</span>
+            .{" "}
+            <span className={`font-medium ${textColor}`}>{timeRemaining}</span>
           </p>
-          
+
           <div className="mt-3 flex items-center gap-3">
             <Link href="/subscription">
-              <Button size="sm" variant="default" className="bg-primary hover:bg-primary/90">
+              <Button
+                size="sm"
+                variant="default"
+                className="bg-primary hover:bg-primary/90"
+              >
                 <Clock className="h-4 w-4 mr-2" />
                 Extend Now
               </Button>
@@ -65,7 +70,7 @@ export function ExpirationWarningBanner({
             </span>
           </div>
         </div>
-        
+
         <Button
           variant="ghost"
           size="icon"

@@ -1,13 +1,13 @@
 /**
  * NOWPayments API Client
- * 
+ *
  * Handles all interactions with the NOWPayments crypto payment gateway.
  * Documentation: https://documenter.getpostman.com/view/7907941/2s93JusNJt
  */
 
-import crypto from 'crypto';
+import crypto from "crypto";
 
-const NOWPAYMENTS_API_URL = 'https://api.nowpayments.io/v1';
+const NOWPAYMENTS_API_URL = "https://api.nowpayments.io/v1";
 
 interface NOWPaymentsConfig {
   apiKey: string;
@@ -19,11 +19,11 @@ function getConfig(): NOWPaymentsConfig {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   const publicKey = process.env.NOWPAYMENTS_PUBLIC_KEY;
   const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
-  
+
   if (!apiKey || !publicKey) {
-    throw new Error('NOWPayments API credentials not configured');
+    throw new Error("NOWPayments API credentials not configured");
   }
-  
+
   return { apiKey, publicKey, ipnSecret };
 }
 
@@ -32,21 +32,25 @@ async function makeRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const config = getConfig();
-  
+
   const response = await fetch(`${NOWPAYMENTS_API_URL}${endpoint}`, {
     ...options,
     headers: {
-      'x-api-key': config.apiKey,
-      'Content-Type': 'application/json',
+      "x-api-key": config.apiKey,
+      "Content-Type": "application/json",
       ...options.headers,
     },
   });
-  
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-    throw new Error(`NOWPayments API error: ${error.message || response.statusText}`);
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Unknown error" }));
+    throw new Error(
+      `NOWPayments API error: ${error.message || response.statusText}`
+    );
   }
-  
+
   return response.json();
 }
 
@@ -59,7 +63,7 @@ interface StatusResponse {
 }
 
 export async function getApiStatus(): Promise<StatusResponse> {
-  return makeRequest<StatusResponse>('/status');
+  return makeRequest<StatusResponse>("/status");
 }
 
 // ============================================
@@ -71,7 +75,7 @@ interface CurrenciesResponse {
 }
 
 export async function getAvailableCurrencies(): Promise<string[]> {
-  const response = await makeRequest<CurrenciesResponse>('/currencies');
+  const response = await makeRequest<CurrenciesResponse>("/currencies");
   return response.currencies;
 }
 
@@ -171,9 +175,9 @@ export async function createPayment(params: {
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
   };
-  
-  return makeRequest<PaymentResponse>('/payment', {
-    method: 'POST',
+
+  return makeRequest<PaymentResponse>("/payment", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
@@ -237,9 +241,9 @@ export async function createInvoice(params: {
     is_fixed_rate: params.isFixedRate,
     is_fee_paid_by_user: params.isFeePaidByUser,
   };
-  
-  return makeRequest<InvoiceResponse>('/invoice', {
-    method: 'POST',
+
+  return makeRequest<InvoiceResponse>("/invoice", {
+    method: "POST",
     body: JSON.stringify(body),
   });
 }
@@ -248,16 +252,16 @@ export async function createInvoice(params: {
 // Payment Status
 // ============================================
 
-export type PaymentStatus = 
-  | 'waiting'
-  | 'confirming'
-  | 'confirmed'
-  | 'sending'
-  | 'partially_paid'
-  | 'finished'
-  | 'failed'
-  | 'refunded'
-  | 'expired';
+export type PaymentStatus =
+  | "waiting"
+  | "confirming"
+  | "confirmed"
+  | "sending"
+  | "partially_paid"
+  | "finished"
+  | "failed"
+  | "refunded"
+  | "expired";
 
 interface PaymentStatusResponse {
   payment_id: number;
@@ -277,7 +281,9 @@ interface PaymentStatusResponse {
   outcome_currency: string;
 }
 
-export async function getPaymentStatus(paymentId: string): Promise<PaymentStatusResponse> {
+export async function getPaymentStatus(
+  paymentId: string
+): Promise<PaymentStatusResponse> {
   return makeRequest<PaymentStatusResponse>(`/payment/${paymentId}`);
 }
 
@@ -295,35 +301,42 @@ export function verifyIPNSignature(
   signature: string
 ): boolean {
   const config = getConfig();
-  
+
   // Use IPN secret if available, otherwise fall back to public key
   const secretKey = config.ipnSecret || config.publicKey;
-  
+
   if (!secretKey) {
     // SECURITY: Fail hard in production if no secret configured
-    if (process.env.NODE_ENV === 'production') {
-      console.error('[NOWPayments] CRITICAL: No IPN secret configured in production - rejecting webhook');
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[NOWPayments] CRITICAL: No IPN secret configured in production - rejecting webhook"
+      );
       return false;
     }
-    console.warn('[NOWPayments] ⚠️  No IPN secret configured - accepting unsigned webhook (DEVELOPMENT ONLY)');
+    console.warn(
+      "[NOWPayments] ⚠️  No IPN secret configured - accepting unsigned webhook (DEVELOPMENT ONLY)"
+    );
     return true;
   }
-  
+
   // Sort payload keys alphabetically and create string
   const sortedPayload = Object.keys(payload)
     .sort()
-    .reduce((acc, key) => {
-      acc[key] = payload[key];
-      return acc;
-    }, {} as Record<string, unknown>);
-  
+    .reduce(
+      (acc, key) => {
+        acc[key] = payload[key];
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
+
   const payloadString = JSON.stringify(sortedPayload);
-  
+
   // Create HMAC signature using the IPN secret
-  const hmac = crypto.createHmac('sha512', secretKey);
+  const hmac = crypto.createHmac("sha512", secretKey);
   hmac.update(payloadString);
-  const calculatedSignature = hmac.digest('hex');
-  
+  const calculatedSignature = hmac.digest("hex");
+
   return calculatedSignature === signature;
 }
 
@@ -335,7 +348,18 @@ export function verifyIPNSignature(
  * Get popular cryptocurrencies for display
  */
 export function getPopularCurrencies(): string[] {
-  return ['btc', 'eth', 'usdt', 'usdc', 'ltc', 'doge', 'sol', 'xrp', 'bnb', 'matic'];
+  return [
+    "btc",
+    "eth",
+    "usdt",
+    "usdc",
+    "ltc",
+    "doge",
+    "sol",
+    "xrp",
+    "bnb",
+    "matic",
+  ];
 }
 
 /**
@@ -343,20 +367,20 @@ export function getPopularCurrencies(): string[] {
  */
 export function formatCurrencyName(currency: string): string {
   const names: Record<string, string> = {
-    btc: 'Bitcoin (BTC)',
-    eth: 'Ethereum (ETH)',
-    usdt: 'Tether (USDT)',
-    usdc: 'USD Coin (USDC)',
-    ltc: 'Litecoin (LTC)',
-    doge: 'Dogecoin (DOGE)',
-    sol: 'Solana (SOL)',
-    xrp: 'Ripple (XRP)',
-    bnb: 'BNB',
-    matic: 'Polygon (MATIC)',
-    dai: 'DAI',
-    trx: 'TRON (TRX)',
+    btc: "Bitcoin (BTC)",
+    eth: "Ethereum (ETH)",
+    usdt: "Tether (USDT)",
+    usdc: "USD Coin (USDC)",
+    ltc: "Litecoin (LTC)",
+    doge: "Dogecoin (DOGE)",
+    sol: "Solana (SOL)",
+    xrp: "Ripple (XRP)",
+    bnb: "BNB",
+    matic: "Polygon (MATIC)",
+    dai: "DAI",
+    trx: "TRON (TRX)",
   };
-  
+
   return names[currency.toLowerCase()] || currency.toUpperCase();
 }
 
@@ -364,19 +388,21 @@ export function formatCurrencyName(currency: string): string {
  * Check if a payment status indicates the payment is complete
  */
 export function isPaymentComplete(status: PaymentStatus): boolean {
-  return status === 'finished' || status === 'confirmed';
+  return status === "finished" || status === "confirmed";
 }
 
 /**
  * Check if a payment status indicates the payment is pending
  */
 export function isPaymentPending(status: PaymentStatus): boolean {
-  return status === 'waiting' || status === 'confirming' || status === 'sending';
+  return (
+    status === "waiting" || status === "confirming" || status === "sending"
+  );
 }
 
 /**
  * Check if a payment status indicates the payment failed
  */
 export function isPaymentFailed(status: PaymentStatus): boolean {
-  return status === 'failed' || status === 'expired' || status === 'refunded';
+  return status === "failed" || status === "expired" || status === "refunded";
 }

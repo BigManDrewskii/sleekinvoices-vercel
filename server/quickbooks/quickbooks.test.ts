@@ -41,7 +41,9 @@ vi.mock("../db", () => ({
 // Mock intuit-oauth
 vi.mock("intuit-oauth", () => {
   const mockClient = {
-    authorizeUri: vi.fn().mockReturnValue("https://appcenter.intuit.com/connect/oauth2?test=1"),
+    authorizeUri: vi
+      .fn()
+      .mockReturnValue("https://appcenter.intuit.com/connect/oauth2?test=1"),
     createToken: vi.fn().mockResolvedValue({
       getJson: () => ({
         access_token: "test_access_token",
@@ -61,7 +63,10 @@ vi.mock("intuit-oauth", () => {
     }),
     setToken: vi.fn(),
     makeApiCall: vi.fn().mockResolvedValue({
-      text: () => JSON.stringify({ Customer: { Id: "123", DisplayName: "Test Customer" } }),
+      text: () =>
+        JSON.stringify({
+          Customer: { Id: "123", DisplayName: "Test Customer" },
+        }),
     }),
   };
 
@@ -75,7 +80,8 @@ describe("QuickBooks OAuth Service", () => {
     vi.clearAllMocks();
     process.env.QUICKBOOKS_CLIENT_ID = "test_client_id";
     process.env.QUICKBOOKS_CLIENT_SECRET = "test_client_secret";
-    process.env.QUICKBOOKS_REDIRECT_URI = "http://localhost:3000/quickbooks/callback";
+    process.env.QUICKBOOKS_REDIRECT_URI =
+      "http://localhost:3000/quickbooks/callback";
     process.env.QUICKBOOKS_ENVIRONMENT = "sandbox";
   });
 
@@ -109,7 +115,8 @@ describe("QuickBooks API Client", () => {
     vi.clearAllMocks();
     process.env.QUICKBOOKS_CLIENT_ID = "test_client_id";
     process.env.QUICKBOOKS_CLIENT_SECRET = "test_client_secret";
-    process.env.QUICKBOOKS_REDIRECT_URI = "http://localhost:3000/quickbooks/callback";
+    process.env.QUICKBOOKS_REDIRECT_URI =
+      "http://localhost:3000/quickbooks/callback";
     process.env.QUICKBOOKS_ENVIRONMENT = "sandbox";
   });
 
@@ -128,7 +135,8 @@ describe("Customer Sync Service", () => {
     vi.clearAllMocks();
     process.env.QUICKBOOKS_CLIENT_ID = "test_client_id";
     process.env.QUICKBOOKS_CLIENT_SECRET = "test_client_secret";
-    process.env.QUICKBOOKS_REDIRECT_URI = "http://localhost:3000/quickbooks/callback";
+    process.env.QUICKBOOKS_REDIRECT_URI =
+      "http://localhost:3000/quickbooks/callback";
     process.env.QUICKBOOKS_ENVIRONMENT = "sandbox";
   });
 
@@ -155,7 +163,8 @@ describe("Invoice Sync Service", () => {
     vi.clearAllMocks();
     process.env.QUICKBOOKS_CLIENT_ID = "test_client_id";
     process.env.QUICKBOOKS_CLIENT_SECRET = "test_client_secret";
-    process.env.QUICKBOOKS_REDIRECT_URI = "http://localhost:3000/quickbooks/callback";
+    process.env.QUICKBOOKS_REDIRECT_URI =
+      "http://localhost:3000/quickbooks/callback";
     process.env.QUICKBOOKS_ENVIRONMENT = "sandbox";
   });
 

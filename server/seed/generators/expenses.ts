@@ -4,9 +4,17 @@ import type { SeededUser } from "./users";
 import type { SeededClient } from "./clients";
 import type { SeededInvoice } from "./invoices";
 import type { SeededExpenseCategory } from "./metadata";
-import { SEED_CONFIG, EXPENSE_PAYMENT_METHOD_DISTRIBUTION } from "../data/constants";
+import {
+  SEED_CONFIG,
+  EXPENSE_PAYMENT_METHOD_DISTRIBUTION,
+} from "../data/constants";
 import { EXPENSE_VENDORS } from "../data/realistic-data";
-import { randomInt, randomChoice, weightedChoice, generateDateDistribution } from "../utils";
+import {
+  randomInt,
+  randomChoice,
+  weightedChoice,
+  generateDateDistribution,
+} from "../utils";
 
 export async function seedExpenses(
   db: MySql2Database<Record<string, unknown>>,
@@ -51,8 +59,13 @@ export async function seedExpenses(
         paymentMethod,
         isBillable,
         isTaxDeductible,
-        receiptUrl: hasReceipt ? `s3://receipts/seed-receipt-${randomInt(1000, 9999)}.pdf` : null,
-        clientId: isBillable && userClients.length > 0 ? randomChoice(userClients).id : null,
+        receiptUrl: hasReceipt
+          ? `s3://receipts/seed-receipt-${randomInt(1000, 9999)}.pdf`
+          : null,
+        clientId:
+          isBillable && userClients.length > 0
+            ? randomChoice(userClients).id
+            : null,
         invoiceId:
           isBillable && Math.random() < 0.5 && userInvoices.length > 0
             ? randomChoice(userInvoices).id

@@ -13,7 +13,9 @@ export function randomChoice<T>(arr: T[]): T {
 
 export function randomChoices<T>(arr: T[], count: number): T[] {
   if (count > arr.length) {
-    throw new Error(`Cannot pick ${count} items from array of length ${arr.length}`);
+    throw new Error(
+      `Cannot pick ${count} items from array of length ${arr.length}`
+    );
   }
   const shuffled = [...arr].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
@@ -34,7 +36,10 @@ export function generateDateDistribution(count: number): Date[] {
   }).sort((a, b) => a.getTime() - b.getTime());
 }
 
-export function decimalToString(value: number | string, decimals: number = 8): string {
+export function decimalToString(
+  value: number | string,
+  decimals: number = 8
+): string {
   return new Decimal(value).toFixed(decimals);
 }
 

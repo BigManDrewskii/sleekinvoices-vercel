@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from "express";
 
 /**
  * Simple in-memory rate limiter
@@ -15,14 +15,17 @@ interface RateLimitStore {
 const store: RateLimitStore = {};
 
 // Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  Object.keys(store).forEach((key) => {
-    if (store[key]!.resetTime < now) {
-      delete store[key];
-    }
-  });
-}, 5 * 60 * 1000);
+setInterval(
+  () => {
+    const now = Date.now();
+    Object.keys(store).forEach(key => {
+      if (store[key]!.resetTime < now) {
+        delete store[key];
+      }
+    });
+  },
+  5 * 60 * 1000
+);
 
 export interface RateLimitOptions {
   windowMs?: number; // Time window in milliseconds
@@ -39,10 +42,10 @@ export function rateLimit(options: RateLimitOptions = {}) {
   const {
     windowMs = 60 * 1000, // 1 minute
     max = 100,
-    message = 'Too many requests, please try again later.',
-    keyGenerator = (req) => {
+    message = "Too many requests, please try again later.",
+    keyGenerator = req => {
       // Use IP address as default key
-      return req.ip || req.socket.remoteAddress || 'unknown';
+      return req.ip || req.socket.remoteAddress || "unknown";
     },
   } = options;
 
@@ -62,9 +65,15 @@ export function rateLimit(options: RateLimitOptions = {}) {
     record.count++;
 
     // Set rate limit headers
-    res.setHeader('X-RateLimit-Limit', max.toString());
-    res.setHeader('X-RateLimit-Remaining', Math.max(0, max - record.count).toString());
-    res.setHeader('X-RateLimit-Reset', new Date(record.resetTime).toISOString());
+    res.setHeader("X-RateLimit-Limit", max.toString());
+    res.setHeader(
+      "X-RateLimit-Remaining",
+      Math.max(0, max - record.count).toString()
+    );
+    res.setHeader(
+      "X-RateLimit-Reset",
+      new Date(record.resetTime).toISOString()
+    );
 
     if (record.count > max) {
       res.status(429).json({
@@ -85,7 +94,7 @@ export function rateLimit(options: RateLimitOptions = {}) {
 export const strictRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
-  message: 'Too many attempts, please try again in a minute.',
+  message: "Too many attempts, please try again in a minute.",
 });
 
 /**
@@ -95,7 +104,7 @@ export const strictRateLimit = rateLimit({
 export const standardRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 100,
-  message: 'Too many requests, please slow down.',
+  message: "Too many requests, please slow down.",
 });
 
 /**
@@ -105,5 +114,5 @@ export const standardRateLimit = rateLimit({
 export const lenientRateLimit = rateLimit({
   windowMs: 60 * 1000,
   max: 200,
-  message: 'Too many requests, please try again shortly.',
+  message: "Too many requests, please try again shortly.",
 });

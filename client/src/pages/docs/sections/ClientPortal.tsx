@@ -14,21 +14,25 @@ export const ClientPortal = () => (
 
     <SubsectionHeading>What is the Client Portal?</SubsectionHeading>
     <P>
-      The Client Portal is a secure, branded space where clients can view invoices and make payments without needing a SleekInvoices account.
+      The Client Portal is a secure, branded space where clients can view
+      invoices and make payments without needing a SleekInvoices account.
     </P>
 
     <SubsectionHeading>Sharing Portal Access</SubsectionHeading>
     <P>
-      1. Go to <Strong>Clients</Strong><br />
-      2. Find the client<br />
-      3. Click the <Strong>key icon</Strong> (Portal Access)<br />
-      4. Click <Strong>Generate Access Link</Strong><br />
-      5. Copy the link<br />
+      1. Go to <Strong>Clients</Strong>
+      <br />
+      2. Find the client
+      <br />
+      3. Click the <Strong>key icon</Strong> (Portal Access)
+      <br />
+      4. Click <Strong>Generate Access Link</Strong>
+      <br />
+      5. Copy the link
+      <br />
       6. Send to your client via email or message
     </P>
-    <P>
-      The link is unique and secure. It expires after 30 days for security.
-    </P>
+    <P>The link is unique and secure. It expires after 30 days for security.</P>
 
     <SubsectionHeading>What Clients See</SubsectionHeading>
     <P>When clients access the portal, they can:</P>
@@ -46,10 +50,12 @@ export const ClientPortal = () => (
 
     <SubsectionHeading>Portal Features</SubsectionHeading>
     <P>
-      <Strong>Invoice List</Strong>: All invoices for the client with status indicators (Draft, Sent, Paid, Overdue).
+      <Strong>Invoice List</Strong>: All invoices for the client with status
+      indicators (Draft, Sent, Paid, Overdue).
     </P>
     <P>
-      <Strong>Invoice Details</Strong>: Full invoice information including line items, tax, discounts, and payment options.
+      <Strong>Invoice Details</Strong>: Full invoice information including line
+      items, tax, discounts, and payment options.
     </P>
     <P>
       <Strong>Payment Options</Strong>:
@@ -60,7 +66,8 @@ export const ClientPortal = () => (
       <LI>Bank transfer details (if provided)</LI>
     </UL>
     <P>
-      <Strong>Email Reminders</Strong>: Clients can opt-in to receive payment reminders.
+      <Strong>Email Reminders</Strong>: Clients can opt-in to receive payment
+      reminders.
     </P>
   </div>
 );

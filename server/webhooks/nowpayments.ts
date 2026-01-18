@@ -1,18 +1,26 @@
 /**
  * NOWPayments IPN (Instant Payment Notification) Webhook Handler
- * 
+ *
  * This handles payment status updates from NOWPayments.
  * Documentation: https://documenter.getpostman.com/view/7907941/2s93JusNJt#ipn
  */
 
-import { Router, Request, Response } from 'express';
-import * as nowpayments from '../lib/nowpayments';
-import * as db from '../db';
-import { invoices, payments, users, cryptoSubscriptionPayments } from '../../drizzle/schema';
-import { eq, and, sql } from 'drizzle-orm';
-import { calculateExtendedEndDate, calculateNewEndDate } from '../lib/subscription-utils';
-import { sendSubscriptionConfirmationEmail } from '../lib/email-notifications';
-import { sendPaymentConfirmationEmail } from '../email';
+import { Router, Request, Response } from "express";
+import * as nowpayments from "../lib/nowpayments";
+import * as db from "../db";
+import {
+  invoices,
+  payments,
+  users,
+  cryptoSubscriptionPayments,
+} from "../../drizzle/schema";
+import { eq, and, sql } from "drizzle-orm";
+import {
+  calculateExtendedEndDate,
+  calculateNewEndDate,
+} from "../lib/subscription-utils";
+import { sendSubscriptionConfirmationEmail } from "../lib/email-notifications";
+import { sendPaymentConfirmationEmail } from "../email";
 
 const router = Router();
 
@@ -50,10 +58,10 @@ function parseSubscriptionOrderId(orderId: string): {
     return {
       userId: parseInt(newFormatMatch[1], 10),
       months: parseInt(newFormatMatch[2], 10),
-      isExtension: newFormatMatch[3] === 'ext',
+      isExtension: newFormatMatch[3] === "ext",
     };
   }
-  
+
   // Legacy format: sub_{userId}_{timestamp} (defaults to 1 month)
   const legacyMatch = orderId.match(/^sub_(\d+)_(\d+)$/);
   if (legacyMatch) {
@@ -63,63 +71,78 @@ function parseSubscriptionOrderId(orderId: string): {
       isExtension: false,
     };
   }
-  
+
   return null;
 }
 
 /**
  * Check if a NOWPayments payment has already been processed (deduplication)
  */
-async function isNOWPaymentsPaymentProcessed(paymentId: string | number): Promise<boolean> {
+async function isNOWPaymentsPaymentProcessed(
+  paymentId: string | number
+): Promise<boolean> {
   const database = await db.getDb();
   if (!database) return false;
-  
+
   // Check in payments table for invoice payments
   const existingPayment = await database
     .select()
     .from(payments)
-    .where(sql`${payments.notes} LIKE ${'%NOWPayments ID: ' + paymentId + '%'}`)
+    .where(sql`${payments.notes} LIKE ${"%NOWPayments ID: " + paymentId + "%"}`)
     .limit(1);
-  
+
   if (existingPayment.length > 0) {
     return true;
   }
-  
+
   // Check in crypto subscription payments table
   const existingSubPayment = await database
     .select()
     .from(cryptoSubscriptionPayments)
     .where(eq(cryptoSubscriptionPayments.paymentId, String(paymentId)))
     .limit(1);
-  
-  return existingSubPayment.length > 0 && existingSubPayment[0].paymentStatus === 'finished';
+
+  return (
+    existingSubPayment.length > 0 &&
+    existingSubPayment[0].paymentStatus === "finished"
+  );
 }
 
-router.post('/nowpayments', async (req: Request, res: Response) => {
+router.post("/nowpayments", async (req: Request, res: Response) => {
   try {
-    const signature = req.headers['x-nowpayments-sig'] as string;
+    const signature = req.headers["x-nowpayments-sig"] as string;
     const payload = req.body as IPNPayload;
 
-    console.log('[NOWPayments IPN] Received webhook:', {
+    console.log("[NOWPayments IPN] Received webhook:", {
       paymentId: payload.payment_id,
       status: payload.payment_status,
       orderId: payload.order_id,
     });
 
     // Verify signature - SECURITY: Fail hard in production if no secret
-    if (signature && !nowpayments.verifyIPNSignature(payload as unknown as Record<string, unknown>, signature)) {
-      console.error('[NOWPayments IPN] Invalid signature');
-      return res.status(401).json({ error: 'Invalid signature' });
+    if (
+      signature &&
+      !nowpayments.verifyIPNSignature(
+        payload as unknown as Record<string, unknown>,
+        signature
+      )
+    ) {
+      console.error("[NOWPayments IPN] Invalid signature");
+      return res.status(401).json({ error: "Invalid signature" });
     }
 
     // DEDUPLICATION: Check if this payment has already been processed
     if (await isNOWPaymentsPaymentProcessed(payload.payment_id)) {
-      console.log(`[NOWPayments IPN] Duplicate webhook for payment ${payload.payment_id}, skipping`);
-      return res.status(200).json({ success: true, message: 'Already processed' });
+      console.log(
+        `[NOWPayments IPN] Duplicate webhook for payment ${payload.payment_id}, skipping`
+      );
+      return res
+        .status(200)
+        .json({ success: true, message: "Already processed" });
     }
 
     // Check if this is a subscription payment
-    const subData = parseSubscriptionOrderId(payload.order_id || '');
+    const subData = parseSubscriptionOrderId(payload.order_id || "");
     if (subData) {
       return await handleSubscriptionPayment(payload, subData, res);
     }
@@ -127,15 +150,18 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
     // Extract invoice ID from order_id (format: INV-{invoiceId}-{timestamp})
     const orderIdMatch = payload.order_id?.match(/^INV-(\d+)-/);
     if (!orderIdMatch) {
-      console.error('[NOWPayments IPN] Invalid order_id format:', payload.order_id);
-      return res.status(400).json({ error: 'Invalid order_id format' });
+      console.error(
+        "[NOWPayments IPN] Invalid order_id format:",
+        payload.order_id
+      );
+      return res.status(400).json({ error: "Invalid order_id format" });
     }
 
     const invoiceId = parseInt(orderIdMatch[1], 10);
     const database = await db.getDb();
     if (!database) {
-      console.error('[NOWPayments IPN] Database not available');
-      return res.status(500).json({ error: 'Database not available' });
+      console.error("[NOWPayments IPN] Database not available");
+      return res.status(500).json({ error: "Database not available" });
     }
 
     // Get the invoice
@@ -145,29 +171,29 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
       .where(eq(invoices.id, invoiceId));
 
     if (!invoice) {
-      console.error('[NOWPayments IPN] Invoice not found:', invoiceId);
-      return res.status(404).json({ error: 'Invoice not found' });
+      console.error("[NOWPayments IPN] Invoice not found:", invoiceId);
+      return res.status(404).json({ error: "Invoice not found" });
     }
 
     // Handle payment status
     const status = payload.payment_status;
-    console.log('[NOWPayments IPN] Processing status:', status);
+    console.log("[NOWPayments IPN] Processing status:", status);
 
     if (nowpayments.isPaymentComplete(status)) {
       // Payment is complete - ATOMIC TRANSACTION: update invoice and create payment together
       const paidAmount = payload.actually_paid || payload.pay_amount;
-      const currentPaid = parseFloat(invoice.amountPaid || '0');
+      const currentPaid = parseFloat(invoice.amountPaid || "0");
       const invoiceTotal = parseFloat(invoice.total);
-      
+
       // Calculate new amount paid (convert from crypto to fiat using outcome_amount)
       const fiatPaid = payload.outcome_amount || payload.price_amount;
       const newAmountPaid = Math.min(currentPaid + fiatPaid, invoiceTotal);
-      
+
       // Determine new status
-      const newStatus = newAmountPaid >= invoiceTotal ? 'paid' : invoice.status;
+      const newStatus = newAmountPaid >= invoiceTotal ? "paid" : invoice.status;
 
       // ATOMIC TRANSACTION: Update invoice and create payment together
-      await database.transaction(async (tx) => {
+      await database.transaction(async tx => {
         // Update invoice
         await tx
           .update(invoices)
@@ -175,7 +201,7 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
             amountPaid: newAmountPaid.toFixed(8),
             status: newStatus,
             cryptoAmount: paidAmount.toString(),
-            paidAt: newStatus === 'paid' ? new Date() : invoice.paidAt,
+            paidAt: newStatus === "paid" ? new Date() : invoice.paidAt,
             updatedAt: new Date(),
           })
           .where(eq(invoices.id, invoiceId));
@@ -186,9 +212,9 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
           userId: invoice.userId,
           amount: fiatPaid.toFixed(8),
           currency: payload.price_currency.toUpperCase(),
-          paymentMethod: 'crypto',
+          paymentMethod: "crypto",
           paymentDate: new Date(),
-          status: 'completed',
+          status: "completed",
           cryptoAmount: paidAmount.toString(),
           cryptoCurrency: payload.pay_currency.toUpperCase(),
           cryptoTxHash: payload.purchase_id,
@@ -197,17 +223,23 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
         });
       });
 
-      console.log('[NOWPayments IPN] Payment recorded successfully (atomic transaction):', {
-        invoiceId,
-        fiatPaid,
-        cryptoPaid: paidAmount,
-        newStatus,
-      });
+      console.log(
+        "[NOWPayments IPN] Payment recorded successfully (atomic transaction):",
+        {
+          invoiceId,
+          fiatPaid,
+          cryptoPaid: paidAmount,
+          newStatus,
+        }
+      );
 
       // Send payment confirmation email if invoice is fully paid (outside transaction - non-critical)
-      if (newStatus === 'paid') {
+      if (newStatus === "paid") {
         try {
-          const client = await db.getClientById(invoice.clientId, invoice.userId);
+          const client = await db.getClientById(
+            invoice.clientId,
+            invoice.userId
+          );
           const user = await db.getUserById(invoice.userId);
 
           if (client?.email && user?.email) {
@@ -222,23 +254,28 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
               amountPaid: fiatPaid,
               paymentMethod: `Crypto (${payload.pay_currency.toUpperCase()})`,
             });
-            console.log('[NOWPayments IPN] Payment confirmation email sent to client');
+            console.log(
+              "[NOWPayments IPN] Payment confirmation email sent to client"
+            );
           }
         } catch (emailError) {
-          console.error('[NOWPayments IPN] Failed to send payment confirmation email:', emailError);
+          console.error(
+            "[NOWPayments IPN] Failed to send payment confirmation email:",
+            emailError
+          );
           // Don't fail the webhook if email fails
         }
       }
     } else if (nowpayments.isPaymentFailed(status)) {
       // Payment failed - log but don't change invoice status
-      console.log('[NOWPayments IPN] Payment failed:', {
+      console.log("[NOWPayments IPN] Payment failed:", {
         invoiceId,
         status,
         paymentId: payload.payment_id,
       });
     } else if (nowpayments.isPaymentPending(status)) {
       // Payment is pending - log for monitoring
-      console.log('[NOWPayments IPN] Payment pending:', {
+      console.log("[NOWPayments IPN] Payment pending:", {
         invoiceId,
         status,
         paymentId: payload.payment_id,
@@ -248,8 +285,8 @@ router.post('/nowpayments', async (req: Request, res: Response) => {
     // Always return 200 to acknowledge receipt
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error('[NOWPayments IPN] Error processing webhook:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("[NOWPayments IPN] Error processing webhook:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -262,14 +299,14 @@ async function handleSubscriptionPayment(
   res: Response
 ) {
   const { userId, months, isExtension } = subData;
-  
+
   const database = await db.getDb();
   if (!database) {
-    return res.status(500).json({ error: 'Database not available' });
+    return res.status(500).json({ error: "Database not available" });
   }
 
   const status = payload.payment_status;
-  console.log('[NOWPayments IPN] Processing subscription payment:', {
+  console.log("[NOWPayments IPN] Processing subscription payment:", {
     userId,
     months,
     isExtension,
@@ -292,19 +329,22 @@ async function handleSubscriptionPayment(
       .where(eq(users.id, userId));
 
     if (!user) {
-      console.error('[NOWPayments IPN] User not found:', userId);
-      return res.status(404).json({ error: 'User not found' });
+      console.error("[NOWPayments IPN] User not found:", userId);
+      return res.status(404).json({ error: "User not found" });
     }
 
     // Calculate new subscription end date
     let newEndDate: Date;
-    
-    if (isExtension && user.subscriptionStatus === 'active') {
+
+    if (isExtension && user.subscriptionStatus === "active") {
       // Extension: add months to existing end date
-      newEndDate = calculateExtendedEndDate({
-        currentPeriodEnd: user.currentPeriodEnd,
-        subscriptionEndDate: user.subscriptionEndDate,
-      }, months);
+      newEndDate = calculateExtendedEndDate(
+        {
+          currentPeriodEnd: user.currentPeriodEnd,
+          subscriptionEndDate: user.subscriptionEndDate,
+        },
+        months
+      );
     } else {
       // New subscription: start from now
       newEndDate = calculateNewEndDate(months);
@@ -314,15 +354,15 @@ async function handleSubscriptionPayment(
     await database
       .update(users)
       .set({
-        subscriptionStatus: 'active',
+        subscriptionStatus: "active",
         subscriptionEndDate: newEndDate,
-        subscriptionSource: 'crypto',
+        subscriptionSource: "crypto",
         // Also update currentPeriodEnd for compatibility
         currentPeriodEnd: newEndDate,
       })
       .where(eq(users.id, userId));
 
-    console.log('[NOWPayments IPN] Subscription activated:', {
+    console.log("[NOWPayments IPN] Subscription activated:", {
       userId,
       months,
       isExtension,
@@ -333,7 +373,7 @@ async function handleSubscriptionPayment(
     try {
       await sendSubscriptionConfirmationEmail({
         userEmail: user.email,
-        userName: user.name || 'Valued Customer',
+        userName: user.name || "Valued Customer",
         months,
         isExtension,
         endDate: newEndDate,
@@ -342,10 +382,13 @@ async function handleSubscriptionPayment(
         cryptoCurrency: payload.pay_currency.toUpperCase(),
         cryptoAmount: payload.actually_paid || payload.pay_amount,
       });
-      console.log('[NOWPayments IPN] Confirmation email sent to:', user.email);
+      console.log("[NOWPayments IPN] Confirmation email sent to:", user.email);
     } catch (emailError) {
       // Don't fail the webhook if email fails
-      console.error('[NOWPayments IPN] Failed to send confirmation email:', emailError);
+      console.error(
+        "[NOWPayments IPN] Failed to send confirmation email:",
+        emailError
+      );
     }
   }
 

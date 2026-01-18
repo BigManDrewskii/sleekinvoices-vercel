@@ -1,8 +1,4 @@
-import {
-  protectedProcedure,
-  router,
-  TRPCError,
-} from "../_core/trpc";
+import { protectedProcedure, router, TRPCError } from "../_core/trpc";
 import { z } from "zod";
 import * as db from "../db";
 import { createPaymentLink } from "../stripe";
@@ -337,9 +333,7 @@ export const invoicesRouter = router({
             const invoice = await tx
               .select({ id: invoices.id })
               .from(invoices)
-              .where(
-                and(eq(invoices.id, id), eq(invoices.userId, ctx.user.id))
-              )
+              .where(and(eq(invoices.id, id), eq(invoices.userId, ctx.user.id)))
               .limit(1);
 
             if (!invoice[0]) {
@@ -457,10 +451,7 @@ export const invoicesRouter = router({
           }
 
           const lineItems = await db.getLineItemsByInvoiceId(id);
-          const client = await db.getClientById(
-            invoice.clientId,
-            ctx.user.id
-          );
+          const client = await db.getClientById(invoice.clientId, ctx.user.id);
           if (!client) {
             errors.push(`Invoice ${id}: Client not found`);
             continue;
@@ -612,11 +603,7 @@ export const invoicesRouter = router({
 
         // Upload to S3
         const fileKey = `invoices/${ctx.user.id}/${invoice.invoiceNumber}-${nanoid()}.pdf`;
-        const { url } = await storagePut(
-          fileKey,
-          pdfBuffer,
-          "application/pdf"
-        );
+        const { url } = await storagePut(fileKey, pdfBuffer, "application/pdf");
 
         return { url };
       } catch (error: unknown) {
@@ -818,9 +805,7 @@ export const invoicesRouter = router({
       const newInvoiceNumber = await db.getNextInvoiceNumber(ctx.user.id);
 
       // Calculate new dates (issue date = today, due date = today + original difference)
-      const originalIssueDateMs = new Date(
-        originalInvoice.issueDate
-      ).getTime();
+      const originalIssueDateMs = new Date(originalInvoice.issueDate).getTime();
       const originalDueDateMs = new Date(originalInvoice.dueDate).getTime();
       const daysDifference = Math.ceil(
         (originalDueDateMs - originalIssueDateMs) / (1000 * 60 * 60 * 24)

@@ -20,17 +20,17 @@ interface PageLayoutProps {
 
 /**
  * PageLayout - Standard layout wrapper for all authenticated pages
- * 
+ *
  * Provides:
  * - Navigation bar
  * - Consistent max-width (1280px default, 896px for narrow)
  * - Responsive padding (16px mobile → 24px tablet → 32px desktop)
  * - Standard page header with title, subtitle, and actions
- * 
+ *
  * Usage:
  * ```tsx
- * <PageLayout 
- *   title="Invoices" 
+ * <PageLayout
+ *   title="Invoices"
  *   subtitle="Manage your invoices"
  *   headerActions={<Button>New Invoice</Button>}
  * >
@@ -50,12 +50,14 @@ export function PageLayout({
   return (
     <div className="page-wrapper">
       <Navigation />
-      
-      <main className={cn(
-        "page-content",
-        narrow && "page-content-narrow",
-        className
-      )}>
+
+      <main
+        className={cn(
+          "page-content",
+          narrow && "page-content-narrow",
+          className
+        )}
+      >
         {/* Page Header */}
         {!hideHeader && (title || headerActions) && (
           <div className="page-header">
@@ -69,18 +71,14 @@ export function PageLayout({
                 </div>
               )}
               {headerActions && (
-                <div className="flex items-center gap-3">
-                  {headerActions}
-                </div>
+                <div className="flex items-center gap-3">{headerActions}</div>
               )}
             </div>
           </div>
         )}
-        
+
         {/* Page Content */}
-        <div className="section-stack">
-          {children}
-        </div>
+        <div className="section-stack">{children}</div>
       </main>
     </div>
   );
@@ -88,7 +86,7 @@ export function PageLayout({
 
 /**
  * PageSection - Wrapper for major page sections
- * 
+ *
  * Use to group related content with consistent spacing
  */
 export function PageSection({
@@ -98,11 +96,7 @@ export function PageSection({
   children: ReactNode;
   className?: string;
 }) {
-  return (
-    <section className={cn("space-y-4", className)}>
-      {children}
-    </section>
-  );
+  return <section className={cn("space-y-4", className)}>{children}</section>;
 }
 
 /**
@@ -118,11 +112,13 @@ export function PageCard({
   compact?: boolean;
 }) {
   return (
-    <div className={cn(
-      "rounded-lg border bg-card text-card-foreground",
-      compact ? "card-compact" : "card-standard",
-      className
-    )}>
+    <div
+      className={cn(
+        "rounded-lg border bg-card text-card-foreground",
+        compact ? "card-compact" : "card-standard",
+        className
+      )}
+    >
       {children}
     </div>
   );

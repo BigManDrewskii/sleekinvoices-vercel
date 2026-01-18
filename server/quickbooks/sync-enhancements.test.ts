@@ -26,8 +26,15 @@ vi.mock("../db", () => ({
 // Mock QB client
 vi.mock("./client", () => ({
   queryQB: vi.fn().mockResolvedValue({ success: true, data: [] }),
-  createQBEntity: vi.fn().mockResolvedValue({ success: true, data: { Id: "qb-123" } }),
-  getQBEntity: vi.fn().mockResolvedValue({ success: true, data: { CustomerRef: { value: "cust-1" } } }),
+  createQBEntity: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { Id: "qb-123" } }),
+  getQBEntity: vi
+    .fn()
+    .mockResolvedValue({
+      success: true,
+      data: { CustomerRef: { value: "cust-1" } },
+    }),
 }));
 
 // Mock OAuth
@@ -37,7 +44,9 @@ vi.mock("./oauth", () => ({
 
 // Mock invoiceSync
 vi.mock("./invoiceSync", () => ({
-  getInvoiceMapping: vi.fn().mockResolvedValue({ qbInvoiceId: "qb-inv-123", syncVersion: 1 }),
+  getInvoiceMapping: vi
+    .fn()
+    .mockResolvedValue({ qbInvoiceId: "qb-inv-123", syncVersion: 1 }),
 }));
 
 describe("QuickBooks Sync Enhancements", () => {
@@ -49,7 +58,7 @@ describe("QuickBooks Sync Enhancements", () => {
     it("should return default settings when none exist", async () => {
       const { getSyncSettings } = await import("./paymentSync");
       const settings = await getSyncSettings(1);
-      
+
       expect(settings).toHaveProperty("autoSyncInvoices");
       expect(settings).toHaveProperty("autoSyncPayments");
       expect(settings).toHaveProperty("syncPaymentsFromQB");
@@ -61,7 +70,7 @@ describe("QuickBooks Sync Enhancements", () => {
     it("should have correct default values", async () => {
       const { getSyncSettings } = await import("./paymentSync");
       const settings = await getSyncSettings(1);
-      
+
       expect(settings.autoSyncInvoices).toBe(true);
       expect(settings.autoSyncPayments).toBe(true);
       expect(settings.syncPaymentsFromQB).toBe(true);
@@ -75,13 +84,13 @@ describe("QuickBooks Sync Enhancements", () => {
         autoSyncInvoices: false,
         minInvoiceAmount: "100.00",
       });
-      
+
       expect(result.success).toBe(true);
     });
 
     it("should check auto-sync conditions for invoices", async () => {
       const { shouldAutoSync } = await import("./paymentSync");
-      
+
       // Should return true by default
       const result = await shouldAutoSync(1, "invoice", 500);
       expect(typeof result).toBe("boolean");
@@ -89,7 +98,7 @@ describe("QuickBooks Sync Enhancements", () => {
 
     it("should check auto-sync conditions for payments", async () => {
       const { shouldAutoSync } = await import("./paymentSync");
-      
+
       const result = await shouldAutoSync(1, "payment");
       expect(typeof result).toBe("boolean");
     });
@@ -99,14 +108,14 @@ describe("QuickBooks Sync Enhancements", () => {
     it("should return null when no payment mapping exists", async () => {
       const { getPaymentMapping } = await import("./paymentSync");
       const mapping = await getPaymentMapping(1, 999);
-      
+
       expect(mapping).toBeNull();
     });
 
     it("should return null when no QB payment mapping exists", async () => {
       const { getPaymentMappingByQBId } = await import("./paymentSync");
       const mapping = await getPaymentMappingByQBId(1, "nonexistent-qb-id");
-      
+
       expect(mapping).toBeNull();
     });
   });
@@ -115,7 +124,7 @@ describe("QuickBooks Sync Enhancements", () => {
     it("should fail when payment not found", async () => {
       const { syncPaymentToQB } = await import("./paymentSync");
       const result = await syncPaymentToQB(1, 999);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe("Payment not found");
     });
@@ -125,7 +134,7 @@ describe("QuickBooks Sync Enhancements", () => {
     it("should return success with zero synced when no new payments", async () => {
       const { pollPaymentsFromQB } = await import("./paymentSync");
       const result = await pollPaymentsFromQB(1);
-      
+
       expect(result.success).toBe(true);
       expect(result.synced).toBe(0);
       expect(Array.isArray(result.errors)).toBe(true);
@@ -133,8 +142,8 @@ describe("QuickBooks Sync Enhancements", () => {
 
     it("should handle disabled sync gracefully", async () => {
       // Mock settings with syncPaymentsFromQB disabled
-      vi.doMock("./paymentSync", async (importOriginal) => {
-        const original = await importOriginal() as any;
+      vi.doMock("./paymentSync", async importOriginal => {
+        const original = (await importOriginal()) as any;
         return {
           ...original,
           getSyncSettings: vi.fn().mockResolvedValue({
@@ -151,7 +160,7 @@ describe("QuickBooks Sync Enhancements", () => {
 
       const { pollPaymentsFromQB } = await import("./paymentSync");
       const result = await pollPaymentsFromQB(1);
-      
+
       expect(result.success).toBe(true);
     });
   });
@@ -164,13 +173,13 @@ describe("QuickBooks Sync Enhancements", () => {
         qbSynced: boolean | null;
         qbLastSyncedAt: Date | null;
       }
-      
+
       const invoice: Invoice = {
         id: 1,
         qbSynced: true,
         qbLastSyncedAt: new Date(),
       };
-      
+
       expect(invoice.qbSynced).toBe(true);
       expect(invoice.qbLastSyncedAt).toBeInstanceOf(Date);
     });
@@ -181,13 +190,13 @@ describe("QuickBooks Sync Enhancements", () => {
         qbSynced: boolean | null;
         qbLastSyncedAt: Date | null;
       }
-      
+
       const invoice: Invoice = {
         id: 1,
         qbSynced: null,
         qbLastSyncedAt: null,
       };
-      
+
       expect(invoice.qbSynced).toBeNull();
       expect(invoice.qbLastSyncedAt).toBeNull();
     });
@@ -206,7 +215,7 @@ describe("QuickBooks Sync Enhancements", () => {
         "lastSyncedAt",
         "createdAt",
       ];
-      
+
       // Verify all expected fields exist
       expectedFields.forEach(field => {
         expect(typeof field).toBe("string");
@@ -227,7 +236,7 @@ describe("QuickBooks Sync Enhancements", () => {
         "createdAt",
         "updatedAt",
       ];
-      
+
       // Verify all expected fields exist
       expectedFields.forEach(field => {
         expect(typeof field).toBe("string");

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * SleekyAvatar - Unified avatar component for Sleeky the otter mascot
- * 
+ *
  * This component provides consistent styling across all AI features with:
  * - Card-matching border colors (border-border)
  * - Consistent rounded-xl styling (matching bordered icons)
@@ -33,11 +33,11 @@ interface SleekyAvatarProps {
 
 // Enlarged sizes for better visibility
 const sizeClasses: Record<SleekyAvatarSize, string> = {
-  xs: "w-8 h-8",      // was w-6 h-6
-  sm: "w-10 h-10",    // was w-8 h-8
-  md: "w-14 h-14",    // was w-12 h-12
-  lg: "w-20 h-20",    // was w-16 h-16
-  xl: "w-28 h-28",    // was w-24 h-24
+  xs: "w-8 h-8", // was w-6 h-6
+  sm: "w-10 h-10", // was w-8 h-8
+  md: "w-14 h-14", // was w-12 h-12
+  lg: "w-20 h-20", // was w-16 h-16
+  xl: "w-28 h-28", // was w-24 h-24
   "2xl": "w-36 h-36", // was w-32 h-32
 };
 

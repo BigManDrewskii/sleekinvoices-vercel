@@ -10,14 +10,14 @@
 
 This comprehensive technical audit evaluates the SleekInvoices application across four critical dimensions: deficiency assessment, gap analysis, feature verification, and architecture review. The application demonstrates strong overall health with **1,150 passing tests**, **32 synchronized database tables**, and **166 API endpoints**. However, several areas require attention to meet production-grade standards.
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| Test Suite | 1,150 passed, 4 skipped | ✅ Healthy |
-| Database Tables | 32 tables in sync | ✅ Healthy |
-| API Endpoints | 166 tRPC routes | ✅ Comprehensive |
-| TypeScript Compilation | 0 errors | ✅ Clean |
-| Security Vulnerabilities | 0 critical | ✅ Secure |
-| Source Lines of Code | ~100,000 | — |
+| Metric                   | Value                   | Status           |
+| ------------------------ | ----------------------- | ---------------- |
+| Test Suite               | 1,150 passed, 4 skipped | ✅ Healthy       |
+| Database Tables          | 32 tables in sync       | ✅ Healthy       |
+| API Endpoints            | 166 tRPC routes         | ✅ Comprehensive |
+| TypeScript Compilation   | 0 errors                | ✅ Clean         |
+| Security Vulnerabilities | 0 critical              | ✅ Secure        |
+| Source Lines of Code     | ~100,000                | —                |
 
 ---
 
@@ -29,27 +29,27 @@ This comprehensive technical audit evaluates the SleekInvoices application acros
 
 The codebase contains several components that appear to be unused or deprecated, representing technical debt that should be addressed:
 
-| Component | Location | Recommendation |
-|-----------|----------|----------------|
-| `Navigation-old.tsx` | `client/src/components/` | Delete - superseded by `Navigation.tsx` |
-| `AIChatBox.tsx` | `client/src/components/` | Verify usage or remove |
-| `ManusDialog.tsx` | `client/src/components/` | Verify usage or remove |
-| `PageTransitionWrapper.tsx` | `client/src/components/` | Verify usage or remove |
-| `PlaceholderTextarea.tsx` | `client/src/components/` | Verify usage or remove |
-| `SleekyAIAvatar.tsx` | `client/src/components/` | Verify usage or remove |
-| `UsageIndicator.tsx` | `client/src/components/` | Verify usage or remove |
+| Component                   | Location                 | Recommendation                          |
+| --------------------------- | ------------------------ | --------------------------------------- |
+| `Navigation-old.tsx`        | `client/src/components/` | Delete - superseded by `Navigation.tsx` |
+| `AIChatBox.tsx`             | `client/src/components/` | Verify usage or remove                  |
+| `ManusDialog.tsx`           | `client/src/components/` | Verify usage or remove                  |
+| `PageTransitionWrapper.tsx` | `client/src/components/` | Verify usage or remove                  |
+| `PlaceholderTextarea.tsx`   | `client/src/components/` | Verify usage or remove                  |
+| `SleekyAIAvatar.tsx`        | `client/src/components/` | Verify usage or remove                  |
+| `UsageIndicator.tsx`        | `client/src/components/` | Verify usage or remove                  |
 
 **Large File Concerns**
 
 Several files exceed recommended size thresholds, indicating potential violations of the Single Responsibility Principle:
 
-| File | Lines | Concern |
-|------|-------|---------|
-| `server/db.ts` | 5,062 | Contains all database operations; consider splitting by domain |
-| `server/routers.ts` | 4,288 | Monolithic router file; consider domain-based splitting |
-| `client/src/pages/Expenses.tsx` | 1,621 | Complex page; extract sub-components |
-| `client/src/pages/Clients.tsx` | 1,560 | Complex page; extract sub-components |
-| `client/src/pages/Invoices.tsx` | 1,400 | Complex page; extract sub-components |
+| File                            | Lines | Concern                                                        |
+| ------------------------------- | ----- | -------------------------------------------------------------- |
+| `server/db.ts`                  | 5,062 | Contains all database operations; consider splitting by domain |
+| `server/routers.ts`             | 4,288 | Monolithic router file; consider domain-based splitting        |
+| `client/src/pages/Expenses.tsx` | 1,621 | Complex page; extract sub-components                           |
+| `client/src/pages/Clients.tsx`  | 1,560 | Complex page; extract sub-components                           |
+| `client/src/pages/Invoices.tsx` | 1,400 | Complex page; extract sub-components                           |
 
 **Console Statements**
 
@@ -75,13 +75,13 @@ No critical security vulnerabilities were detected. The dependency audit shows a
 
 Based on the README documentation and feature specifications, the following gaps were identified:
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Sentry Error Monitoring | ⚠️ Configured but not connected | DSN configured; awaiting Sentry project connection |
-| Promo Codes System | ❌ Schema missing | `promoCodes` and `promoCodeRedemptions` tables not in database |
-| Source Maps Upload | ❌ Not implemented | Sentry source maps not uploaded during build |
-| Email Delivery Tracking | ✅ Implemented | Via Resend integration |
-| QuickBooks Sync | ✅ Implemented | OAuth flow and sync logs functional |
+| Feature                 | Status                          | Notes                                                          |
+| ----------------------- | ------------------------------- | -------------------------------------------------------------- |
+| Sentry Error Monitoring | ⚠️ Configured but not connected | DSN configured; awaiting Sentry project connection             |
+| Promo Codes System      | ❌ Schema missing               | `promoCodes` and `promoCodeRedemptions` tables not in database |
+| Source Maps Upload      | ❌ Not implemented              | Sentry source maps not uploaded during build                   |
+| Email Delivery Tracking | ✅ Implemented                  | Via Resend integration                                         |
+| QuickBooks Sync         | ✅ Implemented                  | OAuth flow and sync logs functional                            |
 
 ### 2.2 Database Schema Observations
 
@@ -96,14 +96,14 @@ These extra columns should be added to the Drizzle schema to maintain schema-as-
 
 All required environment variables are properly configured:
 
-| Integration | Variables | Status |
-|-------------|-----------|--------|
-| Database | `DATABASE_URL` | ✅ Configured with SSL |
-| Authentication | `JWT_SECRET`, `OAUTH_SERVER_URL` | ✅ Configured |
-| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | ✅ Configured |
-| Resend Email | `RESEND_API_KEY` | ✅ Configured |
-| NOWPayments | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET` | ✅ Configured |
-| QuickBooks | `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET` | ✅ Configured |
+| Integration    | Variables                                          | Status                 |
+| -------------- | -------------------------------------------------- | ---------------------- |
+| Database       | `DATABASE_URL`                                     | ✅ Configured with SSL |
+| Authentication | `JWT_SECRET`, `OAUTH_SERVER_URL`                   | ✅ Configured          |
+| Stripe         | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`       | ✅ Configured          |
+| Resend Email   | `RESEND_API_KEY`                                   | ✅ Configured          |
+| NOWPayments    | `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET`    | ✅ Configured          |
+| QuickBooks     | `QUICKBOOKS_CLIENT_ID`, `QUICKBOOKS_CLIENT_SECRET` | ✅ Configured          |
 
 ---
 
@@ -113,36 +113,36 @@ All required environment variables are properly configured:
 
 All documented core features were verified as operational:
 
-| Feature | Route | Status | Notes |
-|---------|-------|--------|-------|
-| Dashboard | `/dashboard` | ✅ Operational | Shows real-time stats, 209 invoices, $153K revenue |
-| Invoice Management | `/invoices` | ✅ Operational | CRUD, filtering, pagination working |
-| Client Management | `/clients` | ✅ Operational | Full client lifecycle supported |
-| Expense Tracking | `/expenses` | ✅ Operational | Categories, billable tracking |
-| Payment Recording | `/payments` | ✅ Operational | Multiple payment methods |
-| Recurring Invoices | `/recurring-invoices` | ✅ Operational | Automated generation |
-| Estimates | `/estimates` | ✅ Operational | Convert to invoice flow |
-| Templates | `/templates` | ✅ Operational | Custom invoice templates |
-| Analytics | `/analytics` | ✅ Operational | Revenue, client, and payment analytics |
-| Settings | `/settings` | ✅ Operational | Profile, company, reminders, integrations |
+| Feature            | Route                 | Status         | Notes                                              |
+| ------------------ | --------------------- | -------------- | -------------------------------------------------- |
+| Dashboard          | `/dashboard`          | ✅ Operational | Shows real-time stats, 209 invoices, $153K revenue |
+| Invoice Management | `/invoices`           | ✅ Operational | CRUD, filtering, pagination working                |
+| Client Management  | `/clients`            | ✅ Operational | Full client lifecycle supported                    |
+| Expense Tracking   | `/expenses`           | ✅ Operational | Categories, billable tracking                      |
+| Payment Recording  | `/payments`           | ✅ Operational | Multiple payment methods                           |
+| Recurring Invoices | `/recurring-invoices` | ✅ Operational | Automated generation                               |
+| Estimates          | `/estimates`          | ✅ Operational | Convert to invoice flow                            |
+| Templates          | `/templates`          | ✅ Operational | Custom invoice templates                           |
+| Analytics          | `/analytics`          | ✅ Operational | Revenue, client, and payment analytics             |
+| Settings           | `/settings`           | ✅ Operational | Profile, company, reminders, integrations          |
 
 ### 3.2 AI Features
 
-| Feature | Status | Notes |
-|---------|--------|-------|
+| Feature                | Status         | Notes                                         |
+| ---------------------- | -------------- | --------------------------------------------- |
 | Magic Invoice (Sleeky) | ✅ Operational | 20/50 credits shown, natural language parsing |
-| AI Assistant | ✅ Operational | Floating assistant button functional |
-| AI Credit System | ✅ Operational | Usage tracking and top-up available |
+| AI Assistant           | ✅ Operational | Floating assistant button functional          |
+| AI Credit System       | ✅ Operational | Usage tracking and top-up available           |
 
 ### 3.3 Integration Features
 
-| Integration | Status | Notes |
-|-------------|--------|-------|
-| Stripe Payments | ✅ Operational | Checkout, webhooks, subscription management |
-| NOWPayments Crypto | ✅ Operational | USDC payments visible in invoice list |
-| Resend Email | ✅ Operational | Invoice sending, reminders |
-| QuickBooks | ✅ Operational | OAuth callback route configured |
-| Client Portal | ✅ Operational | Token-based access for clients |
+| Integration        | Status         | Notes                                       |
+| ------------------ | -------------- | ------------------------------------------- |
+| Stripe Payments    | ✅ Operational | Checkout, webhooks, subscription management |
+| NOWPayments Crypto | ✅ Operational | USDC payments visible in invoice list       |
+| Resend Email       | ✅ Operational | Invoice sending, reminders                  |
+| QuickBooks         | ✅ Operational | OAuth callback route configured             |
+| Client Portal      | ✅ Operational | Token-based access for clients              |
 
 ---
 
@@ -171,25 +171,27 @@ invoice-generator/
 ### 4.2 Separation of Concerns
 
 **Strengths:**
+
 - Clear separation between client and server code
 - Custom hooks abstract complex state logic (`useTableSort`, `useUrlFilters`, `useUndoableDelete`)
 - Context providers manage global state (AI Assistant, Cookie Consent, Keyboard Shortcuts, Theme)
 - tRPC provides type-safe API layer between frontend and backend
 
 **Areas for Improvement:**
+
 - `server/db.ts` (5,062 lines) should be split into domain-specific modules (e.g., `db/invoices.ts`, `db/clients.ts`)
 - `server/routers.ts` (4,288 lines) should be split into domain routers
 - Large page components should extract sub-components for better maintainability
 
 ### 4.3 Componentization Assessment
 
-| Category | Count | Quality |
-|----------|-------|---------|
-| UI Components | 60+ | ✅ Well-organized in `/components/ui/` |
-| Page Components | 37 | ⚠️ Some exceed 1,000 lines |
-| Landing Components | 10+ | ✅ Properly isolated in `/components/landing/` |
-| Template Components | 5+ | ✅ Dedicated `/components/templates/` |
-| Skeleton Components | 10+ | ✅ Consistent loading states |
+| Category            | Count | Quality                                        |
+| ------------------- | ----- | ---------------------------------------------- |
+| UI Components       | 60+   | ✅ Well-organized in `/components/ui/`         |
+| Page Components     | 37    | ⚠️ Some exceed 1,000 lines                     |
+| Landing Components  | 10+   | ✅ Properly isolated in `/components/landing/` |
+| Template Components | 5+    | ✅ Dedicated `/components/templates/`          |
+| Skeleton Components | 10+   | ✅ Consistent loading states                   |
 
 ### 4.4 Reusability Patterns
 
@@ -206,29 +208,29 @@ The codebase demonstrates good reusability patterns:
 
 ### 5.1 High Priority
 
-| Issue | Action | Effort |
-|-------|--------|--------|
-| Split `db.ts` | Create domain-specific database modules | Medium |
-| Split `routers.ts` | Create domain-specific tRPC routers | Medium |
-| Remove dead code | Delete `Navigation-old.tsx` and verify other unused components | Low |
-| Add missing schema columns | Update Drizzle schema with `appliedToMonth`, `completedAt`, `latencyMs` | Low |
+| Issue                      | Action                                                                  | Effort |
+| -------------------------- | ----------------------------------------------------------------------- | ------ |
+| Split `db.ts`              | Create domain-specific database modules                                 | Medium |
+| Split `routers.ts`         | Create domain-specific tRPC routers                                     | Medium |
+| Remove dead code           | Delete `Navigation-old.tsx` and verify other unused components          | Low    |
+| Add missing schema columns | Update Drizzle schema with `appliedToMonth`, `completedAt`, `latencyMs` | Low    |
 
 ### 5.2 Medium Priority
 
-| Issue | Action | Effort |
-|-------|--------|--------|
+| Issue                | Action                                                        | Effort |
+| -------------------- | ------------------------------------------------------------- | ------ |
 | Refactor large pages | Extract sub-components from Expenses, Clients, Invoices pages | Medium |
-| Optimize N+1 queries | Fix `getClientProfitability` query performance | Medium |
-| Remove console.logs | Clean up debug statements for production | Low |
-| Connect Sentry | Complete Sentry project setup for error monitoring | Low |
+| Optimize N+1 queries | Fix `getClientProfitability` query performance                | Medium |
+| Remove console.logs  | Clean up debug statements for production                      | Low    |
+| Connect Sentry       | Complete Sentry project setup for error monitoring            | Low    |
 
 ### 5.3 Low Priority
 
-| Issue | Action | Effort |
-|-------|--------|--------|
-| Add source maps | Configure `@sentry/vite-plugin` for readable stack traces | Low |
-| Implement promo codes | Add `promoCodes` table and redemption logic | Medium |
-| Add E2E tests | Implement Playwright tests for critical user flows | High |
+| Issue                 | Action                                                    | Effort |
+| --------------------- | --------------------------------------------------------- | ------ |
+| Add source maps       | Configure `@sentry/vite-plugin` for readable stack traces | Low    |
+| Implement promo codes | Add `promoCodes` table and redemption logic               | Medium |
+| Add E2E tests         | Implement Playwright tests for critical user flows        | High   |
 
 ---
 

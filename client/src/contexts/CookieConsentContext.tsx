@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
 
 const CONSENT_STORAGE_KEY = "sleek_cookie_consent";
 const CONSENT_VERSION = 1;
@@ -36,17 +43,20 @@ const defaultPreferences: ConsentPreferences = {
   marketing: false,
 };
 
-const CookieConsentContext = createContext<CookieConsentContextValue | undefined>(undefined);
+const CookieConsentContext = createContext<
+  CookieConsentContextValue | undefined
+>(undefined);
 
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const [hasConsent, setHasConsent] = useState(false);
-  const [preferences, setPreferencesState] = useState<ConsentPreferences>(defaultPreferences);
+  const [preferences, setPreferencesState] =
+    useState<ConsentPreferences>(defaultPreferences);
   const [showBanner, setShowBanner] = useState(false);
   const [analyticsLoaded, setAnalyticsLoaded] = useState(false);
 
   const loadAnalytics = useCallback(() => {
     if (analyticsLoaded) return;
-    if (document.querySelector('script[data-website-id]')) {
+    if (document.querySelector("script[data-website-id]")) {
       setAnalyticsLoaded(true);
       return;
     }
@@ -72,23 +82,26 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     setAnalyticsLoaded(true);
   }, [analyticsLoaded]);
 
-  const saveConsent = useCallback((prefs: ConsentPreferences, source: "banner" | "settings" = "banner") => {
-    const consent: StoredConsent = {
-      version: CONSENT_VERSION,
-      timestamp: Date.now(),
-      preferences: prefs,
-      source,
-    };
+  const saveConsent = useCallback(
+    (prefs: ConsentPreferences, source: "banner" | "settings" = "banner") => {
+      const consent: StoredConsent = {
+        version: CONSENT_VERSION,
+        timestamp: Date.now(),
+        preferences: prefs,
+        source,
+      };
 
-    localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consent));
-    setPreferencesState(prefs);
-    setHasConsent(true);
-    setShowBanner(false);
+      localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(consent));
+      setPreferencesState(prefs);
+      setHasConsent(true);
+      setShowBanner(false);
 
-    if (prefs.analytics && !analyticsLoaded) {
-      loadAnalytics();
-    }
-  }, [analyticsLoaded, loadAnalytics]);
+      if (prefs.analytics && !analyticsLoaded) {
+        loadAnalytics();
+      }
+    },
+    [analyticsLoaded, loadAnalytics]
+  );
 
   const loadStoredConsent = useCallback(() => {
     try {
@@ -150,15 +163,18 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     saveConsent(prefs, "banner");
   }, [saveConsent]);
 
-  const setPreferences = useCallback((partialPrefs: Partial<ConsentPreferences>) => {
-    const newPrefs: ConsentPreferences = {
-      ...preferences,
-      ...partialPrefs,
-      essential: true,
-      functional: true,
-    };
-    saveConsent(newPrefs, "settings");
-  }, [preferences, saveConsent]);
+  const setPreferences = useCallback(
+    (partialPrefs: Partial<ConsentPreferences>) => {
+      const newPrefs: ConsentPreferences = {
+        ...preferences,
+        ...partialPrefs,
+        essential: true,
+        functional: true,
+      };
+      saveConsent(newPrefs, "settings");
+    },
+    [preferences, saveConsent]
+  );
 
   const resetConsent = useCallback(() => {
     localStorage.removeItem(CONSENT_STORAGE_KEY);

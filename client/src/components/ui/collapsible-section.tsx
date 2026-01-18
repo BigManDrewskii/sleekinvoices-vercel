@@ -23,11 +23,13 @@ export function CollapsibleSection({
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
-    <div className={cn(
-      "rounded-lg bg-card/50 border border-border/50",
-      disabled && "opacity-60",
-      className
-    )}>
+    <div
+      className={cn(
+        "rounded-lg bg-card/50 border border-border/50",
+        disabled && "opacity-60",
+        className
+      )}
+    >
       <button
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -57,10 +59,14 @@ export function CollapsibleSection({
       <div
         className={cn(
           "overflow-hidden transition-all duration-200",
-          isOpen && !disabled ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
+          isOpen && !disabled
+            ? "max-h-[2000px] opacity-100"
+            : "max-h-0 opacity-0"
         )}
       >
-        <div className={cn("px-4 pb-4 pt-1", disabled && "pointer-events-none")}>
+        <div
+          className={cn("px-4 pb-4 pt-1", disabled && "pointer-events-none")}
+        >
           {children}
         </div>
       </div>
@@ -81,7 +87,7 @@ export function ColorInput({
   value,
   onChange,
   readonly = false,
-  subtitle
+  subtitle,
 }: ColorInputProps) {
   const [copied, setCopied] = React.useState(false);
 
@@ -96,17 +102,21 @@ export function ColorInput({
       <div className="flex items-baseline gap-2">
         <label className="text-sm font-medium text-foreground">{label}</label>
         {subtitle && (
-          <span className="text-xs text-muted-foreground font-normal">{subtitle}</span>
+          <span className="text-xs text-muted-foreground font-normal">
+            {subtitle}
+          </span>
         )}
       </div>
 
       <div className="relative group">
-        <div className={cn(
-          "flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-          readonly
-            ? "border-border bg-muted/30"
-            : "border-border bg-card hover:border-primary/50 hover:shadow-sm"
-        )}>
+        <div
+          className={cn(
+            "flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+            readonly
+              ? "border-border bg-muted/30"
+              : "border-border bg-card hover:border-primary/50 hover:shadow-sm"
+          )}
+        >
           {/* Large Color Swatch */}
           <div className="relative">
             {readonly ? (
@@ -118,7 +128,7 @@ export function ColorInput({
               <input
                 type="color"
                 value={value}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={e => onChange(e.target.value)}
                 className="w-12 h-12 rounded-lg cursor-pointer shadow-sm border-2 border-border/50 hover:shadow-md hover:scale-105 transition-all"
                 style={{ backgroundColor: value }}
               />
@@ -129,7 +139,7 @@ export function ColorInput({
           <input
             type="text"
             value={value}
-            onChange={(e) => !readonly && onChange(e.target.value)}
+            onChange={e => !readonly && onChange(e.target.value)}
             readOnly={readonly}
             className={cn(
               "flex-1 bg-transparent border-0 text-sm font-mono focus:outline-none",
@@ -186,19 +196,21 @@ export function SliderInput({
           <input
             type="number"
             value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
+            onChange={e => onChange(Number(e.target.value))}
             min={min}
             max={max}
             step={step}
             className="w-16 bg-muted/30 border border-border/50 rounded px-2 py-1 text-sm text-right font-mono focus:outline-none focus:border-primary"
           />
-          {unit && <span className="text-xs text-muted-foreground">{unit}</span>}
+          {unit && (
+            <span className="text-xs text-muted-foreground">{unit}</span>
+          )}
         </div>
       </div>
       <input
         type="range"
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={e => onChange(Number(e.target.value))}
         min={min}
         max={max}
         step={step}

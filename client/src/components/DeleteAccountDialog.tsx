@@ -16,7 +16,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { AlertTriangle, Trash2, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  Trash2,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Step = "warning" | "reason" | "confirm";
@@ -36,9 +42,11 @@ export function DeleteAccountDialog() {
         window.location.href = "/";
       }, 2000);
     },
-    onError: (error) => {
+    onError: error => {
       setIsDeleting(false);
-      toast.error(error.message || "Failed to delete account. Please try again.");
+      toast.error(
+        error.message || "Failed to delete account. Please try again."
+      );
     },
   });
 
@@ -105,14 +113,20 @@ export function DeleteAccountDialog() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-center space-y-3">
                 <p>
-                  This action is <strong className="text-foreground">permanent and irreversible</strong>. 
-                  Once deleted, your account and all associated data cannot be recovered.
+                  This action is{" "}
+                  <strong className="text-foreground">
+                    permanent and irreversible
+                  </strong>
+                  . Once deleted, your account and all associated data cannot be
+                  recovered.
                 </p>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            
+
             <div className="my-4 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-              <h4 className="font-medium text-sm mb-2 text-destructive">The following will be permanently deleted:</h4>
+              <h4 className="font-medium text-sm mb-2 text-destructive">
+                The following will be permanently deleted:
+              </h4>
               <ul className="text-sm text-muted-foreground space-y-1.5">
                 <li className="flex items-center gap-2">
                   <XCircle className="h-4 w-4 text-destructive/70" />
@@ -138,7 +152,9 @@ export function DeleteAccountDialog() {
             </div>
 
             <AlertDialogFooter className="gap-2 sm:gap-0">
-              <AlertDialogCancel onClick={handleClose}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel onClick={handleClose}>
+                Cancel
+              </AlertDialogCancel>
               <Button variant="destructive" onClick={handleNext}>
                 I Understand, Continue
               </Button>
@@ -152,17 +168,17 @@ export function DeleteAccountDialog() {
             <AlertDialogHeader>
               <AlertDialogTitle>Help Us Improve</AlertDialogTitle>
               <AlertDialogDescription>
-                We're sorry to see you go. Would you mind sharing why you're leaving? 
-                This helps us improve SleekInvoices for everyone.
+                We're sorry to see you go. Would you mind sharing why you're
+                leaving? This helps us improve SleekInvoices for everyone.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            
+
             <div className="my-4 space-y-3">
               <Label htmlFor="reason">Reason for leaving (optional)</Label>
               <Textarea
                 id="reason"
                 value={reason}
-                onChange={(e) => setReason(e.target.value)}
+                onChange={e => setReason(e.target.value)}
                 placeholder="Tell us why you're deleting your account..."
                 className="min-h-[100px] resize-none"
               />
@@ -190,28 +206,37 @@ export function DeleteAccountDialog() {
                 Final Confirmation
               </AlertDialogTitle>
               <AlertDialogDescription className="text-center">
-                To confirm deletion, please type <strong className="text-foreground font-mono">DELETE MY ACCOUNT</strong> below.
+                To confirm deletion, please type{" "}
+                <strong className="text-foreground font-mono">
+                  DELETE MY ACCOUNT
+                </strong>{" "}
+                below.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            
+
             <div className="my-4 space-y-3">
               <Label htmlFor="confirmText">Type confirmation text</Label>
               <Input
                 id="confirmText"
                 value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
+                onChange={e => setConfirmText(e.target.value)}
                 placeholder="DELETE MY ACCOUNT"
                 className={cn(
                   "font-mono text-center",
-                  isConfirmValid && "border-destructive focus-visible:ring-destructive"
+                  isConfirmValid &&
+                    "border-destructive focus-visible:ring-destructive"
                 )}
                 disabled={isDeleting}
               />
               {confirmText.length > 0 && (
-                <div className={cn(
-                  "flex items-center gap-2 text-sm",
-                  isConfirmValid ? "text-destructive" : "text-muted-foreground"
-                )}>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 text-sm",
+                    isConfirmValid
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  )}
+                >
                   {isConfirmValid ? (
                     <>
                       <CheckCircle2 className="h-4 w-4" />
@@ -228,11 +253,15 @@ export function DeleteAccountDialog() {
             </div>
 
             <AlertDialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" onClick={handleBack} disabled={isDeleting}>
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                disabled={isDeleting}
+              >
                 Back
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleDelete}
                 disabled={!isConfirmValid || isDeleting}
               >

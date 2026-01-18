@@ -1,5 +1,9 @@
 import type { MySql2Database } from "drizzle-orm/mysql2";
-import { clients, clientPortalAccess, type InsertClient } from "../../../drizzle/schema";
+import {
+  clients,
+  clientPortalAccess,
+  type InsertClient,
+} from "../../../drizzle/schema";
 import type { SeededUser } from "./users";
 import { CLIENTS } from "../data/realistic-data";
 import { SEED_CONFIG } from "../data/constants";
@@ -31,7 +35,10 @@ export async function seedClients(
         phone: clientData.phone,
         vatNumber: clientData.vatNumber,
         taxExempt: clientData.taxExempt,
-        createdAt: new Date(now.getTime() - (SEED_CONFIG.clientsPerUser - i) * 10 * 24 * 60 * 60 * 1000),
+        createdAt: new Date(
+          now.getTime() -
+            (SEED_CONFIG.clientsPerUser - i) * 10 * 24 * 60 * 60 * 1000
+        ),
         updatedAt: now,
       });
     }
@@ -70,7 +77,9 @@ async function seedClientPortalAccess(
         expiresAt: isActive
           ? new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000)
           : new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000),
-        lastAccessedAt: isActive ? new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000) : null,
+        lastAccessedAt: isActive
+          ? new Date(now.getTime() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+          : null,
         isActive: isActive ? 1 : 0,
       });
     }

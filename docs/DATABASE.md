@@ -8,12 +8,12 @@ SleekInvoices uses **MySQL** with **Drizzle ORM** for database operations. The p
 
 ## Quick Reference
 
-| Command | Description |
-|---------|-------------|
-| `pnpm db:push` | Push schema changes to database |
-| `node scripts/audit-schema.mjs` | Audit database vs Drizzle schema |
-| `node scripts/sync-schema.mjs` | Add missing columns to database |
-| `node scripts/seed-dev-data.mjs` | Seed development mock data |
+| Command                            | Description                             |
+| ---------------------------------- | --------------------------------------- |
+| `pnpm db:push`                     | Push schema changes to database         |
+| `node scripts/audit-schema.mjs`    | Audit database vs Drizzle schema        |
+| `node scripts/sync-schema.mjs`     | Add missing columns to database         |
+| `node scripts/seed-dev-data.mjs`   | Seed development mock data              |
 | `node scripts/reset-user-data.mjs` | Clear user data for empty state testing |
 
 ## Schema Management
@@ -41,6 +41,7 @@ node scripts/audit-schema.mjs
 ```
 
 This will report:
+
 - Missing tables
 - Missing columns
 - Extra columns (in DB but not in schema)
@@ -70,6 +71,7 @@ node scripts/seed-dev-data.mjs --user-id=1
 ```
 
 The seed script creates:
+
 - 5 clients with varied details
 - 10 products/services
 - 15 invoices (mix of draft, sent, paid, overdue)
@@ -94,6 +96,7 @@ node scripts/reset-user-data.mjs --user-id=1 --confirm
 ```
 
 **What gets deleted:**
+
 - All invoices and line items
 - All estimates and line items
 - All clients
@@ -105,6 +108,7 @@ node scripts/reset-user-data.mjs --user-id=1 --confirm
 - All templates
 
 **What is preserved:**
+
 - User account and profile
 - Subscription status
 - Reminder settings (preferences)
@@ -133,45 +137,45 @@ The production database contains real user data. Never run reset or seed scripts
 
 ### Core Tables
 
-| Table | Description |
-|-------|-------------|
-| `users` | User accounts and profiles |
-| `clients` | Client/customer records |
-| `invoices` | Invoice headers |
-| `invoiceLineItems` | Invoice line items |
-| `estimates` | Estimate/quote headers |
-| `estimateLineItems` | Estimate line items |
-| `products` | Product/service library |
-| `payments` | Payment records |
+| Table               | Description                |
+| ------------------- | -------------------------- |
+| `users`             | User accounts and profiles |
+| `clients`           | Client/customer records    |
+| `invoices`          | Invoice headers            |
+| `invoiceLineItems`  | Invoice line items         |
+| `estimates`         | Estimate/quote headers     |
+| `estimateLineItems` | Estimate line items        |
+| `products`          | Product/service library    |
+| `payments`          | Payment records            |
 
 ### Financial Tables
 
-| Table | Description |
-|-------|-------------|
-| `expenses` | Expense tracking |
-| `expenseCategories` | Expense categorization |
-| `recurringInvoices` | Recurring invoice templates |
+| Table                       | Description                  |
+| --------------------------- | ---------------------------- |
+| `expenses`                  | Expense tracking             |
+| `expenseCategories`         | Expense categorization       |
+| `recurringInvoices`         | Recurring invoice templates  |
 | `recurringInvoiceLineItems` | Recurring invoice line items |
 
 ### System Tables
 
-| Table | Description |
-|-------|-------------|
-| `invoiceTemplates` | Custom invoice templates |
-| `emailLog` | Email delivery tracking |
-| `reminderSettings` | Reminder preferences |
-| `reminderLogs` | Reminder history |
-| `aiCredits` | AI feature usage tracking |
-| `usageTracking` | Invoice limit tracking |
+| Table              | Description               |
+| ------------------ | ------------------------- |
+| `invoiceTemplates` | Custom invoice templates  |
+| `emailLog`         | Email delivery tracking   |
+| `reminderSettings` | Reminder preferences      |
+| `reminderLogs`     | Reminder history          |
+| `aiCredits`        | AI feature usage tracking |
+| `usageTracking`    | Invoice limit tracking    |
 
 ### Payment Integration Tables
 
-| Table | Description |
-|-------|-------------|
-| `stripeWebhookEvents` | Stripe webhook audit log |
-| `cryptoSubscriptionPayments` | Crypto payment tracking |
-| `paymentGateways` | Connected payment providers |
-| `userWallets` | User crypto wallet addresses |
+| Table                        | Description                  |
+| ---------------------------- | ---------------------------- |
+| `stripeWebhookEvents`        | Stripe webhook audit log     |
+| `cryptoSubscriptionPayments` | Crypto payment tracking      |
+| `paymentGateways`            | Connected payment providers  |
+| `userWallets`                | User crypto wallet addresses |
 
 ## Troubleshooting
 

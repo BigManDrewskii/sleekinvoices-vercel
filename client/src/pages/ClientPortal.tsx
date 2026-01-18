@@ -71,7 +71,7 @@ export default function ClientPortal() {
     );
 
   // Create crypto payment mutation
-  const createCryptoPayment = trpc.clientPortal.createCryptoPayment.useMutation(
+  const createCryptoPayment = trpc.crypto.createCryptoPayment.useMutation(
     {
       onSuccess: data => {
         setPaymentUrl(data.invoiceUrl);

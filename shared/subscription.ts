@@ -1,18 +1,18 @@
 /**
  * Subscription Plans & Feature Configuration
- * 
+ *
  * This file defines the subscription tiers, pricing, and feature flags for the application.
  * Import these constants throughout the codebase to ensure consistent subscription logic.
- * 
+ *
  * @example
  * ```typescript
  * import { SUBSCRIPTION_PLANS, isPro, canCreateInvoice } from '@/shared/subscription';
- * 
+ *
  * // Check if user is on Pro plan
  * if (isPro(user.subscriptionStatus)) {
  *   // Allow unlimited invoices
  * }
- * 
+ *
  * // Check if user can create another invoice
  * const usage = await getCurrentMonthUsage(userId);
  * if (!canCreateInvoice(user.subscriptionStatus, usage.invoicesCreated)) {
@@ -30,21 +30,27 @@
  * - past_due: Payment failed (temporarily blocked)
  * - null: Legacy/fallback (treated as free)
  */
-export type SubscriptionStatus = 'free' | 'active' | 'canceled' | 'past_due' | 'trialing' | null;
+export type SubscriptionStatus =
+  | "free"
+  | "active"
+  | "canceled"
+  | "past_due"
+  | "trialing"
+  | null;
 
 /**
  * Subscription plan identifiers
  */
-export type SubscriptionPlan = 'free' | 'pro';
+export type SubscriptionPlan = "free" | "pro";
 
 /**
  * Feature flags for subscription plans
  */
 export interface PlanFeatures {
   /** Number of invoices allowed per month (null = unlimited) */
-  invoices: number | 'unlimited';
+  invoices: number | "unlimited";
   /** Number of clients allowed (null = unlimited) */
-  clients: 'unlimited';
+  clients: "unlimited";
   /** Can generate PDF invoices */
   pdfGeneration: boolean;
   /** Access to basic invoice templates */
@@ -75,12 +81,12 @@ export interface Plan {
 
 /**
  * Subscription plan definitions
- * 
+ *
  * FREE PLAN:
  * - 3 invoices per month
  * - Basic features only
  * - No online payments or email sending
- * 
+ *
  * PRO PLAN:
  * - Unlimited invoices
  * - All premium features
@@ -89,13 +95,13 @@ export interface Plan {
  */
 export const SUBSCRIPTION_PLANS = {
   FREE: {
-    id: 'free' as const,
-    name: 'Free',
+    id: "free" as const,
+    name: "Free",
     price: 0,
     invoiceLimit: 3,
     features: {
       invoices: 3,
-      clients: 'unlimited' as const,
+      clients: "unlimited" as const,
       pdfGeneration: true,
       basicTemplates: true,
       stripePayments: false,
@@ -103,16 +109,16 @@ export const SUBSCRIPTION_PLANS = {
       analytics: false,
       customBranding: false,
       prioritySupport: false,
-    }
+    },
   },
   PRO: {
-    id: 'pro' as const,
-    name: 'Pro',
+    id: "pro" as const,
+    name: "Pro",
     price: 12,
     invoiceLimit: null, // unlimited
     features: {
-      invoices: 'unlimited' as const,
-      clients: 'unlimited' as const,
+      invoices: "unlimited" as const,
+      clients: "unlimited" as const,
       pdfGeneration: true,
       basicTemplates: true,
       stripePayments: true,
@@ -120,16 +126,16 @@ export const SUBSCRIPTION_PLANS = {
       analytics: true,
       customBranding: true,
       prioritySupport: true,
-    }
-  }
+    },
+  },
 } as const;
 
 /**
  * Check if user has an active Pro subscription
- * 
+ *
  * @param status - User's subscription status from database
  * @returns true if user has Pro access (active or trialing)
- * 
+ *
  * @example
  * ```typescript
  * if (isPro(user.subscriptionStatus)) {
@@ -140,16 +146,16 @@ export const SUBSCRIPTION_PLANS = {
  * ```
  */
 export function isPro(status: SubscriptionStatus): boolean {
-  return status === 'active' || status === 'trialing';
+  return status === "active" || status === "trialing";
 }
 
 /**
  * Check if user can create another invoice based on their plan and usage
- * 
+ *
  * @param status - User's subscription status
  * @param currentMonthCount - Number of invoices created this month
  * @returns true if user can create another invoice
- * 
+ *
  * @example
  * ```typescript
  * const usage = await getCurrentMonthUsage(userId);
@@ -158,23 +164,26 @@ export function isPro(status: SubscriptionStatus): boolean {
  * }
  * ```
  */
-export function canCreateInvoice(status: SubscriptionStatus, currentMonthCount: number): boolean {
+export function canCreateInvoice(
+  status: SubscriptionStatus,
+  currentMonthCount: number
+): boolean {
   // Pro users have unlimited invoices
   if (isPro(status)) {
     return true;
   }
-  
+
   // Free users limited to 3 invoices per month
   return currentMonthCount < SUBSCRIPTION_PLANS.FREE.invoiceLimit;
 }
 
 /**
  * Check if user can access a specific feature based on their subscription
- * 
+ *
  * @param status - User's subscription status
  * @param feature - Feature key to check
  * @returns true if user has access to the feature
- * 
+ *
  * @example
  * ```typescript
  * if (!canUseFeature(user.subscriptionStatus, 'stripePayments')) {
@@ -190,7 +199,7 @@ export function canUseFeature(
   if (isPro(status)) {
     return true;
   }
-  
+
   // Free users only have access to features marked true in FREE plan
   const freeFeature = SUBSCRIPTION_PLANS.FREE.features[feature];
   return freeFeature === true;
@@ -198,10 +207,10 @@ export function canUseFeature(
 
 /**
  * Get the plan object for a given subscription status
- * 
+ *
  * @param status - User's subscription status
  * @returns Plan configuration object
- * 
+ *
  * @example
  * ```typescript
  * const plan = getPlan(user.subscriptionStatus);
@@ -214,10 +223,10 @@ export function getPlan(status: SubscriptionStatus): Plan {
 
 /**
  * Get remaining invoices for free tier users
- * 
+ *
  * @param currentMonthCount - Number of invoices created this month
  * @returns Number of invoices remaining (0 if limit reached)
- * 
+ *
  * @example
  * ```typescript
  * const remaining = getRemainingInvoices(usage.invoicesCreated);
@@ -230,15 +239,14 @@ export function getRemainingInvoices(currentMonthCount: number): number {
   return Math.max(0, remaining);
 }
 
-
 /**
  * ============================================================================
  * CRYPTO SUBSCRIPTION TIERS
  * ============================================================================
- * 
+ *
  * Mullvad-style duration-based pricing for crypto payments.
  * Crypto payments offer discounted rates compared to card payments.
- * 
+ *
  * Card Price: $12/month
  * Crypto Prices: $10/month (1mo) down to $8.50/month (12mo)
  */
@@ -268,7 +276,7 @@ export interface CryptoSubscriptionTier {
 
 /**
  * Crypto subscription pricing tiers
- * 
+ *
  * Pricing Strategy:
  * - 1 month:  $10.00/mo = $10.00 total  (17% savings vs $12 card)
  * - 3 months: $9.50/mo  = $28.50 total  (21% savings vs $36 card)
@@ -278,58 +286,62 @@ export interface CryptoSubscriptionTier {
 export const CRYPTO_SUBSCRIPTION_TIERS = {
   MONTHLY: {
     months: 1,
-    label: '1 Month',
-    pricePerMonth: 10.00,
-    totalPrice: 10.00,
+    label: "1 Month",
+    pricePerMonth: 10.0,
+    totalPrice: 10.0,
     savingsPercent: 17,
   },
   QUARTERLY: {
     months: 3,
-    label: '3 Months',
-    pricePerMonth: 9.50,
-    totalPrice: 28.50,
+    label: "3 Months",
+    pricePerMonth: 9.5,
+    totalPrice: 28.5,
     savingsPercent: 21,
     recommended: true,
   },
   BIANNUAL: {
     months: 6,
-    label: '6 Months',
-    pricePerMonth: 9.00,
-    totalPrice: 54.00,
+    label: "6 Months",
+    pricePerMonth: 9.0,
+    totalPrice: 54.0,
     savingsPercent: 25,
   },
   ANNUAL: {
     months: 12,
-    label: '12 Months',
-    pricePerMonth: 8.50,
-    totalPrice: 102.00,
+    label: "12 Months",
+    pricePerMonth: 8.5,
+    totalPrice: 102.0,
     savingsPercent: 29,
   },
 } as const;
 
 /**
  * Get crypto tier by duration in months
- * 
+ *
  * @param months - Duration in months (1, 3, 6, or 12)
  * @returns Tier configuration or null if invalid
  */
-export function getCryptoTierByMonths(months: number): CryptoSubscriptionTier | null {
+export function getCryptoTierByMonths(
+  months: number
+): CryptoSubscriptionTier | null {
   const tiers = Object.values(CRYPTO_SUBSCRIPTION_TIERS);
   return tiers.find(tier => tier.months === months) || null;
 }
 
 /**
  * Get all crypto tiers sorted by duration
- * 
+ *
  * @returns Array of all tiers sorted by months ascending
  */
 export function getAllCryptoTiers(): CryptoSubscriptionTier[] {
-  return Object.values(CRYPTO_SUBSCRIPTION_TIERS).sort((a, b) => a.months - b.months);
+  return Object.values(CRYPTO_SUBSCRIPTION_TIERS).sort(
+    (a, b) => a.months - b.months
+  );
 }
 
 /**
  * Get crypto price for a given duration
- * 
+ *
  * @param months - Duration in months
  * @returns Total price in USD or 0 if invalid
  */
@@ -340,21 +352,21 @@ export function getCryptoPrice(months: number): number {
 
 /**
  * Get savings amount compared to card price
- * 
+ *
  * @param months - Duration in months
  * @returns Savings in USD or 0 if invalid
  */
 export function getCryptoSavings(months: number): number {
   const tier = getCryptoTierByMonths(months);
   if (!tier) return 0;
-  
+
   const cardTotal = CARD_PRICE_PER_MONTH * months;
   return cardTotal - tier.totalPrice;
 }
 
 /**
  * Get savings percentage for a given duration
- * 
+ *
  * @param months - Duration in months
  * @returns Savings percentage or 0 if invalid
  */
@@ -365,7 +377,7 @@ export function getCryptoSavingsPercent(months: number): number {
 
 /**
  * Check if a duration is valid for crypto subscription
- * 
+ *
  * @param months - Duration to validate
  * @returns true if valid (1, 3, 6, or 12)
  */

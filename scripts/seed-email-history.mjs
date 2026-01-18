@@ -1,11 +1,12 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-const DATABASE_URL = 'mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev';
+const DATABASE_URL =
+  "mysql://sleekinvoices:localdev123@localhost:3306/sleekinvoices_dev";
 const url = new URL(DATABASE_URL);
 
 async function seedEmailHistory() {
   const connection = await mysql.createConnection({
-    host: url.hostname || 'localhost',
+    host: url.hostname || "localhost",
     port: parseInt(url.port) || 3306,
     user: url.username,
     password: url.password,
@@ -13,42 +14,44 @@ async function seedEmailHistory() {
   });
 
   try {
-    console.log('\n📧 Seeding email history...\n');
+    console.log("\n📧 Seeding email history...\n");
 
     const userId = 1;
 
     // Get clients and their invoices
     const [clients] = await connection.query(
-      'SELECT id, email, name FROM clients WHERE userId = ? LIMIT 30',
+      "SELECT id, email, name FROM clients WHERE userId = ? LIMIT 30",
       [userId]
     );
 
     const [invoices] = await connection.query(
-      'SELECT id, invoiceNumber, createdAt, total FROM invoices WHERE userId = ? LIMIT 100',
+      "SELECT id, invoiceNumber, createdAt, total FROM invoices WHERE userId = ? LIMIT 100",
       [userId]
     );
 
-    console.log(`Found ${clients.length} clients and ${invoices.length} invoices`);
+    console.log(
+      `Found ${clients.length} clients and ${invoices.length} invoices`
+    );
 
     // Email templates
     const emailSubjects = {
       invoice: [
-        'Invoice {number} from SleekInvoices',
-        'Your invoice {number} is ready',
-        'Invoice {number} - Payment due {date}',
-        'New Invoice: {number} - {company}',
+        "Invoice {number} from SleekInvoices",
+        "Your invoice {number} is ready",
+        "Invoice {number} - Payment due {date}",
+        "New Invoice: {number} - {company}",
       ],
       reminder: [
-        'Reminder: Invoice {number} is due soon',
-        'Payment reminder for invoice {number}',
-        'Friendly reminder: Invoice {number} pending',
-        'Invoice {number} - Payment overdue',
+        "Reminder: Invoice {number} is due soon",
+        "Payment reminder for invoice {number}",
+        "Friendly reminder: Invoice {number} pending",
+        "Invoice {number} - Payment overdue",
       ],
       receipt: [
-        'Payment received for invoice {number}',
-        'Receipt: Invoice {number} paid',
-        'Payment confirmation - Invoice {number}',
-        'Thank you for your payment - {number}',
+        "Payment received for invoice {number}",
+        "Receipt: Invoice {number} paid",
+        "Payment confirmation - Invoice {number}",
+        "Thank you for your payment - {number}",
       ],
     };
 
@@ -58,22 +61,24 @@ async function seedEmailHistory() {
     for (const invoice of invoices) {
       const client = clients[Math.floor(Math.random() * clients.length)];
       const invoiceDate = new Date(invoice.createdAt);
-      const daysSinceCreation = Math.floor((Date.now() - invoiceDate) / (1000 * 60 * 60 * 24));
+      const daysSinceCreation = Math.floor(
+        (Date.now() - invoiceDate) / (1000 * 60 * 60 * 24)
+      );
 
       // 1. Initial invoice email (sent when invoice was created)
       const initialSubject = emailSubjects.invoice[
         Math.floor(Math.random() * emailSubjects.invoice.length)
-      ].replace('{number}', invoice.invoiceNumber);
+      ].replace("{number}", invoice.invoiceNumber);
 
       await insertEmailLog(connection, {
         userId,
         invoiceId: invoice.id,
         recipientEmail: client.email,
         subject: initialSubject,
-        emailType: 'invoice',
+        emailType: "invoice",
         sentAt: new Date(invoiceDate.getTime() + Math.random() * 3600000), // Within 1 hour of creation
         success: Math.random() > 0.05, // 95% success rate
-        deliveryStatus: getRandomDeliveryStatus('invoice'),
+        deliveryStatus: getRandomDeliveryStatus("invoice"),
       });
       emailCount++;
 
@@ -89,17 +94,17 @@ async function seedEmailHistory() {
             );
             const reminderSubject = emailSubjects.reminder[
               Math.floor(Math.random() * emailSubjects.reminder.length)
-            ].replace('{number}', invoice.invoiceNumber);
+            ].replace("{number}", invoice.invoiceNumber);
 
             await insertEmailLog(connection, {
               userId,
               invoiceId: invoice.id,
               recipientEmail: client.email,
               subject: reminderSubject,
-              emailType: 'reminder',
+              emailType: "reminder",
               sentAt: reminderDate,
               success: Math.random() > 0.08, // 92% success rate
-              deliveryStatus: getRandomDeliveryStatus('reminder'),
+              deliveryStatus: getRandomDeliveryStatus("reminder"),
             });
             emailCount++;
           }
@@ -116,17 +121,17 @@ async function seedEmailHistory() {
         if (paymentDate < new Date()) {
           const receiptSubject = emailSubjects.receipt[
             Math.floor(Math.random() * emailSubjects.receipt.length)
-          ].replace('{number}', invoice.invoiceNumber);
+          ].replace("{number}", invoice.invoiceNumber);
 
           await insertEmailLog(connection, {
             userId,
             invoiceId: invoice.id,
             recipientEmail: client.email,
             subject: receiptSubject,
-            emailType: 'receipt',
+            emailType: "receipt",
             sentAt: paymentDate,
             success: Math.random() > 0.02, // 98% success rate
-            deliveryStatus: getRandomDeliveryStatus('receipt'),
+            deliveryStatus: getRandomDeliveryStatus("receipt"),
           });
           emailCount++;
         }
@@ -136,7 +141,8 @@ async function seedEmailHistory() {
     console.log(`\n✅ Seeded ${emailCount} email history records\n`);
 
     // Show statistics
-    const [stats] = await connection.query(`
+    const [stats] = await connection.query(
+      `
       SELECT
         emailType,
         success,
@@ -145,18 +151,19 @@ async function seedEmailHistory() {
       WHERE userId = ?
       GROUP BY emailType, success
       ORDER BY emailType, success
-    `, [userId]);
+    `,
+      [userId]
+    );
 
-    console.log('\n📊 Email Statistics:\n');
-    console.log('Type        | Status    | Count');
-    console.log('------------|-----------|------');
+    console.log("\n📊 Email Statistics:\n");
+    console.log("Type        | Status    | Count");
+    console.log("------------|-----------|------");
     for (const stat of stats) {
       const type = stat.emailType.padEnd(11);
-      const status = (stat.success ? 'Success' : 'Failed').padEnd(10);
+      const status = (stat.success ? "Success" : "Failed").padEnd(10);
       console.log(`${type} | ${status} | ${stat.count}`);
     }
-    console.log('');
-
+    console.log("");
   } finally {
     await connection.end();
   }
@@ -178,20 +185,20 @@ async function insertEmailLog(connection, data) {
   let errorMessage = null;
 
   if (!success) {
-    if (deliveryStatus === 'bounced') {
+    if (deliveryStatus === "bounced") {
       errorMessage = [
-        'Mailbox full',
-        'Invalid recipient',
-        'Domain not found',
-        'Message too large',
-        'Recipient server not responding',
+        "Mailbox full",
+        "Invalid recipient",
+        "Domain not found",
+        "Message too large",
+        "Recipient server not responding",
       ][Math.floor(Math.random() * 5)];
-    } else if (deliveryStatus === 'failed') {
+    } else if (deliveryStatus === "failed") {
       errorMessage = [
-        'Connection timeout',
-        'SMTP error',
-        'Authentication failed',
-        'Rate limit exceeded',
+        "Connection timeout",
+        "SMTP error",
+        "Authentication failed",
+        "Rate limit exceeded",
       ][Math.floor(Math.random() * 4)];
     }
   }
@@ -218,9 +225,9 @@ async function insertEmailLog(connection, data) {
 
 function getRandomDeliveryStatus(emailType) {
   const statuses = {
-    invoice: ['sent', 'delivered', 'opened', 'clicked', 'bounced', 'failed'],
-    reminder: ['sent', 'delivered', 'opened', 'bounced'],
-    receipt: ['sent', 'delivered', 'opened', 'clicked'],
+    invoice: ["sent", "delivered", "opened", "clicked", "bounced", "failed"],
+    reminder: ["sent", "delivered", "opened", "bounced"],
+    receipt: ["sent", "delivered", "opened", "clicked"],
   };
 
   const weights = {

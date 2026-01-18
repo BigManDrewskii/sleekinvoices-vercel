@@ -5,7 +5,11 @@ import { seedTemplates } from "./generators/templates";
 import { seedClients } from "./generators/clients";
 import { seedProducts } from "./generators/products";
 import { seedMetadata } from "./generators/metadata";
-import { seedInvoices, seedRecurringInvoices, seedEstimates } from "./generators/invoices";
+import {
+  seedInvoices,
+  seedRecurringInvoices,
+  seedEstimates,
+} from "./generators/invoices";
 import { seedPayments } from "./generators/payments";
 import { seedEmails, seedAiLogs, seedAuditLogs } from "./generators/emails";
 import { seedExpenses } from "./generators/expenses";
@@ -75,7 +79,10 @@ async function clearAllTables(db: any): Promise<void> {
       await db.execute(sql.raw(`DELETE FROM ${table}`));
     } catch (error: any) {
       if (!error.message.includes("doesn't exist")) {
-        console.error(`   ⚠️  Warning: Could not clear table ${table}:`, error.message);
+        console.error(
+          `   ⚠️  Warning: Could not clear table ${table}:`,
+          error.message
+        );
       }
     }
   }
@@ -83,8 +90,7 @@ async function clearAllTables(db: any): Promise<void> {
   for (const table of tables) {
     try {
       await db.execute(sql.raw(`ALTER TABLE ${table} AUTO_INCREMENT = 1`));
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   console.log("   ✅ All tables cleared\n");
@@ -121,9 +127,13 @@ async function seed(): Promise<void> {
 
     const metadata = await seedMetadata(db, seededUsers, seededClients);
     console.log(`   ✅ Created ${metadata.tags.length} client tags`);
-    console.log(`   ✅ Created ${metadata.categories.length} expense categories`);
+    console.log(
+      `   ✅ Created ${metadata.categories.length} expense categories`
+    );
     console.log(`   ✅ Created ${metadata.customFields.length} custom fields`);
-    console.log(`   ✅ Created ${metadata.batchTemplates.length} batch templates`);
+    console.log(
+      `   ✅ Created ${metadata.batchTemplates.length} batch templates`
+    );
 
     console.log("\n🌱 Phase 3: Seeding recurring invoices and estimates...");
     await seedRecurringInvoices(db, seededUsers, seededClients);
@@ -151,7 +161,13 @@ async function seed(): Promise<void> {
     await seedEmails(db, seededInvoices, seededClients);
     console.log(`   ✅ Created email logs`);
 
-    await seedExpenses(db, seededUsers, seededClients, seededInvoices, metadata.categories);
+    await seedExpenses(
+      db,
+      seededUsers,
+      seededClients,
+      seededInvoices,
+      metadata.categories
+    );
     console.log(`   ✅ Created expenses`);
 
     await seedAiLogs(db, seededUsers);

@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import * as db from './db';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import * as db from "./db";
 
-describe('Invoice Template System', () => {
+describe("Invoice Template System", () => {
   let testUserId: number;
   let testTemplateId: number;
 
@@ -10,11 +10,11 @@ describe('Invoice Template System', () => {
     const openId = `test-templates-${Date.now()}`;
     await db.upsertUser({
       openId,
-      name: 'Template Test User',
+      name: "Template Test User",
       email: `template-test-${Date.now()}@example.com`,
     });
     const user = await db.getUserByOpenId(openId);
-    if (!user) throw new Error('Failed to create test user');
+    if (!user) throw new Error("Failed to create test user");
     testUserId = user.id;
   });
 
@@ -29,124 +29,132 @@ describe('Invoice Template System', () => {
     }
   });
 
-  describe('Template CRUD Operations', () => {
-    it('should create a new invoice template', async () => {
+  describe("Template CRUD Operations", () => {
+    it("should create a new invoice template", async () => {
       await db.createInvoiceTemplate({
         userId: testUserId,
-        name: 'Test Modern Template',
-        templateType: 'modern',
-        primaryColor: '#5f6fff',
-        secondaryColor: '#252f33',
-        accentColor: '#10b981',
-        headingFont: 'Inter',
-        bodyFont: 'Inter',
+        name: "Test Modern Template",
+        templateType: "modern",
+        primaryColor: "#5f6fff",
+        secondaryColor: "#252f33",
+        accentColor: "#10b981",
+        headingFont: "Inter",
+        bodyFont: "Inter",
         fontSize: 14,
-        logoPosition: 'left',
+        logoPosition: "left",
         logoWidth: 150,
-        headerLayout: 'standard',
-        footerLayout: 'simple',
+        headerLayout: "standard",
+        footerLayout: "simple",
         showCompanyAddress: true,
         showPaymentTerms: true,
         showTaxField: true,
         showDiscountField: true,
         showNotesField: true,
-        footerText: 'Thank you for your business!',
-        language: 'en',
-        dateFormat: 'MM/DD/YYYY',
+        footerText: "Thank you for your business!",
+        language: "en",
+        dateFormat: "MM/DD/YYYY",
         isDefault: true,
       });
 
       // Retrieve the created template
       const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-      const created = templates.find(t => t.name === 'Test Modern Template');
+      const created = templates.find(t => t.name === "Test Modern Template");
       expect(created).toBeDefined();
       testTemplateId = created!.id;
     });
 
-    it('should retrieve templates by user ID', async () => {
+    it("should retrieve templates by user ID", async () => {
       const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-      
+
       expect(templates).toBeDefined();
       expect(Array.isArray(templates)).toBe(true);
       expect(templates.length).toBeGreaterThan(0);
-      
+
       const testTemplate = templates.find(t => t.id === testTemplateId);
       expect(testTemplate).toBeDefined();
-      expect(testTemplate?.name).toBe('Test Modern Template');
-      expect(testTemplate?.templateType).toBe('modern');
-      expect(testTemplate?.primaryColor).toBe('#5f6fff');
+      expect(testTemplate?.name).toBe("Test Modern Template");
+      expect(testTemplate?.templateType).toBe("modern");
+      expect(testTemplate?.primaryColor).toBe("#5f6fff");
       expect(testTemplate?.isDefault).toBe(true);
     });
 
-    it('should retrieve a specific template by ID', async () => {
-      const template = await db.getInvoiceTemplateById(testTemplateId, testUserId);
-      
+    it("should retrieve a specific template by ID", async () => {
+      const template = await db.getInvoiceTemplateById(
+        testTemplateId,
+        testUserId
+      );
+
       expect(template).toBeDefined();
       expect(template?.id).toBe(testTemplateId);
-      expect(template?.name).toBe('Test Modern Template');
+      expect(template?.name).toBe("Test Modern Template");
       expect(template?.userId).toBe(testUserId);
-      expect(template?.headingFont).toBe('Inter');
-      expect(template?.bodyFont).toBe('Inter');
+      expect(template?.headingFont).toBe("Inter");
+      expect(template?.bodyFont).toBe("Inter");
       expect(template?.fontSize).toBe(14);
     });
 
-    it('should retrieve the default template', async () => {
+    it("should retrieve the default template", async () => {
       const defaultTemplate = await db.getDefaultTemplate(testUserId);
-      
+
       expect(defaultTemplate).toBeDefined();
       expect(defaultTemplate?.id).toBe(testTemplateId);
       expect(defaultTemplate?.isDefault).toBe(true);
-      expect(defaultTemplate?.name).toBe('Test Modern Template');
+      expect(defaultTemplate?.name).toBe("Test Modern Template");
     });
 
-    it('should update a template', async () => {
+    it("should update a template", async () => {
       await db.updateInvoiceTemplate(testTemplateId, testUserId, {
-        name: 'Updated Modern Template',
-        primaryColor: '#3b82f6',
+        name: "Updated Modern Template",
+        primaryColor: "#3b82f6",
         fontSize: 16,
-        footerText: 'Updated footer text',
+        footerText: "Updated footer text",
       });
 
-      const updated = await db.getInvoiceTemplateById(testTemplateId, testUserId);
-      
+      const updated = await db.getInvoiceTemplateById(
+        testTemplateId,
+        testUserId
+      );
+
       expect(updated).toBeDefined();
-      expect(updated?.name).toBe('Updated Modern Template');
-      expect(updated?.primaryColor).toBe('#3b82f6');
+      expect(updated?.name).toBe("Updated Modern Template");
+      expect(updated?.primaryColor).toBe("#3b82f6");
       expect(updated?.fontSize).toBe(16);
-      expect(updated?.footerText).toBe('Updated footer text');
+      expect(updated?.footerText).toBe("Updated footer text");
       // Unchanged fields should remain the same
-      expect(updated?.templateType).toBe('modern');
-      expect(updated?.headingFont).toBe('Inter');
+      expect(updated?.templateType).toBe("modern");
+      expect(updated?.headingFont).toBe("Inter");
     });
 
-    it('should create a second template and set it as default', async () => {
+    it("should create a second template and set it as default", async () => {
       await db.createInvoiceTemplate({
         userId: testUserId,
-        name: 'Test Classic Template',
-        templateType: 'classic',
-        primaryColor: '#1e3a8a',
-        secondaryColor: '#475569',
-        accentColor: '#dc2626',
-        headingFont: 'Georgia',
-        bodyFont: 'Georgia',
+        name: "Test Classic Template",
+        templateType: "classic",
+        primaryColor: "#1e3a8a",
+        secondaryColor: "#475569",
+        accentColor: "#dc2626",
+        headingFont: "Georgia",
+        bodyFont: "Georgia",
         fontSize: 13,
-        logoPosition: 'center',
+        logoPosition: "center",
         logoWidth: 180,
-        headerLayout: 'centered',
-        footerLayout: 'detailed',
+        headerLayout: "centered",
+        footerLayout: "detailed",
         showCompanyAddress: true,
         showPaymentTerms: true,
         showTaxField: true,
         showDiscountField: true,
         showNotesField: true,
-        footerText: 'We appreciate your prompt payment.',
-        language: 'en',
-        dateFormat: 'DD/MM/YYYY',
+        footerText: "We appreciate your prompt payment.",
+        language: "en",
+        dateFormat: "DD/MM/YYYY",
         isDefault: false,
       });
 
       const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-      const secondTemplate = templates.find(t => t.name === 'Test Classic Template');
+      const secondTemplate = templates.find(
+        t => t.name === "Test Classic Template"
+      );
       expect(secondTemplate).toBeDefined();
       const secondTemplateId = secondTemplate!.id;
 
@@ -156,7 +164,9 @@ describe('Invoice Template System', () => {
       // Check that only the second template is default
       const updatedTemplates = await db.getInvoiceTemplatesByUserId(testUserId);
       const firstTemplate = updatedTemplates.find(t => t.id === testTemplateId);
-      const updatedSecondTemplate = updatedTemplates.find(t => t.id === secondTemplateId);
+      const updatedSecondTemplate = updatedTemplates.find(
+        t => t.id === secondTemplateId
+      );
 
       expect(firstTemplate?.isDefault).toBe(false);
       expect(updatedSecondTemplate?.isDefault).toBe(true);
@@ -166,29 +176,29 @@ describe('Invoice Template System', () => {
       await db.deleteInvoiceTemplate(secondTemplateId, testUserId);
     });
 
-    it('should not allow deleting the default template', async () => {
+    it("should not allow deleting the default template", async () => {
       // Set first template back as default
       await db.setDefaultTemplate(testTemplateId, testUserId);
 
       await expect(
         db.deleteInvoiceTemplate(testTemplateId, testUserId)
-      ).rejects.toThrow('Cannot delete default template');
+      ).rejects.toThrow("Cannot delete default template");
     });
 
-    it('should delete a non-default template', async () => {
+    it("should delete a non-default template", async () => {
       // Create a non-default template
       await db.createInvoiceTemplate({
         userId: testUserId,
-        name: 'Temporary Template',
-        templateType: 'minimal',
-        primaryColor: '#18181b',
-        secondaryColor: '#71717a',
-        accentColor: '#3b82f6',
+        name: "Temporary Template",
+        templateType: "minimal",
+        primaryColor: "#18181b",
+        secondaryColor: "#71717a",
+        accentColor: "#3b82f6",
         isDefault: false,
       });
 
       const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-      const tempTemplate = templates.find(t => t.name === 'Temporary Template');
+      const tempTemplate = templates.find(t => t.name === "Temporary Template");
       expect(tempTemplate).toBeDefined();
       const tempTemplateId = tempTemplate!.id;
 
@@ -196,91 +206,107 @@ describe('Invoice Template System', () => {
       await db.deleteInvoiceTemplate(tempTemplateId, testUserId);
 
       // Verify it's gone
-      const deleted = await db.getInvoiceTemplateById(tempTemplateId, testUserId);
+      const deleted = await db.getInvoiceTemplateById(
+        tempTemplateId,
+        testUserId
+      );
       expect(deleted).toBeUndefined();
     });
   });
 
-  describe('Template Field Validation', () => {
-    it('should handle all template types', async () => {
-      const templateTypes = ['modern', 'classic', 'minimal', 'bold', 'professional', 'creative'] as const;
-      
+  describe("Template Field Validation", () => {
+    it("should handle all template types", async () => {
+      const templateTypes = [
+        "modern",
+        "classic",
+        "minimal",
+        "bold",
+        "professional",
+        "creative",
+      ] as const;
+
       for (const type of templateTypes) {
         await db.createInvoiceTemplate({
           userId: testUserId,
           name: `Test ${type} Template`,
           templateType: type,
-          primaryColor: '#000000',
-          secondaryColor: '#ffffff',
-          accentColor: '#ff0000',
+          primaryColor: "#000000",
+          secondaryColor: "#ffffff",
+          accentColor: "#ff0000",
           isDefault: false,
         });
 
         const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-        const template = templates.find(t => t.name === `Test ${type} Template`);
+        const template = templates.find(
+          t => t.name === `Test ${type} Template`
+        );
         expect(template).toBeDefined();
         const templateId = template!.id;
-        
+
         expect(template?.templateType).toBe(type);
-        
+
         // Cleanup
         await db.deleteInvoiceTemplate(templateId, testUserId);
       }
     });
 
-    it('should handle all logo positions', async () => {
-      const positions = ['left', 'center', 'right'] as const;
-      
+    it("should handle all logo positions", async () => {
+      const positions = ["left", "center", "right"] as const;
+
       for (const position of positions) {
         await db.createInvoiceTemplate({
           userId: testUserId,
           name: `Test ${position} Logo Template`,
-          templateType: 'modern',
+          templateType: "modern",
           logoPosition: position,
           isDefault: false,
         });
 
         const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-        const template = templates.find(t => t.name === `Test ${position} Logo Template`);
+        const template = templates.find(
+          t => t.name === `Test ${position} Logo Template`
+        );
         expect(template).toBeDefined();
         const templateId = template!.id;
-        
+
         expect(template?.logoPosition).toBe(position);
-        
+
         // Cleanup
         await db.deleteInvoiceTemplate(templateId, testUserId);
       }
     });
 
-    it('should handle all header layouts', async () => {
-      const layouts = ['standard', 'centered', 'split'] as const;
-      
+    it("should handle all header layouts", async () => {
+      const layouts = ["standard", "centered", "split"] as const;
+
       for (const layout of layouts) {
         await db.createInvoiceTemplate({
           userId: testUserId,
           name: `Test ${layout} Header Template`,
-          templateType: 'modern',
+          templateType: "modern",
           headerLayout: layout,
           isDefault: false,
         });
 
         const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-        const template = templates.find(t => t.name === `Test ${layout} Header Template`);
+        const template = templates.find(
+          t => t.name === `Test ${layout} Header Template`
+        );
         expect(template).toBeDefined();
         const templateId = template!.id;
-        
+
         expect(template?.headerLayout).toBe(layout);
-        
+
         // Cleanup
         await db.deleteInvoiceTemplate(templateId, testUserId);
       }
     });
 
-    it('should handle field visibility toggles', async () => {
+    it("should handle field visibility toggles", async () => {
       await db.createInvoiceTemplate({
         userId: testUserId,
-        name: 'Test Field Visibility Template',
-        templateType: 'modern',
+        name: "Test Field Visibility Template",
+        templateType: "modern",
         showCompanyAddress: false,
         showPaymentTerms: false,
         showTaxField: false,
@@ -290,23 +316,25 @@ describe('Invoice Template System', () => {
       });
 
       const templates = await db.getInvoiceTemplatesByUserId(testUserId);
-      const template = templates.find(t => t.name === 'Test Field Visibility Template');
+      const template = templates.find(
+        t => t.name === "Test Field Visibility Template"
+      );
       expect(template).toBeDefined();
       const templateId = template!.id;
-      
+
       expect(template?.showCompanyAddress).toBe(false);
       expect(template?.showPaymentTerms).toBe(false);
       expect(template?.showTaxField).toBe(false);
       expect(template?.showDiscountField).toBe(false);
       expect(template?.showNotesField).toBe(false);
-      
+
       // Cleanup
       await db.deleteInvoiceTemplate(templateId, testUserId);
     });
   });
 
-  describe('Template Initialization', () => {
-    it('should initialize 6 templates for new users', async () => {
+  describe("Template Initialization", () => {
+    it("should initialize 6 templates for new users", async () => {
       // Create a new test user
       const openId = `test-init-${Date.now()}`;
       await db.upsertUser({
@@ -314,17 +342,19 @@ describe('Invoice Template System', () => {
         name: "Init Test User",
         email: "init@test.com",
       });
-      
+
       const testUser = await db.getUserByOpenId(openId);
-      if (!testUser) throw new Error('Failed to create test user');
+      if (!testUser) throw new Error("Failed to create test user");
 
       // Verify user has no templates initially
-      const initialTemplates = await db.getInvoiceTemplatesByUserId(testUser.id);
+      const initialTemplates = await db.getInvoiceTemplatesByUserId(
+        testUser.id
+      );
       expect(initialTemplates.length).toBe(0);
 
       // Initialize templates
-      const { TEMPLATE_PRESETS } = await import('../shared/template-presets');
-      
+      const { TEMPLATE_PRESETS } = await import("../shared/template-presets");
+
       for (const preset of TEMPLATE_PRESETS) {
         await db.createInvoiceTemplate({
           userId: testUser.id,
@@ -353,7 +383,9 @@ describe('Invoice Template System', () => {
       }
 
       // Verify Sleek - Default template was created
-      const createdTemplates = await db.getInvoiceTemplatesByUserId(testUser.id);
+      const createdTemplates = await db.getInvoiceTemplatesByUserId(
+        testUser.id
+      );
       expect(createdTemplates.length).toBe(1);
 
       // Verify template name
@@ -363,13 +395,14 @@ describe('Invoice Template System', () => {
       // Verify Sleek - Default is the default
       const defaultTemplate = createdTemplates.find(t => t.isDefault);
       expect(defaultTemplate?.name).toBe("Sleek - Default");
-      
+
       // Verify template has correct properties
-      const sleekTemplate = createdTemplates.find(t => t.name === "Sleek - Default");
+      const sleekTemplate = createdTemplates.find(
+        t => t.name === "Sleek - Default"
+      );
       expect(sleekTemplate?.templateType).toBe("sleek");
       expect(sleekTemplate?.primaryColor).toBe("#5f6fff");
       expect(sleekTemplate?.headingFont).toBe("Inter");
     });
   });
-
 });

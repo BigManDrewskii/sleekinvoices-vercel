@@ -19,7 +19,7 @@ export function useTableSort(options: UseTableSortOptions = {}) {
   });
 
   const handleSort = (key: string) => {
-    setSort((prev) => {
+    setSort(prev => {
       // If clicking the same column, toggle direction
       if (prev.key === key) {
         return {

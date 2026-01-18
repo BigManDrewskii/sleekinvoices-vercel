@@ -1,7 +1,11 @@
 import type { MySql2Database } from "drizzle-orm/mysql2";
 import Decimal from "decimal.js";
 import { eq } from "drizzle-orm";
-import { payments, invoices, type InsertPayment } from "../../../drizzle/schema";
+import {
+  payments,
+  invoices,
+  type InsertPayment,
+} from "../../../drizzle/schema";
 import type { SeededInvoice } from "./invoices";
 import {
   PAYMENT_METHOD_DISTRIBUTION,
@@ -26,7 +30,12 @@ export async function seedPayments(
     if (isPartialPayment) {
       const paymentAmounts = splitAmount(totalAmount, numPayments);
       for (let i = 0; i < numPayments; i++) {
-        await createPayment(db, invoice, paymentAmounts[i]!, i === numPayments - 1);
+        await createPayment(
+          db,
+          invoice,
+          paymentAmounts[i]!,
+          i === numPayments - 1
+        );
       }
     } else {
       await createPayment(db, invoice, totalAmount, true);
@@ -63,7 +72,9 @@ async function createPayment(
   );
 
   const now = new Date();
-  const paymentDate = new Date(now.getTime() - randomInt(1, 30) * 24 * 60 * 60 * 1000);
+  const paymentDate = new Date(
+    now.getTime() - randomInt(1, 30) * 24 * 60 * 60 * 1000
+  );
 
   const paymentData: InsertPayment = {
     invoiceId: invoice.id,

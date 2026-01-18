@@ -1,11 +1,11 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 async function test() {
-  const url = process.env.BUILT_IN_FORGE_API_URL || 'https://forge.manus.im';
+  const url = process.env.BUILT_IN_FORGE_API_URL || "https://forge.manus.im";
   const key = process.env.BUILT_IN_FORGE_API_KEY;
-  
-  console.log('Testing Smart Compose with URL:', url);
-  
+
+  console.log("Testing Smart Compose with URL:", url);
+
   const systemPrompt = `You are an invoice data extraction assistant. Extract structured invoice data from natural language input.
 
 Today's date: 2026-01-07
@@ -28,17 +28,21 @@ Respond ONLY with valid JSON matching this schema:
 }`;
 
   try {
-    const response = await fetch(url + '/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch(url + "/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'content-type': 'application/json',
-        'authorization': 'Bearer ' + key,
+        "content-type": "application/json",
+        authorization: "Bearer " + key,
       },
       body: JSON.stringify({
-        model: 'gemini-2.5-flash',
+        model: "gemini-2.5-flash",
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: 'Invoice TechCorp for 5 hours of web development at $150/hour, due in 2 weeks' }
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content:
+              "Invoice TechCorp for 5 hours of web development at $150/hour, due in 2 weeks",
+          },
         ],
         max_tokens: 1000,
         response_format: {
@@ -58,29 +62,36 @@ Respond ONLY with valid JSON matching this schema:
                     properties: {
                       description: { type: "string" },
                       quantity: { type: "number" },
-                      rate: { type: "number" }
+                      rate: { type: "number" },
                     },
                     required: ["description", "quantity", "rate"],
-                    additionalProperties: false
-                  }
+                    additionalProperties: false,
+                  },
                 },
                 dueDate: { type: ["string", "null"] },
                 notes: { type: ["string", "null"] },
-                currency: { type: ["string", "null"] }
+                currency: { type: ["string", "null"] },
               },
-              required: ["clientName", "clientEmail", "lineItems", "dueDate", "notes", "currency"],
-              additionalProperties: false
-            }
-          }
-        }
-      })
+              required: [
+                "clientName",
+                "clientEmail",
+                "lineItems",
+                "dueDate",
+                "notes",
+                "currency",
+              ],
+              additionalProperties: false,
+            },
+          },
+        },
+      }),
     });
-    
+
     const data = await response.json();
-    console.log('Status:', response.status);
-    console.log('Response:', JSON.stringify(data, null, 2));
+    console.log("Status:", response.status);
+    console.log("Response:", JSON.stringify(data, null, 2));
   } catch (e) {
-    console.error('Error:', e.message);
+    console.error("Error:", e.message);
   }
 }
 

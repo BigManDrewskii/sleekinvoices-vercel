@@ -73,11 +73,7 @@ export const EXPENSE_PAYMENT_METHOD_DISTRIBUTION = {
   other: 0.05,
 };
 
-export const TEMPLATE_PRESETS = [
-  "sleek",
-  "modern",
-  "classic",
-] as const;
+export const TEMPLATE_PRESETS = ["sleek", "modern", "classic"] as const;
 
 export const CRYPTO_CURRENCIES = [
   { code: "BTC", network: "mainnet" },
@@ -86,17 +82,9 @@ export const CRYPTO_CURRENCIES = [
   { code: "USDT", network: "arbitrum" },
 ];
 
-export const CUSTOM_FIELD_TYPES = [
-  "text",
-  "number",
-  "date",
-  "select",
-] as const;
+export const CUSTOM_FIELD_TYPES = ["text", "number", "date", "select"] as const;
 
-export const AI_OPERATION_TYPES = [
-  "smart_compose",
-  "ai_assistant",
-] as const;
+export const AI_OPERATION_TYPES = ["smart_compose", "ai_assistant"] as const;
 
 export const AUDIT_LOG_ACTIONS = [
   "create",

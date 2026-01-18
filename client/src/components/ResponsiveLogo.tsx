@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
-import { LOGO_ASSETS, getLogoSrcset, getLogoDimensions } from "@/const/logoAssets";
+import {
+  LOGO_ASSETS,
+  getLogoSrcset,
+  getLogoDimensions,
+} from "@/const/logoAssets";
 import { useState, useEffect } from "react";
 
 interface ResponsiveLogoProps {
@@ -51,7 +55,9 @@ export function ResponsiveLogo({
     return "wide"; // Desktop
   };
 
-  const activeVariant = responsive ? getVariantForScreenWidth(screenWidth) : variant;
+  const activeVariant = responsive
+    ? getVariantForScreenWidth(screenWidth)
+    : variant;
   const logo = LOGO_ASSETS[activeVariant];
   const dimensions = getLogoDimensions(activeVariant);
 
@@ -62,10 +68,7 @@ export function ResponsiveLogo({
         <source srcSet={logo.svg} type="image/svg+xml" />
 
         {/* PNG sources with srcset for high-DPI displays */}
-        <source
-          srcSet={getLogoSrcset(activeVariant)}
-          type="image/png"
-        />
+        <source srcSet={getLogoSrcset(activeVariant)} type="image/png" />
 
         {/* Fallback image */}
         <img

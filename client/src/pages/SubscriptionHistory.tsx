@@ -32,7 +32,7 @@ export default function SubscriptionHistory() {
   const { loading, isAuthenticated } = useAuth();
 
   const { data: history, isLoading: historyLoading } =
-    trpc.subscription.getHistory.useQuery(undefined, {
+    trpc.crypto.getHistory.useQuery(undefined, {
       enabled: isAuthenticated,
     });
 

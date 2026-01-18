@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 /**
  * Easing function for smooth animation
@@ -24,7 +24,7 @@ interface AnimatedNumberProps {
   delay?: number;
   decimals?: number;
   className?: string;
-  easing?: 'expo' | 'quart';
+  easing?: "expo" | "quart";
 }
 
 /**
@@ -37,7 +37,7 @@ export function AnimatedNumber({
   delay = 0,
   decimals = 0,
   className,
-  easing = 'expo',
+  easing = "expo",
 }: AnimatedNumberProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const startTimeRef = useRef<number | null>(null);
@@ -57,7 +57,7 @@ export function AnimatedNumber({
       return;
     }
 
-    const easingFn = easing === 'expo' ? easeOutExpo : easeOutQuart;
+    const easingFn = easing === "expo" ? easeOutExpo : easeOutQuart;
 
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
@@ -93,9 +93,10 @@ export function AnimatedNumber({
     };
   }, [value, duration, delay, easing]);
 
-  const formatted = decimals > 0 
-    ? displayValue.toFixed(decimals) 
-    : Math.round(displayValue).toLocaleString();
+  const formatted =
+    decimals > 0
+      ? displayValue.toFixed(decimals)
+      : Math.round(displayValue).toLocaleString();
 
   return (
     <span className={cn("font-numeric tabular-nums", className)}>
@@ -111,7 +112,7 @@ interface AnimatedCurrencyProps {
   delay?: number;
   className?: string;
   bold?: boolean;
-  easing?: 'expo' | 'quart';
+  easing?: "expo" | "quart";
 }
 
 /**
@@ -120,12 +121,12 @@ interface AnimatedCurrencyProps {
  */
 export function AnimatedCurrency({
   amount,
-  currency = 'USD',
+  currency = "USD",
   duration = 800,
   delay = 0,
   className,
   bold = false,
-  easing = 'expo',
+  easing = "expo",
 }: AnimatedCurrencyProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const startTimeRef = useRef<number | null>(null);
@@ -143,7 +144,7 @@ export function AnimatedCurrency({
       return;
     }
 
-    const easingFn = easing === 'expo' ? easeOutExpo : easeOutQuart;
+    const easingFn = easing === "expo" ? easeOutExpo : easeOutQuart;
 
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
@@ -180,7 +181,13 @@ export function AnimatedCurrency({
   }, [amount, duration, delay, easing]);
 
   return (
-    <span className={cn(bold ? "font-numeric-bold" : "font-numeric", "tabular-nums", className)}>
+    <span
+      className={cn(
+        bold ? "font-numeric-bold" : "font-numeric",
+        "tabular-nums",
+        className
+      )}
+    >
       {formatCurrency(displayValue, currency)}
     </span>
   );
@@ -192,7 +199,7 @@ interface AnimatedIntegerProps {
   delay?: number;
   className?: string;
   bold?: boolean;
-  easing?: 'expo' | 'quart';
+  easing?: "expo" | "quart";
   suffix?: string;
   prefix?: string;
 }
@@ -207,9 +214,9 @@ export function AnimatedInteger({
   delay = 0,
   className,
   bold = false,
-  easing = 'quart',
-  suffix = '',
-  prefix = '',
+  easing = "quart",
+  suffix = "",
+  prefix = "",
 }: AnimatedIntegerProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const startTimeRef = useRef<number | null>(null);
@@ -227,7 +234,7 @@ export function AnimatedInteger({
       return;
     }
 
-    const easingFn = easing === 'expo' ? easeOutExpo : easeOutQuart;
+    const easingFn = easing === "expo" ? easeOutExpo : easeOutQuart;
 
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
@@ -264,8 +271,16 @@ export function AnimatedInteger({
   }, [value, duration, delay, easing]);
 
   return (
-    <span className={cn(bold ? "font-numeric-bold" : "font-numeric", "tabular-nums", className)}>
-      {prefix}{displayValue.toLocaleString()}{suffix}
+    <span
+      className={cn(
+        bold ? "font-numeric-bold" : "font-numeric",
+        "tabular-nums",
+        className
+      )}
+    >
+      {prefix}
+      {displayValue.toLocaleString()}
+      {suffix}
     </span>
   );
 }
@@ -277,7 +292,7 @@ interface AnimatedPercentageProps {
   decimals?: number;
   className?: string;
   showSign?: boolean;
-  easing?: 'expo' | 'quart';
+  easing?: "expo" | "quart";
 }
 
 /**
@@ -291,7 +306,7 @@ export function AnimatedPercentage({
   decimals = 1,
   className,
   showSign = false,
-  easing = 'quart',
+  easing = "quart",
 }: AnimatedPercentageProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const startTimeRef = useRef<number | null>(null);
@@ -309,7 +324,7 @@ export function AnimatedPercentage({
       return;
     }
 
-    const easingFn = easing === 'expo' ? easeOutExpo : easeOutQuart;
+    const easingFn = easing === "expo" ? easeOutExpo : easeOutQuart;
 
     const animate = (timestamp: number) => {
       if (startTimeRef.current === null) {
@@ -345,7 +360,7 @@ export function AnimatedPercentage({
     };
   }, [value, duration, delay, easing]);
 
-  const sign = showSign && displayValue > 0 ? '+' : '';
+  const sign = showSign && displayValue > 0 ? "+" : "";
   const formatted = `${sign}${displayValue.toFixed(decimals)}%`;
 
   return (

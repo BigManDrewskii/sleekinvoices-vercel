@@ -33,7 +33,7 @@ export function AnimatedProductDemo() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentStage((prev) => (prev + 1) % stages.length);
+      setCurrentStage(prev => (prev + 1) % stages.length);
     }, 2500); // 2.5s per stage
 
     return () => clearInterval(interval);
@@ -88,10 +88,7 @@ export function AnimatedProductDemo() {
           </div>
 
           {/* Text Content with fade transition */}
-          <div
-            key={currentStage}
-            className="fade-in-up space-y-2 max-w-md"
-          >
+          <div key={currentStage} className="fade-in-up space-y-2 max-w-md">
             <h3 className="text-2xl font-bold text-foreground">
               {stage.title}
             </h3>

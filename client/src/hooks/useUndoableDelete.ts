@@ -1,5 +1,5 @@
-import { useRef, useCallback } from 'react';
-import { toast } from 'sonner';
+import { useRef, useCallback } from "react";
+import { toast } from "sonner";
 
 interface UndoableDeleteOptions<T> {
   /** The item being deleted */
@@ -30,68 +30,73 @@ interface PendingDelete {
 export function useUndoableDelete() {
   const pendingDeletes = useRef<Map<string, PendingDelete>>(new Map());
 
-  const executeDelete = useCallback(async <T>({
-    item,
-    itemName,
-    itemType,
-    onOptimisticDelete,
-    onRestore,
-    onConfirmDelete,
-    delay = 5000,
-  }: UndoableDeleteOptions<T>) => {
-    // Generate a unique key for this delete operation
-    const deleteKey = `${itemType}-${Date.now()}-${Math.random()}`;
-    
-    // Optimistically remove from UI immediately
-    onOptimisticDelete();
+  const executeDelete = useCallback(
+    async <T>({
+      item,
+      itemName,
+      itemType,
+      onOptimisticDelete,
+      onRestore,
+      onConfirmDelete,
+      delay = 5000,
+    }: UndoableDeleteOptions<T>) => {
+      // Generate a unique key for this delete operation
+      const deleteKey = `${itemType}-${Date.now()}-${Math.random()}`;
 
-    // Create the toast with undo action
-    const toastId = toast(
-      `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} "${itemName}" deleted`,
-      {
-        description: 'Click undo to restore',
-        duration: delay,
-        action: {
-          label: 'Undo',
-          onClick: () => {
-            // Cancel the pending delete
-            const pending = pendingDeletes.current.get(deleteKey);
-            if (pending) {
-              clearTimeout(pending.timeoutId);
-              pendingDeletes.current.delete(deleteKey);
-            }
-            
-            // Restore the item to UI
-            onRestore();
-            
-            toast.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} restored`);
+      // Optimistically remove from UI immediately
+      onOptimisticDelete();
+
+      // Create the toast with undo action
+      const toastId = toast(
+        `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} "${itemName}" deleted`,
+        {
+          description: "Click undo to restore",
+          duration: delay,
+          action: {
+            label: "Undo",
+            onClick: () => {
+              // Cancel the pending delete
+              const pending = pendingDeletes.current.get(deleteKey);
+              if (pending) {
+                clearTimeout(pending.timeoutId);
+                pendingDeletes.current.delete(deleteKey);
+              }
+
+              // Restore the item to UI
+              onRestore();
+
+              toast.success(
+                `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} restored`
+              );
+            },
           },
-        },
-        onDismiss: () => {
-          // If toast is dismissed without undo, the timeout will handle deletion
-        },
-      }
-    );
+          onDismiss: () => {
+            // If toast is dismissed without undo, the timeout will handle deletion
+          },
+        }
+      );
 
-    // Set timeout to permanently delete after delay
-    const timeoutId = setTimeout(async () => {
-      pendingDeletes.current.delete(deleteKey);
-      
-      try {
-        await onConfirmDelete();
-        // Success toast is optional since the item is already removed from UI
-      } catch (error) {
-        // On error, restore the item and show error message
-        onRestore();
-        toast.error(`Failed to delete ${itemType}. Item has been restored.`);
-      }
-    }, delay);
+      // Set timeout to permanently delete after delay
+      const timeoutId = setTimeout(async () => {
+        pendingDeletes.current.delete(deleteKey);
 
-    // Store the pending delete
-    pendingDeletes.current.set(deleteKey, { toastId, timeoutId });
+        try {
+          await onConfirmDelete();
+          // Success toast is optional since the item is already removed from UI
+        } catch (error) {
+          // On error, restore the item and show error message
+          onRestore();
+          toast.error(`Failed to delete ${itemType}. Item has been restored.`);
+        }
+      }, delay);
 
-    return deleteKey;
-  }, []);
+      // Store the pending delete
+      pendingDeletes.current.set(deleteKey, { toastId, timeoutId });
+
+      return deleteKey;
+    },
+    []
+  );
 
   // Cancel all pending deletes (useful for cleanup)
   const cancelAllPending = useCallback(() => {
@@ -131,18 +136,20 @@ export async function undoableDelete<T>({
     toast(
       `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} "${itemName}" deleted`,
       {
-        description: 'Click undo to restore',
+        description: "Click undo to restore",
         duration: delay,
         action: {
-          label: 'Undo',
+          label: "Undo",
           onClick: () => {
             isUndone = true;
             clearTimeout(timeoutId);
-            
+
             // Restore the item to UI
             onRestore();
-            
-            toast.success(`${itemType.charAt(0).toUpperCase() + itemType.slice(1)} restored`);
+
+            toast.success(
+              `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} restored`
+            );
             resolve();
           },
         },
@@ -152,7 +159,7 @@ export async function undoableDelete<T>({
     // Set timeout to permanently delete after delay
     timeoutId = setTimeout(async () => {
       if (isUndone) return;
-      
+
       try {
         await onConfirmDelete();
         resolve();

@@ -42,7 +42,7 @@ export function DeleteConfirmDialog({
         <AlertDialogFooter className="gap-3">
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
+            onClick={e => {
               e.preventDefault();
               onConfirm();
             }}

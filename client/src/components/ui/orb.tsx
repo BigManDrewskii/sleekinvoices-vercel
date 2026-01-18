@@ -13,9 +13,9 @@ interface OrbProps {
 
 // Enlarged sizes for better visibility
 const sizeClasses: Record<"sm" | "md" | "lg", string> = {
-  sm: "w-10 h-10",  // was w-8 h-8
-  md: "w-14 h-14",  // was w-12 h-12
-  lg: "w-20 h-20",  // was w-16 h-16
+  sm: "w-10 h-10", // was w-8 h-8
+  md: "w-14 h-14", // was w-12 h-12
+  lg: "w-20 h-20", // was w-16 h-16
 };
 
 // Border radius matching bordered icons (rounded-xl)
@@ -69,7 +69,10 @@ export function Orb({
         <img
           src="/sleeky/sleekyAI-Avatar.png"
           alt="Sleeky AI Assistant"
-          className={cn("w-full h-full object-cover", borderRadiusClasses[size])}
+          className={cn(
+            "w-full h-full object-cover",
+            borderRadiusClasses[size]
+          )}
           draggable={false}
         />
 

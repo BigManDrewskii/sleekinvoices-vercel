@@ -1,12 +1,12 @@
 /**
  * Email Notifications for Subscription Events
- * 
+ *
  * Sends transactional emails for subscription confirmations,
  * expiration warnings, and other subscription-related events.
  */
 
-import { Resend } from 'resend';
-import { formatEndDate } from './subscription-utils';
+import { Resend } from "resend";
+import { formatEndDate } from "./subscription-utils";
 
 // Lazy-initialized Resend client to prevent startup crashes if API key is missing
 let _resend: Resend | null = null;
@@ -22,7 +22,7 @@ function getResend(): Resend | null {
 }
 
 // Email sender configuration
-const FROM_EMAIL = 'SleekInvoices <noreply@sleekinvoices.com>';
+const FROM_EMAIL = "SleekInvoices <noreply@sleekinvoices.com>";
 
 interface SubscriptionConfirmationParams {
   userEmail: string | null;
@@ -39,7 +39,9 @@ interface SubscriptionConfirmationParams {
 /**
  * Send subscription confirmation email after successful crypto payment
  */
-export async function sendSubscriptionConfirmationEmail(params: SubscriptionConfirmationParams): Promise<boolean> {
+export async function sendSubscriptionConfirmationEmail(
+  params: SubscriptionConfirmationParams
+): Promise<boolean> {
   const {
     userEmail,
     userName,
@@ -53,20 +55,22 @@ export async function sendSubscriptionConfirmationEmail(params: SubscriptionConf
   } = params;
 
   if (!userEmail) {
-    console.log('[Email] No email address for user, skipping confirmation email');
+    console.log(
+      "[Email] No email address for user, skipping confirmation email"
+    );
     return false;
   }
 
   if (!process.env.RESEND_API_KEY) {
-    console.log('[Email] RESEND_API_KEY not configured, skipping email');
+    console.log("[Email] RESEND_API_KEY not configured, skipping email");
     return false;
   }
 
-  const durationText = months === 1 ? '1 month' : `${months} months`;
-  const actionText = isExtension ? 'extended' : 'activated';
+  const durationText = months === 1 ? "1 month" : `${months} months`;
+  const actionText = isExtension ? "extended" : "activated";
   const formattedEndDate = formatEndDate(endDate);
 
-  const subject = isExtension 
+  const subject = isExtension
     ? `Your SleekInvoices Pro subscription has been extended!`
     : `Welcome to SleekInvoices Pro!`;
 
@@ -98,7 +102,7 @@ export async function sendSubscriptionConfirmationEmail(params: SubscriptionConf
           
           <!-- Greeting -->
           <h2 style="color: #ffffff; font-size: 24px; text-align: center; margin: 0 0 16px 0;">
-            ${isExtension ? 'Subscription Extended!' : 'Welcome to Pro!'}
+            ${isExtension ? "Subscription Extended!" : "Welcome to Pro!"}
           </h2>
           
           <p style="color: #a3a3a3; font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 32px 0;">
@@ -228,7 +232,7 @@ https://sleekinvoices.com
   try {
     const resend = getResend();
     if (!resend) {
-      console.log('[Email] Resend client not available');
+      console.log("[Email] Resend client not available");
       return false;
     }
     const { data, error } = await resend.emails.send({
@@ -240,14 +244,14 @@ https://sleekinvoices.com
     });
 
     if (error) {
-      console.error('[Email] Failed to send subscription confirmation:', error);
+      console.error("[Email] Failed to send subscription confirmation:", error);
       return false;
     }
 
-    console.log('[Email] Subscription confirmation sent:', data?.id);
+    console.log("[Email] Subscription confirmation sent:", data?.id);
     return true;
   } catch (error) {
-    console.error('[Email] Error sending subscription confirmation:', error);
+    console.error("[Email] Error sending subscription confirmation:", error);
     return false;
   }
 }
@@ -262,21 +266,25 @@ interface ExpirationWarningParams {
 /**
  * Send expiration warning email when subscription is about to expire
  */
-export async function sendExpirationWarningEmail(params: ExpirationWarningParams): Promise<boolean> {
+export async function sendExpirationWarningEmail(
+  params: ExpirationWarningParams
+): Promise<boolean> {
   const { userEmail, userName, daysRemaining, endDate } = params;
 
   if (!userEmail) {
-    console.log('[Email] No email address for user, skipping expiration warning');
+    console.log(
+      "[Email] No email address for user, skipping expiration warning"
+    );
     return false;
   }
 
   if (!process.env.RESEND_API_KEY) {
-    console.log('[Email] RESEND_API_KEY not configured, skipping email');
+    console.log("[Email] RESEND_API_KEY not configured, skipping email");
     return false;
   }
 
   const formattedEndDate = formatEndDate(endDate);
-  const daysText = daysRemaining === 1 ? '1 day' : `${daysRemaining} days`;
+  const daysText = daysRemaining === 1 ? "1 day" : `${daysRemaining} days`;
 
   const subject = `Your SleekInvoices Pro subscription expires in ${daysText}`;
 
@@ -364,7 +372,7 @@ https://sleekinvoices.com
   try {
     const resend = getResend();
     if (!resend) {
-      console.log('[Email] Resend client not available');
+      console.log("[Email] Resend client not available");
       return false;
     }
     const { data, error } = await resend.emails.send({
@@ -376,14 +384,14 @@ https://sleekinvoices.com
     });
 
     if (error) {
-      console.error('[Email] Failed to send expiration warning:', error);
+      console.error("[Email] Failed to send expiration warning:", error);
       return false;
     }
 
-    console.log('[Email] Expiration warning sent:', data?.id);
+    console.log("[Email] Expiration warning sent:", data?.id);
     return true;
   } catch (error) {
-    console.error('[Email] Error sending expiration warning:', error);
+    console.error("[Email] Error sending expiration warning:", error);
     return false;
   }
 }

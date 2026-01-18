@@ -17,27 +17,46 @@ interface ShortcutItem {
 
 const shortcuts: ShortcutItem[] = [
   // Navigation
-  { keys: ['⌘', 'K'], description: 'Open search', category: 'Navigation' },
-  { keys: ['Esc'], description: 'Close dialog / search', category: 'Navigation' },
-  
+  { keys: ["⌘", "K"], description: "Open search", category: "Navigation" },
+  {
+    keys: ["Esc"],
+    description: "Close dialog / search",
+    category: "Navigation",
+  },
+
   // Actions
-  { keys: ['⌘', 'Z'], description: 'Undo last delete', category: 'Actions' },
-  { keys: ['⌘', 'N'], description: 'Create new invoice', category: 'Actions' },
-  { keys: ['⌘', 'Shift', 'N'], description: 'Create new client', category: 'Actions' },
-  { keys: ['⌘', 'Shift', 'E'], description: 'Create new expense', category: 'Actions' },
-  
+  { keys: ["⌘", "Z"], description: "Undo last delete", category: "Actions" },
+  { keys: ["⌘", "N"], description: "Create new invoice", category: "Actions" },
+  {
+    keys: ["⌘", "Shift", "N"],
+    description: "Create new client",
+    category: "Actions",
+  },
+  {
+    keys: ["⌘", "Shift", "E"],
+    description: "Create new expense",
+    category: "Actions",
+  },
+
   // Help
-  { keys: ['Shift', '?'], description: 'Show keyboard shortcuts', category: 'Help' },
+  {
+    keys: ["Shift", "?"],
+    description: "Show keyboard shortcuts",
+    category: "Help",
+  },
 ];
 
 // Group shortcuts by category
-const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
-  if (!acc[shortcut.category]) {
-    acc[shortcut.category] = [];
-  }
-  acc[shortcut.category].push(shortcut);
-  return acc;
-}, {} as Record<string, ShortcutItem[]>);
+const groupedShortcuts = shortcuts.reduce(
+  (acc, shortcut) => {
+    if (!acc[shortcut.category]) {
+      acc[shortcut.category] = [];
+    }
+    acc[shortcut.category].push(shortcut);
+    return acc;
+  },
+  {} as Record<string, ShortcutItem[]>
+);
 
 function ShortcutKey({ children }: { children: React.ReactNode }) {
   return (
@@ -49,13 +68,15 @@ function ShortcutKey({ children }: { children: React.ReactNode }) {
 
 export function KeyboardShortcutsHelp() {
   const { isShortcutsHelpOpen, setShortcutsHelpOpen } = useKeyboardShortcuts();
-  
+
   // Detect if user is on Mac
-  const isMac = typeof navigator !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-  
+  const isMac =
+    typeof navigator !== "undefined" &&
+    navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+
   // Replace ⌘ with Ctrl on non-Mac systems
   const formatKey = (key: string) => {
-    if (key === '⌘' && !isMac) return 'Ctrl';
+    if (key === "⌘" && !isMac) return "Ctrl";
     return key;
   };
 
@@ -91,7 +112,9 @@ export function KeyboardShortcutsHelp() {
                     <span className="text-sm">{shortcut.description}</span>
                     <div className="flex items-center gap-1">
                       {shortcut.keys.map((key, keyIndex) => (
-                        <ShortcutKey key={keyIndex}>{formatKey(key)}</ShortcutKey>
+                        <ShortcutKey key={keyIndex}>
+                          {formatKey(key)}
+                        </ShortcutKey>
                       ))}
                     </div>
                   </div>
@@ -101,7 +124,8 @@ export function KeyboardShortcutsHelp() {
           ))}
 
           <div className="mt-4 rounded-lg border border-border/50 bg-muted/30 p-3 text-center text-xs text-muted-foreground">
-            Press <ShortcutKey>Shift</ShortcutKey> + <ShortcutKey>?</ShortcutKey> anytime to show this help
+            Press <ShortcutKey>Shift</ShortcutKey> +{" "}
+            <ShortcutKey>?</ShortcutKey> anytime to show this help
           </div>
         </DialogBody>
       </DialogContent>

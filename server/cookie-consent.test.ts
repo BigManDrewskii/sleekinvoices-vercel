@@ -202,7 +202,7 @@ describe("Cookie Consent System", () => {
 
   describe("Analytics Script Loading", () => {
     it("should not load analytics script without consent", () => {
-      const scripts = document.querySelectorAll('script[data-website-id]');
+      const scripts = document.querySelectorAll("script[data-website-id]");
       expect(scripts.length).toBe(0);
     });
 
@@ -338,17 +338,20 @@ describe("Cookie Consent System", () => {
     });
 
     it("should allow consent withdrawal via resetConsent", () => {
-      localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({
-        version: CONSENT_VERSION,
-        timestamp: Date.now(),
-        preferences: {
-          essential: true,
-          functional: true,
-          analytics: true,
-          marketing: false,
-        },
-        source: "banner",
-      }));
+      localStorage.setItem(
+        CONSENT_STORAGE_KEY,
+        JSON.stringify({
+          version: CONSENT_VERSION,
+          timestamp: Date.now(),
+          preferences: {
+            essential: true,
+            functional: true,
+            analytics: true,
+            marketing: false,
+          },
+          source: "banner",
+        })
+      );
 
       expect(localStorage.getItem(CONSENT_STORAGE_KEY)).toBeDefined();
 
@@ -367,17 +370,20 @@ describe("Cookie Consent System", () => {
     });
 
     it("should hide banner when consent exists", () => {
-      localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({
-        version: CONSENT_VERSION,
-        timestamp: Date.now(),
-        preferences: {
-          essential: true,
-          functional: true,
-          analytics: false,
-          marketing: false,
-        },
-        source: "banner",
-      }));
+      localStorage.setItem(
+        CONSENT_STORAGE_KEY,
+        JSON.stringify({
+          version: CONSENT_VERSION,
+          timestamp: Date.now(),
+          preferences: {
+            essential: true,
+            functional: true,
+            analytics: false,
+            marketing: false,
+          },
+          source: "banner",
+        })
+      );
 
       const hasStoredConsent = !!localStorage.getItem(CONSENT_STORAGE_KEY);
       const shouldShowBanner = !hasStoredConsent;
@@ -420,7 +426,10 @@ describe("Cookie Consent System", () => {
         source: "banner" as const,
       };
 
-      localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(outdatedConsent));
+      localStorage.setItem(
+        CONSENT_STORAGE_KEY,
+        JSON.stringify(outdatedConsent)
+      );
 
       const stored = JSON.parse(localStorage.getItem(CONSENT_STORAGE_KEY)!);
       const shouldShowBanner = stored.version < CONSENT_VERSION;

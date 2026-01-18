@@ -65,7 +65,7 @@ export function useAuth(options?: UseAuthOptions) {
     if (isLocalDevMode()) {
       return;
     }
-    
+
     if (!redirectOnUnauthenticated) return;
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;

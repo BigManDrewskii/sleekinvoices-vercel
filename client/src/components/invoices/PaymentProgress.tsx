@@ -8,11 +8,11 @@ interface PaymentProgressProps {
   showDetails?: boolean;
 }
 
-export function PaymentProgress({ 
-  totalPaid, 
-  total, 
+export function PaymentProgress({
+  totalPaid,
+  total,
   currency = "USD",
-  showDetails = true 
+  showDetails = true,
 }: PaymentProgressProps) {
   const percentage = total > 0 ? Math.round((totalPaid / total) * 100) : 0;
   const amountDue = Math.max(0, total - totalPaid);

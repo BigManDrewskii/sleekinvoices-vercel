@@ -12,8 +12,8 @@ export const A4_WIDTH_PX = 794;
 export const A4_HEIGHT_PX = 1123;
 export const A4_ASPECT_RATIO = A4_HEIGHT_PX / A4_WIDTH_PX;
 
-export type PreviewFormat = 'a4' | 'web' | 'email';
-export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
+export type PreviewFormat = "a4" | "web" | "email";
+export type PreviewDevice = "desktop" | "tablet" | "mobile";
 
 interface A4PreviewContainerProps {
   children: ReactNode;
@@ -31,12 +31,12 @@ interface A4PreviewContainerProps {
  */
 export function A4PreviewContainer({
   children,
-  format = 'a4',
-  device = 'desktop',
+  format = "a4",
+  device = "desktop",
   className,
   showPageBorder = true,
   showShadow = true,
-  maxHeight = '80vh',
+  maxHeight = "80vh",
 }: A4PreviewContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -47,7 +47,10 @@ export function A4PreviewContainer({
     mobile: 375,
   };
 
-  const formatStyles: Record<PreviewFormat, { width: number; aspectRatio?: number }> = {
+  const formatStyles: Record<
+    PreviewFormat,
+    { width: number; aspectRatio?: number }
+  > = {
     a4: { width: A4_WIDTH_PX, aspectRatio: A4_ASPECT_RATIO },
     web: { width: deviceWidths[device] },
     email: { width: 600 },
@@ -65,7 +68,7 @@ export function A4PreviewContainer({
 
       let newScale = containerWidth / targetWidth;
 
-      if (format === 'a4' && currentFormat.aspectRatio) {
+      if (format === "a4" && currentFormat.aspectRatio) {
         const contentHeight = targetWidth * currentFormat.aspectRatio;
         const heightScale = containerHeight / contentHeight;
         newScale = Math.min(newScale, heightScale);
@@ -100,23 +103,26 @@ export function A4PreviewContainer({
         style={{
           transform: `scale(${scale})`,
           width: targetWidth,
-          minHeight: format === 'a4' && currentFormat.aspectRatio 
-            ? targetWidth * currentFormat.aspectRatio 
-            : 'auto',
+          minHeight:
+            format === "a4" && currentFormat.aspectRatio
+              ? targetWidth * currentFormat.aspectRatio
+              : "auto",
         }}
       >
         <div
           className={cn(
             "bg-white",
             showPageBorder && "border border-zinc-200",
-            showShadow && "shadow-[0_4px_20px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.1)]",
+            showShadow &&
+              "shadow-[0_4px_20px_rgba(0,0,0,0.08),0_0_1px_rgba(0,0,0,0.1)]",
             "rounded-sm overflow-hidden"
           )}
           style={{
             width: targetWidth,
-            minHeight: format === 'a4' && currentFormat.aspectRatio 
-              ? targetWidth * currentFormat.aspectRatio 
-              : 'auto',
+            minHeight:
+              format === "a4" && currentFormat.aspectRatio
+                ? targetWidth * currentFormat.aspectRatio
+                : "auto",
           }}
         >
           {children}

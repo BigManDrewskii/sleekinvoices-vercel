@@ -16,7 +16,7 @@ export function AnalyticsPageSkeleton() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4].map(i => (
           <Card key={i} className="border-border/50">
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-24" />
@@ -56,7 +56,7 @@ export function AnalyticsPageSkeleton() {
 
       {/* Additional Stats */}
       <div className="grid gap-4 md:grid-cols-3">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <Card key={i} className="border-border/50">
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-28" />
@@ -97,7 +97,7 @@ export function ViewInvoicePageSkeleton() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4].map(i => (
               <Skeleton key={i} className="h-9 w-24 rounded-lg" />
             ))}
           </div>
@@ -126,8 +126,11 @@ export function ViewInvoicePageSkeleton() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex justify-between items-center py-3 border-b border-border/50 last:border-0">
+                  {[1, 2, 3].map(i => (
+                    <div
+                      key={i}
+                      className="flex justify-between items-center py-3 border-b border-border/50 last:border-0"
+                    >
                       <div className="flex-1">
                         <Skeleton className="h-4 w-48 mb-1" />
                         <Skeleton className="h-3 w-24" />
@@ -245,7 +248,7 @@ export function InvoiceFormSkeleton() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {[1, 2].map((i) => (
+                {[1, 2].map(i => (
                   <div key={i} className="grid gap-4 md:grid-cols-12 items-end">
                     <div className="md:col-span-5">
                       <Skeleton className="h-4 w-20 mb-2" />
@@ -418,7 +421,7 @@ export function SubscriptionPageSkeleton() {
 
         {/* Plan Comparison */}
         <div className="grid gap-6 md:grid-cols-2">
-          {[1, 2].map((i) => (
+          {[1, 2].map(i => (
             <Card key={i} className="border-border/50">
               <CardHeader>
                 <Skeleton className="h-6 w-16 mb-2" />
@@ -426,7 +429,7 @@ export function SubscriptionPageSkeleton() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {[1, 2, 3, 4].map((j) => (
+                  {[1, 2, 3, 4].map(j => (
                     <div key={j} className="flex items-center gap-2">
                       <Skeleton className="h-4 w-4 rounded-full" />
                       <Skeleton className="h-4 w-40" />
@@ -451,7 +454,7 @@ export function PaymentsPageSkeleton() {
     <PageLayout title="Payments" subtitle="Track and manage your payments">
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-4 mb-8">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4].map(i => (
           <Card key={i} className="border-border/50">
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-24" />
@@ -481,7 +484,7 @@ export function PaymentsPageSkeleton() {
           </div>
           {/* Table Rows */}
           <div className="space-y-4 pt-4">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="grid grid-cols-5 gap-4 items-center">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-4 w-20" />
@@ -502,13 +505,16 @@ export function PaymentsPageSkeleton() {
  */
 export function RecurringInvoicesPageSkeleton() {
   return (
-    <PageLayout title="Recurring Invoices" subtitle="Manage your recurring billing">
+    <PageLayout
+      title="Recurring Invoices"
+      subtitle="Manage your recurring billing"
+    >
       <div className="flex justify-end mb-6">
         <Skeleton className="h-10 w-48 rounded-lg" />
       </div>
 
       <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <Card key={i} className="border-border/50">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -541,10 +547,13 @@ export function RecurringInvoicesPageSkeleton() {
  */
 export function ProductsPageSkeleton() {
   return (
-    <PageLayout title="Products & Services" subtitle="Manage your product catalog">
+    <PageLayout
+      title="Products & Services"
+      subtitle="Manage your product catalog"
+    >
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3 mb-8">
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <Card key={i} className="border-border/50">
             <CardHeader className="pb-2">
               <Skeleton className="h-4 w-28" />
@@ -567,8 +576,11 @@ export function ProductsPageSkeleton() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0">
+            {[1, 2, 3, 4].map(i => (
+              <div
+                key={i}
+                className="flex items-center justify-between py-3 border-b border-border/50 last:border-0"
+              >
                 <div className="flex items-center gap-4">
                   <Skeleton className="h-10 w-10 rounded-lg" />
                   <div>
@@ -604,13 +616,15 @@ export function EstimatesPageSkeleton() {
         <CardContent className="pt-6">
           {/* Table Header */}
           <div className="grid grid-cols-6 gap-4 pb-3 border-b border-border/50">
-            {["Number", "Client", "Date", "Amount", "Status", "Actions"].map((_, i) => (
-              <Skeleton key={i} className="h-4 w-16" />
-            ))}
+            {["Number", "Client", "Date", "Amount", "Status", "Actions"].map(
+              (_, i) => (
+                <Skeleton key={i} className="h-4 w-16" />
+              )
+            )}
           </div>
           {/* Table Rows */}
           <div className="space-y-4 pt-4">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3, 4, 5].map(i => (
               <div key={i} className="grid grid-cols-6 gap-4 items-center">
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-32" />
@@ -665,8 +679,11 @@ export function ClientPortalPageSkeleton() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between py-4 border-b border-border/50 last:border-0">
+              {[1, 2, 3].map(i => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-4 border-b border-border/50 last:border-0"
+                >
                   <div>
                     <Skeleton className="h-5 w-24 mb-1" />
                     <Skeleton className="h-4 w-32" />
