@@ -444,9 +444,127 @@ export function Navigation() {
     </>
   );
 
-  // Tablet Layout (768px-1024px): Search + New + User only (no nav links, logo in main nav)
+  // Tablet Layout (768px-1024px): Hamburger + Search + New + User (logo in main nav, nav links in hamburger)
   const TabletNav = () => (
     <div className="flex items-center gap-2">
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] text-[var(--nav-text-color)]"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent
+          side="right"
+          className="w-80 max-w-[85vw] p-0"
+          hideCloseButton
+        >
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+          <div className="flex flex-col h-full">
+            <Accordion type="single" collapsible className="border-0">
+              <AccordionItem value="billing">
+                <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5" />
+                    <span className="font-medium text-[var(--nav-text-color)]">
+                      Billing
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
+                  <div className="space-y-1 px-4 py-2">
+                    {navigationConfig.billing.items.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <NavigationIcon
+                          icon={item.icon}
+                          isActive={isActive(item.href)}
+                          className="h-4 w-4"
+                        />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="finances">
+                <AccordionTrigger className="h-14 px-4 flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="h-5 w-5" />
+                    <span className="font-medium text-[var(--nav-text-color)]">
+                      Finances
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="border-t border-[rgba(36,38,40,0.5)] bg-[rgba(17,29,34,0.95)]">
+                  <div className="space-y-1 px-4 py-2">
+                    {navigationConfig.finances.items.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <NavigationIcon
+                          icon={item.icon}
+                          isActive={isActive(item.href)}
+                          className="h-4 w-4"
+                        />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <Link
+                href="/clients"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Users className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Clients
+                </span>
+              </Link>
+
+              <Link
+                href="/templates"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <LayoutTemplate className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Templates
+                </span>
+              </Link>
+
+              <Link
+                href="/docs"
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg hover:bg-accent/50 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <BookOpen className="h-5 w-5" />
+                <span className="font-medium text-[var(--nav-text-color)]">
+                  Docs
+                </span>
+              </Link>
+            </Accordion>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <SearchButton />
       <QuickActionsMenu />
 
