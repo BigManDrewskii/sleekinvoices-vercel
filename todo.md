@@ -403,3 +403,4 @@
 | 2026-01-18 | Associate form inputs with labels | ✅ Complete |
 | 2026-01-18 | Standardize z-index values with design tokens | ✅ Complete |
 | 2026-01-18 | Add aria-labels to 27 icon-only buttons for WCAG 2.1 AA compliance | ✅ Complete |
+| 2026-01-18 | Explore Polar payment integration alongside Stripe | 🔄 In Progress |
