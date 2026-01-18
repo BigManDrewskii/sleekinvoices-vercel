@@ -502,3 +502,51 @@ export async function getPaymentsByUserId(userId: number) {
     .where(inArray(payments.invoiceId, invoiceIds))
     .orderBy(desc(payments.paymentDate));
 }
+
+/**
+ * Get payment summary for an invoice
+ * Returns detailed payment information including all payments and status
+ */
+export async function getInvoicePaymentSummary(
+  invoiceId: number,
+  userId: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Get invoice
+  const [invoice] = await db
+    .select()
+    .from(invoices)
+    .where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId)))
+    .limit(1);
+
+  if (!invoice) return null;
+
+  // Get all payments
+  const invoicePayments = await db
+    .select()
+    .from(payments)
+    .where(eq(payments.invoiceId, invoiceId))
+    .orderBy(desc(payments.paymentDate));
+
+  const totalPaid = invoicePayments
+    .filter(p => p.status === "completed")
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+
+  const invoiceTotal = Number(invoice.total);
+  const remaining = Math.max(0, invoiceTotal - totalPaid);
+
+  return {
+    invoiceId,
+    invoiceNumber: invoice.invoiceNumber,
+    total: invoiceTotal,
+    totalPaid,
+    remaining,
+    currency: invoice.currency,
+    status: invoice.status,
+    payments: invoicePayments,
+    isFullyPaid: remaining <= 0,
+    isPartiallyPaid: totalPaid > 0 && remaining > 0,
+  };
+}

@@ -21,4 +21,5 @@ export * from './products.js';
 export * from './estimates.js';
 export * from './batch-templates.js';
 export * from './audit.js';
+export * from './crypto-payments.js';
 export * from './types.js';
