@@ -53,7 +53,7 @@ interface ClientTableProps {
   onEdit: (client: Client) => void;
   onDelete: (client: Client) => void;
   onPortalAccess: (client: Client) => void;
-  onDuplicate: (client: Client) => void;
+  onDuplicate?: (client: Client) => void;
 }
 
 export function ClientTable({
@@ -207,6 +207,7 @@ export function ClientTable({
                           <span className="text-sm">Edit</span>
                         </div>
                       </DropdownMenuItem>
+                      {onDuplicate && (
                       <DropdownMenuItem
                         onClick={() => onDuplicate(client)}
                       >
@@ -215,6 +216,7 @@ export function ClientTable({
                           <span className="text-sm">Duplicate</span>
                         </div>
                       </DropdownMenuItem>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onDelete(client)}

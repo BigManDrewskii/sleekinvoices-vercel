@@ -168,7 +168,7 @@ export function FeatureTooltip({
           <div
             ref={tooltipRef}
             className={cn(
-              "fixed z-[9998] max-w-[280px] pointer-events-auto",
+              "fixed z-[var(--z-feature-tooltip)] max-w-[280px] pointer-events-auto",
               "bg-popover border border-border/50 rounded-xl shadow-lg",
               "animate-in fade-in zoom-in-95 duration-200",
               placement === "top" && "origin-bottom",
@@ -306,7 +306,7 @@ export function SimpleTooltip({
         createPortal(
           <div
             className={cn(
-              "fixed z-[9997] px-2.5 py-1.5 text-xs font-medium",
+              "fixed z-[calc(var(--z-feature-tooltip)-1)] px-2.5 py-1.5 text-xs font-medium",
               "bg-foreground text-background rounded-md shadow-md",
               "animate-in fade-in zoom-in-95 duration-150",
               "whitespace-nowrap pointer-events-none",

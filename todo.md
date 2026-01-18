@@ -399,3 +399,6 @@
 | 2026-01-18 | Implement mobile touch swipe hints | ✅ Complete |
 | 2026-01-18 | Add ScrollableTableWrapper to InvoiceTable component | ✅ Complete |
 | 2026-01-18 | Rams Design Review - Accessibility & Visual Design Audit | ✅ Complete |
+| 2026-01-18 | Verify icon pack usage | ✅ Complete (Lucide-react primary, Phosphor secondary) |
+| 2026-01-18 | Associate form inputs with labels | ✅ Complete |
+| 2026-01-18 | Standardize z-index values with design tokens | ✅ Complete |

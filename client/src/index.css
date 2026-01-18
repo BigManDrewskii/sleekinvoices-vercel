@@ -92,14 +92,21 @@
     0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
-  /* Z-Index Hierarchy */
+  /* Z-Index Hierarchy
+   * Use these semantic tokens instead of arbitrary z-index values
+   * Scale: base < dropdown < sticky < modal < popover < tooltip < notification < overlay
+   */
   --z-base: 0;
-  --z-dropdown: 1000;
-  --z-sticky: 1100;
-  --z-modal: 1200;
-  --z-popover: 1300;
-  --z-tooltip: 1400;
-  --z-notification: 1500;
+  --z-above: 10;
+  --z-dropdown: 50;
+  --z-sticky: 100;
+  --z-modal: 1000;
+  --z-popover: 1100;
+  --z-tooltip: 1200;
+  --z-notification: 1300;
+  --z-overlay: 1400;
+  --z-cookie-banner: 1500;
+  --z-feature-tooltip: 9000;
 
   /* Special Colors */
   --color-crypto: #f7931a;

@@ -72,6 +72,7 @@ export function CategoryDialog({
             <div className="flex gap-3">
               {/* Color Picker */}
               <div className="relative">
+                <Label htmlFor={ids.categoryColor} className="sr-only">Category Color</Label>
                 <Input
                   id={ids.categoryColor}
                   type="color"
@@ -82,12 +83,14 @@ export function CategoryDialog({
                       color: e.target.value,
                     })
                   }
+                  aria-label="Category color"
                   className="w-12 h-12 p-1 cursor-pointer rounded-lg border-2 border-border/50 hover:border-primary/50 transition-colors"
                 />
               </div>
 
               {/* Name Input */}
               <div className="flex-1">
+                <Label htmlFor={ids.categoryName} className="sr-only">Category Name</Label>
                 <Input
                   id={ids.categoryName}
                   value={categoryForm.name}
@@ -98,6 +101,7 @@ export function CategoryDialog({
                     })
                   }
                   placeholder="Enter category name..."
+                  aria-label="Category name"
                   className="h-12"
                   required
                 />

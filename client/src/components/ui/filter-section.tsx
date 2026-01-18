@@ -57,6 +57,7 @@ export function FilterSection({
                 placeholder={searchPlaceholder}
                 value={searchValue || ""}
                 onChange={e => onSearchChange(e.target.value)}
+                aria-label={searchPlaceholder.replace("...", "")}
                 className="pl-12 h-11 md:h-12 text-sm rounded-lg border-border/60 bg-background shadow-xs focus:ring-2 focus:ring-primary/20 focus:border-primary"
               />
             </div>

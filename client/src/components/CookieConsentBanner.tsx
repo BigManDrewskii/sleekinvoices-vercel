@@ -45,7 +45,7 @@ export function CookieConsentBanner() {
   if (showDetailed) {
     return (
       <div
-        className="fixed inset-0 z-[1500] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 z-[var(--z-cookie-banner)] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
         role="dialog"
         aria-modal="true"
         aria-labelledby="cookie-preferences-title"
@@ -199,7 +199,7 @@ export function CookieConsentBanner() {
 
   return (
     <div
-      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-[1500] animate-in slide-in-from-bottom-4 fade-in duration-300"
+      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-[var(--z-cookie-banner)] animate-in slide-in-from-bottom-4 fade-in duration-300"
       role="dialog"
       aria-modal="false"
       aria-labelledby="cookie-banner-title"
