@@ -364,3 +364,6 @@
 - [ ] Run full test suite (pnpm test)
 - [ ] Verify application works in browser
 | 2026-01-18 | Fix ClientTable dropdown menu actions (Edit, Delete, Portal Access) | ✅ Complete |
+| 2026-01-18 | Add client duplicate functionality | ✅ Complete |
+| 2026-01-18 | Add sorting indicators to ClientTable headers | ✅ Complete |
+| 2026-01-18 | Test Portal Access feature | ✅ Complete |

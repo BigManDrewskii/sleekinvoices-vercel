@@ -52,6 +52,7 @@ interface ClientTableProps {
   onEdit: (client: Client) => void;
   onDelete: (client: Client) => void;
   onPortalAccess: (client: Client) => void;
+  onDuplicate: (client: Client) => void;
 }
 
 export function ClientTable({
@@ -67,6 +68,7 @@ export function ClientTable({
   onEdit,
   onDelete,
   onPortalAccess,
+  onDuplicate,
 }: ClientTableProps) {
   return (
     <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm overflow-hidden">
@@ -100,8 +102,13 @@ export function ClientTable({
                   }
                 />
               </TableHead>
-              <TableHead scope="col">Company</TableHead>
-              <TableHead scope="col">Tags</TableHead>
+              <SortableTableHeader
+                label="Company"
+                sortKey="name"
+                currentSort={currentSort}
+                onSort={handleSort}
+              />
+              <TableHead scope="col">Contact</TableHead>
               <TableHead scope="col">VAT</TableHead>
               <TableHead scope="col">Address</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -199,6 +206,15 @@ export function ClientTable({
                           <span className="text-sm">Edit</span>
                         </div>
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onDuplicate(client)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Copy className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-sm">Duplicate</span>
+                        </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onDelete(client)}
                         className="text-destructive"

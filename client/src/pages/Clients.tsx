@@ -644,6 +644,16 @@ export default function Clients() {
                     setSelectedClient(client as Client);
                     setPortalAccessDialogOpen(true);
                   }}
+                  onDuplicate={(client) => {
+                    // Create a new client object with the same data but no ID
+                    const duplicateClient = {
+                      ...client,
+                      id: 0, // Will be treated as new client
+                      name: `${client.name} (Copy)`,
+                    } as Client;
+                    setSelectedClient(duplicateClient);
+                    setClientDialogOpen(true);
+                  }}
                 />
 
                 {/* Mobile Card View */}
