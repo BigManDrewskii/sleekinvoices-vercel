@@ -34,6 +34,7 @@ import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
 import { useUndoableDelete } from "@/hooks/useUndoableDelete";
+import { ClientTable } from "@/components/clients/ClientTable";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import {
@@ -957,79 +958,16 @@ export default function Clients() {
           handleBulkDelete={handleBulkDelete}
         />
 
-        {/* Clients Table */}
-        <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm overflow-hidden">
-          <div className="p-5 pb-4">
-            <h3 className="text-lg font-semibold text-foreground">
-              All Clients
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              <span className="font-numeric">{totalItems}</span> client
-              {totalItems !== 1 ? "s" : ""} found
-            </p>
-          </div>
-          <div className="px-5 pb-5">
-            {clientsLoading ? (
-              <ClientsTableSkeleton rows={8} />
-            ) : !clients || clients.length === 0 ? (
-              <EmptyState
-                {...EmptyStatePresets.clients}
-                action={{
-                  label: "Add Client",
-                  onClick: handleAddNew,
-                  icon: Plus,
-                }}
-              />
-            ) : filteredAndSortedClients.length === 0 ? (
-              <EmptyState {...EmptyStatePresets.search} size="sm" />
-            ) : (
-              <>
-                {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[40px]" scope="col">
-                          <Checkbox
-                            checked={isAllSelected}
-                            onCheckedChange={handleSelectAll}
-                            aria-label="Select all"
-                          />
-                        </TableHead>
-                        <SortableTableHeader
-                          label="Name"
-                          sortKey="name"
-                          currentSort={{
-                            key: sortField,
-                            direction: sortDirection,
-                          }}
-                          onSort={key => handleSort(key as SortField)}
-                        />
-                        <SortableTableHeader
-                          label="Contact"
-                          sortKey="email"
-                          currentSort={{
-                            key: sortField,
-                            direction: sortDirection,
-                          }}
-                          onSort={key => handleSort(key as SortField)}
-                        />
-                        <TableHead scope="col">Company</TableHead>
-                        <TableHead scope="col">Tags</TableHead>
-                        <TableHead scope="col">VAT</TableHead>
-                        <TableHead scope="col">Address</TableHead>
-                        <TableHead className="text-right" scope="col">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedClients.map(client => (
-                        <TableRow
-                          key={client.id}
-                          className={
-                            selectedIds.has(client.id) ? "bg-primary/5" : ""
-                          }
+        <ClientTable
+          paginatedClients={paginatedClients}
+          filteredAndSortedClients={filteredAndSortedClients}
+          selectedIds={selectedIds}
+          currentSort={currentSort}
+          handleSort={handleSort}
+          handleSelectOne={handleSelectOne}
+          clientTagsMap={clientTagsMap}
+          removeTagMutation={removeTagMutation}
+        />
                         >
                           <TableCell>
                             <Checkbox
