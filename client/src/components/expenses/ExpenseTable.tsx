@@ -38,6 +38,7 @@ import {
   DataTableEmpty,
   DataTableLoading,
 } from "@/components/ui/data-table-empty";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import type { ExpenseWithDetails } from "@shared/types";
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
@@ -100,8 +101,8 @@ export function ExpenseTable({
             {filteredAndSortedExpenses.length !== 1 ? "s" : ""} found
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <div className="min-w-[800px]">
+        <CardContent className="p-0">
+          <ScrollableTableWrapper minWidth={800}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -302,7 +303,7 @@ export function ExpenseTable({
               )}
             </TableBody>
           </Table>
-          </div>
+          </ScrollableTableWrapper>
           {/* Pagination */}
           {!isLoading &&
             expenses &&

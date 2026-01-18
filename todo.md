@@ -393,3 +393,4 @@
 | 2026-01-18 | Fix minor: Line length control missing (Minor #18) | ✅ Complete (prose classes already used) |
 | 2026-01-18 | Add horizontal scroll to Invoices table | ✅ Complete |
 | 2026-01-18 | Add horizontal scroll to Expenses table | ✅ Complete |
+| 2026-01-18 | Add horizontal scroll to Payments table | ✅ Complete || 2026-01-18 | Create ScrollableTableWrapper component with fade indicators | ✅ Complete | 2026-01-18 | Apply ScrollableTableWrapper to Invoices, Expenses, Clients tables | ✅ Complete |

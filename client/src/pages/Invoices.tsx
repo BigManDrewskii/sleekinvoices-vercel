@@ -41,6 +41,7 @@ import { InvoiceNumberCell } from "@/components/invoices/InvoiceNumberCell";
 import { Pagination } from "@/components/shared/Pagination";
 import { InvoiceBulkActionsBar } from "@/components/invoices/InvoiceBulkActionsBar";
 import { InvoiceTable } from "@/components/invoices/InvoiceTable";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
@@ -967,8 +968,7 @@ export default function Invoices() {
             ) : (
               <>
                 {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto -mx-5 sm:mx-0">
-                  <div className="min-w-[900px] px-5 sm:px-0">
+                <ScrollableTableWrapper minWidth={900} className="hidden md:block">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -1185,8 +1185,7 @@ export default function Invoices() {
                       ))}
                     </TableBody>
                   </Table>
-                  </div>
-                </div>
+                </ScrollableTableWrapper>
 
                 {/* Mobile Card View */}
                 <div className="md:hidden space-y-4">

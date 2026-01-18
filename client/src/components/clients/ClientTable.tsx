@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { useTableSort } from "@/hooks/useTableSort";
 import { Mail, Phone, MapPin, Key, Edit, Trash2, Copy } from "lucide-react";
 
@@ -82,8 +83,7 @@ export function ClientTable({
           {filteredAndSortedClients.length !== 1 ? "s" : ""} found
         </p>
       </div>
-      <div className="px-5 pb-5 overflow-x-auto -mx-5 sm:mx-0">
-        <div className="min-w-[700px] px-5 sm:px-0">
+      <ScrollableTableWrapper minWidth={700} className="px-5 pb-5">
         <Table>
           <TableHeader>
             <TableRow>
@@ -241,8 +241,7 @@ export function ClientTable({
             ))}
           </TableBody>
         </Table>
-        </div>
-      </div>
+      </ScrollableTableWrapper>
 
       <div className="px-5 pb-5 md:hidden">
         <div className="space-y-3">

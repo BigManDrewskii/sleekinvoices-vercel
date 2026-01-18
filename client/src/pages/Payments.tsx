@@ -61,6 +61,7 @@ import {
 } from "@/components/ui/animated-number";
 import { Pagination } from "@/components/shared/Pagination";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
+import { ScrollableTableWrapper } from "@/components/ui/scrollable-table-wrapper";
 import { useTableSort } from "@/hooks/useTableSort";
 import { FilterSection, FilterSelect } from "@/components/ui/filter-section";
 import { DialogBody, DialogActions } from "@/components/shared/DialogPatterns";
@@ -562,7 +563,7 @@ export default function Payments() {
             />
           ) : (
             <>
-              <div className="rounded-lg border overflow-hidden">
+              <ScrollableTableWrapper minWidth={700} className="rounded-lg border overflow-hidden">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30">
@@ -628,7 +629,7 @@ export default function Payments() {
                     ))}
                   </TableBody>
                 </Table>
-              </div>
+              </ScrollableTableWrapper>
 
               {/* Pagination */}
               {totalPages > 1 && (
