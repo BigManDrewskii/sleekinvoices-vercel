@@ -22,7 +22,9 @@ interface InvoiceBulkActionsBarProps {
   clearSelection: () => void;
   handleBulkSendEmail: () => void;
   handleBulkCreatePaymentLinks: () => void;
-  handleBulkUpdateStatus: (status: "draft" | "sent" | "paid" | "overdue" | "canceled") => void;
+  handleBulkUpdateStatus: (
+    status: "draft" | "sent" | "paid" | "overdue" | "canceled"
+  ) => void;
   setBulkDeleteDialogOpen: (open: boolean) => void;
   bulkSendEmail: { isPending: boolean };
   bulkCreatePaymentLinks: { isPending: boolean };
