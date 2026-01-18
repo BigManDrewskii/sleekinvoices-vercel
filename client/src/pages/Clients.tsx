@@ -320,7 +320,12 @@ export default function Clients() {
           const tagsMap = await utils.clients.getClientTagsForMultiple.fetch({
             clientIds,
           });
-          setClientTagsMap(tagsMap);
+          // Convert Record to Map
+          const map = new Map<number, ClientTag[]>();
+          Object.entries(tagsMap).forEach(([key, value]) => {
+            map.set(parseInt(key), value);
+          });
+          setClientTagsMap(map);
         } catch (error) {
           console.error("Failed to load client tags:", error);
         }
@@ -332,15 +337,16 @@ export default function Clients() {
   // Sorting and filtering logic
   const currentSort = useMemo(
     () => ({
-      field: sortField,
-      direction: sortDirection,
+      key: sortField as string,
+      direction: sortDirection as "asc" | "desc",
     }),
     [sortField, sortDirection]
   );
 
-  const handleSort = (field: SortField) => {
-    if (currentSort.field === field) {
-      setSortDirection(currentSort.direction === "asc" ? "desc" : "asc");
+  const handleSort = (key: string) => {
+    const field = key as SortField;
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
       setSortDirection("asc");
@@ -409,13 +415,13 @@ export default function Clients() {
       let aVal: any;
       let bVal: any;
 
-      if (currentSort.field === "name") {
+      if (currentSort.key === "name") {
         aVal = a.name;
         bVal = b.name;
-      } else if (currentSort.field === "email") {
+      } else if (currentSort.key === "email") {
         aVal = a.email || "";
         bVal = b.email || "";
-      } else if (currentSort.field === "createdAt") {
+      } else if (currentSort.key === "createdAt") {
         aVal = new Date(a.createdAt).getTime();
         bVal = new Date(b.createdAt).getTime();
       }
@@ -486,14 +492,22 @@ export default function Clients() {
 
   const confirmDelete = () => {
     if (!clientToDelete) return;
-    executeDelete(
-      () => deleteClient.mutate({ id: clientToDelete.id }),
-      () => {
+    executeDelete({
+      item: clientToDelete,
+      itemName: clientToDelete.name,
+      itemType: "client",
+      onOptimisticDelete: () => {
         setDeleteDialogOpen(false);
         setClientToDelete(null);
       },
-      clientToDelete.name
-    );
+      onRestore: () => {
+        // Refetch clients to restore the deleted one
+        utils.clients.list.invalidate();
+      },
+      onConfirmDelete: async () => {
+        await deleteClient.mutateAsync({ id: clientToDelete.id });
+      },
+    });
   };
 
   const handleBulkDelete = () => {
@@ -585,7 +599,7 @@ export default function Clients() {
             {clientsLoading ? (
               <ClientsTableSkeleton />
             ) : clients && clients.length === 0 ? (
-              <EmptyState preset={EmptyStatePresets.CLIENTS} />
+              <EmptyState {...EmptyStatePresets.clients} />
             ) : filteredAndSortedClients.length === 0 ? (
               <Card>
                 <CardContent className="pt-12 pb-12 text-center">
@@ -612,8 +626,24 @@ export default function Clients() {
                   currentSort={currentSort}
                   handleSort={handleSort}
                   handleSelectOne={handleSelectOne}
+                  toggleSelectAll={() => {
+                    if (selectedIds.size === paginatedClients.length) {
+                      setSelectedIds(new Set());
+                    } else {
+                      setSelectedIds(new Set(paginatedClients.map(c => c.id)));
+                    }
+                  }}
                   clientTagsMap={clientTagsMap}
                   removeTagMutation={removeTagMutation}
+                  onEdit={(client) => {
+                    setSelectedClient(client as Client);
+                    setClientDialogOpen(true);
+                  }}
+                  onDelete={(client) => handleDelete(client as Client)}
+                  onPortalAccess={(client) => {
+                    setSelectedClient(client as Client);
+                    setPortalAccessDialogOpen(true);
+                  }}
                 />
 
                 {/* Mobile Card View */}

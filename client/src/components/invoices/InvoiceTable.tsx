@@ -55,6 +55,21 @@ interface InvoiceTableProps {
   sort: { key: string; direction: "asc" | "desc" };
   handleSort: (key: string) => void;
   totalItems: number;
+  qbStatus?: { connected: boolean };
+  onView: (invoice: Invoice) => void;
+  onEdit: (invoice: Invoice) => void;
+  onDelete: (invoice: Invoice) => void;
+  onDuplicate: (invoice: Invoice) => void;
+  onDownloadPDF: (invoice: Invoice) => void;
+  onSendEmail: (invoice: Invoice) => void;
+  onCreatePaymentLink: (invoice: Invoice) => void;
+  isLoading?: {
+    pdf?: boolean;
+    email?: boolean;
+    paymentLink?: boolean;
+    duplicate?: boolean;
+  };
+  syncingInvoiceId?: number | null;
 }
 
 export function InvoiceTable({
@@ -66,6 +81,17 @@ export function InvoiceTable({
   toggleSelect,
   sort,
   handleSort,
+  totalItems,
+  qbStatus,
+  onView,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  onDownloadPDF,
+  onSendEmail,
+  onCreatePaymentLink,
+  isLoading = {},
+  syncingInvoiceId,
 }: InvoiceTableProps) {
   if (!invoices) return null;
 
@@ -244,30 +270,19 @@ export function InvoiceTable({
                       invoiceId={invoice.id}
                       invoiceNumber={invoice.invoiceNumber}
                       hasPaymentLink={!!invoice.paymentLink}
-                      onView={() =>
-                        window.location.assign(`/invoices/${invoice.id}`)
-                      }
-                      onEdit={() =>
-                        window.location.assign(`/invoices/${invoice.id}/edit`)
-                      }
-                      onDownloadPDF={() =>
-                        window.location.assign(`/invoices/${invoice.id}`)
-                      }
-                      onViewPDF={() =>
-                        window.location.assign(`/invoices/${invoice.id}`)
-                      }
-                      onSendEmail={() =>
-                        window.location.assign(`/invoices/${invoice.id}`)
-                      }
-                      onCreatePaymentLink={() =>
-                        window.location.assign(`/invoices/${invoice.id}`)
-                      }
+                      onView={() => onView(invoice)}
+                      onEdit={() => onEdit(invoice)}
+                      onDownloadPDF={() => onDownloadPDF(invoice)}
+                      onSendEmail={() => onSendEmail(invoice)}
+                      onCreatePaymentLink={() => onCreatePaymentLink(invoice)}
+                      onDelete={() => onDelete(invoice)}
+                      onDuplicate={() => onDuplicate(invoice)}
                       quickBooksConnected={qbStatus?.connected || false}
                       isLoading={{
-                        pdf: generatePDF.isPending,
-                        email: sendEmail.isPending,
-                        paymentLink: createPaymentLink.isPending,
-                        duplicate: duplicateInvoice.isPending,
+                        pdf: isLoading.pdf,
+                        email: isLoading.email,
+                        paymentLink: isLoading.paymentLink,
+                        duplicate: isLoading.duplicate,
                         quickBooksSync: syncingInvoiceId === invoice.id,
                       }}
                     />
@@ -304,6 +319,21 @@ export function InvoiceTable({
                   invoiceId={invoice.id}
                   invoiceNumber={invoice.invoiceNumber}
                   hasPaymentLink={!!invoice.paymentLink}
+                  onView={() => onView(invoice)}
+                  onEdit={() => onEdit(invoice)}
+                  onDownloadPDF={() => onDownloadPDF(invoice)}
+                  onSendEmail={() => onSendEmail(invoice)}
+                  onCreatePaymentLink={() => onCreatePaymentLink(invoice)}
+                  onDelete={() => onDelete(invoice)}
+                  onDuplicate={() => onDuplicate(invoice)}
+                  quickBooksConnected={qbStatus?.connected || false}
+                  isLoading={{
+                    pdf: isLoading.pdf,
+                    email: isLoading.email,
+                    paymentLink: isLoading.paymentLink,
+                    duplicate: isLoading.duplicate,
+                    quickBooksSync: syncingInvoiceId === invoice.id,
+                  }}
                 />
               </div>
               <div className="flex items-center justify-between">

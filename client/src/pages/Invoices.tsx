@@ -813,6 +813,21 @@ export default function Invoices() {
           sort={sort}
           handleSort={handleSort}
           totalItems={totalItems}
+          qbStatus={qbStatus}
+          onView={(invoice) => window.location.assign(`/invoices/${invoice.id}`)}
+          onEdit={(invoice) => window.location.assign(`/invoices/${invoice.id}/edit`)}
+          onDelete={(invoice) => handleDelete(invoice as unknown as Invoice)}
+          onDuplicate={(invoice) => handleDuplicate(invoice.id)}
+          onDownloadPDF={(invoice) => handleDownloadPDF(invoice.id)}
+          onSendEmail={(invoice) => handleSendEmail(invoice.id)}
+          onCreatePaymentLink={(invoice) => handleCreatePaymentLink(invoice.id)}
+          isLoading={{
+            pdf: generatePDF.isPending,
+            email: sendEmail.isPending,
+            paymentLink: createPaymentLink.isPending,
+            duplicate: duplicateInvoice.isPending,
+          }}
+          syncingInvoiceId={syncingInvoiceId}
         />
 
         {/* Filters */}
