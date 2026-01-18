@@ -371,3 +371,4 @@
 | 2026-01-18 | Add hamburger menu to tablet view navigation | ✅ Complete |
 | 2026-01-18 | Fix sidebar animation flickering when it appears | ✅ Complete |
 | 2026-01-18 | Add OG banner image for social media sharing | ✅ Complete |
+| 2026-01-18 | Replace hardcoded LD button with UserAvatar component in tablet/mobile nav | ✅ Complete |

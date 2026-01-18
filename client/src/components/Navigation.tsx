@@ -572,13 +572,9 @@ export function Navigation() {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[14.4px] border-[var(--nav-button-border)] transition-all duration-200"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all duration-200 hover:ring-2 hover:ring-primary/20"
           >
-            <div className="relative">
-              <span className="text-[#94a3b8] font-semibold text-lg leading-6">
-                LD
-              </span>
-            </div>
+            {user && <UserAvatar user={user} size="sm" />}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
@@ -752,13 +748,9 @@ export function Navigation() {
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-[14.4px] border-[var(--nav-button-border)] transition-all duration-200"
+            className="h-11 w-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-all duration-200 hover:ring-2 hover:ring-primary/20"
           >
-            <div className="relative">
-              <span className="text-[#94a3b8] font-semibold text-lg leading-6">
-                LD
-              </span>
-            </div>
+            {user && <UserAvatar user={user} size="sm" />}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60" sideOffset={8}>
