@@ -398,3 +398,4 @@
 | 2026-01-18 | Add ScrollableTableWrapper to other tables (Estimates, EmailHistory) | ✅ Complete |
 | 2026-01-18 | Implement mobile touch swipe hints | ✅ Complete |
 | 2026-01-18 | Add ScrollableTableWrapper to InvoiceTable component | ✅ Complete |
+| 2026-01-18 | Rams Design Review - Accessibility & Visual Design Audit | ✅ Complete |
