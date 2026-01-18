@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SortableTableHeader } from "@/components/shared/SortableTableHeader";
 import { useTableSort } from "@/hooks/useTableSort";
-import { useUndoableDelete } from "@/hooks/useUndoableDelete";
-import { Mail, Phone } from "lucide-react";
+import { Mail, Phone, MapPin, Key, Edit, Trash2 } from "lucide-react";
 
 interface Client {
   id: number;
@@ -27,6 +27,7 @@ interface Client {
   phone?: string | null;
   companyName?: string | null;
   vatNumber?: string | null;
+  address?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,8 +46,12 @@ interface ClientTableProps {
   currentSort: { key: string; direction: "asc" | "desc" };
   handleSort: (key: string) => void;
   handleSelectOne: (id: number, selected: boolean) => void;
+  toggleSelectAll: () => void;
   clientTagsMap: Map<number, ClientTag[]>;
   removeTagMutation: any;
+  onEdit: (client: Client) => void;
+  onDelete: (client: Client) => void;
+  onPortalAccess: (client: Client) => void;
 }
 
 export function ClientTable({
@@ -56,8 +61,12 @@ export function ClientTable({
   currentSort,
   handleSort,
   handleSelectOne,
+  toggleSelectAll,
   clientTagsMap,
   removeTagMutation,
+  onEdit,
+  onDelete,
+  onPortalAccess,
 }: ClientTableProps) {
   return (
     <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm overflow-hidden">
@@ -191,18 +200,7 @@ export function ClientTable({
                         </div>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() =>
-                          useUndoableDelete({
-                            entity: client,
-                            entityId: client.id,
-                            type: "client",
-                            onConfirm: () => {
-                              window.confirm(
-                                `Are you sure you want to delete "${client.name}"?`
-                              );
-                            },
-                          })
-                        }
+                        onClick={() => onDelete(client)}
                         className="text-destructive"
                       >
                         <div className="flex items-center gap-2">
@@ -226,6 +224,86 @@ export function ClientTable({
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="px-5 pb-5 md:hidden">
+        <div className="space-y-3">
+          {paginatedClients.map(client => (
+            <div
+              key={client.id}
+              className={`p-4 rounded-lg border border-border/50 bg-card/50 ${selectedIds.has(client.id) ? "ring-2 ring-primary/50" : ""}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={selectedIds.has(client.id)}
+                    onCheckedChange={checked =>
+                      handleSelectOne(client.id, !!checked)
+                    }
+                    aria-label={`Select ${client.name}`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-foreground truncate">
+                      {client.name}
+                    </h4>
+                    {client.companyName && (
+                      <p className="text-sm text-muted-foreground truncate">
+                        {client.companyName}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onPortalAccess(client)}
+                    aria-label={`Manage portal access for ${client.name}`}
+                  >
+                    <Key className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(client)}
+                    aria-label={`Edit ${client.name}`}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(client)}
+                    className="text-destructive hover:text-destructive"
+                    aria-label={`Delete ${client.name}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-3 space-y-1.5 text-sm">
+                {client.email && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <span className="truncate">{client.email}</span>
+                  </div>
+                )}
+                {client.phone && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="h-3 w-3" />
+                    <span>{client.phone}</span>
+                  </div>
+                )}
+                {client.address && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{client.address}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
