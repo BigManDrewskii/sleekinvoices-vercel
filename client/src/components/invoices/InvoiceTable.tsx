@@ -72,9 +72,7 @@ export function InvoiceTable({
   return (
     <div className="rounded-2xl bg-gradient-to-br from-card to-card/80 border border-border/50 backdrop-blur-sm overflow-hidden">
       <div className="p-5 pb-4">
-        <h3 className="text-lg font-semibold text-foreground">
-          All Invoices
-        </h3>
+        <h3 className="text-lg font-semibold text-foreground">All Invoices</h3>
         <p className="text-sm text-muted-foreground">
           <span className="font-numeric">{totalItems}</span> invoice
           {totalItems !== 1 ? "s" : ""} found
@@ -141,9 +139,7 @@ export function InvoiceTable({
                   onSort={handleSort}
                 />
                 {qbStatus?.connected && (
-                  <TableHead className="w-[60px] text-center">
-                    QB
-                  </TableHead>
+                  <TableHead className="w-[60px] text-center">QB</TableHead>
                 )}
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -174,7 +170,10 @@ export function InvoiceTable({
                   <TableCell className="font-semibold">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Currency amount={invoice.total} currency={invoice.currency} />
+                        <Currency
+                          amount={invoice.total}
+                          currency={invoice.currency}
+                        />
                         {invoice.currency && invoice.currency !== "USD" && (
                           <CurrencyBadge code={invoice.currency} />
                         )}
@@ -182,8 +181,7 @@ export function InvoiceTable({
                       {invoice.paymentStatus &&
                         invoice.paymentStatus !== "unpaid" && (
                           <div className="text-xs text-muted-foreground">
-                            Paid:{" "}
-                            <Currency amount={invoice.totalPaid || "0"} />
+                            Paid: <Currency amount={invoice.totalPaid || "0"} />
                           </div>
                         )}
                     </div>
@@ -246,14 +244,24 @@ export function InvoiceTable({
                       invoiceId={invoice.id}
                       invoiceNumber={invoice.invoiceNumber}
                       hasPaymentLink={!!invoice.paymentLink}
-                      onView={() => window.location.assign(`/invoices/${invoice.id}`)}
+                      onView={() =>
+                        window.location.assign(`/invoices/${invoice.id}`)
+                      }
                       onEdit={() =>
                         window.location.assign(`/invoices/${invoice.id}/edit`)
                       }
-                      onDownloadPDF={() => window.location.assign(`/invoices/${invoice.id}`)}
-                      onViewPDF={() => window.location.assign(`/invoices/${invoice.id}`)}
-                      onSendEmail={() => window.location.assign(`/invoices/${invoice.id}`)}
-                      onCreatePaymentLink={() => window.location.assign(`/invoices/${invoice.id}`)}
+                      onDownloadPDF={() =>
+                        window.location.assign(`/invoices/${invoice.id}`)
+                      }
+                      onViewPDF={() =>
+                        window.location.assign(`/invoices/${invoice.id}`)
+                      }
+                      onSendEmail={() =>
+                        window.location.assign(`/invoices/${invoice.id}`)
+                      }
+                      onCreatePaymentLink={() =>
+                        window.location.assign(`/invoices/${invoice.id}`)
+                      }
                       quickBooksConnected={qbStatus?.connected || false}
                       isLoading={{
                         pdf: generatePDF.isPending,
@@ -292,11 +300,11 @@ export function InvoiceTable({
                     </p>
                   </div>
                 </div>
-                  <InvoiceActionsMenu
-                      invoiceId={invoice.id}
-                      invoiceNumber={invoice.invoiceNumber}
-                      hasPaymentLink={!!invoice.paymentLink}
-                    />
+                <InvoiceActionsMenu
+                  invoiceId={invoice.id}
+                  invoiceNumber={invoice.invoiceNumber}
+                  hasPaymentLink={!!invoice.paymentLink}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -304,33 +312,33 @@ export function InvoiceTable({
                   <PaymentStatusBadge
                     status={invoice.paymentStatus || "unpaid"}
                   />
-                  {qbStatus?.connected &&
-                    invoice.quickbooks?.synced && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                              <svg
-                                className="w-3 h-3 text-emerald-500"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                              </svg>
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            <span className="text-xs">
-                              Synced to QuickBooks
-                            </span>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
+                  {qbStatus?.connected && invoice.quickbooks?.synced && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                            <svg
+                              className="w-3 h-3 text-emerald-500"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                            >
+                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <span className="text-xs">Synced to QuickBooks</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="font-semibold flex items-center gap-1 justify-end">
-                    <Currency amount={invoice.total} currency={invoice.currency} />
+                    <Currency
+                      amount={invoice.total}
+                      currency={invoice.currency}
+                    />
                     {invoice.currency && invoice.currency !== "USD" && (
                       <CurrencyBadge code={invoice.currency} />
                     )}
@@ -338,8 +346,7 @@ export function InvoiceTable({
                   {invoice.paymentStatus &&
                     invoice.paymentStatus !== "unpaid" && (
                       <p className="text-xs text-muted-foreground">
-                        Paid:{" "}
-                        <Currency amount={invoice.totalPaid || "0"} />
+                        Paid: <Currency amount={invoice.totalPaid || "0"} />
                       </p>
                     )}
                 </div>
@@ -350,8 +357,7 @@ export function InvoiceTable({
                   <DateDisplay date={invoice.issueDate} format="short" />
                 </span>
                 <span>
-                  Due:{" "}
-                  <DateDisplay date={invoice.dueDate} format="short" />
+                  Due: <DateDisplay date={invoice.dueDate} format="short" />
                 </span>
               </div>
             </div>
