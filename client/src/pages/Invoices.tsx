@@ -967,7 +967,8 @@ export default function Invoices() {
             ) : (
               <>
                 {/* Desktop Table View */}
-                <div className="hidden md:block overflow-x-auto">
+                <div className="hidden md:block overflow-x-auto -mx-5 sm:mx-0">
+                  <div className="min-w-[900px] px-5 sm:px-0">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -1184,6 +1185,7 @@ export default function Invoices() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </div>
 
                 {/* Mobile Card View */}

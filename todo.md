@@ -391,3 +391,5 @@
 | 2026-01-18 | Fix minor: Navigation sheet width (Minor #16) | ✅ Complete (already has max-w-[85vw]) |
 | 2026-01-18 | Fix minor: Images without explicit dimensions (Minor #17) | ✅ Complete |
 | 2026-01-18 | Fix minor: Line length control missing (Minor #18) | ✅ Complete (prose classes already used) |
+| 2026-01-18 | Add horizontal scroll to Invoices table | ✅ Complete |
+| 2026-01-18 | Add horizontal scroll to Expenses table | ✅ Complete |

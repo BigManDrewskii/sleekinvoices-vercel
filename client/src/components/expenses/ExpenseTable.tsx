@@ -100,7 +100,8 @@ export function ExpenseTable({
             {filteredAndSortedExpenses.length !== 1 ? "s" : ""} found
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
+          <div className="min-w-[800px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -301,6 +302,7 @@ export function ExpenseTable({
               )}
             </TableBody>
           </Table>
+          </div>
           {/* Pagination */}
           {!isLoading &&
             expenses &&
