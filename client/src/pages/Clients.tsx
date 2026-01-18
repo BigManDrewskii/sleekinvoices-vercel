@@ -320,204 +320,126 @@ export default function Clients() {
           const tagsMap = await utils.clients.getClientTagsForMultiple.fetch({
             clientIds,
           });
-
-          // Convert to Map format
-          const newMap = new Map<number, ClientTag[]>();
-          for (const client of clients) {
-            newMap.set(client.id, tagsMap[client.id] || []);
-          }
-          setClientTagsMap(newMap);
+          setClientTagsMap(tagsMap);
         } catch (error) {
-          if (import.meta.env.DEV) {
-            console.error("Failed to load client tags:", error);
-          }
-          // Set empty tags for all clients on error
-          const newMap = new Map<number, ClientTag[]>();
-          for (const client of clients) {
-            newMap.set(client.id, []);
-          }
-          setClientTagsMap(newMap);
+          console.error("Failed to load client tags:", error);
         }
       };
       loadClientTags();
     }
-  }, [clients, isAuthenticated, utils]);
+  }, [clients, isAuthenticated]);
 
-  // Get unique companies for filter dropdown
-  const uniqueCompanies = useMemo(() => {
-    if (!clients) return [];
-    const companies = clients
-      .map(c => c.companyName)
-      .filter((c): c is string => !!c)
-      .filter((c, i, arr) => arr.indexOf(c) === i)
-      .sort();
-    return companies;
-  }, [clients]);
+  // Sorting and filtering logic
+  const currentSort = useMemo(
+    () => ({
+      field: sortField,
+      direction: sortDirection,
+    }),
+    [sortField, sortDirection]
+  );
 
-  // Filter and sort clients
+  const handleSort = (field: SortField) => {
+    if (currentSort.field === field) {
+      setSortDirection(currentSort.direction === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
   const filteredAndSortedClients = useMemo(() => {
     if (!clients) return [];
-    const query = searchQuery.toLowerCase();
 
-    // Text search filter
-    let filtered = clients.filter(
-      client =>
-        client.name.toLowerCase().includes(query) ||
-        client.email?.toLowerCase().includes(query) ||
-        client.phone?.toLowerCase().includes(query) ||
-        client.companyName?.toLowerCase().includes(query)
-    );
+    let filtered = [...clients];
 
-    // Company filter
-    if (filters.company !== "all") {
-      if (filters.company === "no-company") {
-        filtered = filtered.filter(c => !c.companyName);
-      } else {
-        filtered = filtered.filter(c => c.companyName === filters.company);
-      }
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        client =>
+          client.name.toLowerCase().includes(query) ||
+          client.email?.toLowerCase().includes(query) ||
+          client.phone?.includes(query) ||
+          client.companyName?.toLowerCase().includes(query)
+      );
     }
 
-    // Tax exempt filter
-    if (filters.taxExempt !== "all") {
-      if (filters.taxExempt === "exempt") {
-        filtered = filtered.filter(c => c.taxExempt === true);
-      } else if (filters.taxExempt === "not-exempt") {
-        filtered = filtered.filter(c => c.taxExempt !== true);
-      }
+    // Apply tag filter
+    if (filters.tag && filters.tag !== "all") {
+      filtered = filtered.filter(client => {
+        const clientTags = clientTagsMap.get(client.id) || [];
+        return clientTags.some(t => t.id === parseInt(filters.tag));
+      });
     }
 
-    // Date range filter
-    if (filters.dateRange !== "all") {
+    // Apply company filter
+    if (filters.company && filters.company !== "all") {
+      filtered = filtered.filter(client =>
+        filters.company === "with"
+          ? client.companyName
+          : !client.companyName
+      );
+    }
+
+    // Apply tax exempt filter
+    if (filters.taxExempt && filters.taxExempt !== "all") {
+      filtered = filtered.filter(client =>
+        filters.taxExempt === "yes"
+          ? client.taxExempt
+          : !client.taxExempt
+      );
+    }
+
+    // Apply date range filter
+    if (filters.dateRange && filters.dateRange !== "all") {
       const now = new Date();
-      let cutoffDate: Date;
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-      switch (filters.dateRange) {
-        case "today":
-          cutoffDate = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate()
-          );
-          break;
-        case "week":
-          cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
-        case "month":
-          cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          break;
-        case "quarter":
-          cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-          break;
-        case "year":
-          cutoffDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
-          break;
-        default:
-          cutoffDate = new Date(0);
-      }
-
-      filtered = filtered.filter(c => new Date(c.createdAt) >= cutoffDate);
+      filtered = filtered.filter(client => {
+        const createdDate = new Date(client.createdAt);
+        if (filters.dateRange === "30") return createdDate >= thirtyDaysAgo;
+        if (filters.dateRange === "90") return createdDate >= ninetyDaysAgo;
+        return true;
+      });
     }
 
-    // Tag filter
-    if (filters.tag !== "all") {
-      if (filters.tag === "no-tags") {
-        filtered = filtered.filter(c => {
-          const clientTags = clientTagsMap.get(c.id) || [];
-          return clientTags.length === 0;
-        });
-      } else {
-        const tagId = parseInt(filters.tag);
-        filtered = filtered.filter(c => {
-          const clientTags = clientTagsMap.get(c.id) || [];
-          return clientTags.some(t => t.id === tagId);
-        });
-      }
-    }
-
-    // Sort
+    // Apply sorting
     filtered.sort((a, b) => {
-      let aValue: string | Date | null;
-      let bValue: string | Date | null;
+      let aVal: any;
+      let bVal: any;
 
-      switch (sortField) {
-        case "name":
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
-          break;
-        case "email":
-          aValue = a.email?.toLowerCase() || "";
-          bValue = b.email?.toLowerCase() || "";
-          break;
-        case "createdAt":
-          aValue = new Date(a.createdAt);
-          bValue = new Date(b.createdAt);
-          break;
-        default:
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+      if (currentSort.field === "name") {
+        aVal = a.name;
+        bVal = b.name;
+      } else if (currentSort.field === "email") {
+        aVal = a.email || "";
+        bVal = b.email || "";
+      } else if (currentSort.field === "createdAt") {
+        aVal = new Date(a.createdAt).getTime();
+        bVal = new Date(b.createdAt).getTime();
       }
 
-      if (sortField === "createdAt") {
-        const aTime = (aValue as Date).getTime();
-        const bTime = (bValue as Date).getTime();
-        return sortDirection === "asc" ? aTime - bTime : bTime - aTime;
+      if (currentSort.direction === "asc") {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
       }
-
-      const comparison = (aValue as string).localeCompare(bValue as string);
-      return sortDirection === "asc" ? comparison : -comparison;
     });
 
     return filtered;
-  }, [
-    clients,
-    searchQuery,
-    sortField,
-    sortDirection,
-    filters.company,
-    filters.taxExempt,
-    filters.dateRange,
-    filters.tag,
-    clientTagsMap,
-  ]);
+  }, [clients, searchQuery, currentSort, filters, clientTagsMap]);
 
-  // Calculate pagination
+  // Pagination
   const totalItems = filteredAndSortedClients.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-
-  // Reset to page 1 when search, sort, or filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    searchQuery,
-    sortField,
-    sortDirection,
-    filters.company,
-    filters.taxExempt,
-    filters.dateRange,
-    filters.tag,
-  ]);
-
-  // Ensure current page is valid
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  // Get paginated clients
+  const totalPages = Math.ceil(totalItems / pageSize);
   const paginatedClients = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredAndSortedClients.slice(startIndex, startIndex + pageSize);
+    const startIdx = (currentPage - 1) * pageSize;
+    return filteredAndSortedClients.slice(startIdx, startIdx + pageSize);
   }, [filteredAndSortedClients, currentPage, pageSize]);
-
-  // Clear selection when page changes
-  useEffect(() => {
-    setSelectedIds(new Set());
-  }, [currentPage, pageSize, searchQuery]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handlePageSizeChange = (size: number) => {
@@ -525,35 +447,7 @@ export default function Clients() {
     setCurrentPage(1);
   };
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
-    }
-    return sortDirection === "asc" ? (
-      <ArrowUp className="h-4 w-4 ml-1" />
-    ) : (
-      <ArrowDown className="h-4 w-4 ml-1" />
-    );
-  };
-
   // Selection handlers
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(new Set(paginatedClients.map(c => c.id)));
-    } else {
-      setSelectedIds(new Set());
-    }
-  };
-
   const handleSelectOne = (id: number, checked: boolean) => {
     const newSelected = new Set(selectedIds);
     if (checked) {
@@ -564,83 +458,19 @@ export default function Clients() {
     setSelectedIds(newSelected);
   };
 
-  const isAllSelected =
-    paginatedClients.length > 0 &&
-    paginatedClients.every(c => selectedIds.has(c.id));
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(paginatedClients.map(c => c.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
   const isSomeSelected = selectedIds.size > 0;
 
-  const handleBulkDelete = () => {
-    setBulkDeleteDialogOpen(true);
-  };
-
-  const confirmBulkDelete = () => {
-    bulkDeleteClients.mutate({ ids: Array.from(selectedIds) });
-    setBulkDeleteDialogOpen(false);
-  };
-
-  const handleUndoableDelete = (client: Client) => {
-    const previousClients = utils.clients.list.getData();
-
-    const undoDelete = () => {
-      if (previousClients) {
-        utils.clients.list.setData(undefined, previousClients);
-      } else {
-        utils.clients.list.invalidate();
-      }
-    };
-
-    pushUndoAction({
-      type: "delete",
-      entityType: "client",
-      description: `Delete client "${client.name}"`,
-      undo: undoDelete,
-    });
-
-    executeDelete({
-      item: client,
-      itemName: client.name,
-      itemType: "client",
-      onOptimisticDelete: () => {
-        utils.clients.list.setData(undefined, old =>
-          old?.filter(c => c.id !== client.id)
-        );
-        setDeleteDialogOpen(false);
-        setClientToDelete(null);
-      },
-      onRestore: undoDelete,
-      onConfirmDelete: async () => {
-        await deleteClient.mutateAsync({ id: client.id });
-      },
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="opacity-70">
-          <GearLoader size="md" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    window.location.href = getLoginUrl();
-    return null;
-  }
-
+  // Action handlers
   const handleEdit = (client: Client) => {
     setSelectedClient(client);
-    setClientDialogOpen(true);
-  };
-
-  const handleDelete = (client: Client) => {
-    setClientToDelete(client);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleAddNew = () => {
-    setSelectedClient(null);
     setClientDialogOpen(true);
   };
 
@@ -649,511 +479,142 @@ export default function Clients() {
     setPortalAccessDialogOpen(true);
   };
 
+  const handleDelete = (client: Client) => {
+    setClientToDelete(client);
+    setDeleteDialogOpen(true);
+  };
+
   const confirmDelete = () => {
-    if (clientToDelete) {
-      handleUndoableDelete(clientToDelete);
-    }
-  };
-
-  // Export clients to CSV
-  const handleExportCSV = () => {
-    if (!clients || clients.length === 0) {
-      toast.error("No clients to export");
-      return;
-    }
-
-    // Use filtered clients if filters are active, otherwise all clients
-    const clientsToExport =
-      filteredAndSortedClients.length > 0 ? filteredAndSortedClients : clients;
-
-    // CSV headers
-    const headers = [
-      "Name",
-      "Email",
-      "Phone",
-      "Company",
-      "Address",
-      "VAT Number",
-      "Tax Exempt",
-      "Notes",
-      "Created At",
-    ];
-
-    // Helper function to escape CSV values
-    const escapeCSV = (
-      value: string | null | undefined | boolean | Date
-    ): string => {
-      if (value === null || value === undefined) return "";
-      if (typeof value === "boolean") return value ? "Yes" : "No";
-      if (value instanceof Date) return value.toISOString().split("T")[0];
-      const str = String(value);
-      // Escape quotes and wrap in quotes if contains comma, quote, or newline
-      if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-        return `"${str.replace(/"/g, '""')}"`;
-      }
-      return str;
-    };
-
-    // Build CSV rows
-    const rows = clientsToExport.map(client => [
-      escapeCSV(client.name),
-      escapeCSV(client.email),
-      escapeCSV(client.phone),
-      escapeCSV(client.companyName),
-      escapeCSV(client.address),
-      escapeCSV(client.vatNumber),
-      escapeCSV(client.taxExempt),
-      escapeCSV(client.notes),
-      escapeCSV(new Date(client.createdAt)),
-    ]);
-
-    // Combine headers and rows
-    const csvContent = [
-      headers.join(","),
-      ...rows.map(row => row.join(",")),
-    ].join("\n");
-
-    // Create and download file
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `clients-export-${new Date().toISOString().split("T")[0]}.csv`
+    if (!clientToDelete) return;
+    executeDelete(
+      () => deleteClient.mutate({ id: clientToDelete.id }),
+      () => {
+        setDeleteDialogOpen(false);
+        setClientToDelete(null);
+      },
+      clientToDelete.name
     );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    toast.success(`Exported ${clientsToExport.length} client(s) to CSV`);
   };
 
-  // Build active filter chips
-  const activeFilters = useMemo(() => {
-    const chips: Array<{
-      key: string;
-      label: string;
-      value: string;
-      onRemove: () => void;
-    }> = [];
+  const handleBulkDelete = () => {
+    setBulkDeleteDialogOpen(true);
+  };
 
-    if (filters.company !== "all") {
-      chips.push({
-        key: "company",
-        label: "Company",
-        value:
-          filters.company === "no-company" ? "No Company" : filters.company,
-        onRemove: () => setFilter("company", "all"),
-      });
-    }
+  const confirmBulkDelete = () => {
+    bulkDeleteClients.mutate({
+      ids: Array.from(selectedIds),
+    });
+    setBulkDeleteDialogOpen(false);
+  };
 
-    if (filters.taxExempt !== "all") {
-      chips.push({
-        key: "taxExempt",
-        label: "Tax",
-        value: filters.taxExempt === "exempt" ? "Exempt" : "Not Exempt",
-        onRemove: () => setFilter("taxExempt", "all"),
-      });
-    }
-
-    if (filters.dateRange !== "all") {
-      const dateLabels: Record<string, string> = {
-        today: "Today",
-        week: "Last 7 Days",
-        month: "Last 30 Days",
-        quarter: "Last 90 Days",
-        year: "Last Year",
-      };
-      chips.push({
-        key: "dateRange",
-        label: "Added",
-        value: dateLabels[filters.dateRange] || filters.dateRange,
-        onRemove: () => setFilter("dateRange", "all"),
-      });
-    }
-
-    if (filters.tag !== "all") {
-      const tag = tags?.find(t => t.id.toString() === filters.tag);
-      chips.push({
-        key: "tag",
-        label: "Tag",
-        value: filters.tag === "no-tags" ? "No Tags" : tag?.name || filters.tag,
-        onRemove: () => setFilter("tag", "all"),
-      });
-    }
-
-    return chips;
-  }, [filters, tags, setFilter]);
+  if (!isAuthenticated || loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <GearLoader />
+      </div>
+    );
+  }
 
   return (
-    <div className="page-wrapper">
+    <div className="min-h-screen bg-background">
       <Navigation />
-
-      {/* Main Content */}
-      <main
-        id="main-content"
-        className="page-content page-transition"
-        role="main"
-        aria-label="Clients"
-      >
-        {/* Page Header */}
-        <div className="page-header">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <main className="container mx-auto py-8">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="page-header-title">Clients</h1>
-              <p className="page-header-subtitle">
-                Manage your client database
+              <h1 className="text-3xl font-bold">Clients</h1>
+              <p className="text-muted-foreground mt-1">
+                Manage your client information and communication
               </p>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={handleExportCSV}
-                className="flex-1 sm:flex-initial touch-target"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Export CSV</span>
-                <span className="sm:hidden">Export</span>
-              </Button>
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 onClick={() => setImportDialogOpen(true)}
-                className="flex-1 sm:flex-initial touch-target"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Import CSV</span>
-                <span className="sm:hidden">Import</span>
+                Import CSV
               </Button>
-              <Button
-                onClick={handleAddNew}
-                className="flex-1 sm:flex-initial touch-target"
-              >
+              <Button onClick={() => {
+                setSelectedClient(null);
+                setClientDialogOpen(true);
+              }}>
                 <Plus className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Add Client</span>
-                <span className="sm:hidden">Add</span>
+                New Client
               </Button>
             </div>
           </div>
-        </div>
 
-        {/* Search and Filter */}
-        <FilterSection
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Search clients by name, email, phone, or company..."
-          activeFilters={activeFilters}
-          onClearAll={hasActiveFilters ? clearFilters : undefined}
-        >
-          <Select
-            value={sortField}
-            onValueChange={(value: SortField) => setSortField(value)}
-          >
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name">Sort by Name</SelectItem>
-              <SelectItem value="email">Sort by Email</SelectItem>
-              <SelectItem value="createdAt">Sort by Date Added</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant={filterModalOpen ? "secondary" : "outline"}
-            onClick={() => setFilterModalOpen(true)}
-            className="gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filters
-            {activeFilters.length > 0 && (
-              <Badge
-                variant="secondary"
-                className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-              >
-                {activeFilters.length}
-              </Badge>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() =>
-              setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-            }
-            title={sortDirection === "asc" ? "Ascending" : "Descending"}
-          >
-            {sortDirection === "asc" ? (
-              <ArrowUp className="h-4 w-4" />
-            ) : (
-              <ArrowDown className="h-4 w-4" />
-            )}
-          </Button>
-        </FilterSection>
-
-        {/* Filter Modal */}
-        <FilterModal
-          open={filterModalOpen}
-          onOpenChange={setFilterModalOpen}
-          title="Client Filters"
-          fields={[
-            {
-              key: "company",
-              label: "Company",
-              type: "select",
-              options: [
-                { value: "all", label: "All Companies" },
-                { value: "no-company", label: "No Company" },
-                ...uniqueCompanies.map(c => ({ value: c, label: c })),
-              ],
-            },
-            {
-              key: "taxExempt",
-              label: "Tax Status",
-              type: "select",
-              options: [
-                { value: "all", label: "All Statuses" },
-                { value: "exempt", label: "Tax Exempt" },
-                { value: "not-exempt", label: "Not Exempt" },
-              ],
-            },
-            {
-              key: "dateRange",
-              label: "Added",
-              type: "select",
-              options: [
-                { value: "all", label: "Any Time" },
-                { value: "today", label: "Today" },
-                { value: "week", label: "Last 7 Days" },
-                { value: "month", label: "Last 30 Days" },
-                { value: "quarter", label: "Last 90 Days" },
-                { value: "year", label: "Last Year" },
-              ],
-            },
-            {
-              key: "tag",
-              label: "Tag",
-              type: "select",
-              options: [
-                { value: "all", label: "All Tags" },
-                { value: "no-tags", label: "No Tags" },
-                ...(tags?.map(t => ({
-                  value: t.id.toString(),
-                  label: t.name,
-                })) || []),
-              ],
-            },
-          ]}
-          values={filters}
-          onChange={setFilter}
-          onClear={clearFilters}
-        />
-
-        <BulkActionsBar
-          isSomeSelected={isSomeSelected}
-          selectedIds={selectedIds}
-          setSelectedIds={setSelectedIds}
-          tags={tags}
-          bulkAssignTag={bulkAssignTag}
-          handleBulkDelete={handleBulkDelete}
-        />
-
-        <ClientTable
-          paginatedClients={paginatedClients}
-          filteredAndSortedClients={filteredAndSortedClients}
-          selectedIds={selectedIds}
-          currentSort={currentSort}
-          handleSort={handleSort}
-          handleSelectOne={handleSelectOne}
-          clientTagsMap={clientTagsMap}
-          removeTagMutation={removeTagMutation}
-        />
-                        >
-                          <TableCell>
-                            <Checkbox
-                              checked={selectedIds.has(client.id)}
-                              onCheckedChange={checked =>
-                                handleSelectOne(client.id, !!checked)
-                              }
-                              aria-label={`Select ${client.name}`}
-                            />
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {client.name}
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {client.email && (
-                                <div className="flex items-center gap-2 text-sm">
-                                  <Mail className="h-3 w-3 text-muted-foreground" />
-                                  <span>{client.email}</span>
-                                </div>
-                              )}
-                              {client.phone && (
-                                <div className="flex items-center gap-2 text-sm">
-                                  <Phone className="h-3 w-3 text-muted-foreground" />
-                                  <span>{client.phone}</span>
-                                </div>
-                              )}
-                              {!client.email && !client.phone && (
-                                <span className="text-sm text-muted-foreground">
-                                  No contact info
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {client.companyName || (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {(clientTagsMap.get(client.id) || []).map(tag => (
-                                <Badge
-                                  key={tag.id}
-                                  variant="secondary"
-                                  className="text-xs cursor-pointer hover:opacity-80"
-                                  style={{
-                                    backgroundColor: tag.color + "20",
-                                    color: tag.color,
-                                    borderColor: tag.color,
-                                  }}
-                                  onClick={() =>
-                                    removeTagMutation.mutate({
-                                      clientId: client.id,
-                                      tagId: tag.id,
-                                    })
-                                  }
-                                  title="Click to remove"
-                                >
-                                  {tag.name}
-                                  <X className="h-3 w-3 ml-1" />
-                                </Badge>
-                              ))}
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    aria-label={`Add tag to ${client.name}`}
-                                  >
-                                    <Tag className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  {tags && tags.length > 0 ? (
-                                    tags.map(tag => {
-                                      const isAssigned = (
-                                        clientTagsMap.get(client.id) || []
-                                      ).some(t => t.id === tag.id);
-                                      return (
-                                        <DropdownMenuItem
-                                          key={tag.id}
-                                          onClick={() => {
-                                            if (isAssigned) {
-                                              removeTagMutation.mutate({
-                                                clientId: client.id,
-                                                tagId: tag.id,
-                                              });
-                                            } else {
-                                              assignTag.mutate({
-                                                clientId: client.id,
-                                                tagId: tag.id,
-                                              });
-                                            }
-                                          }}
-                                        >
-                                          <div
-                                            className="w-3 h-3 rounded-full mr-2"
-                                            style={{
-                                              backgroundColor: tag.color,
-                                            }}
-                                          />
-                                          {tag.name}
-                                          {isAssigned && (
-                                            <span className="ml-auto text-primary">
-                                              ✓
-                                            </span>
-                                          )}
-                                        </DropdownMenuItem>
-                                      );
-                                    })
-                                  ) : (
-                                    <DropdownMenuItem disabled>
-                                      No tags created
-                                    </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {client.vatNumber ? (
-                                <span className="text-sm font-mono">
-                                  {client.vatNumber}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">—</span>
-                              )}
-                              {client.taxExempt && (
-                                <Badge
-                                  variant="secondary"
-                                  className="text-xs flex items-center gap-1 w-fit"
-                                >
-                                  <ShieldCheck className="h-3 w-3" />
-                                  Tax Exempt
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {client.address ? (
-                              <div className="flex items-start gap-2 text-sm max-w-xs">
-                                <MapPin className="h-3 w-3 text-muted-foreground mt-0.5 flex-shrink-0" />
-                                <span className="line-clamp-2">
-                                  {client.address}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handlePortalAccess(client)}
-                                aria-label={`Manage portal access for ${client.name}`}
-                              >
-                                <Key className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEdit(client)}
-                                aria-label={`Edit ${client.name}`}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDelete(client)}
-                                className="text-destructive hover:text-destructive"
-                                aria-label={`Delete ${client.name}`}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+          {/* Search and Filter Bar */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, email, or company..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant={hasActiveFilters ? "default" : "outline"}
+                    onClick={() => setFilterModalOpen(true)}
+                  >
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filters {hasActiveFilters && `(${Object.values(filters).filter(f => f !== "all").length})`}
+                  </Button>
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => clearFilters()}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Content */}
+          <div>
+            {clientsLoading ? (
+              <ClientsTableSkeleton />
+            ) : clients && clients.length === 0 ? (
+              <EmptyState preset={EmptyStatePresets.CLIENTS} />
+            ) : filteredAndSortedClients.length === 0 ? (
+              <Card>
+                <CardContent className="pt-12 pb-12 text-center">
+                  <p className="text-muted-foreground">
+                    No clients match your filters
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                <BulkActionsBar
+                  isSomeSelected={isSomeSelected}
+                  selectedIds={selectedIds}
+                  setSelectedIds={setSelectedIds}
+                  tags={tags}
+                  bulkAssignTag={bulkAssignTag}
+                  handleBulkDelete={handleBulkDelete}
+                />
+
+                <ClientTable
+                  paginatedClients={paginatedClients}
+                  filteredAndSortedClients={filteredAndSortedClients}
+                  selectedIds={selectedIds}
+                  currentSort={currentSort}
+                  handleSort={handleSort}
+                  handleSelectOne={handleSelectOne}
+                  clientTagsMap={clientTagsMap}
+                  removeTagMutation={removeTagMutation}
+                />
 
                 {/* Mobile Card View */}
                 <div className="md:hidden space-y-3">

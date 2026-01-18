@@ -223,12 +223,12 @@ export function InvoiceTable({
                           </TooltipTrigger>
                           <TooltipContent side="top">
                             <span className="text-xs">
-                              {invoice.quickbooks?.synced ? (
+                              {invoice.quickbooks?.synced && (
                                 <div className="font-medium">
                                   Synced to QuickBooks
                                 </div>
                               )}
-                              {invoice.quickbooks.lastSyncedAt && (
+                              {invoice.quickbooks?.lastSyncedAt && (
                                 <div className="text-muted-foreground">
                                   {new Date(
                                     invoice.quickbooks.lastSyncedAt
