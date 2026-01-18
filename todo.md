@@ -369,3 +369,4 @@
 | 2026-01-18 | Test Portal Access feature | ✅ Complete |
 | 2026-01-18 | Fix navbar avatar profile dropdown showing only one option | ✅ Complete |
 | 2026-01-18 | Add hamburger menu to tablet view navigation | ✅ Complete |
+| 2026-01-18 | Fix sidebar animation flickering when it appears | ✅ Complete |
