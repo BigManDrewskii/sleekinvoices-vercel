@@ -7,12 +7,8 @@ import type {
 import {
   batchInvoiceTemplates,
   batchInvoiceTemplateLineItems,
-  clientTags,
-  clientTagAssignments,
-  clients,
 } from "../../drizzle/schema.js";
 import { getDb } from "./connection.js";
-import type { Client } from "../../drizzle/schema.js";
 
 export async function getBatchInvoiceTemplates(
   userId: number
@@ -293,41 +289,4 @@ export async function updateBatchTemplateLineItems(
 
   // Create new line items
   await createBatchTemplateLineItems(templateId, items);
-}
-
-/**
- * Get clients by tag ID for batch invoice creation
- */
-export async function getClientsByTagId(
-  tagId: number,
-  userId: number
-): Promise<Client[]> {
-  const db = await getDb();
-  if (!db) return [];
-
-  // Verify tag belongs to user
-  const [tag] = await db
-    .select()
-    .from(clientTags)
-    .where(and(eq(clientTags.id, tagId), eq(clientTags.userId, userId)))
-    .limit(1);
-
-  if (!tag) return [];
-
-  // Get all client IDs with this tag
-  const assignments = await db
-    .select({ clientId: clientTagAssignments.clientId })
-    .from(clientTagAssignments)
-    .where(eq(clientTagAssignments.tagId, tagId));
-
-  if (assignments.length === 0) return [];
-
-  const clientIds = assignments.map(a => a.clientId);
-
-  // Get the clients
-  return await db
-    .select()
-    .from(clients)
-    .where(and(eq(clients.userId, userId), inArray(clients.id, clientIds)))
-    .orderBy(clients.name);
 }

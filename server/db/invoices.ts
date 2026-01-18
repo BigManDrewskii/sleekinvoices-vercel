@@ -577,27 +577,6 @@ export async function getInvoiceStatusBreakdown(userId: number) {
 }
 
 // ============================================================================
-// INVOICE TEMPLATE OPERATIONS
-// ============================================================================
-
-export async function getDefaultTemplate(userId: number) {
-  const db = await getDb();
-  if (!db) return null;
-
-  const results = await db
-    .select()
-    .from(invoiceTemplates)
-    .where(
-      and(
-        eq(invoiceTemplates.userId, userId),
-        eq(invoiceTemplates.isDefault, true)
-      )
-    );
-
-  return results[0] || null;
-}
-
-// ============================================================================
 // INVOICE VIEW TRACKING
 // ============================================================================
 
