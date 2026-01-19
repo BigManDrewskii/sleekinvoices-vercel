@@ -127,14 +127,14 @@ describe("Authentication Flow Enhancement", () => {
       expect(landingContent).toContain("useAuth");
     });
 
-    it("should redirect authenticated users to dashboard", () => {
-      expect(landingContent).toContain("isAuthenticated");
-      expect(landingContent).toContain("/dashboard");
+    it("should be accessible to all users (no redirect)", () => {
+      // Landing page is now public - no redirect for authenticated users
+      expect(landingContent).toContain("Landing page is now public");
     });
 
-    it("should use setLocation for redirect", () => {
-      expect(landingContent).toContain("useLocation");
-      expect(landingContent).toContain("setLocation");
+    it("should use useAuth for navbar state only", () => {
+      // Auth is only used to determine navbar buttons (Dashboard vs Login/SignUp)
+      expect(landingContent).toContain("useAuth");
     });
 
     it("should show loading state while checking auth", () => {
