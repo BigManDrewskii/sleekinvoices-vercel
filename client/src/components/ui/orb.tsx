@@ -67,7 +67,7 @@ export function Orb({
         type="button"
       >
         <img
-          src="/sleeky/sleekyAI-Avatar.png"
+          src="/sleeky/ai-avatars/avatar.png"
           alt="Sleeky AI Assistant"
           className={cn(
             "w-full h-full object-cover",

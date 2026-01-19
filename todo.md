@@ -422,3 +422,9 @@
 - [x] Run pnpm audit fix - reduced from 15 to 12 vulnerabilities (remaining are in dev dependencies)
 - [x] Add DOMPurify sanitization for user-generated HTML content (EmailTemplateEditor)
 - [x] Add CSRF tokens for sensitive mutations (Custom Header Validation pattern)
+
+## Image Optimization - Jan 19, 2026
+- [x] Replace mascot images with optimized versions (33MB → 6.3MB, 81% reduction)
+- [x] Consolidate duplicate images to single source
+- [x] Update code references to use consolidated paths
+- [x] Remove old duplicate image files
