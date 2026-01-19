@@ -102,6 +102,7 @@ export function EmptyState({
             <img
               src={illustration}
               alt=""
+              loading="lazy"
               className={cn(sizes.illustration, "object-contain opacity-95")}
             />
           ) : (

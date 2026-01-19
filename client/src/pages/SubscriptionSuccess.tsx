@@ -44,6 +44,7 @@ export default function SubscriptionSuccess() {
               <img
                 src="/sleeky/success-states/subscription-upgraded.png"
                 alt="Sleeky celebrating your Pro upgrade!"
+                loading="lazy"
                 className="h-40 w-40 object-contain animate-bounce-subtle"
               />
             </div>

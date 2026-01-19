@@ -428,3 +428,7 @@
 - [x] Consolidate duplicate images to single source
 - [x] Update code references to use consolidated paths
 - [x] Remove old duplicate image files
+
+## Lazy Loading for Mascot Images - Jan 19, 2026
+- [x] Add loading="lazy" to all mascot/sleeky images
+- [x] Verify lazy loading works correctly

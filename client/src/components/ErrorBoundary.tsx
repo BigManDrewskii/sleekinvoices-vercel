@@ -30,6 +30,7 @@ class ErrorBoundary extends Component<Props, State> {
             <img
               src="/sleeky/error-states/error.png"
               alt="Sleeky looking concerned about the error"
+              loading="lazy"
               className="h-48 w-48 object-contain mb-6 animate-bounce-subtle"
             />
 

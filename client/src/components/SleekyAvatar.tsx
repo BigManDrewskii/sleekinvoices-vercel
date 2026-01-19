@@ -108,6 +108,7 @@ export function SleekyAvatar({
       <img
         src="/sleeky/ai-avatars/avatar.png"
         alt={alt}
+        loading="lazy"
         width={sizeClasses[size] === "w-6 h-6" ? 24 : sizeClasses[size] === "w-8 h-8" ? 32 : sizeClasses[size] === "w-10 h-10" ? 40 : sizeClasses[size] === "w-12 h-12" ? 48 : sizeClasses[size] === "w-14 h-14" ? 56 : 64}
         height={sizeClasses[size] === "w-6 h-6" ? 24 : sizeClasses[size] === "w-8 h-8" ? 32 : sizeClasses[size] === "w-10 h-10" ? 40 : sizeClasses[size] === "w-12 h-12" ? 48 : sizeClasses[size] === "w-14 h-14" ? 56 : 64}
         className={cn("w-full h-full object-cover", borderRadiusClasses[size])}

@@ -69,6 +69,7 @@ export function Orb({
         <img
           src="/sleeky/ai-avatars/avatar.png"
           alt="Sleeky AI Assistant"
+          loading="lazy"
           className={cn(
             "w-full h-full object-cover",
             borderRadiusClasses[size]
