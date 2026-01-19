@@ -414,3 +414,11 @@
 - [ ] Redirect authenticated users from landing page to dashboard (optional)
 
 - [x] Add automatic redirect for authenticated users from landing page to dashboard
+
+
+## Security Improvements - Jan 19, 2026
+- [x] Update @trpc/server, @trpc/client, @trpc/react-query to fix prototype pollution (11.6.0 → 11.8.1)
+- [x] Update pdfjs-dist to fix PDF.js vulnerability (3.11.174 → 4.10.38)
+- [x] Run pnpm audit fix - reduced from 15 to 12 vulnerabilities (remaining are in dev dependencies)
+- [x] Add DOMPurify sanitization for user-generated HTML content (EmailTemplateEditor)
+- [x] Add CSRF tokens for sensitive mutations (Custom Header Validation pattern)

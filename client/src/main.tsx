@@ -95,11 +95,21 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
+// CSRF header name and value for protection against cross-site request forgery
+const CSRF_HEADER_NAME = "x-csrf-protection";
+const CSRF_HEADER_VALUE = "1";
+
 const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
+      headers() {
+        // Include CSRF protection header on all requests
+        return {
+          [CSRF_HEADER_NAME]: CSRF_HEADER_VALUE,
+        };
+      },
       fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),

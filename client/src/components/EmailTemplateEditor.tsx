@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from "react";
+import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -270,13 +271,36 @@ export function EmailTemplateEditor({
       .replace(/(?<!span)>/g, "&gt;")
       .replace(/\n/g, "<br>");
 
-    return preview;
+    // Sanitize the HTML to prevent XSS attacks
+    return DOMPurify.sanitize(preview, {
+      ALLOWED_TAGS: ["span", "br", "p"],
+      ALLOWED_ATTR: ["class"],
+    });
   }, [value, isHtmlTemplate]);
 
   // Generate HTML content for iframe preview
   const iframeContent = useMemo(() => {
     if (!isHtmlTemplate || !value) return "";
-    return replaceVariables(value);
+    // Sanitize HTML content to prevent XSS while allowing email-safe tags
+    const sanitizedHtml = DOMPurify.sanitize(replaceVariables(value), {
+      ALLOWED_TAGS: [
+        "html", "head", "body", "style", "meta", "title",
+        "div", "span", "p", "br", "hr",
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "table", "thead", "tbody", "tr", "td", "th",
+        "a", "img", "strong", "b", "em", "i", "u",
+        "ul", "ol", "li", "blockquote", "pre", "code",
+        "center", "font"
+      ],
+      ALLOWED_ATTR: [
+        "style", "class", "id", "href", "src", "alt", "title",
+        "width", "height", "border", "cellpadding", "cellspacing",
+        "align", "valign", "bgcolor", "color", "face", "size",
+        "target", "rel"
+      ],
+      ALLOW_DATA_ATTR: false,
+    });
+    return sanitizedHtml;
   }, [value, isHtmlTemplate]);
 
   // Insert variable at cursor position

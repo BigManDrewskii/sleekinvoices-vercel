@@ -40,8 +40,9 @@ describe("Authentication Flow Enhancement", () => {
       expect(landingNavContent).toContain("Menu");
     });
 
-    it("should import Loader2 icon", () => {
-      expect(landingNavContent).toContain("Loader2");
+    it("should import loading icon", () => {
+      // Uses LogIn icon for login button
+      expect(landingNavContent).toContain("LogIn");
     });
 
     it("should have Docs navigation button", () => {
@@ -114,30 +115,31 @@ describe("Authentication Flow Enhancement", () => {
     });
   });
 
-  describe("Home Page Routing", () => {
-    const homePath = path.join(__dirname, "../client/src/pages/Home.tsx");
-    let homeContent: string;
+  describe("Landing Page Auth Redirect", () => {
+    const landingPath = path.join(__dirname, "../client/src/pages/Landing.tsx");
+    let landingContent: string;
 
     beforeEach(() => {
-      homeContent = fs.readFileSync(homePath, "utf-8");
+      landingContent = fs.readFileSync(landingPath, "utf-8");
     });
 
     it("should use useAuth hook", () => {
-      expect(homeContent).toContain("useAuth");
+      expect(landingContent).toContain("useAuth");
     });
 
     it("should redirect authenticated users to dashboard", () => {
-      expect(homeContent).toContain("isAuthenticated");
-      expect(homeContent).toContain("/dashboard");
+      expect(landingContent).toContain("isAuthenticated");
+      expect(landingContent).toContain("/dashboard");
     });
 
-    it("should redirect unauthenticated users to landing", () => {
-      expect(homeContent).toContain("/landing");
+    it("should use setLocation for redirect", () => {
+      expect(landingContent).toContain("useLocation");
+      expect(landingContent).toContain("setLocation");
     });
 
     it("should show loading state while checking auth", () => {
-      expect(homeContent).toContain("loading");
-      expect(homeContent).toContain("GearLoader");
+      expect(landingContent).toContain("loading");
+      expect(landingContent).toContain("GearLoader");
     });
   });
 

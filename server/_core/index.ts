@@ -13,6 +13,7 @@ import { serveStatic, setupVite } from "./vite";
 import { initializeScheduler } from "../jobs/scheduler";
 import { initializeDefaultCurrencies } from "../currency";
 import { standardRateLimit, strictRateLimit } from "./rateLimit";
+import { csrfProtection } from "./csrf";
 
 import {
   initializeErrorMonitoring,
@@ -269,6 +270,9 @@ async function startServer() {
       res.status(500).json({ error: errorMessage });
     }
   });
+
+  // CSRF protection for API endpoints (must be before tRPC)
+  app.use("/api/trpc", csrfProtection);
 
   // Rate limiting for API endpoints
   app.use("/api/trpc", standardRateLimit);
