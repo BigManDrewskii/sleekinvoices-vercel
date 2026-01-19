@@ -64,6 +64,24 @@ const queryClient = new QueryClient({
   },
 });
 
+// Public paths that should NOT redirect to login on auth errors
+const PUBLIC_PATHS = [
+  "/",
+  "/landing",
+  "/docs",
+  "/terms",
+  "/privacy",
+  "/refund-policy",
+  "/portal", // Client portal paths start with /portal
+];
+
+const isPublicPath = () => {
+  const path = window.location.pathname;
+  return PUBLIC_PATHS.some(publicPath => 
+    path === publicPath || path.startsWith(`${publicPath}/`) || path.startsWith("/portal/")
+  );
+};
+
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
@@ -71,6 +89,9 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
 
   if (!isUnauthorized) return;
+
+  // Don't redirect on public pages - they should work without auth
+  if (isPublicPath()) return;
 
   window.location.href = getLoginUrl();
 };

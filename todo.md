@@ -443,3 +443,8 @@
 - [x] Remove auto-redirect for authenticated users on landing page
 - [x] Allow all users (logged in or not) to view landing page
 - [x] Navbar already shows appropriate buttons based on auth state (Dashboard for logged in, Login/SignUp for visitors)
+
+
+## Bug Fix: Landing Page Redirect - Jan 19, 2026
+- [x] Fix unauthenticated users being redirected from landing page to login
+- [x] Ensure landing page is fully public with no auth requirements
