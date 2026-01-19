@@ -412,3 +412,5 @@
 - [x] Ensure all dashboard-related routes are behind auth wall
 - [x] Update navbar to show Login/Sign Up for unauthenticated users on landing page
 - [ ] Redirect authenticated users from landing page to dashboard (optional)
+
+- [x] Add automatic redirect for authenticated users from landing page to dashboard
