@@ -14,9 +14,8 @@ import { AIAssistantProvider } from "./contexts/AIAssistantContext";
 import { CookieConsentProvider } from "./contexts/CookieConsentContext";
 import { CookieConsentBanner } from "./components/CookieConsentBanner";
 
-// Eager load: Public pages (landing, home, client portal)
+// Eager load: Public pages (landing, client portal, legal)
 // These are needed immediately for anonymous visitors
-import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Docs from "./pages/Docs";
 import ClientPortal from "./pages/ClientPortal";
@@ -83,7 +82,8 @@ function Router() {
       <Suspense fallback={<LoadingFallback />}>
         <Switch>
           {/* Public routes - eager loaded */}
-          <Route path={"/"} component={Home} />
+          {/* Landing page is now the default homepage */}
+          <Route path={"/"} component={Landing} />
           <Route path={"/landing"} component={Landing} />
           <Route path={"/docs"} component={Docs} />
           <Route path="/portal/:accessToken" component={ClientPortal} />
@@ -92,6 +92,7 @@ function Router() {
           <Route path="/refund-policy" component={RefundPolicy} />
 
           {/* Authenticated routes - lazy loaded */}
+          {/* All dashboard-related routes require authentication */}
           <Route path={"/dashboard"} component={Dashboard} />
           <Route path={"/clients"} component={Clients} />
           <Route path={"/invoices"} component={Invoices} />

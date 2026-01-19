@@ -404,3 +404,11 @@
 | 2026-01-18 | Standardize z-index values with design tokens | ✅ Complete |
 | 2026-01-18 | Add aria-labels to 27 icon-only buttons for WCAG 2.1 AA compliance | ✅ Complete |
 | 2026-01-18 | Explore Polar payment integration alongside Stripe | 🔄 In Progress |
+
+
+## Landing Page as Default Homepage - Jan 19, 2026
+- [x] Make landing page the default route at `/` (public, no auth required)
+- [x] Move dashboard to `/dashboard` route (auth required)
+- [x] Ensure all dashboard-related routes are behind auth wall
+- [x] Update navbar to show Login/Sign Up for unauthenticated users on landing page
+- [ ] Redirect authenticated users from landing page to dashboard (optional)
