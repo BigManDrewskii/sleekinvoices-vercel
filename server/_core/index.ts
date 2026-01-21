@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-import express from "express";
+import express, { type Express } from "express";
 
 // Load .env.local for local development
 dotenv.config({ path: ".env.local" });
 import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
+import { registerAuthRoutes } from "./auth-routes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -65,9 +65,12 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 
-async function startServer() {
+/**
+ * Create and configure the Express application
+ * This function is exported for use in both local development and Vercel serverless
+ */
+export function createApp(): Express {
   const app = express();
-  const server = createServer(app);
 
   // Stripe webhook endpoint (MUST be before JSON body parser for raw body)
   app.post(
@@ -331,7 +334,8 @@ async function startServer() {
   });
 
   // OAuth callback under /api/oauth/callback
-  registerOAuthRoutes(app);
+  registerAuthRoutes(app);
+
   // tRPC API
   app.use(
     "/api/trpc",
@@ -340,11 +344,26 @@ async function startServer() {
       createContext,
     })
   );
+
+  return app;
+}
+
+/**
+ * Start the development server
+ * Only used in local development - Vercel handles server startup in production
+ */
+async function startServer() {
+  const app = createApp();
+  const server = createServer(app);
+
   // development mode uses Vite, production mode uses static files
-  if (process.env.NODE_ENV === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  // In Vercel, static files are served via vercel.json routes, so we skip this
+  if (!process.env.VERCEL) {
+    if (process.env.NODE_ENV === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
@@ -369,8 +388,19 @@ async function startServer() {
     }
 
     // Initialize cron jobs for automated tasks
-    initializeScheduler();
+    // Skip in Vercel (serverless functions can't run continuous cron jobs)
+    if (!process.env.VERCEL) {
+      initializeScheduler();
+    }
   });
 }
 
-startServer().catch(console.error);
+// Export app for Vercel serverless function
+export const app = createApp();
+export default app;
+
+// Auto-start server in local development
+// require.main === module ensures this only runs when executed directly (not imported)
+if (require.main === module || process.env.NODE_ENV === "development") {
+  startServer().catch(console.error);
+}

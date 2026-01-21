@@ -26,6 +26,15 @@ pnpm format
 # Generate and run migrations
 pnpm db:push
 
+# Audit database schema (check for inconsistencies)
+pnpm db:audit
+
+# Sync database schema (development)
+pnpm db:sync
+
+# Reset user data (careful!)
+pnpm db:reset
+
 # Seed database with test data (local dev only)
 pnpm seed
 ```
@@ -40,7 +49,7 @@ pnpm test
 pnpm test --watch
 
 # Run specific test file
-pnpm test server/templates.test.ts
+pnpm test server/ai/assistant.test.ts
 ```
 
 ### Production
@@ -57,81 +66,100 @@ pnpm start
 
 ### Tech Stack
 
-- **Frontend**: React 19, TailwindCSS 4, TypeScript, Wouter (routing)
-- **Backend**: Express, tRPC 11, Drizzle ORM
-- **Database**: MySQL (TiDB compatible)
-- **Auth**: Manus OAuth (bypassed in local dev with SKIP_AUTH=true)
-- **Payments**: Stripe + NOWPayments (crypto)
-- **PDF**: Puppeteer
-- **Email**: Resend
-- **Storage**: S3 (AWS SDK)
-- **AI**: OpenRouter API
+- **Frontend**: React 19, TailwindCSS 4, TypeScript, Wouter (routing), React Query
+- **Backend**: Express, tRPC 11, Drizzle ORM, node-cron
+- **Database**: MySQL (TiDB compatible) with Drizzle ORM
+- **Auth**: Manus OAuth with JWT session cookies (bypassed in local dev with SKIP_AUTH=true)
+- **Payments**: Stripe + NOWPayments (crypto subscriptions)
+- **PDF**: Puppeteer (headless Chrome)
+- **Email**: Resend API with delivery tracking webhooks
+- **Storage**: S3-compatible API (AWS SDK v3)
+- **AI**: OpenRouter API with multiple LLM backends
+- **Monitoring**: Sentry (error tracking)
+- **Testing**: Vitest
+- **Build**: Vite + esbuild
 
 ### Project Structure
 
 ```
 ├── client/src/          # React frontend
-│   ├── pages/          # Page components
-│   ├── components/     # Reusable UI components
-│   ├── contexts/       # React contexts (AI, Onboarding, Theme)
+│   ├── pages/          # Page components (30+ routes)
+│   ├── components/     # Reusable UI components (shadcn/ui based)
+│   ├── contexts/       # React contexts (AI, Theme, Cookie Consent)
 │   ├── hooks/          # Custom React hooks
-│   ├── lib/            # Utilities (tRPC, decimal math, fonts, HSL)
-│   └── App.tsx         # Routes and app shell
+│   ├── lib/            # Utilities (tRPC client, decimal math, fonts)
+│   ├── _core/          # Core hooks and utilities
+│   └── App.tsx         # Wouter routes + app shell
 ├── server/             # Express + tRPC backend
-│   ├── _core/          # Framework code (don't modify)
-│   ├── routers.ts      # tRPC API routes
-│   ├── db.ts           # Database queries (Drizzle)
+│   ├── _core/          # Framework code (OAuth, context, error monitoring)
+│   ├── routers.ts      # tRPC API router definitions
+│   ├── db.ts           # Database queries (Drizzle ORM)
 │   ├── pdf.ts          # PDF generation (Puppeteer)
 │   ├── email.ts        # Email sending (Resend)
 │   ├── stripe.ts       # Stripe integration
 │   ├── ai/             # AI features (assistant, smart compose)
-│   ├── lib/            # Backend utilities
-│   └── webhooks/       # Webhook handlers
+│   ├── jobs/           # Cron jobs (recurring invoices, reminders)
+│   ├── webhooks/       # Webhook handlers (Stripe, Resend, NOWPayments)
+│   ├── storage.ts      # S3 file operations
+│   └── lib/            # Backend utilities
 ├── drizzle/            # Database schema and migrations
-│   └── schema.ts       # All table definitions
+│   └── schema.ts       # 43+ table definitions with Drizzle
 ├── shared/             # Shared types between client/server
-└── scripts/            # Utility scripts
+└── scripts/            # Utility scripts (seeding, schema sync)
 ```
 
 ## Key Architectural Patterns
 
 ### 1. tRPC API Architecture
 
-- All API endpoints defined in `server/routers.ts`
-- Client calls via `@/lib/trpc.ts`
-- Use `protectedProcedure` for authenticated routes
-- Use `publicProcedure` for public routes (landing, webhooks)
+- All API endpoints defined in `server/routers.ts` (single-file router)
+- Client calls via `client/src/lib/trpc.ts` (createTRPCReact)
+- Use `protectedProcedure` for authenticated routes (requires `ctx.user`)
+- Use `publicProcedure` for public routes (landing page, webhooks, client portal)
 - Input validation with Zod schemas
+- Context creation in `server/_core/context.ts` (handles SKIP_AUTH dev mode)
+- Error monitoring via Sentry (`server/_core/errorMonitoring.ts`)
+
+**CRITICAL**: SKIP_AUTH=true will throw in production (security block in context.ts)
 
 ### 2. Database Layer
 
 - All queries in `server/db.ts` (no inline SQL in routers)
 - Use Drizzle ORM query builder (not raw SQL)
-- Schema defined in `drizzle/schema.ts`
-- Run `pnpm db:push` after schema changes
+- Schema defined in `drizzle/schema.ts` (43 tables with full type inference)
+- Run `pnpm db:push` after schema changes to generate migrations
+- Decimal.js for financial calculations (avoid floating point math)
+- Connection pooling via mysql2
 
-### 3. Authentication Flow
+### 3. Authentication & Authorization Flow
 
-- Production: Manus OAuth with JWT session cookies
-- Local Dev: Set `SKIP_AUTH=true` in `.env.local` to bypass
+- Production: Manus OAuth with JWT session cookies (httpOnly, secure, SameSite)
+- Local Dev: Set `SKIP_AUTH=true` in `.env.local` to auto-authenticate as "dev-user-local"
 - Session user available in `ctx.user` for protected procedures
-- Frontend gets user from `useQuery(api.auth.me)`
+- Frontend gets user from `api.auth.me` query
+- CSRF protection via custom header validation (server/_core/csrf.ts)
+- Rate limiting: standard (100 req/15min) and strict (20 req/15min) for sensitive routes
 
 ### 4. Frontend Patterns
 
-- UI components use shadcn/ui conventions (in `client/src/components`)
-- State management: React Query (tRPC) + Context API
+- UI components use shadcn/ui conventions (Radix UI + TailwindCSS)
+- State management: React Query via tRPC for server state + Context API for client state
 - Forms: react-hook-form with Zod validation
-- Routing: Wouter (`<Route path="..." component={...} />`)
+- Routing: Wouter with lazy loading for authenticated pages
 - Toasts: Sonner (`toast.success()`, `toast.error()`)
-- Theme: next-themes (light/dark with tweakcn color system)
+- Theme: next-themes (light/dark with CSS variables)
+- Error boundaries: Catch render errors and show fallback UI
+- Loading states: Skeleton components for all async data
 
 ### 5. Styling System
 
-- TailwindCSS 4 with custom theme in `client/src/index.css`
-- Design tokens: Uses tweakcn color palette
-- Dark mode: Automatic with CSS variables
-- Icons: Phosphor Icons (@phosphor-icons/react) - use Bold weight for primary actions
+- TailwindCSS 4 with Vite plugin (automatic CSS scanning)
+- Custom theme in `client/src/index.css` with CSS variables
+- Dark mode: Automatic via next-themes (prefers-color-scheme)
+- Icons: Phosphor Icons (@phosphor-icons/react) - Bold weight for primary actions
+- Responsive breakpoints: Mobile first (320px base, 768px tablet, 1024px desktop)
+- Utility classes: `card-glow`, `hover-lift`, `stagger-fade-in`, `gradient-text`
+- Manual chunk splitting in vite.config.ts for vendor bundles (React, Radix, forms, etc.)
 
 ### 6. Invoice Template System
 
@@ -143,10 +171,12 @@ pnpm start
 
 ### 7. AI Features
 
-- AI Assistant: Chat interface in sidebar (`AIAssistant.tsx`)
-- Smart Compose: Extract invoice data from text (`server/ai/smartCompose.ts`)
-- OpenRouter API for LLM calls
-- Lazy-loaded to reduce main bundle size
+- AI Assistant: Chat interface with streaming responses, context persistence
+- Smart Compose: Extract invoice data from natural language text
+- OpenRouter API integration with multiple LLM backends (Gemini, Claude, etc.)
+- Lazy-loaded to reduce main bundle size (vendor-ai-markdown chunk)
+- Credit-based rate limiting: 5 credits/month free, 50 credits/month pro
+- Usage tracking via `aiCredits` and `aiUsageLogs` tables
 
 ## Important Implementation Details
 
@@ -188,23 +218,41 @@ pnpm start
 ### Performance Optimizations
 
 - Code splitting: AI features, charts lazy-loaded
-- Manual chunks in `vite.config.ts` for better caching
+- Manual chunks in `vite.config.ts` for better caching (React, Radix, forms, Stripe, etc.)
 - Skeleton loaders for async data
 - Pagination on large lists (invoices, clients, payments)
+- Image optimization before S3 upload (Sharp)
+- Lazy loading for all mascot images
+
+### Background Jobs (Cron)
+
+- Recurring invoice generation (daily check at midnight)
+- Overdue invoice detection (daily)
+- Payment reminder scheduling (automated based on due dates)
+- Initialized in `server/_core/index.ts` via `initializeScheduler()`
+
+### Webhook Handlers
+
+- **Stripe**: Payment events, subscription updates (`server/webhooks/stripe.ts`)
+- **Resend**: Email delivery tracking (`server/webhooks/resend.ts`)
+- **NOWPayments**: Crypto payment confirmations (`server/webhooks/nowpayments.ts`)
+- All webhooks verify signatures before processing
 
 ## Common Development Tasks
 
 ### Adding a New Page
 
 1. Create component in `client/src/pages/`
-2. Add route in `client/src/App.tsx`
+2. Add lazy-loaded route in `client/src/App.tsx`
 3. Add navigation link in `client/src/components/Navigation.tsx`
+4. If authenticated: wrap in lazy(), if public: eager load (Landing, Docs, etc.)
 
 ### Adding a New API Endpoint
 
 1. Define procedure in `server/routers.ts`
 2. Add database query in `server/db.ts` if needed
 3. Call from frontend via `api.yourRouter.yourProcedure.useQuery()`
+4. Use `protectedProcedure` if auth required, `publicProcedure` otherwise
 
 ### Modifying Database Schema
 
@@ -256,37 +304,39 @@ open http://localhost:5173
 
 Set `SKIP_AUTH=true` in `.env.local` to bypass OAuth and auto-login as dev user.
 
-## Important Notes
+## Important Implementation Notes
 
-### Code Quality Standards
+### Decimal Precision for Financial Calculations
 
-- **Type Safety**: No `any` without justification; prefer `unknown`
-- **Error Handling**: Always handle promise rejections with try/catch
-- **Forms**: Use react-hook-form + Zod validation
-- **Database**: Use Drizzle query builder, not raw SQL
-- **Comments**: Only where logic isn't self-evident (no "what" comments)
+- **ALWAYS** use Decimal.js for money math (import Decimal from "decimal.js")
+- NEVER use native JavaScript numbers (floating point errors)
+- Example: `new Decimal(amount).times(taxRate).toDecimalPlaces(2)`
+- All invoice totals, tax calculations, and line item sums use Decimal.js
 
-### Testing Requirements
+### Type Safety Standards
 
-- Write tests for all new API procedures
-- Test invoice calculation logic (decimal precision)
-- Test subscription limit enforcement
-- Test database queries with edge cases
+- NO `any` without explicit justification comment
+- NO `@ts-ignore` or `@ts-expect-error` without explanation
+- Prefer `unknown` over `any` when type is truly unknown
+- Use explicit return types on exported functions
 
-### Performance Considerations
+### Error Handling Patterns
 
-- Lazy load heavy dependencies (AI, charts)
-- Use pagination for large datasets
-- Add loading skeletons for async data
-- Optimize images before S3 upload (Sharp)
+- Always handle promise rejections with try/catch
+- Use Error boundaries for React components
+- Server errors sent to Sentry for monitoring
+- User-facing errors via toast notifications (Sonner)
 
-### Security Reminders
+### Security Checklist
 
-- Validate all user input with Zod
-- Use `protectedProcedure` for authenticated routes
-- Never expose API keys in frontend
-- Sanitize HTML in email templates
-- Verify Stripe webhook signatures
+- [ ] Input validation with Zod schemas on all tRPC procedures
+- [ ] SQL injection protection via Drizzle ORM (no raw SQL)
+- [ ] XSS protection via React escaping + DOMPurify for HTML
+- [ ] CSRF protection via custom headers on mutations
+- [ ] Rate limiting on sensitive endpoints
+- [ ] Webhook signature verification (Stripe, Resend, NOWPayments)
+- [ ] httpOnly + secure + SameSite cookies for sessions
+- [ ] Never expose API keys in frontend code
 
 ## Troubleshooting
 
@@ -307,3 +357,10 @@ Set `SKIP_AUTH=true` in `.env.local` to bypass OAuth and auto-login as dev user.
 - Ensure database is accessible
 - Check for stale test data
 - Run single test: `pnpm test path/to/test.ts`
+
+### Performance Issues
+
+- Check bundle size: Run `pnpm build` and review chunk sizes
+- Use React DevTools Profiler to identify slow renders
+- Enable lazy loading for heavy components
+- Verify pagination is working on large lists

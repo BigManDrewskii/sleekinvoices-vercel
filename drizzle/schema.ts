@@ -1,4 +1,5 @@
 import {
+  char,
   int,
   mysqlEnum,
   mysqlTable,
@@ -15,14 +16,22 @@ import {
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+
+  // NEW: Add UUID for Auth.js compatibility
+  uuid: char("uuid", { length: 36 }).unique(),
+
+  openId: varchar("openId", { length: 64 }).unique(), // Keep for migration
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
 
+  // NEW: Auth.js standard fields
+  emailVerified: timestamp("emailVerified"),
+  image: text("image"), // Renamed from avatarUrl for Auth.js
+
   // Profile
-  avatarUrl: text("avatarUrl"), // Custom uploaded avatar URL
+  avatarUrl: text("avatarUrl"), // Keep for migration period
   avatarType: mysqlEnum("avatarType", ["initials", "boring", "upload"]).default(
     "initials"
   ), // Avatar display type
@@ -63,6 +72,54 @@ export const users = mysqlTable("users", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+/**
+ * Auth.js account table (OAuth provider linkage)
+ * Links OAuth providers (Google, GitHub) to local user accounts
+ */
+export const accounts = mysqlTable("accounts", {
+  id: char("id", { length: 36 }).primaryKey(),
+  userId: int("userId")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+  type: varchar("type", { length: 50 }).notNull(),
+  provider: varchar("provider", { length: 50 }).notNull(),
+  providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
+  refresh_token: text("refresh_token"),
+  access_token: text("access_token"),
+  expires_at: int("expires_at"),
+  token_type: varchar("token_type", { length: 50 }),
+  scope: varchar("scope", { length: 255 }),
+  id_token: text("id_token"),
+  session_state: varchar("session_state", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Account = typeof accounts.$inferSelect;
+export type InsertAccount = typeof accounts.$inferInsert;
+
+/**
+ * Auth.js sessions table (JWT tracking)
+ * Stores active user sessions for authentication
+ */
+export const sessions = mysqlTable("sessions", {
+  id: char("id", { length: 36 }).primaryKey(),
+  userId: int("userId")
+    .notNull()
+    .references(() => users.id, {
+      onDelete: "cascade",
+    }),
+  expires: timestamp("expires").notNull(),
+  sessionToken: varchar("sessionToken", { length: 255 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Session = typeof sessions.$inferSelect;
+export type InsertSession = typeof sessions.$inferInsert;
 
 /**
  * Usage tracking table for enforcing invoice limits on free tier

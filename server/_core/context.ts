@@ -1,6 +1,6 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
+import { authHandler } from "./auth";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -13,16 +13,14 @@ export async function createContext(
 ): Promise<TrpcContext> {
   let user: User | null = null;
 
-  // SECURITY: Explicitly block SKIP_AUTH in production
+  // SKIP_AUTH bypass (KEEP THIS!) - Development mode
   if (process.env.SKIP_AUTH === "true") {
     if (process.env.NODE_ENV === "production") {
       throw new Error(
-        "CRITICAL SECURITY ERROR: SKIP_AUTH is enabled in production. " +
-          "This is a severe security vulnerability. Deployment blocked."
+        "CRITICAL SECURITY ERROR: SKIP_AUTH is enabled in production"
       );
     }
 
-    // Development mode only: Auto-authenticate with dev user
     const { getUserByOpenId, upsertUser } = await import("../db");
 
     let devUser = await getUserByOpenId("dev-user-local");
@@ -45,11 +43,25 @@ export async function createContext(
     };
   }
 
-  // Regular authentication flow
+  // Auth.js session validation
   try {
-    user = await sdk.authenticateRequest(opts.req);
+    const url = new URL(opts.req.url || "", `http://${opts.req.headers.host}`);
+    const request = new Request(url, {
+      headers: opts.req.headers as HeadersInit,
+      body:
+        opts.req.method === "POST" ? JSON.stringify(opts.req.body) : undefined,
+    });
+
+    const response = await authHandler(request);
+    const sessionData = (await response.json()) as { user?: { id: string } };
+
+    if (sessionData.user?.id) {
+      const userId = parseInt(sessionData.user.id);
+      const { getUserById } = await import("../db");
+      user = await getUserById(userId);
+    }
   } catch (error) {
-    // Authentication is optional for public procedures.
+    console.warn("[Auth] Session validation failed:", error);
     user = null;
   }
 

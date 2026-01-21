@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import * as mysql from "mysql2/promise";
+import type { PoolOptions } from "mysql2";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 let _pool: mysql.Pool | null = null;
@@ -9,7 +10,10 @@ export async function getDb() {
     try {
       // Parse DATABASE_URL to create connection pool
       const url = new URL(process.env.DATABASE_URL);
-      const connectionConfig = {
+      const isLocalhost =
+        url.hostname === "localhost" || url.hostname === "127.0.0.1";
+
+      const connectionConfig: PoolOptions = {
         host: url.hostname || "localhost",
         port: parseInt(url.port) || 3306,
         user: url.username,
@@ -18,9 +22,11 @@ export async function getDb() {
         multipleStatements: false,
         supportBigNumbers: true,
         bigNumberStrings: false,
-        ssl: {
-          rejectUnauthorized: true,
-        },
+        ssl: isLocalhost
+          ? undefined
+          : {
+              rejectUnauthorized: true,
+            },
       };
 
       _pool = mysql.createPool(connectionConfig) as unknown as Exclude<

@@ -18,6 +18,8 @@
     "seed": "NODE_ENV=development tsx server/seed/index.ts"
   },
   "dependencies": {
+    "@auth/core": "^0.34.3",
+    "@auth/drizzle-adapter": "^1.11.1",
     "@aws-sdk/client-s3": "^3.693.0",
     "@aws-sdk/s3-request-presigner": "^3.693.0",
     "@hookform/resolvers": "^5.2.2",
@@ -59,6 +61,7 @@
     "@trpc/server": "^11.8.1",
     "@types/archiver": "^7.0.0",
     "archiver": "^7.0.1",
+    "arctic": "^3.7.0",
     "axios": "^1.12.0",
     "boring-avatars": "^2.0.4",
     "canvas-confetti": "^1.9.4",
