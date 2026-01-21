@@ -1,11 +1,11 @@
 // Vercel API Handler
 // This file serves as the entry point for Vercel serverless functions
-// It delegates all requests to the Express application defined in server/_core/index.ts
+// It delegates all requests to the Express application bundled at dist/index.js
 
-import { app } from '../server/_core/index';
+import { app } from '../dist/index.js';
 
 // Vercel serverless function handler
 // Vercel provides req/res in Express-compatible format
-export default function handler(req: any, res: any) {
+export default function handler(req, res) {
   app(req, res);
 }

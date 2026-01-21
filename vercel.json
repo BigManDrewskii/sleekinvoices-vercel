@@ -10,16 +10,12 @@
     "api/**/*.js": {
       "memory": 1024,
       "maxDuration": 30
-    },
-    "api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 30
     }
   },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.ts"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json))",
