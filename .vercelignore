@@ -1,4 +1,4 @@
-# Ignore server bundle - it's only imported by api/index.js
+# Note: Function detection happens before .vercelignore filtering
+# The routing in vercel.json handles this correctly
 dist/index.js
-# Keep other build outputs
 !dist/public/**
