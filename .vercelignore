@@ -1,5 +1,3 @@
-# Exclude server bundle from deployment (Vercel ignores _ prefixed dirs)
-dist/_server/**
 # Keep frontend build artifacts
 !dist/public/**
-# Cache bust 1768991727
+# Cache bust 1768993022
