@@ -117,3 +117,5 @@ research/ARCHIVE/
 
 # Local notes
 notes/
+.vercel
+.env*.local
