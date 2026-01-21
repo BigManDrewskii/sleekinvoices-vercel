@@ -2,3 +2,4 @@
 dist/_server/**
 # Keep frontend build artifacts
 !dist/public/**
+# Cache bust 1768991727
