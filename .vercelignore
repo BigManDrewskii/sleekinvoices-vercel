@@ -1,4 +1,4 @@
-# Note: Function detection happens before .vercelignore filtering
-# The routing in vercel.json handles this correctly
-dist/index.js
+# Exclude server bundle from deployment (Vercel ignores _ prefixed dirs)
+dist/_server/**
+# Keep frontend build artifacts
 !dist/public/**
