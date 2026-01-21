@@ -1,0 +1,4 @@
+# Ignore server bundle - it's only imported by api/index.js
+dist/index.js
+# Keep other build outputs
+!dist/public/**
